@@ -18,13 +18,21 @@
 
 Laravel Cashier provides an expressive, fluent interface to [Stripe's](https://stripe.com) subscription billing services.
 
+### Composer
+
 First, add the Cashier package to your `composer.json` file:
 
 	"laravel/cashier": "~1.0"
 
+### Server Provider
+
 Next, register the `Laravel\Cashier\CashierServiceProvider` in your `app` configuration file.
 
+### Migration
+
 Before using Cashier, we'll need to add several columns to your database. Don't worry, you can use the `cashier:table` Artisan command to create a migration to add the necessary column. Once the migration has been created, simply run the `migrate` command.
+
+### Model Setup
 
 Next, add the BillableTrait and appropriate date mutators to your model definition:
 
@@ -39,6 +47,8 @@ class User extends Eloquent {
 
 }
 ```
+
+### Stripe Key
 
 Finally, set your Stripe key in one of your bootstrap files:
 
