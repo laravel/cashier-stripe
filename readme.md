@@ -134,7 +134,6 @@ Route::filter('subscribed', function()
 	{
 		return Redirect::to('billing');
 	}
-}
 });
 ```
 
