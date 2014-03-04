@@ -12,6 +12,8 @@
 <a name="configuration"></a>
 ## Configuration
 
+> **Note:** Cashier requires PHP version 5.4 or greater.
+
 First, add the Cashier package to your `composer.json` file:
 
 	"laravel/cashier": "~1.0"
