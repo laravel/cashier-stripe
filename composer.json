@@ -1,6 +1,8 @@
 {
     "name": "laravel/cashier",
     "description": "",
+    "keywords": ["laravel", "stripe", "billing"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -17,7 +19,7 @@
     },
     "require-dev": {
         "illuminate/view": "~4.1",
-        "mockery/mockery": "0.8.*"
+        "mockery/mockery": "0.9.*"
     },
     "autoload": {
         "psr-0": {
