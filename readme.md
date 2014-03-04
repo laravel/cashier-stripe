@@ -7,6 +7,7 @@
 - [Cancelling A Subscription](#cancelling-a-subscription)
 - [Resuming A Subscription](#resuming-a-subscription)
 - [Checking Subscription Status](#checking-subscription-status)
+- [Handling Failed Payments](#handling-failed-payments)
 - [Invoices](#invoices)
 
 <a name="configuration"></a>
@@ -182,6 +183,35 @@ if ($user->everSubscribed())
 	//
 }
 ```
+
+<a name="handling-failed-payments"></a>
+## Handling Failed Payments
+
+What if a customer's credit card expires? No worries - Cashier includes a Webhook controller that can easily cancel the customer's subscription for you. Just point a route to the controller:
+
+```php
+Route::get('stripe/webhook', 'Laravel\Cashier\WebhookController@handleWebhook');
+```
+
+The `stripe/webhook` URI in this example is just for example. You will need to configure the URI in your Stripe settings.
+
+If you have additional Stripe webhook events you would like to handle, simply extend the Webhook controller:
+
+```php
+class WebhookController extends Laravel\Cashier\WebhookController {
+
+	public function handleWebhook()
+	{
+		// Handle other events...
+
+		// Fallback to failed payment check...
+		return parent::handleWebhook();
+	}
+
+}
+```
+
+> **Note:** In addition to updating the subscription information in your database, the Webhook controller will also cancel the subscription via the Stripe API.
 
 <a name="invoices"></a>
 ## Invoices
