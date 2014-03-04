@@ -38,8 +38,9 @@ Next, add the BillableTrait and appropriate date mutators to your model definiti
 
 ```php
 use Laravel\Cashier\BillableTrait;
+use Laravel\Cashier\BillableInterface;
 
-class User extends Eloquent {
+class User extends Eloquent implements BillableInterface {
 
 	use BillableTrait;
 
