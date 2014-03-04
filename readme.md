@@ -106,7 +106,7 @@ If the user is on trial, the trial will be maintained as normal. Also, if a "qua
 <a name="subscription-quantity"></a>
 ## Subscription Quantity
 
-Sometimes subscription are affected by "quantity". For example, your application might charge $10 per month per user on an account. To easily increment or decrement your subscription quantity, use the `increment` and `decrement` methods:
+Sometimes subscriptions are affected by "quantity". For example, your application might charge $10 per month per user on an account. To easily increment or decrement your subscription quantity, use the `increment` and `decrement` methods:
 
 ```php
 $user = User::find(1);
