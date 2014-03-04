@@ -38,7 +38,9 @@ class User extends Eloquent {
 
 In one of your bootstrap files, set your Stripe key:
 
+```php
 User::setStripeKey('stripe-key');
+```
 
 <a name="subscribing-to-a-plan"></a>
 ## Subscribing To A Plan
