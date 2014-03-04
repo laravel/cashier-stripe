@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Laravel\Cashier\Invoice;
+use Laravel\Cashier\CurrencySymbol;
 
 class InvoiceTest extends PHPUnit_Framework_TestCase {
 
@@ -13,8 +14,9 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 
 	public function testGettingDollarTotalOfInvoice()
 	{
-		$invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000]);
-		$this->assertEquals('$100.00', $invoice->dollars());
+		$invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000 , 'currency'=>'usd' ]);
+		$currencySymbol = ( new CurrencySymbol( $invoice->currency ) )->get();
+		$this->assertEquals($currencySymbol.'100.00', $invoice->dollars());
 	}
 
 
@@ -56,9 +58,10 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 
 	public function testDiscountCanBeRetrieved()
 	{
-		$invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000, 'subtotal' => 20000]);
+		$invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000, 'subtotal' => 20000,'currency'=>'usd']);
 		$this->assertEquals(100.00, $invoice->discount());
-		$this->assertEquals('$100', $invoice->discountDollars());
+		$currencySymbol = ( new CurrencySymbol( $invoice->currency ) )->get();
+		$this->assertEquals($currencySymbol.'100', $invoice->discountCurrency());
 	}
 
 

@@ -15,6 +15,13 @@ trait BillableTrait {
 	protected static $stripeKey;
 
 	/**
+	 * The Stripe Currency Setting
+	 *
+	 * @var string
+	 */
+	protected static $currency;
+
+	/**
 	 * Get the name that should be shown on the entity's invoices.
 	 *
 	 * @return string
@@ -411,6 +418,27 @@ trait BillableTrait {
 	public static function setStripeKey($key)
 	{
 		static::$stripeKey = $key;
+	}
+
+	/**
+	 * Set the Stripe Currency To Use
+	 *
+	 * @param  string  $currency
+	 * @return void
+	 */
+	public static function setCurrency($currency)
+	{
+		static::$currency = $currency;
+	}
+
+	/**
+	 * Get the Stripe API key.
+	 *
+	 * @return string
+	 */
+	public function getCurrency()
+	{
+		return static::$stripeKey ?: Config::get('services.stripe.currency');
 	}
 
 }

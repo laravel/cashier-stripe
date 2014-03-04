@@ -10,6 +10,20 @@ class LineItem {
 	protected $stripeLine;
 
 	/**
+	 * The Currency The Line Item Is In
+	 *
+	 * @var string
+	 */
+	protected $currency;
+
+	/**
+	 * The Symbol to use for the currency this line item is in
+	 *
+	 * @var string
+	 */
+	protected $currencySymbol;
+
+	/**
 	 * Create a new line item instance.
 	 *
 	 * @param  object  $stripeLine
@@ -18,22 +32,36 @@ class LineItem {
 	public function __construct($stripeLine)
 	{
 		$this->stripeLine = $stripeLine;
+		$this->currency = isset( $stripeLine->currency ) ? $stripeLine->currency : 'usd';
+		$this->currencySymbol = ( new CurrencySymbol( $this->currency ) )->get();
 	}
 
 	/**
 	 * Get the total amount for the line item in dollars.
 	 *
+	 * @param  string $symbol The Symbol you want to show
 	 * @return string
 	 */
 	public function dollars()
 	{
+		return $this->totalWithCurrency();
+	}
+
+	/**
+	 * Get the total amount for the line item in the currency symbol of your choice
+	 *
+	 * @param  string $symbol The Symbol you want to show
+	 * @return string
+	 */
+	public function totalWithCurrency($symbol)
+	{
 		if (starts_with($total = $this->total(), '-'))
 		{
-			return '-$'.ltrim($total, '-');
+			return '-'.$this->currencySymbol.ltrim($total, '-');
 		}
 		else
 		{
-			return '$'.$total;
+			return $this->currencySymbol.$total;
 		}
 	}
 
