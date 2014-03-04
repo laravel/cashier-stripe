@@ -47,7 +47,7 @@ User::setStripeKey('stripe-key');
 <a name="subscribing-to-a-plan"></a>
 ## Subscribing To A Plan
 
-Once you have a model instance, you can easily subscribe that user to a given Stripe plane:
+Once you have a model instance, you can easily subscribe that user to a given Stripe plan:
 
 ```php
 $user = User::find(1);
