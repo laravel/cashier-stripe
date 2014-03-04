@@ -19,6 +19,10 @@ Laravel Cashier provides a fluent interface to [Stripe's](https://stripe.com) su
 First, add the Cashier package to your `composer.json` file:
 
 	"laravel/cashier": "~1.0"
+	
+Next, install Cashier's Service Provider in `/app/config/app.php`'s `providers` array.
+
+	"Laravel\Cashier\CashierServiceProvider",
 
 To use Cashier, we'll need to add several columns to your database. Don't worry, you can use the `cashier:table` Artisan command to create a migration to add the necessary column. Once the migration has been created, simply run the `migrate` command.
 
