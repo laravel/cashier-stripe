@@ -4,6 +4,7 @@
 - [Subscribing To A Plan](#subscribing-to-a-plan)
 - [No Card Up Front](#no-card-up-front)
 - [Swapping Subscriptions](#swapping-subscriptions)
+- [Subscription Quantity](#subscription-quantity)
 - [Cancelling A Subscription](#cancelling-a-subscription)
 - [Resuming A Subscription](#resuming-a-subscription)
 - [Checking Subscription Status](#checking-subscription-status)
@@ -101,6 +102,25 @@ $user->subscription('premium')->swap();
 ```
 
 If the user is on trial, the trial will be maintained as normal. Also, if a "quantity" exists for the subscription, that quantity will also be maintained.
+
+<a name="subscription-quantity"></a>
+## Subscription Quantity
+
+Sometimes subscription are affected by "quantity". For example, your application might charge $10 per month per user on an account. To easily increment or decrement your subscription quantity, use the `increment` and `decrement` methods:
+
+```php
+$user = User::find(1);
+
+$user->subscription()->increment();
+
+// Add five to the subscription's current quantity...
+$user->subscription()->increment(5)
+
+$user->subscription->decrement();
+
+// Subtract five to the subscription's current quantity...
+$user->subscription()->decrement(5)
+```
 
 <a name="cancelling-a-subscription"></a>
 ## Cancelling A Subscription
