@@ -14,13 +14,15 @@
 
 > **Note:** Because of its use of traits, Cashier requires PHP 5.4 or greater.
 
-Laravel Cashier provides a fluent interface to [Stripe's](https://stripe.com) subscription billing services.
+Laravel Cashier provides an expressive, fluent interface to [Stripe's](https://stripe.com) subscription billing services.
 
 First, add the Cashier package to your `composer.json` file:
 
 	"laravel/cashier": "~1.0"
 
-To use Cashier, we'll need to add several columns to your database. Don't worry, you can use the `cashier:table` Artisan command to create a migration to add the necessary column. Once the migration has been created, simply run the `migrate` command.
+Next, register the `Laravel\Cashier\CashierServiceProvider` in your `app` configuration file.
+
+Before using Cashier, we'll need to add several columns to your database. Don't worry, you can use the `cashier:table` Artisan command to create a migration to add the necessary column. Once the migration has been created, simply run the `migrate` command.
 
 Next, add the BillableTrait and appropriate date mutators to your model definition:
 
