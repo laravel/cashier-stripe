@@ -14,6 +14,8 @@
 
 > **Note:** Because of its use of traits, Cashier requires PHP 5.4 or greater.
 
+Laravel Cashier provides a fluent interface to [Stripe's](https://stripe.com) subscription billing services.
+
 First, add the Cashier package to your `composer.json` file:
 
 	"laravel/cashier": "~1.0"
@@ -33,6 +35,10 @@ class User extends Eloquent {
 
 }
 ```
+
+In one of your bootstrap files, set your Stripe key:
+
+User::setStripeKey('stripe-key');
 
 <a name="subscribing-to-a-plan"></a>
 ## Subscribing To A Plan
