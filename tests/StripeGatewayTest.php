@@ -15,12 +15,14 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 	public function testCreatePassesProperOptionsToCustomer()
 	{
 		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable->shouldReceive('getCurrency')->once()->andReturn('gbp');
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData]', array($billable, 'plan'));
 		$gateway->shouldReceive('createStripeCustomer')->andReturn($customer = m::mock('StdClass'));
 		$customer->shouldReceive('updateSubscription')->once()->with([
 			'coupon' => null,
 			'plan' => 'plan',
 			'prorate' => true,
+			'currency'=>'gbp',
 			'quantity' => 1,
 			'trial_end' => null,
 		]);
@@ -35,6 +37,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 	public function testCreatePassesProperOptionsToCustomerForTrialEnd()
 	{
 		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable->shouldReceive('getCurrency')->once()->andReturn('usd');
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData]', array($billable, 'plan'));
 		$gateway->shouldReceive('createStripeCustomer')->andReturn($customer = m::mock('StdClass'));
 		$customer->shouldReceive('updateSubscription')->once()->with([
@@ -42,6 +45,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			'plan' => 'plan',
 			'prorate' => true,
 			'quantity' => 1,
+			'currency' => 'usd',
 			'trial_end' => 'now',
 		]);
 		$customer->id = 'foo';
@@ -56,6 +60,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 	public function testCreateUtilizesGivenCustomerIfApplicable()
 	{
 		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable->shouldReceive('getCurrency')->once()->andReturn('usd');
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData]', array($billable, 'plan'));
 		$gateway->shouldReceive('createStripeCustomer')->never();
 		$customer = m::mock('StdClass');

@@ -87,6 +87,7 @@ class StripeGateway {
 			'plan' => $this->plan,
 			'prorate' => $this->prorate,
 			'quantity' => $this->quantity,
+			'currency' => $this->getCurrency(),
 			'trial_end' => $this->getTrialEndForUpdate(),
 		]);
 
@@ -575,6 +576,15 @@ class StripeGateway {
 	protected function getStripeKey()
 	{
 		return $this->billable->getStripeKey();
+	}
+
+	/**
+	 * Get the currency to be used throughout transactions
+	 * @return string
+	 */
+	protected function getCurrency()
+	{
+		return $this->billable->getCurrency();
 	}
 
 }
