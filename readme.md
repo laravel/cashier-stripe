@@ -36,7 +36,7 @@ class User extends Eloquent {
 }
 ```
 
-In one of your bootstrap files, set your Stripe key:
+Finally, set your Stripe key in one of your bootstrap files:
 
 ```php
 User::setStripeKey('stripe-key');
