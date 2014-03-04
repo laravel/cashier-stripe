@@ -23,7 +23,7 @@ class Invoice {
 	protected $stripeInvoice;
 
 	/**
-	 * Create a new invoiec instance.
+	 * Create a new invoice instance.
 	 *
 	 * @param  \Laravel\Cashier\BillableInterface  $billable
 	 * @param  object
