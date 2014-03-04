@@ -1,0 +1,28 @@
+{
+    "name": "laravel/cashier",
+    "description": "",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/filesystem": "~4.1",
+        "illuminate/support": "~4.1",
+        "nesbot/carbon": "~1.0",
+        "stripe/stripe-php": "~1.0",
+        "symfony/http-kernel": "~2.4"
+    },
+    "require-dev": {
+        "illuminate/view": "~4.1",
+        "mockery/mockery": "0.8.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Laravel\\Cashier\\": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
