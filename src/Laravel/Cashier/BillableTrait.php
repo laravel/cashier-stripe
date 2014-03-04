@@ -80,10 +80,8 @@ trait BillableTrait {
 		{
 			throw new NotFoundHttpException;
 		}
-		else
-		{
-			return $invoice;
-		}
+		
+		return $invoice;
 	}
 
 	/**
@@ -130,10 +128,8 @@ trait BillableTrait {
 		{
 			return Carbon::today()->lt($this->getTrialEndDate());
 		}
-		else
-		{
-			return false;
-		}
+		
+		return false;
 	}
 
 	/**
@@ -147,10 +143,9 @@ trait BillableTrait {
 		{
 			return Carbon::today()->lt(Carbon::instance($endsAt));
 		}
-		else
-		{
-			return false;
-		}
+			
+		
+		return false;
 	}
 
 	/**
@@ -164,10 +159,8 @@ trait BillableTrait {
 		{
 			return $this->stripeIsActive() || $this->onGracePeriod();
 		}
-		else
-		{
-			return $this->stripeIsActive() || $this->onTrial() || $this->onGracePeriod();
-		}
+		
+		return $this->stripeIsActive() || $this->onTrial() || $this->onGracePeriod();
 	}
 
 	/**
