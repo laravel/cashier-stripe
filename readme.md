@@ -12,7 +12,7 @@
 <a name="configuration"></a>
 ## Configuration
 
-> **Note:** Because of its user of traits, Cashier requires PHP 5.4 or greater.
+> **Note:** Because of its use of traits, Cashier requires PHP 5.4 or greater.
 
 First, add the Cashier package to your `composer.json` file:
 
