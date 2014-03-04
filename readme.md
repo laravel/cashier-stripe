@@ -125,6 +125,19 @@ if ($user->subscribed())
 }
 ```
 
+The `subscribed` method makes a great candidate for a route filter:
+
+```php
+Route::filter('subscribed', function()
+{
+	if (Auth::user() && ! Auth::user()->subscribed())
+	{
+		return Redirect::to('billing');
+	}
+}
+});
+```
+
 You may also determine if the user is still within their trial period (if applicable) using the `onTrial` method:
 
 ```php
