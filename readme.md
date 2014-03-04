@@ -20,6 +20,10 @@ Laravel Cashier provides an expressive, fluent interface to [Stripe's](https://s
 First, add the Cashier package to your `composer.json` file:
 
 	"laravel/cashier": "~1.0"
+	
+Next, install Cashier's Service Provider in `/app/config/app.php`'s `providers` array.
+
+	"Laravel\Cashier\CashierServiceProvider",
 
 Next, register the `Laravel\Cashier\CashierServiceProvider` in your `app` configuration file.
 
