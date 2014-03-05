@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use Symfony\Component\HttpFoundation\Response;
@@ -224,8 +225,10 @@ class Invoice {
 	public function view(array $data)
 	{
 		$data = array_merge($data, ['invoice' => $this, 'billable' => $this->billable]);
-
-		return View::make('cashier::receipt', $data);
+		
+		$view = Config::get('services.cashier.view') ?: 'cashier::receipt';
+		
+		return View::make($view, $data);
 	}
 
 	/**
