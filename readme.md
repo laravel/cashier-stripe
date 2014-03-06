@@ -24,7 +24,7 @@ First, add the Cashier package to your `composer.json` file:
 
 	"laravel/cashier": "~1.0"
 
-#### Server Provider
+#### Service Provider
 
 Next, register the `Laravel\Cashier\CashierServiceProvider` in your `app` configuration file.
 
