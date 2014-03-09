@@ -143,7 +143,7 @@ class StripeGateway {
 	 * @param  string  $token
 	 * @return void
 	 */
-	public function resume($token)
+	public function resume($token = null)
 	{
 		$this->noProrate()->skipTrial()->create($token, '', $this->getStripeCustomer());
 
