@@ -276,15 +276,22 @@ class StripeGateway {
 	 *
 	 * @return void
 	 */
-	public function cancel($atPeriodEnd = false)
+	public function cancel($atPeriodEnd = true)
 	{
 		$customer = $this->getStripeCustomer();
 
 		if ($customer->subscription)
 		{
-			$this->billable->setSubscriptionEndDate(
-				Carbon::createFromTimestamp($this->getSubscriptionEndTimestamp($customer))
-			);
+			if($atPeriodEnd)
+			{
+				$this->billable->setSubscriptionEndDate(
+					Carbon::createFromTimestamp($this->getSubscriptionEndTimestamp($customer))
+				);
+			}
+			else
+			{
+				$this->billable->setSubscriptionEndDate(Carbon::now());
+			}
 		}
 
 		$customer->cancelSubscription(['at_period_end' => $atPeriodEnd]);
@@ -300,6 +307,16 @@ class StripeGateway {
 	public function cancelAtEndOfPeriod()
 	{
 		return $this->cancel(true);
+	}
+	
+	/**
+	 * Cancel the billable entity's subscription immediately.
+	 *
+	 * @return void
+	 */
+	public function cancelNow()
+	{
+		return $this->cancel(false);
 	}
 
 	/**
