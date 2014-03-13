@@ -282,7 +282,7 @@ class StripeGateway {
 
 		if ($customer->subscription)
 		{
-			if($atPeriodEnd)
+			if ($atPeriodEnd)
 			{
 				$this->billable->setSubscriptionEndDate(
 					Carbon::createFromTimestamp($this->getSubscriptionEndTimestamp($customer))
