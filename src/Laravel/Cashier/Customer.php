@@ -38,7 +38,7 @@ class Customer extends Stripe_Customer {
 	 */
 	public function findSubscription($id)
 	{
-		foreach ($this->subscriptions as $subscription)
+		foreach ($this->subscriptions->all() as $subscription)
 		{
 			if ($subscription->id == $id) return $subscription;
 		}
