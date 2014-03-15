@@ -82,9 +82,9 @@ class StripeGateway {
 			$customer = $this->createStripeCustomer($token, $description);
 		}
 
-		$subscription = $customer->updateSubscription($this->buildPayload());
-
-		$this->billable->setStripeSubscription($subscription->id);
+		$this->billable->setStripeSubscription(
+			$customer->updateSubscription($this->buildPayload())->id
+		);
 
 		$this->updateLocalStripeData($this->getStripeCustomer($customer->id));
 	}
