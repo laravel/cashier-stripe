@@ -53,7 +53,7 @@ class Customer extends Stripe_Customer {
 	 * @param  array  $data
 	 * @return void
 	 */
-	public function updateSubscription(array $data)
+	public function updateSubscription($params = null)
 	{
 		if (is_null($this->subscription))
 		{
@@ -74,7 +74,7 @@ class Customer extends Stripe_Customer {
 	 * @param  array  $data
 	 * @return void
 	 */
-	public function cancelSubscription(array $data)
+	public function cancelSubscription($params = null)
 	{
 		return $this->subscription->cancel($data);
 	}
