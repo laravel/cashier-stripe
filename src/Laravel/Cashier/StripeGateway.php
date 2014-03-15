@@ -82,13 +82,15 @@ class StripeGateway {
 			$customer = $this->createStripeCustomer($token, $description);
 		}
 
-		$customer->updateSubscription([
+		$subscription = $customer->updateSubscription([
 			'coupon' => $this->coupon,
 			'plan' => $this->plan,
 			'prorate' => $this->prorate,
 			'quantity' => $this->quantity,
 			'trial_end' => $this->getTrialEndForUpdate(),
 		]);
+
+		$this->billable->setStripeSubscription($subscription->id);
 
 		$this->updateLocalStripeData($this->getStripeCustomer($customer->id));
 	}
@@ -392,7 +394,6 @@ class StripeGateway {
 		$this->billable
 				->setStripeId($customer->id)
 				->setStripePlan($plan ?: $this->plan)
-				->setStripeSubscription($customer->getStripeSubscription())
 				->setLastFourCardDigits($this->getLastFourCardDigits($customer))
 				->setStripeIsActive(true)
 				->setSubscriptionEndDate(null)
@@ -443,7 +444,7 @@ class StripeGateway {
 	protected function usingMultipleSubscriptionApi($customer)
 	{
 		return ! isset($customer->subscription) &&
-                 isset($customer->subscriptions) &&
+                 count($customer->subscriptions) > 0 &&
                  ! is_null($this->billable->getStripeSubscription());
 	}
 

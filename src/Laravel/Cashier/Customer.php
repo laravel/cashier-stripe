@@ -59,7 +59,7 @@ class Customer extends Stripe_Customer {
 	 * Update the current subscription with the given data.
 	 *
 	 * @param  array  $params
-	 * @return void
+	 * @return \Stripe_Subscription
 	 */
 	public function updateSubscription($params = null)
 	{
@@ -67,13 +67,28 @@ class Customer extends Stripe_Customer {
 		{
 			return $this->createSubscription($params);
 		}
+		else
+		{
+			return $this->saveSubscription($params);
+		}
+	}
 
+	/**
+	 * Save the current subscription with the given parameters.
+	 *
+	 * @param  array  $params
+	 * @return \Stripe_Subscription
+	 */
+	protected function saveSubscription($params)
+	{
 		foreach ($params as $key => $value)
 		{
 			$this->subscription->{$key} = $value;
 		}
 
 		$this->subscription->save();
+
+		return $this->subscription;
 	}
 
 	/**

@@ -23,8 +23,9 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			'prorate' => true,
 			'quantity' => 1,
 			'trial_end' => null,
-		]);
+		])->andReturn((object) ['id' => 'sub_id']);
 		$customer->id = 'foo';
+		$billable->shouldReceive('setStripeSubscription')->once()->with('sub_id');
 		$gateway->shouldReceive('getStripeCustomer')->once()->with('foo');
 		$gateway->shouldReceive('updateLocalStripeData')->once();
 
@@ -43,8 +44,9 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			'prorate' => true,
 			'quantity' => 1,
 			'trial_end' => 'now',
-		]);
+		])->andReturn((object) ['id' => 'sub_id']);
 		$customer->id = 'foo';
+		$billable->shouldReceive('setStripeSubscription')->once()->with('sub_id');
 		$gateway->shouldReceive('getStripeCustomer')->once()->with('foo');
 		$gateway->shouldReceive('updateLocalStripeData')->once();
 
@@ -59,7 +61,8 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData]', array($billable, 'plan'));
 		$gateway->shouldReceive('createStripeCustomer')->never();
 		$customer = m::mock('StdClass');
-		$customer->shouldReceive('updateSubscription')->once();
+		$customer->shouldReceive('updateSubscription')->once()->andReturn($sub = (object) ['id' => 'sub_id']);
+		$billable->shouldReceive('setStripeSubscription')->with('sub_id');
 		$customer->id = 'foo';
 		$gateway->shouldReceive('getStripeCustomer')->once()->with('foo');
 		$gateway->shouldReceive('updateLocalStripeData')->once();
@@ -193,7 +196,6 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		$billable = m::mock('Laravel\Cashier\BillableInterface');
 		$gateway = new StripeGateway($billable, 'plan');
 		$billable->shouldReceive('setStripeId')->once()->with('id')->andReturn($billable);
-		$billable->shouldReceive('setStripeSubscription')->once()->with('sub_id')->andReturn($billable);
 		$billable->shouldReceive('setStripePlan')->once()->with('plan')->andReturn($billable);
 		$billable->shouldReceive('setLastFourCardDigits')->once()->with('last-four')->andReturn($billable);
 		$billable->shouldReceive('setStripeIsActive')->once()->with(true)->andReturn($billable);
