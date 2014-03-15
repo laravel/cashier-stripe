@@ -428,7 +428,7 @@ class StripeGateway {
 
 		if ($this->usingMultipleSubscriptionApi($customer))
 		{
-			$customer->subscription = $customer->findSubscription($this->billable->stripe_subscription);
+			$customer->subscription = $customer->findSubscription($this->billable->getStripeSubscription());
 		}
 
 		return $customer;
@@ -444,7 +444,7 @@ class StripeGateway {
 	{
 		return ! isset($customer->subscription) &&
                  isset($customer->subscriptions) &&
-                 ! is_null($this->billable->getSubscriptionId());
+                 ! is_null($this->billable->getStripeSubscription());
 	}
 
 	/**
