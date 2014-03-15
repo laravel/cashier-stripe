@@ -289,7 +289,7 @@ class StripeGateway {
 
 		$customer->cancelSubscription(['at_period_end' => $atPeriodEnd]);
 
-		$this->billable->setStripeIsActive(false)->saveBillableInstance();
+		$this->billable->deactivateStripe()->saveBillableInstance();
 	}
 
 	/**
@@ -375,6 +375,7 @@ class StripeGateway {
 		$this->billable
 				->setStripeId($customer->id)
 				->setStripePlan($plan ?: $this->plan)
+				->setStripeSubscription($customer->getSubscriptionId())
 				->setLastFourCardDigits($this->getLastFourCardDigits($customer))
 				->setStripeIsActive(true)
 				->setSubscriptionEndDate(null)
@@ -404,7 +405,14 @@ class StripeGateway {
 	 */
 	public function getStripeCustomer($id = null)
 	{
-		return Stripe_Customer::retrieve($id ?: $this->billable->getStripeId(), $this->getStripeKey());
+		$customer = Customer::retrieve($id ?: $this->billable->getStripeId(), $this->getStripeKey());
+
+		if ( ! isset($customer->subscription) && isset($customer->subscriptions) && isset($this->billable->stripe_subscription))
+		{
+			$customer->subscription = $customer->findSubscription($this->billable->stripe_subscription);
+		}
+
+		return $customer;
 	}
 
 	/**

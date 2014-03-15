@@ -259,6 +259,20 @@ trait BillableTrait {
 	}
 
 	/**
+	 * Set Stripe as inactive on the entity.
+	 *
+	 * @return \Laravel\Cashier\BillableInterface
+	 */
+	public function deactivateStripe()
+	{
+		$this->setStripeIsActive(false);
+
+		$this->stripe_subscription = null;
+
+		return $this;
+	}
+
+	/**
 	 * Deteremine if the entity has a Stripe customer ID.
 	 *
 	 * @return bool
@@ -297,6 +311,29 @@ trait BillableTrait {
 	public function setStripeId($stripe_id)
 	{
 		$this->stripe_id = $stripe_id;
+
+		return $this;
+	}
+
+	/**
+	 * Get the current subscription ID.
+	 *
+	 * @return string
+	 */
+	public function getSubscriptionId()
+	{
+		return $this->stripe_subscription;
+	}
+
+	/**
+	 * Set the current subscription ID.
+	 *
+	 * @param  string  $subscription_id
+	 * @return \Laravel\Cashier\BillableInterface
+	 */
+	public function setSubscriptionId($subscription_id)
+	{
+		$this->stripe_subscription = $subscription_id;
 
 		return $this;
 	}
