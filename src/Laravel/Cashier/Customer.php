@@ -39,28 +39,28 @@ class Customer extends Stripe_Customer {
 	/**
 	 * Create the current subscription with the given data.
 	 *
-	 * @param  array  $data
+	 * @param  array  $params
 	 * @return void
 	 */
-	protected function createSubscription(array $data)
+	protected function createSubscription(array $params)
 	{
-		return $this->subscription = $this->subscriptions->create($data);
+		return $this->subscription = $this->subscriptions->create($params);
 	}
 
 	/**
 	 * Update the current subscription with the given data.
 	 *
-	 * @param  array  $data
+	 * @param  array  $params
 	 * @return void
 	 */
 	public function updateSubscription($params = null)
 	{
 		if (is_null($this->subscription))
 		{
-			return $this->createSubscription($data);
+			return $this->createSubscription($params);
 		}
 
-		foreach ($data as $key => $value)
+		foreach ($params as $key => $value)
 		{
 			$this->subscription->{$key} = $value;
 		}
@@ -71,12 +71,12 @@ class Customer extends Stripe_Customer {
 	/**
 	 * Cancel the current subscription.
 	 *
-	 * @param  array  $data
+	 * @param  array  $params
 	 * @return void
 	 */
 	public function cancelSubscription($params = null)
 	{
-		return $this->subscription->cancel($data);
+		return $this->subscription->cancel($params);
 	}
 
 }
