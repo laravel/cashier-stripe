@@ -82,13 +82,16 @@ class StripeGateway {
 			$customer = $this->createStripeCustomer($token, $description);
 		}
 
-		$subscription = $customer->updateSubscription([
-			'coupon' => $this->coupon,
+		$payload = [
 			'plan' => $this->plan,
 			'prorate' => $this->prorate,
 			'quantity' => $this->quantity,
 			'trial_end' => $this->getTrialEndForUpdate(),
-		]);
+		];
+
+		if ($this->coupon) $payload['coupon'] = $this->coupon;
+
+		$subscription = $customer->updateSubscription($payload);
 
 		$this->billable->setStripeSubscription($subscription->id);
 
@@ -298,7 +301,15 @@ class StripeGateway {
 
 		$customer->cancelSubscription(['at_period_end' => $atPeriodEnd]);
 
-		$this->billable->deactivateStripe()->saveBillableInstance();
+		if ($atPeriodEnd)
+		{
+			$this->billable->setStripeIsActive(false)->saveBillableInstance();
+		}
+		else
+		{
+			$this->billable->deactivateStripe()->saveBillableInstance();
+		}
+
 	}
 
 	/**
