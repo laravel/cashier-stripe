@@ -408,11 +408,13 @@ class StripeGateway {
 	 */
 	public function createStripeCustomer($token, $description)
 	{
-		return Stripe_Customer::create([
+		$customer = Stripe_Customer::create([
 			'card' => $token,
 			'description' => $description,
 
 		], $this->getStripeKey());
+
+		return $this->getStripeCustomer($customer->id);
 	}
 
 	/**
