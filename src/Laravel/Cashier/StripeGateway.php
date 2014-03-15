@@ -308,7 +308,7 @@ class StripeGateway {
 	{
 		return $this->cancel(true);
 	}
-	
+
 	/**
 	 * Cancel the billable entity's subscription immediately.
 	 *
@@ -424,12 +424,25 @@ class StripeGateway {
 	{
 		$customer = Customer::retrieve($id ?: $this->billable->getStripeId(), $this->getStripeKey());
 
-		if ( ! isset($customer->subscription) && isset($customer->subscriptions) && isset($this->billable->stripe_subscription))
+		if ($this->usingMultipleSubscriptionApi($customer))
 		{
 			$customer->subscription = $customer->findSubscription($this->billable->stripe_subscription);
 		}
 
 		return $customer;
+	}
+
+	/**
+	 * Deteremine if the customer has a subscription.
+	 *
+	 * @param  \Stripe_Customer  $customer
+	 * @return bool
+	 */
+	protected function usingMultipleSubscriptionApi($customer)
+	{
+		return ! isset($customer->subscription) &&
+                 isset($customer->subscriptions) &&
+                 ! is_null($this->billable->getSubscriptionId());
 	}
 
 	/**
