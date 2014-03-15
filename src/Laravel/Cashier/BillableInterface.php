@@ -115,6 +115,13 @@ interface BillableInterface {
 	public function setStripeIsActive($active = true);
 
 	/**
+	 * Set Stripe as inactive on the entity.
+	 *
+	 * @return \Laravel\Cashier\BillableInterface
+	 */
+	public function deactivateStripe();
+
+	/**
 	 * Get the Stripe ID for the entity.
 	 *
 	 * @return string
@@ -128,6 +135,21 @@ interface BillableInterface {
 	 * @return \Laravel\Cashier\BillableInterface
 	 */
 	public function setStripeId($stripe_id);
+
+	/**
+	 * Get the current subscription ID.
+	 *
+	 * @return string
+	 */
+	public function getStripeSubscription();
+
+	/**
+	 * Set the current subscription ID.
+	 *
+	 * @param  string  $subscription_id
+	 * @return \Laravel\Cashier\BillableInterface
+	 */
+	public function setStripeSubscription($subscription_id);
 
 	/**
 	 * Get the last four digits of the entity's credit card.

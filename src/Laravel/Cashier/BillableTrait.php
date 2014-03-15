@@ -320,7 +320,7 @@ trait BillableTrait {
 	 *
 	 * @return string
 	 */
-	public function getSubscriptionId()
+	public function getStripeSubscription()
 	{
 		return $this->stripe_subscription;
 	}
@@ -331,7 +331,7 @@ trait BillableTrait {
 	 * @param  string  $subscription_id
 	 * @return \Laravel\Cashier\BillableInterface
 	 */
-	public function setSubscriptionId($subscription_id)
+	public function setStripeSubscription($subscription_id)
 	{
 		$this->stripe_subscription = $subscription_id;
 
