@@ -82,20 +82,28 @@ class StripeGateway {
 			$customer = $this->createStripeCustomer($token, $description);
 		}
 
-		$payload = [
-			'plan' => $this->plan,
-			'prorate' => $this->prorate,
-			'quantity' => $this->quantity,
-			'trial_end' => $this->getTrialEndForUpdate(),
-		];
-
-		if ($this->coupon) $payload['coupon'] = $this->coupon;
-
-		$subscription = $customer->updateSubscription($payload);
+		$subscription = $customer->updateSubscription($this->buildPayload());
 
 		$this->billable->setStripeSubscription($subscription->id);
 
 		$this->updateLocalStripeData($this->getStripeCustomer($customer->id));
+	}
+
+	/**
+	 * Build the payload for a subscription create / update.
+	 *
+	 * @return array
+	 */
+	protected function buildPayload()
+	{
+		$payload = [
+			'plan' => $this->plan, 'prorate' => $this->prorate,
+			'quantity' => $this->quantity, 'trial_end' => $this->getTrialEndForUpdate(),
+		];
+
+		if ($this->coupon) $payload['coupon'] = $this->coupon;
+
+		return $payload;
 	}
 
 	/**
