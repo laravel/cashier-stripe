@@ -17,7 +17,7 @@ class Customer extends Stripe_Customer {
 	 *
 	 * @return string|null
 	 */
-	public function getSubscriptionId()
+	public function getStripeSubscription()
 	{
 		return $this->subscription ? $this->subscription->id : null;
 	}

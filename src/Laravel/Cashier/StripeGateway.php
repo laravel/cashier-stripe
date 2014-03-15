@@ -392,7 +392,7 @@ class StripeGateway {
 		$this->billable
 				->setStripeId($customer->id)
 				->setStripePlan($plan ?: $this->plan)
-				->setStripeSubscription($customer->getSubscriptionId())
+				->setStripeSubscription($customer->getStripeSubscription())
 				->setLastFourCardDigits($this->getLastFourCardDigits($customer))
 				->setStripeIsActive(true)
 				->setSubscriptionEndDate(null)
