@@ -18,7 +18,6 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData]', array($billable, 'plan'));
 		$gateway->shouldReceive('createStripeCustomer')->andReturn($customer = m::mock('StdClass'));
 		$customer->shouldReceive('updateSubscription')->once()->with([
-			'coupon' => null,
 			'plan' => 'plan',
 			'prorate' => true,
 			'quantity' => 1,
@@ -39,7 +38,6 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData]', array($billable, 'plan'));
 		$gateway->shouldReceive('createStripeCustomer')->andReturn($customer = m::mock('StdClass'));
 		$customer->shouldReceive('updateSubscription')->once()->with([
-			'coupon' => null,
 			'plan' => 'plan',
 			'prorate' => true,
 			'quantity' => 1,
@@ -126,7 +124,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			return $value;
 		});
 		$customer->shouldReceive('cancelSubscription')->once();
-		$billable->shouldReceive('deactivateStripe')->once()->andReturn($billable);
+		$billable->shouldReceive('setStripeIsActive')->once()->with(false)->andReturn($billable);
 		$billable->shouldReceive('saveBillableInstance')->once();
 
 		$gateway->cancel();
@@ -145,7 +143,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			return $value;
 		});
 		$customer->shouldReceive('cancelSubscription')->once();
-		$billable->shouldReceive('deactivateStripe')->once()->andReturn($billable);
+		$billable->shouldReceive('setStripeIsActive')->once()->with(false)->andReturn($billable);
 		$billable->shouldReceive('saveBillableInstance')->once();
 
 		$gateway->cancel();
