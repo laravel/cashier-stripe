@@ -13,6 +13,14 @@ class Customer extends Stripe_Customer {
 	public $subscription;
 
 	/**
+	 * {@inheritdoc}
+	 */
+	public static function retrieve($id, $apiKey = null)
+	{
+		return self::_scopedRetrieve(get_called_class(), $id, $apiKey);
+	}
+
+	/**
 	 * Get the current subscription ID.
 	 *
 	 * @return string|null
