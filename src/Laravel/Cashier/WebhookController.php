@@ -41,7 +41,7 @@ class WebhookController extends Controller {
 	}
 
 	/**
-	 * Determine if the invoiec has too many failed attempts.
+	 * Determine if the invoice has too many failed attempts.
 	 *
 	 * @param  array  $payload
 	 * @return bool

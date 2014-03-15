@@ -24,7 +24,7 @@ First, add the Cashier package to your `composer.json` file:
 
 	"laravel/cashier": "~1.0"
 
-#### Server Provider
+#### Service Provider
 
 Next, register the `Laravel\Cashier\CashierServiceProvider` in your `app` configuration file.
 
@@ -38,8 +38,9 @@ Next, add the BillableTrait and appropriate date mutators to your model definiti
 
 ```php
 use Laravel\Cashier\BillableTrait;
+use Laravel\Cashier\BillableInterface;
 
-class User extends Eloquent {
+class User extends Eloquent implements BillableInterface {
 
 	use BillableTrait;
 

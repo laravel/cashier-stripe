@@ -210,7 +210,7 @@ trait BillableTrait {
 	{
 		if ($plan instanceof PlanInterface) $plan = $plan->getStripeId();
 
-		return $this->stripeIsActive() && $this->subscription()->planId() == $plane;
+		return $this->stripeIsActive() && $this->subscription()->planId() == $plan;
 	}
 
 	/**
