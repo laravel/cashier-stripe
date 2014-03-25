@@ -88,10 +88,25 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		$customer->shouldReceive('updateSubscription')->once()->with([
 			'plan' => 1,
 			'quantity' => 5,
-			'trial_end' => null,
 		]);
 
 		$gateway = new StripeGateway(m::mock('Laravel\Cashier\BillableInterface'), 'plan');
+		$gateway->updateQuantity($customer, 5);
+	}
+
+
+	public function testUpdateQuantityWithTrialEnd()
+	{
+		$customer = m::mock('StdClass');
+		$customer->subscription = (object) ['plan' => (object) ['id' => 1]];
+		$customer->shouldReceive('updateSubscription')->once()->with([
+			'plan' => 1,
+			'quantity' => 5,
+			'trial_end' => 'now',
+		]);
+
+		$gateway = new StripeGateway(m::mock('Laravel\Cashier\BillableInterface'), 'plan');
+		$gateway->skipTrial();
 		$gateway->updateQuantity($customer, 5);
 	}
 

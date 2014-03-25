@@ -277,11 +277,17 @@ class StripeGateway {
 	 */
 	public function updateQuantity($customer, $quantity)
 	{
-		$customer->updateSubscription([
+		$subscription = [
 			'plan' => $customer->subscription->plan->id,
 			'quantity' => $quantity,
-			'trial_end' => $this->getTrialEndForUpdate(),
-		]);
+		];
+
+		if ($trialEnd = $this->getTrialEndForUpdate())
+		{
+			$subscription['trial_end'] = $trialEnd;
+		}
+
+		$customer->updateSubscription($subscription);
 	}
 
 	/**
