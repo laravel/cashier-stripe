@@ -104,14 +104,17 @@ class Invoice {
 	{
 		$lineItems = [];
 
-		foreach ($this->lines->data as $line)
+		if (isset($this->lines->data))
 		{
-			if ($line->type == $type)
+			foreach ($this->lines->data as $line)
 			{
-				$lineItems[] = new LineItem($line);
+				if ($line->type == $type)
+				{
+					$lineItems[] = new LineItem($line);
+				}
 			}
 		}
-
+		
 		return $lineItems;
 	}
 
