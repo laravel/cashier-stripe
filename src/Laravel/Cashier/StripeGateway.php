@@ -257,6 +257,18 @@ class StripeGateway {
 	}
 
 	/**
+	 *  Increment the quantity of the subscription. and invoice immediately.
+	 *
+	 * @param  int|null  $quantity
+	 * @return void
+	 */
+	public function incrementAndInvoice($quantity = null)
+	{
+		$this->increment($quantity);
+		$this->invoice();
+	}
+
+	/**
 	 * Decrement the quantity of the subscription.
 	 *
 	 * @param  int  $count
