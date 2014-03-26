@@ -174,7 +174,8 @@ class StripeGateway {
 		{
 			$customer = $this->getStripeCustomer();
 
-			Stripe_Invoice::create(['customer' => $customer->id], $this->getStripeKey());
+			$invoice = Stripe_Invoice::create(['customer' => $customer->id], $this->getStripeKey());
+			$invoice->pay();
 
 			return true;
 		}
