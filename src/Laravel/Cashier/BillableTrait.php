@@ -109,6 +109,17 @@ trait BillableTrait {
 	}
 
 	/**
+	 * Update customer's credit card.
+	 *
+	 * @param  string  $token
+	 * @return void
+	 */
+	public function updateCard($token)
+	{
+		return $this->subscription()->updateCard($token);
+	}
+
+	/**
 	 * Apply a coupon to the billable entity.
 	 *
 	 * @param  string  $coupon
