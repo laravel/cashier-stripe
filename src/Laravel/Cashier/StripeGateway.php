@@ -75,7 +75,7 @@ class StripeGateway {
 	 * @param  object|null  $customer
 	 * @return void
 	 */
-	public function create($token, $description = '', $customer = null)
+	public function create($token = null, $description = '', $customer = null)
 	{
 		if ( ! $customer)
 		{
