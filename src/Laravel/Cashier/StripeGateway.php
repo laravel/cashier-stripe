@@ -81,6 +81,10 @@ class StripeGateway {
 		{
 			$customer = $this->createStripeCustomer($token, $description);
 		}
+		else
+		{
+			$this->updateCard($token);
+		}
 
 		$this->billable->setStripeSubscription(
 			$customer->updateSubscription($this->buildPayload())->id
