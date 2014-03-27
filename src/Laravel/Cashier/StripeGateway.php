@@ -415,7 +415,10 @@ class StripeGateway {
 	 */
 	protected function getLastFourCardDigits($customer)
 	{
-		return $customer->cards->retrieve($customer->default_card)->last4;
+		if ( ! is_null($customer->default_card))
+		{
+			return $customer->cards->retrieve($customer->default_card)->last4;
+		}
 	}
 
 	/**
