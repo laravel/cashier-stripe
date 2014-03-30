@@ -14,8 +14,8 @@
         "illuminate/filesystem": "~4.1",
         "illuminate/support": "~4.1",
         "nesbot/carbon": "~1.0",
-        "stripe/stripe-php": "~1.0",
-        "symfony/http-kernel": "~2.4"
+        "stripe/stripe-php": "~1.9",
+        "symfony/http-kernel": "~2.3"
     },
     "require-dev": {
         "illuminate/view": "~4.1",
@@ -26,6 +26,5 @@
         "psr-0": {
             "Laravel\\Cashier\\": "src/"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }
