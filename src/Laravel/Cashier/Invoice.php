@@ -114,7 +114,7 @@ class Invoice {
 				}
 			}
 		}
-		
+
 		return $lineItems;
 	}
 
@@ -246,14 +246,14 @@ class Invoice {
 	 * Create an invoice download response.
 	 *
 	 * @param  array   $data
-	 * @param  string  $prefix
+	 * @param  string  $storagePath
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function download(array $data)
+	public function download(array $data, $storagePath = null)
 	{
 		$filename = $this->getDownloadFilename($data['product']);
 
-		$document = $this->writeInvoice($data);
+		$document = $this->writeInvoice($data, $storagePath);
 
 		$response = new Response($this->files->get($document), 200, [
 			'Content-Description' => 'File Transfer',
@@ -271,14 +271,15 @@ class Invoice {
 	 * Write the raw PDF bytes for the invoice via PhantomJS.
 	 *
 	 * @param  array  $data
+	 * @param  string  $storagePath
 	 * @return string
 	 */
-	protected function writeInvoice(array $data)
+	protected function writeInvoice(array $data, $storagePath)
 	{
 		// To properly capture a screenshot of the invoice view, we will pipe out to
 		// PhantomJS, which is a headless browser. We'll then capture a PNG image
 		// of the webpage, which will produce a very faithful copy of the page.
-		$viewPath = $this->writeViewForImaging($data);
+		$viewPath = $this->writeViewForImaging($data, $storagePath);
 
 		$this->getPhantomProcess($viewPath)
 							->setTimeout(10)->run();
@@ -290,11 +291,14 @@ class Invoice {
 	 * Write the view HTML so PhantomJS can access it.
 	 *
 	 * @param  array  $data
+	 * @param  string  $storagePath
 	 * @return string
 	 */
-	protected function writeViewForImaging(array $data)
+	protected function writeViewForImaging(array $data, $storagePath)
 	{
-		$this->files->put($path = __DIR__.'/work/'.md5($this->id).'.pdf', $this->render($data));
+		$storagePath = $storagePath ?: storage_path().'/meta';
+
+		$this->files->put($path = $storagePath.'/'.md5($this->id).'.pdf', $this->render($data));
 
 		return $path;
 	}

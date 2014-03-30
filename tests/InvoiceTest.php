@@ -85,7 +85,7 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 		$files->shouldReceive('get')->once()->with($workPath)->andReturn('pdf-content');
 		$files->shouldReceive('delete')->once()->with($workPath);
 
-		$invoice->download($data);
+		$invoice->download($data, realpath(__DIR__.'/../src/Laravel/Cashier/work'));
 	}
 
 
