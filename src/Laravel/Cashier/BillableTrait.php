@@ -432,13 +432,13 @@ trait BillableTrait {
 	}
 
 	/**
-	 * Get the Stripe API key.
+	 * Get the Stripe Currency To Use
 	 *
 	 * @return string
 	 */
 	public function getCurrency()
 	{
-		return static::$stripeKey ?: Config::get('services.stripe.currency');
+		return static::$currency ?: Config::get('services.stripe.currency');
 	}
 
 }
