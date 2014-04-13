@@ -107,9 +107,13 @@ trait BillableTrait {
 	{
 		
 		if($allTime)
+		{
 			return $this->subscription()->invoices();
+		}
 		else
+		{
 			return $this->stripeIsActive() ? $this->subscription()->invoices() : [];
+		}
 	}
 
 	/**
