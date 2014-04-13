@@ -103,9 +103,13 @@ trait BillableTrait {
 	 *
 	 * @return array
 	 */
-	public function invoices()
+	public function invoices($allTime = false)
 	{
-		return $this->stripeIsActive() ? $this->subscription()->invoices() : [];
+		
+		if($allTime)
+			return $this->subscription()->invoices();
+		else
+			return $this->stripeIsActive() ? $this->subscription()->invoices() : [];
 	}
 
 	/**
