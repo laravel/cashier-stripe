@@ -74,17 +74,7 @@ trait BillableTrait {
 	 * @param  string  $id
 	 * @return \Laravel\Cashier\Invoice
 	 */
-	public function findInvoiceOrFail($id)
-	{
-		if (is_null($invoice = $this->findInvoice($id)))
-		{
-			throw new NotFoundHttpException;
-		}
-		else
-		{
-			return $invoice;
-		}
-	}
+in
 
 	/**
 	 * Create an invoice download Response.
@@ -106,7 +96,7 @@ trait BillableTrait {
 	public function invoices($allTime = false)
 	{
 		
-		if($allTime)
+		if ($allTime)
 		{
 			return $this->subscription()->invoices();
 		}
