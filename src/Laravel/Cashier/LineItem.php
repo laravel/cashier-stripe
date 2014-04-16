@@ -3,6 +3,13 @@
 class LineItem {
 
 	/**
+	 * The billable instance.
+	 *
+	 * @var \Laravel\Cashier\BillableInterface
+	 */
+	protected $billable;
+
+	/**
 	 * The Stripe invoice line instance.
 	 *
 	 * @var object
@@ -15,8 +22,9 @@ class LineItem {
 	 * @param  object  $stripeLine
 	 * @return void
 	 */
-	public function __construct($stripeLine)
+	public function __construct(BillableInterface $billable, $stripeLine)
 	{
+		$this->billable = $billable;
 		$this->stripeLine = $stripeLine;
 	}
 
@@ -55,7 +63,7 @@ class LineItem {
 	 */
 	public function total()
 	{
-		return number_format($this->amount / 100, 2);
+		return $this->billable->formatCurrency($this->amount);
 	}
 
 	/**

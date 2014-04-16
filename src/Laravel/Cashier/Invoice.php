@@ -78,7 +78,7 @@ class Invoice {
 	 */
 	public function total()
 	{
-		return number_format($this->total / 100, 2);
+		return $this->billable->formatCurrency($this->total);
 	}
 
 	/**
@@ -88,7 +88,7 @@ class Invoice {
 	 */
 	public function subtotal()
 	{
-		return number_format($this->subtotal / 100, 2);
+		return $this->billable->formatCurrency($this->subtotal);
 	}
 
 	/**
@@ -127,7 +127,7 @@ class Invoice {
 			{
 				if ($line->type == $type)
 				{
-					$lineItems[] = new LineItem($line);
+					$lineItems[] = new LineItem($this->billable, $line);
 				}
 			}
 		}
@@ -217,7 +217,7 @@ class Invoice {
 	{
 		if (isset($this->discount->coupon->amount_off))
 		{
-			return number_format($this->discount->coupon->amount_off / 100, 2);
+			return $this->billable->formatCurrency($this->discount->coupon->amount_off);
 		}
 	}
 

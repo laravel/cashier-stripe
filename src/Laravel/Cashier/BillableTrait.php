@@ -451,6 +451,17 @@ trait BillableTrait {
 	}
 
 	/**
+	 * Format the given currency for display, without the currency symbol.
+	 *
+	 * @param  int  $amount
+	 * @return mixed
+	 */
+	public function formatCurrency($amount)
+	{
+		return number_format($amount / 100, 2);
+	}
+
+	/**
 	 * Add the currency symbol to a given amount.
 	 *
 	 * @param  string  $amount

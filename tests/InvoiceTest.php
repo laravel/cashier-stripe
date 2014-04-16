@@ -14,6 +14,7 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 	public function testGettingDollarTotalOfInvoice()
 	{
 		$invoice = new Invoice($billable = m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000, 'currency' => 'usd']);
+		$billable->shouldReceive('formatCurrency')->andReturn(100.00);
 		$billable->shouldReceive('addCurrencySymbol')->andReturn('$100.00');
 		$this->assertEquals('$100.00', $invoice->dollars());
 	}
@@ -21,7 +22,8 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 
 	public function testGettingSubtotal()
 	{
-		$invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) ['subtotal' => 10000]);
+		$invoice = new Invoice($billable = m::mock('Laravel\Cashier\BillableInterface'), (object) ['subtotal' => 10000]);
+		$billable->shouldReceive('formatCurrency')->andReturn(100.00);
 		$this->assertEquals(100.00, $invoice->subtotal());
 	}
 

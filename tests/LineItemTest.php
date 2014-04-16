@@ -13,7 +13,8 @@ class LineItemTest extends PHPUnit_Framework_TestCase {
 
 	public function testReceivingDollarTotal()
 	{
-		$line = new LineItem((object) ['amount' => 10000]);
+		$line = new LineItem($billable = m::mock('Laravel\Cashier\BillableInterface'), (object) ['amount' => 10000]);
+		$billable->shouldReceive('formatCurrency')->andReturn(100.00);
 		$this->assertEquals(100.00, $line->total());
 	}
 
