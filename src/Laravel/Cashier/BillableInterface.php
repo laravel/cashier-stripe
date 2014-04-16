@@ -187,4 +187,18 @@ interface BillableInterface {
 	 */
 	public function setSubscriptionEndDate($date);
 
+	/**
+	 * Get the Stripe supported currency used by the entity.
+	 *
+	 * @return string
+	 */
+	public function getCurrency();
+
+	/**
+	 * Get the currency symbol for the entity.
+	 *
+	 * @return string
+	 */
+	public function getCurrencySymbol();
+
 }
