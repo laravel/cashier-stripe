@@ -441,6 +441,26 @@ trait BillableTrait {
 	}
 
 	/**
+	 * Get the Stripe supported currency used by the entity.
+	 *
+	 * @return string
+	 */
+	public function getCurrency()
+	{
+		return 'usd';
+	}
+
+	/**
+	 * Get the currency symbol for the entity.
+	 *
+	 * @return string
+	 */
+	public function getCurrencySymbol()
+	{
+		return '$';
+	}
+
+	/**
 	 * Get the Stripe API key.
 	 *
 	 * @return string

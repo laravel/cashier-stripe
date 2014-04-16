@@ -13,7 +13,8 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 
 	public function testGettingDollarTotalOfInvoice()
 	{
-		$invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000]);
+		$invoice = new Invoice($billable = m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000, 'currency' => 'usd']);
+		$billable->shouldReceive('getCurrencySymbol')->andReturn('$');
 		$this->assertEquals('$100.00', $invoice->dollars());
 	}
 
@@ -56,9 +57,10 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 
 	public function testDiscountCanBeRetrieved()
 	{
-		$invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000, 'subtotal' => 20000]);
+		$invoice = new Invoice($billable = m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000, 'subtotal' => 20000, 'currency' => 'usd']);
+		$billable->shouldReceive('getCurrencySymbol')->andReturn('$');
 		$this->assertEquals(100.00, $invoice->discount());
-		$this->assertEquals('$100', $invoice->discountDollars());
+		$this->assertEquals('$100', $invoice->discountCurrency());
 	}
 
 

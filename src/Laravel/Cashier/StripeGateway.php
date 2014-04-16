@@ -105,6 +105,7 @@ class StripeGateway {
 		$payload = [
 			'plan' => $this->plan, 'prorate' => $this->prorate,
 			'quantity' => $this->quantity, 'trial_end' => $this->getTrialEndForUpdate(),
+			'currency' => $this->getCurrency(),
 		];
 
 		if ($this->coupon) $payload['coupon'] = $this->coupon;
@@ -665,6 +666,16 @@ class StripeGateway {
 	protected function getStripeKey()
 	{
 		return $this->billable->getStripeKey();
+	}
+
+	/**
+	 * Get the currency for the billable entity.
+	 *
+	 * @return string
+	 */
+	protected function getCurrency()
+	{
+		return $this->billable->getCurrency();
 	}
 
 }

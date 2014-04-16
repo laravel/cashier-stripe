@@ -23,7 +23,14 @@ class Invoice {
 	protected $stripeInvoice;
 
 	/**
-	 * Create a new invoice instance.
+	 * The filesystem instance.
+	 *
+	 * @var \Illuminate\Filesystem\Filesystem
+	 */
+	protected $files;
+
+	/**
+	 * Create a new invoiec instance.
 	 *
 	 * @param  \Laravel\Cashier\BillableInterface  $billable
 	 * @param  object
@@ -32,25 +39,35 @@ class Invoice {
 	public function __construct(BillableInterface $billable, $invoice)
 	{
 		$this->billable = $billable;
-		$this->stripeInvoice = $invoice;
-
 		$this->files = new Filesystem;
+		$this->stripeInvoice = $invoice;
 	}
 
 	/**
-	 * Get the formatted dollar amount for the invoice.
+	 * Get the total amount for the line item in dollars.
 	 *
 	 * @return string
 	 */
 	public function dollars()
 	{
+		return $this->totalWithCurrency();
+	}
+
+	/**
+	 * Get the total amount for the line item in the currency symbol of your choice
+	 *
+	 * @param  string $symbol The Symbol you want to show
+	 * @return string
+	 */
+	public function totalWithCurrency()
+	{
 		if (starts_with($total = $this->total(), '-'))
 		{
-			return '-$'.ltrim($total, '-');
+			return '-'.$this->billable->getCurrencySymbol().ltrim($total, '-');
 		}
 		else
 		{
-			return '$'.$total;
+			return $this->billable->getCurrencySymbol().$total;
 		}
 	}
 
@@ -135,11 +152,21 @@ class Invoice {
 	 */
 	public function discountDollars()
 	{
-		return '$'.$this->discount();
+		return $this->discountCurrency();
 	}
 
 	/**
-	 * Get the discount amount in dollars.
+	 * Get the discount amount with the currency symbol.
+	 *
+	 * @return string
+	 */
+	public function discountCurrency()
+	{
+		return $this->billable->getCurrencySymbol().$this->discount();
+	}
+
+	/**
+	 * Get the discount amount.
 	 *
 	 * @return float
 	 */

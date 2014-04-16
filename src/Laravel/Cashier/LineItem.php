@@ -23,17 +23,28 @@ class LineItem {
 	/**
 	 * Get the total amount for the line item in dollars.
 	 *
+	 * @param  string $symbol The Symbol you want to show
 	 * @return string
 	 */
 	public function dollars()
 	{
+		return $this->totalWithCurrency();
+	}
+
+	/**
+	 * Get the total amount for the line item with the currency symbol.
+	 *
+	 * @return string
+	 */
+	public function totalWithCurrency()
+	{
 		if (starts_with($total = $this->total(), '-'))
 		{
-			return '-$'.ltrim($total, '-');
+			return '-'.$this->billable->getCurrencySymbol().ltrim($total, '-');
 		}
 		else
 		{
-			return '$'.$total;
+			return $this->billable->getCurrencySymbol().$total;
 		}
 	}
 
