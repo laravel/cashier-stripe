@@ -195,6 +195,14 @@ interface BillableInterface {
 	public function getCurrency();
 
 	/**
+	 * Format the given currency for display, without the currency symbol.
+	 *
+	 * @param  int  $amount
+	 * @return mixed
+	 */
+	public function formatCurrency($amount);
+
+	/**
 	 * Add the currency symbol to a given amount.
 	 *
 	 * @param  string  $amount
