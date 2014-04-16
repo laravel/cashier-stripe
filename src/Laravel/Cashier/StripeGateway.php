@@ -81,7 +81,7 @@ class StripeGateway {
 		{
 			$customer = $this->createStripeCustomer($token, $description);
 		}
-		else
+		elseif ( ! is_null($token))
 		{
 			$this->updateCard($token);
 		}

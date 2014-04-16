@@ -56,13 +56,14 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 	public function testCreateUtilizesGivenCustomerIfApplicable()
 	{
 		$billable = m::mock('Laravel\Cashier\BillableInterface');
-		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData]', array($billable, 'plan'));
+		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData,updateCard]', array($billable, 'plan'));
 		$gateway->shouldReceive('createStripeCustomer')->never();
 		$customer = m::mock('StdClass');
 		$customer->shouldReceive('updateSubscription')->once()->andReturn($sub = (object) ['id' => 'sub_id']);
 		$billable->shouldReceive('setStripeSubscription')->with('sub_id');
 		$customer->id = 'foo';
 		$gateway->shouldReceive('getStripeCustomer')->once()->with('foo');
+		$gateway->shouldReceive('updateCard')->once();
 		$gateway->shouldReceive('updateLocalStripeData')->once();
 
 		$gateway->create('token', 'description', $customer);
