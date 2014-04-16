@@ -417,7 +417,12 @@ class StripeGateway {
 	 */
 	public function planId()
 	{
-		return $this->getStripeCustomer()->subscription->plan->id;
+		$customer = $this->getStripeCustomer();
+
+		if (isset($customer->subscription))
+		{
+			return $customer->subscription->plan->id;
+		}
 	}
 
 	/**
