@@ -451,6 +451,16 @@ trait BillableTrait {
 	}
 
 	/**
+	 * Get the locale for the currency used by the entity.
+	 *
+	 * @return string
+	 */
+	public function getCurrencyLocale()
+	{
+		return 'en_US';
+	}
+
+	/**
 	 * Format the given currency for display, without the currency symbol.
 	 *
 	 * @param  int  $amount

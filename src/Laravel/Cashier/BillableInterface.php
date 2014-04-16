@@ -195,6 +195,13 @@ interface BillableInterface {
 	public function getCurrency();
 
 	/**
+	 * Get the locale for the currency used by the entity.
+	 *
+	 * @return string
+	 */
+	public function getCurrencyLocale();
+
+	/**
 	 * Format the given currency for display, without the currency symbol.
 	 *
 	 * @param  int  $amount

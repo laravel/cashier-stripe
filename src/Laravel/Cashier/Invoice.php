@@ -172,6 +172,8 @@ class Invoice {
 	 */
 	public function discount()
 	{
+		setlocale(LC_MONETARY, $this->billable->getCurrencyLocale());
+
 		return round(money_format('%i', ($this->subtotal / 100) - ($this->total / 100)), 2);
 	}
 
