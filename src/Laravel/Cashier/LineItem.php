@@ -40,11 +40,11 @@ class LineItem {
 	{
 		if (starts_with($total = $this->total(), '-'))
 		{
-			return '-'.$this->billable->getCurrencySymbol().ltrim($total, '-');
+			return '-'.$this->billable->addCurrencySymbol(ltrim($total, '-'));
 		}
 		else
 		{
-			return $this->billable->getCurrencySymbol().$total;
+			return $this->billable->addCurrencySymbol($total);
 		}
 	}
 

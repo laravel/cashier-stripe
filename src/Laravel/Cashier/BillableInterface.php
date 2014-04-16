@@ -195,10 +195,11 @@ interface BillableInterface {
 	public function getCurrency();
 
 	/**
-	 * Get the currency symbol for the entity.
+	 * Add the currency symbol to a given amount.
 	 *
+	 * @param  string  $amount
 	 * @return string
 	 */
-	public function getCurrencySymbol();
+	public function addCurrencySymbol($amount);
 
 }
