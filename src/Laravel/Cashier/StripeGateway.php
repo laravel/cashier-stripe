@@ -75,7 +75,7 @@ class StripeGateway {
 	 * @param  object|null  $customer
 	 * @return void
 	 */
-	public function create($token, $description = '', $customer = null)
+	public function create($token = null, $description = '', $customer = null)
 	{
 		if ( ! $customer)
 		{
@@ -499,7 +499,10 @@ class StripeGateway {
 	 */
 	protected function getLastFourCardDigits($customer)
 	{
-		return $customer->cards->retrieve($customer->default_card)->last4;
+		if ( ! is_null($customer->default_card))
+		{
+			return $customer->cards->retrieve($customer->default_card)->last4;
+		}
 	}
 
 	/**
