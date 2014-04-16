@@ -14,7 +14,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	public function testCreatePassesProperOptionsToCustomer()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = $this->mockBillableInterface();
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData]', array($billable, 'plan'));
 		$gateway->shouldReceive('createStripeCustomer')->andReturn($customer = m::mock('StdClass'));
 		$customer->shouldReceive('updateSubscription')->once()->with([
@@ -34,7 +34,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	public function testCreatePassesProperOptionsToCustomerForTrialEnd()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = $this->mockBillableInterface();
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData]', array($billable, 'plan'));
 		$gateway->shouldReceive('createStripeCustomer')->andReturn($customer = m::mock('StdClass'));
 		$customer->shouldReceive('updateSubscription')->once()->with([
@@ -55,7 +55,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	public function testCreateUtilizesGivenCustomerIfApplicable()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = $this->mockBillableInterface();
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData,updateCard]', array($billable, 'plan'));
 		$gateway->shouldReceive('createStripeCustomer')->never();
 		$customer = m::mock('StdClass');
@@ -72,7 +72,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	public function testSwapCallsCreateWithProperArguments()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = $this->mockBillableInterface();
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[create,getStripeCustomer,maintainTrial]', array($billable, 'plan'));
 		$gateway->shouldReceive('getStripeCustomer')->once()->andReturn($customer = m::mock('StdClass'));
 		$gateway->shouldReceive('maintainTrial')->once();
@@ -91,7 +91,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			'quantity' => 5,
 		]);
 
-		$gateway = new StripeGateway(m::mock('Laravel\Cashier\BillableInterface'), 'plan');
+		$gateway = new StripeGateway($this->mockBillableInterface(), 'plan');
 		$gateway->updateQuantity($customer, 5);
 	}
 
@@ -106,7 +106,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			'trial_end' => 'now',
 		]);
 
-		$gateway = new StripeGateway(m::mock('Laravel\Cashier\BillableInterface'), 'plan');
+		$gateway = new StripeGateway($this->mockBillableInterface(), 'plan');
 		$gateway->skipTrial();
 		$gateway->updateQuantity($customer, 5);
 	}
@@ -122,7 +122,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			'trial_end' => 'now',
 		]);
 
-		$gateway = new StripeGateway(m::mock('Laravel\Cashier\BillableInterface'), 'plan');
+		$gateway = new StripeGateway($this->mockBillableInterface(), 'plan');
 		$gateway->skipTrial();
 		$gateway->updateQuantity($customer, 5);
 	}
@@ -130,7 +130,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	public function testCancellingOfSubscriptions()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = $this->mockBillableInterface();
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer]', array($billable, 'plan'));
 		$gateway->shouldReceive('getStripeCustomer')->andReturn($customer = m::mock('StdClass'));
 		$customer->subscription = (object) ['current_period_end' => $time = time(), 'trial_end' => null];
@@ -149,7 +149,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	public function testCancellingOfSubscriptionsWithTrials()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = $this->mockBillableInterface();
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer]', array($billable, 'plan'));
 		$gateway->shouldReceive('getStripeCustomer')->andReturn($customer = m::mock('StdClass'));
 		$customer->subscription = (object) ['current_period_end' => $time = time(), 'trial_end' => $trialTime = time() + 50];
@@ -168,7 +168,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	public function testUpdatingCreditCardData()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = $this->mockBillableInterface();
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,updateLocalStripeData]', array($billable, 'plan'));
 		$gateway->shouldReceive('getStripeCustomer')->twice()->andReturn($customer = m::mock('StdClass'));
 		$customer->subscription = (object) ['plan' => (object) ['id' => 1]];
@@ -184,7 +184,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	public function testApplyingCoupon()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = $this->mockBillableInterface();
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer]', array($billable, 'plan'));
 		$gateway->shouldReceive('getStripeCustomer')->andReturn($customer = m::mock('StdClass'));
 		$customer->shouldReceive('save')->once();
@@ -196,7 +196,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	public function testRetrievingACustomersStripePlanId()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = $this->mockBillableInterface();
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer]', array($billable, 'plan'));
 		$gateway->shouldReceive('getStripeCustomer')->andReturn($customer = m::mock('StdClass'));
 		$customer->subscription = (object) ['plan' => (object) ['id' => 1]];
@@ -207,7 +207,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	public function testUpdatingLocalStripeData()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = $this->mockBillableInterface();
 		$gateway = new StripeGateway($billable, 'plan');
 		$billable->shouldReceive('setStripeId')->once()->with('id')->andReturn($billable);
 		$billable->shouldReceive('setStripePlan')->once()->with('plan')->andReturn($billable);
@@ -228,7 +228,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	public function testMaintainTrialSetsTrialToHoursLeftOnCurrentTrial()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = $this->mockBillableInterface();
 		$billable->shouldReceive('readyForBilling')->once()->andReturn(true);
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,getTrialEndForCustomer]', [$billable, 'plan']);
 		$gateway->shouldReceive('getStripeCustomer')->once()->andReturn($customer = m::mock('StdClass'));
@@ -241,7 +241,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	public function testMaintainTrialDoesNothingIfNotOnTrial()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = $this->mockBillableInterface();
 		$billable->shouldReceive('readyForBilling')->once()->andReturn(true);
 		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,getTrialEndForCustomer]', [$billable, 'plan']);
 		$gateway->shouldReceive('getStripeCustomer')->once()->andReturn($customer = m::mock('StdClass'));
@@ -256,10 +256,18 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 	{
 		$time = time();
 		$customer = (object) ['subscription' => (object) ['trial_end' => $time]];
-		$gateway = new StripeGateway(m::mock('Laravel\Cashier\BillableInterface'), 'plan');
+		$gateway = new StripeGateway($this->mockBillableInterface(), 'plan');
 
 		$this->assertInstanceOf('Carbon\Carbon', $gateway->getTrialEndForCustomer($customer));
 		$this->assertEquals($time, $gateway->getTrialEndForCustomer($customer)->getTimestamp());
+	}
+
+
+	protected function mockBillableInterface()
+	{
+		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable->shouldReceive('getStripeKey')->andReturn('key');
+		return $billable;
 	}
 
 }

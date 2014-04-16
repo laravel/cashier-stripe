@@ -65,6 +65,8 @@ class StripeGateway {
 	{
 		$this->plan = $plan;
 		$this->billable = $billable;
+
+		\Stripe::setApiKey($this->getStripeKey());
 	}
 
 	/**
