@@ -21,7 +21,6 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		$customer->shouldReceive('updateSubscription')->once()->with([
 			'plan' => 'plan',
 			'prorate' => true,
-			'currency' => 'gbp',
 			'quantity' => 1,
 			'trial_end' => null,
 		])->andReturn((object) ['id' => 'sub_id']);
@@ -44,7 +43,6 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			'plan' => 'plan',
 			'prorate' => true,
 			'quantity' => 1,
-			'currency' => 'usd',
 			'trial_end' => 'now',
 		])->andReturn((object) ['id' => 'sub_id']);
 		$customer->id = 'foo';

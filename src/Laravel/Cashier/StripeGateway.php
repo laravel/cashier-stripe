@@ -105,7 +105,6 @@ class StripeGateway {
 		$payload = [
 			'plan' => $this->plan, 'prorate' => $this->prorate,
 			'quantity' => $this->quantity, 'trial_end' => $this->getTrialEndForUpdate(),
-			'currency' => $this->getCurrency(),
 		];
 
 		if ($this->coupon) $payload['coupon'] = $this->coupon;
