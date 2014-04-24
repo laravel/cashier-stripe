@@ -138,6 +138,10 @@ class StripeGateway {
 			$this->quantity(
 				$customer->subscription->quantity
 			);
+		} else {
+			$this->quantity(
+				$quantity
+			);
 		}
 
 		return $this->create(null, null, $customer);
