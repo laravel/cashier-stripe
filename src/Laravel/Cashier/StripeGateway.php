@@ -448,7 +448,7 @@ class StripeGateway {
 				->setSubscriptionEndDate(null)
 				->saveBillableInstance();
 	}
-	
+
 	/**
 	 * Create a new Stripe customer instance.
 	 *
@@ -462,7 +462,7 @@ class StripeGateway {
 
 		return $this->getStripeCustomer($customer->id);
 	}
-	
+
 	/**
 	 * Get the Stripe customer for entity.
 	 *
