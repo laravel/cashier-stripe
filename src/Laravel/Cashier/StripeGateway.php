@@ -74,14 +74,15 @@ class StripeGateway {
 	 *
 	 * @param  string  $token
 	 * @param  string  $description
+	 * @param  string  $email
 	 * @param  object|null  $customer
 	 * @return void
 	 */
-	public function create($token, $description = '', $customer = null)
+	public function create($token, $description = '', $email = '', $customer = null)
 	{
 		if ( ! $customer)
 		{
-			$customer = $this->createStripeCustomer($token, $description);
+			$customer = $this->createStripeCustomer($token, $description, $email);
 		}
 		elseif ( ! is_null($token))
 		{
@@ -454,13 +455,15 @@ class StripeGateway {
 	 *
 	 * @param  string  $token
 	 * @param  string  $description
+	 * @param  string  $email
 	 * @return \Stripe_Customer
 	 */
-	public function createStripeCustomer($token, $description)
+	public function createStripeCustomer($token, $description, $email)
 	{
 		$customer = Stripe_Customer::create([
 			'card' => $token,
 			'description' => $description,
+			'email' => $email,
 
 		], $this->getStripeKey());
 
