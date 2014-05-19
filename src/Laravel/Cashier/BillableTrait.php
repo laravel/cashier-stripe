@@ -105,7 +105,7 @@ trait BillableTrait {
 	 */
 	public function invoices()
 	{
-		return $this->stripeIsActive() ? $this->subscription()->invoices() : [];
+		return $this->subscription()->invoices();
 	}
 
 	/**
