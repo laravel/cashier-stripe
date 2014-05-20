@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+
 class WebhookController extends Controller {
 
 	/**
@@ -18,8 +19,8 @@ class WebhookController extends Controller {
 
 		switch ($payload['type'])
 		{
-			case 'invoice.payment_failed':
-				return $this->handleFailedPayment($payload);
+            case StripeWebhookEvents::INVOICE_PAYMENT_FAILED:
+            return $this->handleFailedPayment($payload);
 		}
 	}
 
