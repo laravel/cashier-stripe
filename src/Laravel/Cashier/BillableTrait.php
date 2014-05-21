@@ -156,7 +156,7 @@ trait BillableTrait {
 	{
 		if ( ! is_null($endsAt = $this->getSubscriptionEndDate()))
 		{
-			return Carbon::today()->lt(Carbon::instance($endsAt));
+			return Carbon::now()->lt(Carbon::instance($endsAt));
 		}
 		else
 		{
