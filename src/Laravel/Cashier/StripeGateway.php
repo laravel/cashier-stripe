@@ -139,6 +139,11 @@ class StripeGateway {
 				$customer->subscription->quantity
 			);
 		}
+		else {
+			$this->quantity(
+				$quantity
+			);
+		}
 
 		return $this->create(null, [], $customer);
 	}
