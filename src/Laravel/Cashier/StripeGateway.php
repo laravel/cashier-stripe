@@ -139,10 +139,12 @@ class StripeGateway {
 				$customer->subscription->quantity
 			);
 		}
+
+		// If the developer specified an explicit quantity we can just pass it to the
+		// quantity method directly. This will set the proper quantity on this new
+		// plan that we are swapping to. Then we'll make this subscription swap.
 		else {
-			$this->quantity(
-				$quantity
-			);
+			$this->quantity($quantity);
 		}
 
 		return $this->create(null, [], $customer);
