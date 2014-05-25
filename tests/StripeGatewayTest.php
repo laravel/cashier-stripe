@@ -29,7 +29,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		$gateway->shouldReceive('getStripeCustomer')->once()->with('foo');
 		$gateway->shouldReceive('updateLocalStripeData')->once();
 
-		$gateway->create('token', 'description');
+		$gateway->create('token', []);
 	}
 
 
@@ -51,7 +51,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		$gateway->shouldReceive('updateLocalStripeData')->once();
 
 		$gateway->skipTrial();
-		$gateway->create('token', 'description');
+		$gateway->create('token', []);
 	}
 
 
@@ -69,7 +69,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		$gateway->shouldReceive('updateCard')->once();
 		$gateway->shouldReceive('updateLocalStripeData')->once();
 
-		$gateway->create('token', 'description', $customer);
+		$gateway->create('token', [], $customer);
 	}
 
 
