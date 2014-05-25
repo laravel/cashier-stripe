@@ -77,7 +77,7 @@ class StripeGateway {
 	 * @param  object|null  $customer
 	 * @return void
 	 */
-	public function create($token, $properties, $customer = null)
+	public function create($token, array $properties = array(), $customer = null)
 	{
 		if ( ! $customer)
 		{
@@ -140,7 +140,7 @@ class StripeGateway {
 			);
 		}
 
-		return $this->create(null, null, $customer);
+		return $this->create(null, [], $customer);
 	}
 
 	/**
@@ -164,7 +164,7 @@ class StripeGateway {
 	 */
 	public function resume($token = null)
 	{
-		$this->noProrate()->skipTrial()->create($token, '', $this->getStripeCustomer());
+		$this->noProrate()->skipTrial()->create($token, [], $this->getStripeCustomer());
 
 		$this->billable->setTrialEndDate(null)->saveBillableInstance();
 	}
@@ -456,9 +456,11 @@ class StripeGateway {
 	 * @param  array  $properties
 	 * @return string
 	 */
-	public function createStripeCustomer($token, $properties)
+	public function createStripeCustomer($token, array $properties = array())
 	{
-		$customer = Stripe_Customer::create(array_merge(['card' => $token], $properties), $this->getStripeKey());
+		$customer = Stripe_Customer::create(
+			array_merge(['card' => $token], $properties), $this->getStripeKey()
+		);
 
 		return $this->getStripeCustomer($customer->id);
 	}
