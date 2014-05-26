@@ -4,7 +4,7 @@
  * User: Jason Kristian <jasonkristian@gmail.com>
  * Date: 20/05/2014
  * Time: 5:35 PM
- *  © 2014 Apps 4 U Pty. Ltd.
+ *
  */
 
 namespace Laravel\Cashier;
