@@ -65,7 +65,12 @@ trait BillableTrait {
 	 */
 	public function findInvoice($id)
 	{
-		return $this->subscription()->findInvoice($id);
+		$invoice = $this->subscription()->findInvoice($id);
+
+		if ($invoice->customer == $this->getStripeId())
+		{
+			return $invoice;
+		}
 	}
 
 	/**
@@ -76,7 +81,9 @@ trait BillableTrait {
 	 */
 	public function findInvoiceOrFail($id)
 	{
-		if (is_null($invoice = $this->findInvoice($id)))
+		$invoice = $this->findInvoice($id);
+
+		if (is_null($invoice))
 		{
 			throw new NotFoundHttpException;
 		}
