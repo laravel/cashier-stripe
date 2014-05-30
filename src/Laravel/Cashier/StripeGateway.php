@@ -73,15 +73,15 @@ class StripeGateway {
 	 * Subscribe to the plan for the first time.
 	 *
 	 * @param  string  $token
-	 * @param  string  $description
+	 * @param  array  $properties
 	 * @param  object|null  $customer
 	 * @return void
 	 */
-	public function create($token, $description = '', $customer = null)
+	public function create($token, array $properties = array(), $customer = null)
 	{
 		if ( ! $customer)
 		{
-			$customer = $this->createStripeCustomer($token, $description);
+			$customer = $this->createStripeCustomer($token, $properties);
 		}
 		elseif ( ! is_null($token))
 		{
@@ -140,7 +140,15 @@ class StripeGateway {
 			);
 		}
 
-		return $this->create(null, null, $customer);
+		// If the developer specified an explicit quantity we can just pass it to the
+		// quantity method directly. This will set the proper quantity on this new
+		// plan that we are swapping to. Then we'll make this subscription swap.
+		else
+		{
+			$this->quantity($quantity);
+		}
+
+		return $this->create(null, [], $customer);
 	}
 
 	/**
@@ -164,7 +172,7 @@ class StripeGateway {
 	 */
 	public function resume($token = null)
 	{
-		$this->noProrate()->skipTrial()->create($token, '', $this->getStripeCustomer());
+		$this->noProrate()->skipTrial()->create($token, [], $this->getStripeCustomer());
 
 		$this->billable->setTrialEndDate(null)->saveBillableInstance();
 	}
@@ -453,16 +461,14 @@ class StripeGateway {
 	 * Create a new Stripe customer instance.
 	 *
 	 * @param  string  $token
-	 * @param  string  $description
-	 * @return \Stripe_Customer
+	 * @param  array  $properties
+	 * @return string
 	 */
-	public function createStripeCustomer($token, $description)
+	public function createStripeCustomer($token, array $properties = array())
 	{
-		$customer = Stripe_Customer::create([
-			'card' => $token,
-			'description' => $description,
-
-		], $this->getStripeKey());
+		$customer = Stripe_Customer::create(
+			array_merge(['card' => $token], $properties), $this->getStripeKey()
+		);
 
 		return $this->getStripeCustomer($customer->id);
 	}
