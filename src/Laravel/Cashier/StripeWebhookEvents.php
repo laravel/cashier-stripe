@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by Apps 4 U Pty Ltd.
- * User: Jason Kristian <jasonkristian@gmail.com>
- * Date: 20/05/2014
- * Time: 5:35 PM
- *
- */
 
 namespace Laravel\Cashier;
 
