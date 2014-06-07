@@ -1,3 +1,4 @@
+Im going to intergrate this with Sentry like SaaSFrame uses groups to stripe plans so you can use the Sentry permission system I like some of SaaSFrame features but Cashier is nicer interface to the rest of Stripe API . Please fell free to submit pull requests once Ive started.
 # Laravel Cashier
 
 - [Configuration](#configuration)
@@ -22,7 +23,7 @@ Laravel Cashier provides an expressive, fluent interface to [Stripe's](https://s
 
 First, add the Cashier package to your `composer.json` file:
 
-	"laravel/cashier": "~1.0"
+	"laravel/cashier": "~2.0"
 
 #### Service Provider
 
@@ -76,9 +77,9 @@ $user->subscription('monthly')
      ->create($creditCardToken);
 ```
 
-The `subscription` method will automatically create the Stripe subscription, as well as update your database with Stripe customer ID and other relevant billing information. If your plan includes a trial, the trial end date will also automatically be set on the user record.
+The `subscription` method will automatically create the Stripe subscription, as well as update your database with Stripe customer ID and other relevant billing information. If your plan has a trial configured in Stripe, the trial end date will also automatically be set on the user record.
 
-If your plan has a trial period, make sure to set the trial end date on your model after subscribing:
+If your plan has a trial period that is **not** configured in Stripe, you must set the trial end date manually after subscribing:
 
 ```php
 $user->trial_ends_at = Carbon::now()->addDays(14);

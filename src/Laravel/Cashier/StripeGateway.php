@@ -79,9 +79,13 @@ class StripeGateway {
 	 */
 	public function create($token, array $properties = array(), $customer = null)
 	{
+		$freshCustomer = false;
+
 		if ( ! $customer)
 		{
 			$customer = $this->createStripeCustomer($token, $properties);
+
+			$freshCustomer = true;
 		}
 		elseif ( ! is_null($token))
 		{
@@ -92,7 +96,14 @@ class StripeGateway {
 			$customer->updateSubscription($this->buildPayload())->id
 		);
 
-		$this->updateLocalStripeData($this->getStripeCustomer($customer->id));
+		$customer = $this->getStripeCustomer($customer->id);
+
+		if ($freshCustomer && $trialEnd = $this->getTrialEndForCustomer($customer))
+		{
+			$this->billable->setTrialEndDate($trialEnd);
+		}
+
+		$this->updateLocalStripeData($customer);
 	}
 
 	/**
