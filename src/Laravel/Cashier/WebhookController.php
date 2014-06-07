@@ -79,7 +79,7 @@ class WebhookController extends Controller {
      *  The reason I used a large case block was so I could fire other events for my
      *  site as Ive integrated my site with Xero Api as well and I needed the two
      *  packages to be able to handel there own event so I did not want to tie my
-     *  Xero package to fire a API request because of a Stripe.
+     *  Xero package to fire a API request because of a Stripe Event.
      *  So if you only need to handle Stripe events you can replace this code with
      *
      *  Event::fire("cashier.stripe".$payload['type'], $payload);
