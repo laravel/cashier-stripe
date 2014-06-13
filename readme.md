@@ -1,3 +1,4 @@
+Im going to intergrate this with Sentry like SaaSFrame uses groups to stripe plans so you can use the Sentry permission system I like some of SaaSFrame features but Cashier is nicer interface to the rest of Stripe API . Please fell free to submit pull requests once Ive started.
 # Laravel Cashier
 
 - [Configuration](#configuration)
