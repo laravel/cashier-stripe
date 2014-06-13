@@ -4,6 +4,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class WebhookController extends Controller {
 
@@ -16,10 +17,15 @@ class WebhookController extends Controller {
 	{
 		$payload = $this->getJsonPayload();
 
-		switch ($payload['type'])
+		$method = 'handle'.studly_case(str_replace('.', '_', $payload['type']));
+
+		if (method_exists($this, $method))
 		{
-			case 'invoice.payment_failed':
-				return $this->handleFailedPayment($payload);
+			return $this->{$method}($payload);
+		}
+		else
+		{
+			throw new NotFoundHttpException;
 		}
 	}
 
@@ -29,7 +35,7 @@ class WebhookController extends Controller {
 	 * @param  array  $payload
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	protected function handleFailedPayment(array $payload)
+	protected function handleInvoicePaymentFailed(array $payload)
 	{
 		if ($this->tooManyFailedPayments($payload))
 		{
