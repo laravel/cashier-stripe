@@ -1,5 +1,12 @@
 # Laravel Cashier
 
+[![Build Status](https://travis-ci.org/laravel/cashier.svg)](https://travis-ci.org/laravel/cashier)
+[![Total Downloads](https://poser.pugx.org/laravel/cashier/downloads.svg)](https://packagist.org/packages/laravel/cashier)
+[![Latest Stable Version](https://poser.pugx.org/laravel/cashier/v/stable.svg)](https://packagist.org/packages/laravel/cashier)
+[![Latest Unstable Version](https://poser.pugx.org/laravel/cashier/v/unstable.svg)](https://packagist.org/packages/laravel/cashier)
+[![License](https://poser.pugx.org/laravel/cashier/license.svg)](https://packagist.org/packages/laravel/cashier)
+
+
 - [Configuration](#configuration)
 - [Subscribing To A Plan](#subscribing-to-a-plan)
 - [No Card Up Front](#no-card-up-front)
