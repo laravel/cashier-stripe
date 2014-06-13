@@ -18,6 +18,7 @@
         "symfony/http-kernel": "~2.3"
     },
     "require-dev": {
+        "illuminate/routing": "~4.1",
         "illuminate/view": "~4.1",
         "mockery/mockery": "~0.9",
         "phpunit/phpunit": "~4.0"
