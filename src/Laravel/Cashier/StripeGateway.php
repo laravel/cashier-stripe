@@ -412,12 +412,15 @@ class StripeGateway {
 	{
 		$customer = $this->getStripeCustomer();
 
-		$customer->updateSubscription([
-			'plan' => $plan = $customer->subscription->plan->id,
-			'card' => $token,
-		]);
+		$card = $customer->cards->create(['card' => $token]);
 
-		$this->updateLocalStripeData($this->getStripeCustomer(), $plan);
+		$customer->default_card = $card->id;
+
+		$customer->save();
+
+		$this->billable
+             ->setLastFourCardDigits($this->getLastFourCardDigits($this->getStripeCustomer()))
+             ->saveBillableInstance();
 	}
 
 	/**

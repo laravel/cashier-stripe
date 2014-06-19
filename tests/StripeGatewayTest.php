@@ -172,14 +172,18 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 	public function testUpdatingCreditCardData()
 	{
 		$billable = $this->mockBillableInterface();
-		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,updateLocalStripeData]', array($billable, 'plan'));
-		$gateway->shouldReceive('getStripeCustomer')->twice()->andReturn($customer = m::mock('StdClass'));
+		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,getLastFourCardDigits]', array($billable, 'plan'));
+		$gateway->shouldAllowMockingProtectedMethods();
+		$gateway->shouldReceive('getStripeCustomer')->andReturn($customer = m::mock('StdClass'));
+		$gateway->shouldReceive('getLastFourCardDigits')->once()->andReturn('1111');
 		$customer->subscription = (object) ['plan' => (object) ['id' => 1]];
-		$customer->shouldReceive('updateSubscription')->once()->with([
-			'plan' => 1,
-			'card' => 'token',
-		]);
-		$gateway->shouldReceive('updateLocalStripeData')->once()->with($customer, 1);
+		$customer->cards = m::mock('StdClass');
+		$customer->cards->shouldReceive('create')->once()->with(['card' => 'token'])->andReturn($card = m::mock('StdClass'));
+		$card->id = 'card_id';
+		$customer->shouldReceive('save')->once();
+
+		$billable->shouldReceive('setLastFourCardDigits')->once()->with('1111')->andReturn($billable);
+		$billable->shouldReceive('saveBillableInstance')->once();
 
 		$gateway->updateCard('token');
 	}
