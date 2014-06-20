@@ -110,9 +110,9 @@ trait BillableTrait {
 	 *
 	 * @return array
 	 */
-	public function invoices()
+	public function invoices($parameters = array())
 	{
-		return $this->subscription()->invoices();
+		return $this->subscription()->invoices(false, $parameters);
 	}
 
 	/**
