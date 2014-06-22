@@ -99,6 +99,12 @@
 				<strong>Invoice Number:</strong> {{ $invoice->id }}<br>
 			</p>
 
+			<!-- Extra / VAT Information -->
+			@if (isset($vat))
+				<br><br>
+				{{ $vat }}
+			@endif
+
 			<br><br>
 
 			<!-- Invoice Table -->
