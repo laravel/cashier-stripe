@@ -101,8 +101,9 @@
 
 			<!-- Extra / VAT Information -->
 			@if (isset($vat))
-				<br><br>
-				{{ $vat }}
+				<p>
+					{{ $vat }}
+				</p>
 			@endif
 
 			<br><br>
