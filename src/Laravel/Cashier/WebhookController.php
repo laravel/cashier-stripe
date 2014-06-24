@@ -79,4 +79,15 @@ class WebhookController extends Controller {
 		return (array) json_decode(Request::getContent(), true);
 	}
 
+	/**
+	 * Handle calls to missing methods on the controller.
+	 *
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public function missingMethod($parameters = array())
+	{
+		return new Response;
+	}
+
 }
