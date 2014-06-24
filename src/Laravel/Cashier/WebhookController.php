@@ -23,10 +23,6 @@ class WebhookController extends Controller {
 		{
 			return $this->{$method}($payload);
 		}
-		else
-		{
-			throw new NotFoundHttpException;
-		}
 	}
 
 	/**
