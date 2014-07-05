@@ -233,11 +233,11 @@ class StripeGateway {
 	 * @param  bool  $includePending
 	 * @return array
 	 */
-	public function invoices($includePending = false)
+	public function invoices($includePending = false, $parameters = array())
 	{
 		$invoices = [];
 
-		$stripeInvoices = $this->getStripeCustomer()->invoices();
+		$stripeInvoices = $this->getStripeCustomer()->invoices($parameters);
 
 		// Here we will loop through the Stripe invoices and create our own custom Invoice
 		// instances that have more helper methods and are generally more convenient to
