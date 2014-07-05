@@ -401,6 +401,18 @@ class StripeGateway {
 			return $customer->subscription->current_period_end;
 		}
 	}
+	
+	/**
+	* Get the current subscription period's end date
+	* 
+	* @return \Carbon\Carbon
+	*/
+	public function getSubscriptionEndDate()
+	{
+		$customer = $this->getStripeCustomer();
+
+		return Carbon::createFromTimestamp($this->getSubscriptionEndTimestamp($customer));
+        }
 
 	/**
 	 * Update the credit card attached to the entity.
