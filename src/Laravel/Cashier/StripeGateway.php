@@ -231,6 +231,7 @@ class StripeGateway {
 	 * Get an array of the entity's invoices.
 	 *
 	 * @param  bool  $includePending
+	 * @param  array $parameters
 	 * @return array
 	 */
 	public function invoices($includePending = false, $parameters = array())
