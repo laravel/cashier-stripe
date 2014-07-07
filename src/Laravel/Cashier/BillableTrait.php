@@ -108,6 +108,7 @@ trait BillableTrait {
 	/**
 	 * Get an array of the entity's invoices.
 	 *
+	 * @param array $parameters
 	 * @return array
 	 */
 	public function invoices($parameters = array())
