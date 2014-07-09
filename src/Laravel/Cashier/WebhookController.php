@@ -76,7 +76,7 @@ class WebhookController extends Controller {
 	 */
 	protected function getJsonPayload()
 	{
-		return (array) json_decode(Request::getContent(), true);
+		return Request::json()->all();
 	}
 
 	/**
