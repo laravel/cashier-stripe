@@ -73,7 +73,7 @@ class StripeGateway {
 	 * Subscribe to the plan for the first time.
 	 *
 	 * @param  string  $token
-	 * @param  array  $properties
+	 * @param  array   $properties
 	 * @param  object|null  $customer
 	 * @return void
 	 */
@@ -230,7 +230,8 @@ class StripeGateway {
 	/**
 	 * Get an array of the entity's invoices.
 	 *
-	 * @param  bool  $includePending
+	 * @param  bool   $includePending
+	 * @param  array  $parameters
 	 * @return array
 	 */
 	public function invoices($includePending = false, $parameters = array())
@@ -401,10 +402,10 @@ class StripeGateway {
 			return $customer->subscription->current_period_end;
 		}
 	}
-	
+
 	/**
 	* Get the current subscription period's end date
-	* 
+	*
 	* @return \Carbon\Carbon
 	*/
 	public function getSubscriptionEndDate()
@@ -487,7 +488,7 @@ class StripeGateway {
 	 * Create a new Stripe customer instance.
 	 *
 	 * @param  string  $token
-	 * @param  array  $properties
+	 * @param  array   $properties
 	 * @return string
 	 */
 	public function createStripeCustomer($token, array $properties = array())
