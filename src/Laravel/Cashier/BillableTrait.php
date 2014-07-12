@@ -97,7 +97,7 @@ trait BillableTrait {
 	 * Create an invoice download Response.
 	 *
 	 * @param  string  $id
-	 * @param  array  $data
+	 * @param  array   $data
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function downloadInvoice($id, array $data)
@@ -108,6 +108,7 @@ trait BillableTrait {
 	/**
 	 * Get an array of the entity's invoices.
 	 *
+	 * @param  array  $parameters
 	 * @return array
 	 */
 	public function invoices($parameters = array())
