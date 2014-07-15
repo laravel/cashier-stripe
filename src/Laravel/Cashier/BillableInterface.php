@@ -217,4 +217,10 @@ interface BillableInterface {
 	 */
 	public function addCurrencySymbol($amount);
 
+	/**
+	 * Get the billing_cycle_anchor value.
+	 *
+	 * @return  string|null
+	 */
+	 public function getBillingCycleAnchor();
 }
