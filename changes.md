@@ -1,5 +1,11 @@
 # Cashier Change Log
 
+## Upcoming
+
+- Allow user to pass paramaters when fetching invoices.
+- Added a method to get the current subscription period's end date.
+- The webhook handler now returns the missing method function rather than throwing a not found exception.
+
 ## Version 2.0.3
 
 - Added space for extra / VAT information in receipts.
