@@ -21,14 +21,12 @@ class WebhookControllerTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	/**
-	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-	 */
-	public function testNotFoundExceptionsAreThrownWhenMethodDoesntExists()
+	public function testNormalResponseIsReturnedIfMethodIsMissing()
 	{
 		Request::shouldReceive('getContent')->andReturn(json_encode(['type' => 'foo.bar']));
 		$controller = new WebhookControllerTestStub;
-		$controller->handleWebhook();
+		$response = $controller->handleWebhook();
+		$this->assertEquals(200, $response->getStatusCode());
 	}
 
 }

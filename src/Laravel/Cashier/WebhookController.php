@@ -25,7 +25,7 @@ class WebhookController extends Controller {
 		}
 		else
 		{
-			throw new NotFoundHttpException;
+			return $this->missingMethod();
 		}
 	}
 
