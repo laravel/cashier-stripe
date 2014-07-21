@@ -538,7 +538,12 @@ class StripeGateway {
 	 */
 	protected function getLastFourCardDigits($customer)
 	{
-		return $customer->cards->retrieve($customer->default_card)->last4;
+		try{
+			return $customer->cards->retrieve($customer->default_card)->last4;
+		}
+		catch{
+			return "";
+		}
 	}
 
 	/**
