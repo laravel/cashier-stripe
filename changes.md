@@ -1,6 +1,6 @@
 # Cashier Change Log
 
-## Upcoming
+## Version 2.0.4
 
 - Allow user to pass paramaters when fetching invoices.
 - Added a method to get the current subscription period's end date.
