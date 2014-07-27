@@ -511,4 +511,32 @@ trait BillableTrait {
 		static::$stripeKey = $key;
 	}
 
+	/**
+	 * Get the billing_cycle_anchor value.
+	 * 
+	 * At creation time, passing a non-now value for billing_cycle_anchor allows you to set up a 
+	 * subscription to have its * first "regular" billing date be at a specified point in the future.  
+	 * In particular (and unlike trial_end) billing_cycle_anchor lets you make a prorated charge for 
+	 * a fraction of the month, and then "snap" the billing cycle to the day that you desire.
+	 *
+	 * So, for instance, if on the 20th of January you did a create subscription request with 
+	 * billing_cycle_anchor equal to February 1st, your customer would immediately be charged for about 
+	 * 1/3 of a month, and then subsequently be charged the full amount on the 1st of each month, going 
+	 * forward.
+	 *
+	 * Additionally, when updating an existing subscription, you can pass billing_cycle_anchor=now (you 
+	 * can pass the string "now", just like for trial_end) to force the billing cycle to "reset" and be 
+	 * anchored "now", the way that it would if you were changing intervals.
+	 * 
+	 * Concretely, if you had a subscription that billed on the 1st of the month and then on the 18th of 
+	 * February you made an update request with billing_cycle_anchor=now, the subscription would 
+	 * immediately bill in full for the month of February 18th - March 18th, and then bill on the 18th 
+	 * of the month going forward.
+	 *
+	 * @var string|null
+	 */
+	public function getBillingCycleAnchor()
+	{
+		return $this->billingCycleAnchor ?: null;
+	}
 }

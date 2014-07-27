@@ -116,6 +116,7 @@ class StripeGateway {
 		$payload = [
 			'plan' => $this->plan, 'prorate' => $this->prorate,
 			'quantity' => $this->quantity, 'trial_end' => $this->getTrialEndForUpdate(),
+			'billing_cycle_anchor' => $this->getBillingCycleAnchor()
 		];
 
 		if ($this->coupon) $payload['coupon'] = $this->coupon;
@@ -708,6 +709,16 @@ class StripeGateway {
 	protected function getCurrency()
 	{
 		return $this->billable->getCurrency();
+	}
+
+	/**
+	 * Get the billing_cycle_anchor value.
+	 *
+	 * @var string|null
+	 */
+	protected function getBillingCycleAnchor()
+	{
+		return $this->billable->getBillingCycleAnchor();
 	}
 
 }
