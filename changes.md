@@ -4,7 +4,7 @@
 
 - Allow user to pass paramaters when fetching invoices.
 - Added a method to get the current subscription period's end date.
-- The webhook handler now returns the missing method function rather than throwing a not found exception.
+- If a webhook endpoint is not defined for a given hook, an empty 200 response will be returned.
 
 ## Version 2.0.3
 
