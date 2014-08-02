@@ -1,7 +1,7 @@
 <?php namespace Laravel\Cashier;
 
 use Carbon\Carbon;
-use Stripe_Invoice, Stripe_Customer;
+use Stripe_Invoice, Stripe_Customer, Stripe_Charge;
 
 class StripeGateway {
 
@@ -67,6 +67,34 @@ class StripeGateway {
 		$this->billable = $billable;
 
 		\Stripe::setApiKey($this->getStripeKey());
+	}
+
+	/**
+	 * Perform a One Time Payment.
+	 *
+	 * @param  string  $token
+	 * @param  array   $paymentProperties
+	 * @param  array   $userProperties
+	 * @return void
+	 */
+	public function performPayment($token, array $paymentProperties = array(), array $userProperties = array())
+	{
+		if( $this->billable->getStripeId() )
+		{
+			$customer = $this->getStripeCustomer();
+
+			$this->updateCard($token);
+		}
+		else
+		{
+			$customer = $this->createStripeCustomer($token, $userProperties);
+		}
+
+		$paymentProperties['customer'] = $customer->id;
+
+		$this->createStripeCharge($paymentProperties);
+
+		$this->updateLocalStripeData($customer);
 	}
 
 	/**
@@ -413,7 +441,7 @@ class StripeGateway {
 		$customer = $this->getStripeCustomer();
 
 		return Carbon::createFromTimestamp($this->getSubscriptionEndTimestamp($customer));
-        }
+	}
 
 	/**
 	 * Update the credit card attached to the entity.
@@ -432,8 +460,8 @@ class StripeGateway {
 		$customer->save();
 
 		$this->billable
-             ->setLastFourCardDigits($this->getLastFourCardDigits($this->getStripeCustomer()))
-             ->saveBillableInstance();
+			 ->setLastFourCardDigits($this->getLastFourCardDigits($this->getStripeCustomer()))
+			 ->saveBillableInstance();
 	}
 
 	/**
@@ -479,7 +507,7 @@ class StripeGateway {
 				->setStripeId($customer->id)
 				->setStripePlan($plan ?: $this->plan)
 				->setLastFourCardDigits($this->getLastFourCardDigits($customer))
-				->setStripeIsActive(true)
+				->setStripeIsActive(($plan || $this->plan) ? true : null)
 				->setSubscriptionEndDate(null)
 				->saveBillableInstance();
 	}
@@ -503,6 +531,7 @@ class StripeGateway {
 	/**
 	 * Get the Stripe customer for entity.
 	 *
+	 * @param  int|null  $id
 	 * @return \Stripe_Customer
 	 */
 	public function getStripeCustomer($id = null)
@@ -518,7 +547,18 @@ class StripeGateway {
 	}
 
 	/**
-	 * Deteremine if the customer has a subscription.
+	 * Create a new Stripe charge instance.
+	 *
+	 * @param  array  $paymentProperties
+	 * @return \Stripe_Charge
+	 */
+	public function createStripeCharge(array $paymentProperties)
+	{
+		return Stripe_Charge::create($paymentProperties, $this->getStripeKey());
+	}
+
+	/**
+	 * Determine if the customer has a subscription.
 	 *
 	 * @param  \Stripe_Customer  $customer
 	 * @return bool
@@ -526,8 +566,8 @@ class StripeGateway {
 	protected function usingMultipleSubscriptionApi($customer)
 	{
 		return ! isset($customer->subscription) &&
-                 count($customer->subscriptions) > 0 &&
-                 ! is_null($this->billable->getStripeSubscription());
+				 count($customer->subscriptions) > 0 &&
+				 ! is_null($this->billable->getStripeSubscription());
 	}
 
 	/**
