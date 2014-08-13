@@ -511,4 +511,19 @@ trait BillableTrait {
 		static::$stripeKey = $key;
 	}
 
+	/**
+	 * Add a card without charging the user.
+	 *
+	 * @param  string  $token
+	 * @return \Laravel\Cashier\BillableInterface
+	 */
+	public function addCardWithoutCharging($token)
+	{
+		$this->subscription()->updateLocalStripeData(
+			$this->subscription()->createStripeCustomer($token)
+			);
+		$this->setStripeIsActive(false);
+		return $this;
+	}
+
 }
