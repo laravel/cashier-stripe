@@ -269,6 +269,25 @@ class StripeGateway {
 	}
 
 	/**
+	 * Get the entity's upcoming invoice.
+	 *
+	 * @return \Laravel\Cashier\Invoice|null
+	 */
+	public function upcomingInvoice()
+	{
+		try
+		{
+			$customer = $this->getStripeCustomer();
+			$stripeInvoice= Stripe_Invoice::upcoming(['customer' => $customer->id]);
+			return new Invoice($this->billable, $stripeInvoice);
+		}
+		catch (\Stripe_InvalidRequestError $e)
+		{
+			return null;
+		}	
+	}
+
+	/**
 	 * Increment the quantity of the subscription.
 	 *
 	 * @param  int  $count
