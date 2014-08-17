@@ -709,5 +709,15 @@ class StripeGateway {
 	{
 		return $this->billable->getCurrency();
 	}
-
+	
+	/**
+	 * Get the subscription quantity.
+ 	 *
+ 	 * @return int
+	 */
+	public function getQuantity()
+	{
+		$customer = $this->getStripeCustomer();
+		return $customer->subscription->quantity;
+	}
 }
