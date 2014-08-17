@@ -330,6 +330,32 @@ class StripeGateway {
 	}
 
 	/**
+	 * Set a new quantity for the subscription.
+	 *
+	 * @param  int  $count
+	 * @return void
+	 */
+	public function setQuantity($quantity)
+	{
+		$customer = $this->getStripeCustomer();
+
+		$this->updateQuantity($customer, $quantity);
+	}
+
+	/**
+	 *  Set a new quantity for the subscription. and invoice immediately.
+	 *
+	 * @param  int|null  $quantity
+	 * @return void
+	 */
+	public function setQuantityAndInvoice($quantity)
+	{
+		$this->setQuantity($quantity);
+
+		$this->invoice();
+	}
+
+	/**
 	 * Cancel the billable entity's subscription.
 	 *
 	 * @return void
