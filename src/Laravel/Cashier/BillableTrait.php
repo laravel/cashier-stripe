@@ -100,9 +100,9 @@ trait BillableTrait {
 	 * @param  array   $data
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function downloadInvoice($id, array $data)
+	public function downloadInvoice($id, array $data, array $options = [])
 	{
-		return $this->findInvoiceOrFail($id)->download($data);
+		return $this->findInvoiceOrFail($id)->download($data, null, $options);
 	}
 
 	/**
