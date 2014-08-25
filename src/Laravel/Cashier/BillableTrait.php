@@ -66,8 +66,8 @@ trait BillableTrait {
 	public function findInvoice($id)
 	{
 		$invoice = $this->subscription()->findInvoice($id);
-
-		if ($invoice->customer == $this->getStripeId())
+		
+		if ($invoice && $invoice->customer == $this->getStripeId())
 		{
 			return $invoice;
 		}
