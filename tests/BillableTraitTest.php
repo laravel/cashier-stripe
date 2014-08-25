@@ -36,9 +36,9 @@ class BillableTraitTest extends PHPUnit_Framework_TestCase {
 	{
 		$billable = m::mock('BillableTraitTestStub[findInvoice]');
 		$billable->shouldReceive('findInvoice')->once()->with('id')->andReturn($invoice = m::mock('StdClass'));
-		$invoice->shouldReceive('download')->once()->with(['foo']);
+		$invoice->shouldReceive('download')->once()->with(['foo'], '', []);
 
-		$billable->downloadInvoice('id', ['foo']);
+		$billable->downloadInvoice('id', ['foo'], []);
 	}
 
 

@@ -66,8 +66,8 @@ trait BillableTrait {
 	public function findInvoice($id)
 	{
 		$invoice = $this->subscription()->findInvoice($id);
-
-		if ($invoice->customer == $this->getStripeId())
+		
+		if ($invoice && $invoice->customer == $this->getStripeId())
 		{
 			return $invoice;
 		}
@@ -100,9 +100,9 @@ trait BillableTrait {
 	 * @param  array   $data
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function downloadInvoice($id, array $data)
+	public function downloadInvoice($id, array $data, array $options = [])
 	{
-		return $this->findInvoiceOrFail($id)->download($data);
+		return $this->findInvoiceOrFail($id)->download($data, null, $options);
 	}
 
 	/**
