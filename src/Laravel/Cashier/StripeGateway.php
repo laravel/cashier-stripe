@@ -55,6 +55,13 @@ class StripeGateway {
 	protected $skipTrial = false;
 
 	/**
+	 * Indicates what the billing cycle period end should be.
+	 *
+	 * @var bool
+	 */
+	protected $billingCycleAnchor;
+
+	/**
 	 * Create a new Stripe gateway instance.
 	 *
 	 * @param  \Laravel\Cashier\BillableInterface   $billable
@@ -116,6 +123,7 @@ class StripeGateway {
 		$payload = [
 			'plan' => $this->plan, 'prorate' => $this->prorate,
 			'quantity' => $this->quantity, 'trial_end' => $this->getTrialEndForUpdate(),
+			'billing_cycle_anchor' => $this->billingCycleAnchor
 		];
 
 		if ($this->coupon) $payload['coupon'] = $this->coupon;
@@ -672,6 +680,18 @@ class StripeGateway {
 		{
 			return Carbon::createFromTimestamp($customer->subscription->trial_end);
 		}
+	}
+
+	/**
+	 * Set the billing cycle anchor value.
+	 *
+	 * @var string|null
+	 */
+	public function billingCycleAnchor($anchor)
+	{
+		$this->billingCycleAnchor = $anchor;
+
+		return $this;
 	}
 
 	/**
