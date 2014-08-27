@@ -60,8 +60,10 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 	public function testDiscountCanBeRetrieved()
 	{
 		$invoice = new Invoice($billable = m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000, 'subtotal' => 20000, 'currency' => 'usd']);
+
 		$billable->shouldReceive('addCurrencySymbol')->andReturn('$100');
 		$billable->shouldReceive('getCurrencyLocale')->andReturn('en_US');
+
 		$this->assertEquals(100.00, $invoice->discount());
 		$this->assertEquals('$100', $invoice->discountCurrency());
 	}
