@@ -123,8 +123,9 @@ class StripeGateway {
 		$payload = [
 			'plan' => $this->plan, 'prorate' => $this->prorate,
 			'quantity' => $this->quantity, 'trial_end' => $this->getTrialEndForUpdate(),
-			'billing_cycle_anchor' => $this->billingCycleAnchor
 		];
+
+		if($this->billingCycleAnchor) array_push($payload, ['billing_cycle_anchor' => $this->billingCycleAnchor]);
 
 		if ($this->coupon) $payload['coupon'] = $this->coupon;
 
@@ -191,7 +192,7 @@ class StripeGateway {
 	 */
 	public function resume($token = null)
 	{
-		$this->noProrate()->skipTrial()->create($token, [], $this->getStripeCustomer());
+		$this->noProrate()->billingCycleAnchor(null)->skipTrial()->create($token, [], $this->getStripeCustomer());
 
 		$this->billable->setTrialEndDate(null)->saveBillableInstance();
 	}

@@ -22,8 +22,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			'plan' => 'plan',
 			'prorate' => true,
 			'quantity' => 1,
-			'trial_end' => null,
-			'billing_cycle_anchor' => null
+			'trial_end' => null
 		])->andReturn((object) ['id' => 'sub_id']);
 		$customer->id = 'foo';
 		$billable->shouldReceive('setStripeSubscription')->once()->with('sub_id');
@@ -44,8 +43,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			'plan' => 'plan',
 			'prorate' => true,
 			'quantity' => 1,
-			'trial_end' => 'now',
-			'billing_cycle_anchor' => null
+			'trial_end' => 'now'
 		])->andReturn((object) ['id' => 'sub_id']);
 		$customer->id = 'foo';
 		$billable->shouldReceive('setStripeSubscription')->once()->with('sub_id');
