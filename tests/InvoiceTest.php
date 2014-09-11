@@ -56,11 +56,12 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($invoice->hasDiscount());
 	}
 
-    public function testHasDiscountIndicatesIfTotalDiscountWasApplied()
-    {
-        $invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 0, 'subtotal' => 20000]);
-        $this->assertTrue($invoice->hasDiscount());
-    }
+
+	public function testHasDiscountIndicatesIfTotalDiscountWasApplied()
+	{
+		$invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 0, 'subtotal' => 20000]);
+		$this->assertTrue($invoice->hasDiscount());
+	}
 
 
 	public function testDiscountCanBeRetrieved()
