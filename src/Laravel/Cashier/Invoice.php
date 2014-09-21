@@ -30,6 +30,13 @@ class Invoice {
 	protected $files;
 
 	/**
+	 * The view used to generate the invoice PDF
+	 *
+	 * @var string
+	 */
+	protected $view_receipt = 'cashier::receipt';
+
+	/**
 	 * Create a new invoice instance.
 	 *
 	 * @param  \Laravel\Cashier\BillableInterface  $billable
@@ -257,7 +264,7 @@ class Invoice {
 	{
 		$data = array_merge($data, ['invoice' => $this, 'billable' => $this->billable]);
 
-		return View::make('cashier::receipt', $data);
+		return View::make($this->view_receipt, $data);
 	}
 
 	/**
@@ -278,9 +285,20 @@ class Invoice {
 	 * @param  string  $storagePath
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function download(array $data, $storagePath = null)
+	public function download(array $data, $storagePath = null, array $options = [])
 	{
-		$filename = $this->getDownloadFilename($data['product']);
+		if (isset($options['filename']))
+		{
+			$filename = $options['filename'];
+		}
+		else
+		{
+			$filename = $this->getDownloadFilename($data['product']);
+		}
+		if (isset($options['view_receipt']))
+		{
+			$this->view_receipt = $options['view_receipt'];
+		}
 
 		$document = $this->writeInvoice($data, $storagePath);
 
