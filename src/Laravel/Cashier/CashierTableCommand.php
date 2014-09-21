@@ -43,7 +43,9 @@ class CashierTableCommand extends Command {
 	 */
 	protected function createBaseMigration()
 	{
-		$name = 'add_cashier_columns';
+		$table = $this->argument('table');
+		
+		$name = "add_cashier_columns_to_$table";
 
 		$path = $this->laravel['path.database'].'/migrations';
 
