@@ -44,9 +44,10 @@ interface BillableInterface {
 	/**
 	 * Get an array of the entity's invoices.
 	 *
+	 * @param  array  $parameters
 	 * @return array
 	 */
-	public function invoices();
+	public function invoices($parameters = array());
 
 	/**
 	 * Apply a coupon to the billable entity.

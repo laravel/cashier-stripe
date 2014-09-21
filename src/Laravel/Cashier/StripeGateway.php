@@ -493,6 +493,11 @@ class StripeGateway {
 	 */
 	public function createStripeCustomer($token, array $properties = array())
 	{
+		if ($this->coupon)
+		{
+			$properties['coupon'] = $this->coupon;
+		}
+
 		$customer = Stripe_Customer::create(
 			array_merge(['card' => $token], $properties), $this->getStripeKey()
 		);
