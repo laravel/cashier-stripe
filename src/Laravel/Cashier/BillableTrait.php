@@ -13,6 +13,27 @@ trait BillableTrait {
 	 * @var string
 	 */
 	protected static $stripeKey;
+	
+	/**
+	 * Currency for Stripe to use.
+	 * 
+	 * @var string
+	 */
+	protected static $currency = "usd";
+	
+	/**
+	 * Currency symbol for Stripe to display.
+	 * 
+	 * @var string
+	 */
+	protected static $currencySymbol = "$";
+	
+	/**
+	 * Locale of the currency for Stripe to use.
+	 * 
+	 * @var string
+	 */
+	protected static $currencyLocale = "en_US";
 
 	/**
 	 * Get the name that should be shown on the entity's invoices.
@@ -455,7 +476,7 @@ trait BillableTrait {
 	 */
 	public function getCurrency()
 	{
-		return 'usd';
+		return $this->currency;
 	}
 
 	/**
@@ -465,7 +486,7 @@ trait BillableTrait {
 	 */
 	public function getCurrencyLocale()
 	{
-		return 'en_US';
+		return $this->currencyLocale;
 	}
 
 	/**
@@ -487,7 +508,7 @@ trait BillableTrait {
 	 */
 	public function addCurrencySymbol($amount)
 	{
-		return '$'.$amount;
+		return $this->currencySymbol.$amount;
 	}
 
 	/**
