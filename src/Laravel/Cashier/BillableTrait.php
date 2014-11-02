@@ -476,7 +476,7 @@ trait BillableTrait {
 	 */
 	public function getCurrency()
 	{
-		return static::currency;
+		return static::$currency;
 	}
 
 	/**
@@ -486,7 +486,7 @@ trait BillableTrait {
 	 */
 	public function getCurrencyLocale()
 	{
-		return static::currencyLocale;
+		return static::$currencyLocale;
 	}
 
 	/**
@@ -508,7 +508,7 @@ trait BillableTrait {
 	 */
 	public function addCurrencySymbol($amount)
 	{
-		return static::currencySymbol.$amount;
+		return static::$currencySymbol.$amount;
 	}
 
 	/**
