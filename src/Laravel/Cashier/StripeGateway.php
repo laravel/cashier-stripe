@@ -1,7 +1,7 @@
 <?php namespace Laravel\Cashier;
 
 use Carbon\Carbon;
-use Stripe_Invoice, Stripe_Customer;
+use Stripe_Invoice, Stripe_Customer, Stripe_Charge;
 
 class StripeGateway {
 
@@ -55,18 +55,71 @@ class StripeGateway {
 	protected $skipTrial = false;
 
 	/**
+	 * The card token from Stripe.
+	 * 
+	 * @var string
+	 */
+	protected $card = null;
+
+	/**
 	 * Create a new Stripe gateway instance.
 	 *
 	 * @param  \Laravel\Cashier\BillableInterface   $billable
 	 * @param  string|null  $plan
 	 * @return void
 	 */
-	public function __construct(BillableInterface $billable, $plan = null)
+	public function __construct(BillableInterface $billable, $plan = null, $card = null)
 	{
 		$this->plan = $plan;
 		$this->billable = $billable;
+		$this->card = $card;
 
 		\Stripe::setApiKey($this->getStripeKey());
+	}
+
+	/**
+	 * Create a general charge on a given card.
+	 * 
+	 * @param  array  $properties
+	 * @param  array  $user
+	 * @return \Stripe_Charge
+	 */
+	public function charge(array $properties = array(), array $user = array()) 
+	{
+		if ($this->billable->getStripeId())
+		{
+			$customer = $this->getStripeCustomer();
+
+			if( ! is_null($this->card)) {
+				$this->updateCard($this->card);
+			}
+		}
+		else 
+		{
+			$user['card'] = $this->card;
+
+			$customer = $this->createStripeCustomer($this->card, $user);
+
+			$this->updateLocalStripeData($customer);
+
+			$this->billable->setStripeIsActive(false);
+		}
+
+		$properties['customer'] = $customer->id;
+
+		try 
+		{
+			$charge = Stripe_Charge::create($properties);
+		}
+		catch(Stripe_CardError $e) 
+		{
+			// The card on the account was declined.
+
+			return false;
+		}
+
+		return $charge;
+
 	}
 
 	/**
