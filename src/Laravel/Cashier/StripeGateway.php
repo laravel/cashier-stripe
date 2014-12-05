@@ -1,7 +1,7 @@
 <?php namespace Laravel\Cashier;
 
 use Carbon\Carbon;
-use Stripe_Invoice, Stripe_Customer, Stripe_Charge;
+use Stripe_Invoice, Stripe_Customer, Stripe_Charge, Stripe_CardError;
 
 class StripeGateway {
 
