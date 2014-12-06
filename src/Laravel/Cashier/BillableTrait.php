@@ -17,7 +17,7 @@ trait BillableTrait {
 	/**
 	 * Manipulate a card or a card in storage.
 	 * 
-	 * @param  string|null $token
+	 * @param  string|null  $token
 	 * @return \Laravel\Cashier\StripeGateway
 	 */
 	public function card($token = null) {
