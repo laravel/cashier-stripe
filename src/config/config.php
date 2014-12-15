@@ -12,5 +12,5 @@ return array(
     |
     */
 
-    'phantomjs' => '' 
+    'phantomjs' => '', 
 );
