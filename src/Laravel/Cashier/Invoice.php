@@ -357,7 +357,7 @@ class Invoice {
 	{
 		$prefix = ! is_null($prefix) ? $prefix.'_' : '';
 
-		return $prefix.$this->date()->month.'_'.$this->date()->year;
+		return $prefix.$this->date()->month.'_'.$this->date()->year.'.pdf';
 	}
 
 	/**
