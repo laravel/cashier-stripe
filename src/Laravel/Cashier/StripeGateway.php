@@ -1,7 +1,7 @@
 <?php namespace Laravel\Cashier;
 
 use Carbon\Carbon;
-use Stripe_Invoice, Stripe_Customer, Stripe_Charge, Stripe_CardError;
+use Stripe_Invoice, Stripe_Customer, Stripe_Charge;
 
 class StripeGateway {
 
@@ -111,7 +111,7 @@ class StripeGateway {
 		{
 			$charge = Stripe_Charge::create($properties);
 		}
-		catch(Stripe_CardError $e) 
+		catch(\Stripe_CardError $e)
 		{
 			// The card on the account was declined.
 
