@@ -5,7 +5,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-trait BillableTrait {
+trait Billable {
 
 	/**
 	 * The Stripe API key.

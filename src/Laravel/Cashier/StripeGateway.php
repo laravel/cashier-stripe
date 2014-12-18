@@ -432,7 +432,7 @@ class StripeGateway {
 		$customer = $this->getStripeCustomer();
 
 		return Carbon::createFromTimestamp($this->getSubscriptionEndTimestamp($customer));
-        }
+	}
 
 	/**
 	 * Update the credit card attached to the entity.
@@ -451,8 +451,8 @@ class StripeGateway {
 		$customer->save();
 
 		$this->billable
-             ->setLastFourCardDigits($this->getLastFourCardDigits($this->getStripeCustomer()))
-             ->saveBillableInstance();
+			 ->setLastFourCardDigits($this->getLastFourCardDigits($this->getStripeCustomer()))
+			 ->saveBillableInstance();
 	}
 
 	/**
@@ -550,8 +550,8 @@ class StripeGateway {
 	protected function usingMultipleSubscriptionApi($customer)
 	{
 		return ! isset($customer->subscription) &&
-                 count($customer->subscriptions) > 0 &&
-                 ! is_null($this->billable->getStripeSubscription());
+				 count($customer->subscriptions) > 0 &&
+				 ! is_null($this->billable->getStripeSubscription());
 	}
 
 	/**
@@ -604,8 +604,8 @@ class StripeGateway {
 
 	/**
 	 * Get the subscription quantity.
- 	 *
- 	 * @return int
+	 *
+	 * @return int
 	 */
 	public function getQuantity()
 	{
