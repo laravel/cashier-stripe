@@ -278,7 +278,7 @@ trait Billable {
 	 * Set whether the entity has a current Stripe subscription.
 	 *
 	 * @param  bool  $active
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setStripeIsActive($active = true)
 	{
@@ -290,7 +290,7 @@ trait Billable {
 	/**
 	 * Set Stripe as inactive on the entity.
 	 *
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function deactivateStripe()
 	{
@@ -335,7 +335,7 @@ trait Billable {
 	 * Set the Stripe ID for the entity.
 	 *
 	 * @param  string  $stripe_id
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setStripeId($stripe_id)
 	{
@@ -358,7 +358,7 @@ trait Billable {
 	 * Set the current subscription ID.
 	 *
 	 * @param  string  $subscription_id
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setStripeSubscription($subscription_id)
 	{
@@ -381,7 +381,7 @@ trait Billable {
 	 * Set the Stripe plan ID.
 	 *
 	 * @param  string  $plan
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setStripePlan($plan)
 	{
@@ -403,7 +403,7 @@ trait Billable {
 	/**
 	 * Set the last four digits of the entity's credit card.
 	 *
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setLastFourCardDigits($digits)
 	{
@@ -426,7 +426,7 @@ trait Billable {
 	 * Set the date on which the trial ends.
 	 *
 	 * @param  \DateTime|null  $date
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setTrialEndDate($date)
 	{
@@ -449,7 +449,7 @@ trait Billable {
 	 * Set the subscription end date for the entity.
 	 *
 	 * @param  \DateTime|null  $date
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setSubscriptionEndDate($date)
 	{

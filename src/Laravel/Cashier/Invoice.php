@@ -5,13 +5,14 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use Symfony\Component\HttpFoundation\Response;
+use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class Invoice {
 
 	/**
 	 * The billable instance.
 	 *
-	 * @var \Laravel\Cashier\BillableInterface
+	 * @var \Laravel\Cashier\Contracts\Billable
 	 */
 	protected $billable;
 
@@ -32,11 +33,11 @@ class Invoice {
 	/**
 	 * Create a new invoice instance.
 	 *
-	 * @param  \Laravel\Cashier\BillableInterface  $billable
+	 * @param  \Laravel\Cashier\Contracts\Billable  $billable
 	 * @param  object
 	 * @return void
 	 */
-	public function __construct(BillableInterface $billable, $invoice)
+	public function __construct(BillableContract $billable, $invoice)
 	{
 		$this->billable = $billable;
 		$this->files = new Filesystem;

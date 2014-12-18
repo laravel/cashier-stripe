@@ -1,11 +1,13 @@
 <?php namespace Laravel\Cashier;
 
+use Laravel\Cashier\Contracts\Billable as BillableContract;
+
 class LineItem {
 
 	/**
 	 * The billable instance.
 	 *
-	 * @var \Laravel\Cashier\BillableInterface
+	 * @var \Laravel\Cashier\Contracts\Billable
 	 */
 	protected $billable;
 
@@ -19,10 +21,11 @@ class LineItem {
 	/**
 	 * Create a new line item instance.
 	 *
+	 * @param  Billable  $billable
 	 * @param  object  $stripeLine
 	 * @return void
 	 */
-	public function __construct(BillableInterface $billable, $stripeLine)
+	public function __construct(BillableContract $billable, $stripeLine)
 	{
 		$this->billable = $billable;
 		$this->stripeLine = $stripeLine;

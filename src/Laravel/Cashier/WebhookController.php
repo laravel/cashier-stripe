@@ -62,7 +62,7 @@ class WebhookController extends Controller {
 	 * Get the billable entity instance by Stripe ID.
 	 *
 	 * @param  string  $stripeId
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	protected function getBillable($stripeId)
 	{

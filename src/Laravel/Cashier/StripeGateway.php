@@ -2,13 +2,14 @@
 
 use Carbon\Carbon;
 use Stripe_Invoice, Stripe_Customer;
+use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class StripeGateway {
 
 	/**
 	 * The billable instance.
 	 *
-	 * @var \Laravel\Cashier\BillableInterface
+	 * @var \Laravel\Cashier\Contracts\Billable
 	 */
 	protected $billable;
 
@@ -57,11 +58,11 @@ class StripeGateway {
 	/**
 	 * Create a new Stripe gateway instance.
 	 *
-	 * @param  \Laravel\Cashier\BillableInterface   $billable
+	 * @param  \Laravel\Cashier\Contracts\Billable   $billable
 	 * @param  string|null  $plan
 	 * @return void
 	 */
-	public function __construct(BillableInterface $billable, $plan = null)
+	public function __construct(BillableContract $billable, $plan = null)
 	{
 		$this->plan = $plan;
 		$this->billable = $billable;

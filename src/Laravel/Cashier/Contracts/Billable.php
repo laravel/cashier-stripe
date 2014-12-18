@@ -1,8 +1,8 @@
-<?php namespace Laravel\Cashier;
+<?php namespace Laravel\Cashier\Contracts;
 
 use DateTime;
 
-interface BillableInterface {
+interface Billable {
 
 	/**
 	 * Get the name that should be shown on the entity's invoices.
@@ -111,14 +111,14 @@ interface BillableInterface {
 	 * Set whether the entity has a current Stripe subscription.
 	 *
 	 * @param  bool  $active
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setStripeIsActive($active = true);
 
 	/**
 	 * Set Stripe as inactive on the entity.
 	 *
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function deactivateStripe();
 
@@ -133,7 +133,7 @@ interface BillableInterface {
 	 * Set the Stripe ID for the entity.
 	 *
 	 * @param  string  $stripe_id
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setStripeId($stripe_id);
 
@@ -148,7 +148,7 @@ interface BillableInterface {
 	 * Set the current subscription ID.
 	 *
 	 * @param  string  $subscription_id
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setStripeSubscription($subscription_id);
 
@@ -162,7 +162,7 @@ interface BillableInterface {
 	/**
 	 * Set the last four digits of the entity's credit card.
 	 *
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setLastFourCardDigits($digits);
 
