@@ -37,13 +37,11 @@ trait Billable {
 	/**
 	 * Get a new billing gateway instance for the given plan.
 	 *
-	 * @param  \Laravel\Cashier\PlanInterface|string|null  $plan
+	 * @param  string|null  $plan
 	 * @return \Laravel\Cashier\StripeGateway
 	 */
 	public function subscription($plan = null)
 	{
-		if ($plan instanceof PlanInterface) $plan = $plan->getStripeId();
-
 		return new StripeGateway($this, $plan);
 	}
 
@@ -232,13 +230,11 @@ trait Billable {
 	/**
 	 * Determine if the entity is on the given plan.
 	 *
-	 * @param  \Laravel\Cashier\PlanInterface|string  $plan
+	 * @param  string  $plan
 	 * @return bool
 	 */
 	public function onPlan($plan)
 	{
-		if ($plan instanceof PlanInterface) $plan = $plan->getStripeId();
-
 		return $this->stripeIsActive() && $this->subscription()->planId() == $plan;
 	}
 

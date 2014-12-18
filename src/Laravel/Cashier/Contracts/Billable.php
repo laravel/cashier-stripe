@@ -21,7 +21,7 @@ interface Billable {
 	/**
 	 * Get a new billing builder instance for the given plan.
 	 *
-	 * @param  \Laravel\Cashier\PlanInterface|string|null  $plan
+	 * @param  string|null  $plan
 	 * @return \Laravel\Cashier\Builder
 	 */
 	public function subscription($plan = null);
@@ -81,7 +81,7 @@ interface Billable {
 	/**
 	 * Determine if the entity is on the given plan.
 	 *
-	 * @param  \Laravel\Cashier\PlanInterface|string  $plan
+	 * @param  string  $plan
 	 * @return bool
 	 */
 	public function onPlan($plan);
