@@ -15,6 +15,18 @@ trait BillableTrait {
 	protected static $stripeKey;
 
 	/**
+	 * Manipulate a card or a card in storage.
+	 * 
+	 * @param  string|null  $token
+	 * @return \Laravel\Cashier\StripeGateway
+	 */
+	public function card($token = null) {
+
+		return new StripeGateway($this, null, $token);
+
+	}
+
+	/**
 	 * Get the name that should be shown on the entity's invoices.
 	 *
 	 * @return string
