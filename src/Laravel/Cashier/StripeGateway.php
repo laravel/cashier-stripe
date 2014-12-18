@@ -276,13 +276,15 @@ class StripeGateway {
 		try
 		{
 			$customer = $this->getStripeCustomer();
-			$stripeInvoice= Stripe_Invoice::upcoming(['customer' => $customer->id]);
+
+			$stripeInvoice = Stripe_Invoice::upcoming(['customer' => $customer->id]);
+
 			return new Invoice($this->billable, $stripeInvoice);
 		}
 		catch (\Stripe_InvalidRequestError $e)
 		{
 			return null;
-		}	
+		}
 	}
 
 	/**

@@ -116,7 +116,6 @@ trait BillableTrait {
 		return $this->subscription()->invoices(false, $parameters);
 	}
 
-	
 	/**
 	 *  Get the entity's upcoming invoice.
 	 *
