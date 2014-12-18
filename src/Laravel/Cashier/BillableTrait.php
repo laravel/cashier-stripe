@@ -511,4 +511,12 @@ trait BillableTrait {
 		static::$stripeKey = $key;
 	}
 
+	/**
+	 * Resubscribe the entity to the same plan and with the same quantity
+	 *
+	 * @return void
+	 */
+	public function resume(){
+		$this->subscription($this->getStripePlan())->quantity($this->subscription()->getQuantity())->resume();
+	}
 }
