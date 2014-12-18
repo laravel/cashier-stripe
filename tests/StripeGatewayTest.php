@@ -11,6 +11,36 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		Mockery::close();
 	}
 
+	public function testPerformPaymentPassesProperOptionsToCustomer()
+	{
+		$billable = $this->mockBillableInterface();
+		$billable->shouldReceive('getCurrency')->andReturn('eur');
+		$billable->shouldReceive('getStripeId')->andReturn('foo');
+		$gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,updateCard,createStripeCharge,updateLocalStripeData]', array($billable, 'plan'));
+		$gateway->shouldReceive('getStripeCustomer')->andReturn($customer = m::mock('StdClass'));
+		$customer->id = 'foo';
+		$gateway->shouldReceive('updateCard')->once();
+		$gateway->shouldReceive('createStripeCharge')->once();
+		$gateway->shouldReceive('updateLocalStripeData')->once();
+
+		$gateway->performPayment('token', [], []);
+	}
+
+
+	public function testPerformPaymentWithNewCustomerPassesProperOptionsToCustomer()
+	{
+		$billable = $this->mockBillableInterface();
+		$billable->shouldReceive('getCurrency')->andReturn('eur');
+		$billable->shouldReceive('getStripeId')->once()->andReturn(false);
+		$gateway = m::mock('Laravel\Cashier\StripeGateway[createStripeCustomer,createStripeCharge,updateLocalStripeData]', array($billable, 'plan'));
+		$gateway->shouldReceive('createStripeCustomer')->andReturn($customer = m::mock('StdClass'));
+		$customer->id = 'foo';
+		$gateway->shouldReceive('createStripeCharge')->once();
+		$gateway->shouldReceive('updateLocalStripeData')->once();
+
+		$gateway->performPayment('token', [], []);
+	}
+
 
 	public function testCreatePassesProperOptionsToCustomer()
 	{

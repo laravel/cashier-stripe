@@ -35,6 +35,16 @@ trait BillableTrait {
 	}
 
 	/**
+	 * Get a new billing gateway instance to perform a One Time Payment.
+	 *
+	 * @return \Laravel\Cashier\StripeGateway
+	 */
+	public function oneTimePayment()
+	{
+		return new StripeGateway($this);
+	}
+
+	/**
 	 * Get a new billing gateway instance for the given plan.
 	 *
 	 * @param  \Laravel\Cashier\PlanInterface|string|null  $plan
