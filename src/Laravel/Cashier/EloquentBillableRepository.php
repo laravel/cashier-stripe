@@ -1,7 +1,7 @@
 <?php namespace Laravel\Cashier;
 
 use Illuminate\Support\Facades\Config;
-use Laravel\Cashier\Contracts\Billable;
+use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class EloquentBillableRepository implements BillableRepositoryInterface {
 
@@ -28,7 +28,7 @@ class EloquentBillableRepository implements BillableRepositoryInterface {
 	{
 		$model = new $class;
 
-		if ( ! $model instanceof Billable)
+		if ( ! $model instanceof BillableContract)
 		{
 			throw new \InvalidArgumentException("Model does not implement Billable.");
 		}
