@@ -13,7 +13,7 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 
 	public function testGettingDollarTotalOfInvoice()
 	{
-		$invoice = new Invoice($billable = m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000, 'currency' => 'usd']);
+		$invoice = new Invoice($billable = m::mock('Laravel\Cashier\Contracts\Billable'), (object) ['total' => 10000, 'currency' => 'usd']);
 		$billable->shouldReceive('formatCurrency')->andReturn(100.00);
 		$billable->shouldReceive('addCurrencySymbol')->andReturn('$100.00');
 		$this->assertEquals('$100.00', $invoice->dollars());
@@ -22,7 +22,7 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 
 	public function testGettingSubtotal()
 	{
-		$invoice = new Invoice($billable = m::mock('Laravel\Cashier\BillableInterface'), (object) ['subtotal' => 10000]);
+		$invoice = new Invoice($billable = m::mock('Laravel\Cashier\Contracts\Billable'), (object) ['subtotal' => 10000]);
 		$billable->shouldReceive('formatCurrency')->andReturn(100.00);
 		$this->assertEquals(100.00, $invoice->subtotal());
 	}
@@ -30,7 +30,7 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 
 	public function testGettingLineItemsByType()
 	{
-		$invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) [
+		$invoice = new Invoice(m::mock('Laravel\Cashier\Contracts\Billable'), (object) [
 			'lines' => (object) [
 				'data' => [
 					(object) ['type' => 'foo', 'name' => 'taylor'],
@@ -52,21 +52,21 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 
 	public function testHasDiscountIndicatesIfDiscountWasApplied()
 	{
-		$invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000, 'subtotal' => 20000]);
+		$invoice = new Invoice(m::mock('Laravel\Cashier\Contracts\Billable'), (object) ['total' => 10000, 'subtotal' => 20000]);
 		$this->assertTrue($invoice->hasDiscount());
 	}
 
 
 	public function testHasDiscountIndicatesIfTotalDiscountWasApplied()
 	{
-		$invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 0, 'subtotal' => 20000]);
+		$invoice = new Invoice(m::mock('Laravel\Cashier\Contracts\Billable'), (object) ['total' => 0, 'subtotal' => 20000]);
 		$this->assertTrue($invoice->hasDiscount());
 	}
 
 
 	public function testDiscountCanBeRetrieved()
 	{
-		$invoice = new Invoice($billable = m::mock('Laravel\Cashier\BillableInterface'), (object) ['total' => 10000, 'subtotal' => 20000, 'currency' => 'usd']);
+		$invoice = new Invoice($billable = m::mock('Laravel\Cashier\Contracts\Billable'), (object) ['total' => 10000, 'subtotal' => 20000, 'currency' => 'usd']);
 		$billable->shouldReceive('addCurrencySymbol')->andReturn('$100');
 		$billable->shouldReceive('getCurrencyLocale')->andReturn('en_US');
 		$this->assertEquals(100.00, $invoice->discount());
@@ -76,7 +76,7 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 
 	public function testCouponCanBeRetrieved()
 	{
-		$invoice = new Invoice(m::mock('Laravel\Cashier\BillableInterface'), (object) ['discount' => (object) ['coupon' => (object) ['id' => 'coupon-code']]]);
+		$invoice = new Invoice(m::mock('Laravel\Cashier\Contracts\Billable'), (object) ['discount' => (object) ['coupon' => (object) ['id' => 'coupon-code']]]);
 		$this->assertEquals('coupon-code', $invoice->coupon());
 	}
 
@@ -84,7 +84,7 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 	public function testDownloadingInvoiceReturnsResponse()
 	{
 		$data = ['vendor' => 'Vendor', 'product' => 'Product'];
-		$invoice = m::mock('Laravel\Cashier\Invoice[render,getPhantomProcess]', array(m::mock('Laravel\Cashier\BillableInterface'), new StdClass));
+		$invoice = m::mock('Laravel\Cashier\Invoice[render,getPhantomProcess]', array(m::mock('Laravel\Cashier\Contracts\Billable'), new StdClass));
 		$invoice->id = 'id';
 		$invoice->date = time();
 		$workPath = realpath(__DIR__.'/../src/Laravel/Cashier/work').'/'.md5('id').'.pdf';
@@ -113,7 +113,7 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 		$url = 'url';
 		$__stripeInvoice = (object) ['id' => 1, 'date' => $date = time()];
 
-		$invoice = m::mock('Laravel\Cashier\Invoice', array(m::mock('Laravel\Cashier\BillableInterface'), $__stripeInvoice));
+		$invoice = m::mock('Laravel\Cashier\Invoice', array(m::mock('Laravel\Cashier\Contracts\Billable'), $__stripeInvoice));
 		$invoice->shouldReceive('date')->andReturn(Carbon\Carbon::createFromTimestamp($date));
 
 		/**

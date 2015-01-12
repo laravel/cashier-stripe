@@ -5,7 +5,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-trait BillableTrait {
+trait Billable {
 
 	/**
 	 * The Stripe API key.
@@ -37,13 +37,11 @@ trait BillableTrait {
 	/**
 	 * Get a new billing gateway instance for the given plan.
 	 *
-	 * @param  \Laravel\Cashier\PlanInterface|string|null  $plan
+	 * @param  string|null  $plan
 	 * @return \Laravel\Cashier\StripeGateway
 	 */
 	public function subscription($plan = null)
 	{
-		if ($plan instanceof PlanInterface) $plan = $plan->getStripeId();
-
 		return new StripeGateway($this, $plan);
 	}
 
@@ -114,6 +112,16 @@ trait BillableTrait {
 	public function invoices($parameters = array())
 	{
 		return $this->subscription()->invoices(false, $parameters);
+	}
+
+	/**
+	 *  Get the entity's upcoming invoice.
+	 *
+	 * @return @return \Laravel\Cashier\Invoice|null
+	 */
+	public function upcomingInvoice()
+	{
+		return $this->subscription()->upcomingInvoice();
 	}
 
 	/**
@@ -222,13 +230,11 @@ trait BillableTrait {
 	/**
 	 * Determine if the entity is on the given plan.
 	 *
-	 * @param  \Laravel\Cashier\PlanInterface|string  $plan
+	 * @param  string  $plan
 	 * @return bool
 	 */
 	public function onPlan($plan)
 	{
-		if ($plan instanceof PlanInterface) $plan = $plan->getStripeId();
-
 		return $this->stripeIsActive() && $this->subscription()->planId() == $plan;
 	}
 
@@ -268,7 +274,7 @@ trait BillableTrait {
 	 * Set whether the entity has a current Stripe subscription.
 	 *
 	 * @param  bool  $active
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setStripeIsActive($active = true)
 	{
@@ -280,7 +286,7 @@ trait BillableTrait {
 	/**
 	 * Set Stripe as inactive on the entity.
 	 *
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function deactivateStripe()
 	{
@@ -325,7 +331,7 @@ trait BillableTrait {
 	 * Set the Stripe ID for the entity.
 	 *
 	 * @param  string  $stripe_id
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setStripeId($stripe_id)
 	{
@@ -348,7 +354,7 @@ trait BillableTrait {
 	 * Set the current subscription ID.
 	 *
 	 * @param  string  $subscription_id
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setStripeSubscription($subscription_id)
 	{
@@ -371,7 +377,7 @@ trait BillableTrait {
 	 * Set the Stripe plan ID.
 	 *
 	 * @param  string  $plan
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setStripePlan($plan)
 	{
@@ -393,7 +399,7 @@ trait BillableTrait {
 	/**
 	 * Set the last four digits of the entity's credit card.
 	 *
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setLastFourCardDigits($digits)
 	{
@@ -416,7 +422,7 @@ trait BillableTrait {
 	 * Set the date on which the trial ends.
 	 *
 	 * @param  \DateTime|null  $date
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setTrialEndDate($date)
 	{
@@ -439,7 +445,7 @@ trait BillableTrait {
 	 * Set the subscription end date for the entity.
 	 *
 	 * @param  \DateTime|null  $date
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function setSubscriptionEndDate($date)
 	{

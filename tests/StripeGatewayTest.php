@@ -2,7 +2,7 @@
 
 use Mockery as m;
 use Laravel\Cashier\StripeGateway;
-use Laravel\Cashier\BillableInterface;
+use Laravel\Cashier\Contracts\Billable;
 
 class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
@@ -272,7 +272,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 	protected function mockBillableInterface()
 	{
-		$billable = m::mock('Laravel\Cashier\BillableInterface');
+		$billable = m::mock('Laravel\Cashier\Contracts\Billable');
 		$billable->shouldReceive('getStripeKey')->andReturn('key');
 		return $billable;
 	}

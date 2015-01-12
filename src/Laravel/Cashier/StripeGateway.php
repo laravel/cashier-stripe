@@ -2,13 +2,14 @@
 
 use Carbon\Carbon;
 use Stripe_Invoice, Stripe_Customer;
+use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class StripeGateway {
 
 	/**
 	 * The billable instance.
 	 *
-	 * @var \Laravel\Cashier\BillableInterface
+	 * @var \Laravel\Cashier\Contracts\Billable
 	 */
 	protected $billable;
 
@@ -57,11 +58,11 @@ class StripeGateway {
 	/**
 	 * Create a new Stripe gateway instance.
 	 *
-	 * @param  \Laravel\Cashier\BillableInterface   $billable
+	 * @param  \Laravel\Cashier\Contracts\Billable   $billable
 	 * @param  string|null  $plan
 	 * @return void
 	 */
-	public function __construct(BillableInterface $billable, $plan = null)
+	public function __construct(BillableContract $billable, $plan = null)
 	{
 		$this->plan = $plan;
 		$this->billable = $billable;
@@ -117,8 +118,6 @@ class StripeGateway {
 			'plan' => $this->plan, 'prorate' => $this->prorate,
 			'quantity' => $this->quantity, 'trial_end' => $this->getTrialEndForUpdate(),
 		];
-
-		if ($this->coupon) $payload['coupon'] = $this->coupon;
 
 		return $payload;
 	}
@@ -269,6 +268,27 @@ class StripeGateway {
 	}
 
 	/**
+	 * Get the entity's upcoming invoice.
+	 *
+	 * @return \Laravel\Cashier\Invoice|null
+	 */
+	public function upcomingInvoice()
+	{
+		try
+		{
+			$customer = $this->getStripeCustomer();
+
+			$stripeInvoice = Stripe_Invoice::upcoming(['customer' => $customer->id]);
+
+			return new Invoice($this->billable, $stripeInvoice);
+		}
+		catch (\Stripe_InvalidRequestError $e)
+		{
+			return null;
+		}
+	}
+
+	/**
 	 * Increment the quantity of the subscription.
 	 *
 	 * @param  int  $count
@@ -413,7 +433,7 @@ class StripeGateway {
 		$customer = $this->getStripeCustomer();
 
 		return Carbon::createFromTimestamp($this->getSubscriptionEndTimestamp($customer));
-        }
+	}
 
 	/**
 	 * Update the credit card attached to the entity.
@@ -432,8 +452,8 @@ class StripeGateway {
 		$customer->save();
 
 		$this->billable
-             ->setLastFourCardDigits($this->getLastFourCardDigits($this->getStripeCustomer()))
-             ->saveBillableInstance();
+			 ->setLastFourCardDigits($this->getLastFourCardDigits($this->getStripeCustomer()))
+			 ->saveBillableInstance();
 	}
 
 	/**
@@ -531,8 +551,8 @@ class StripeGateway {
 	protected function usingMultipleSubscriptionApi($customer)
 	{
 		return ! isset($customer->subscription) &&
-                 count($customer->subscriptions) > 0 &&
-                 ! is_null($this->billable->getStripeSubscription());
+				 count($customer->subscriptions) > 0 &&
+				 ! is_null($this->billable->getStripeSubscription());
 	}
 
 	/**
@@ -581,6 +601,18 @@ class StripeGateway {
 		$this->prorate = false;
 
 		return $this;
+	}
+
+	/**
+	 * Get the subscription quantity.
+	 *
+	 * @return int
+	 */
+	public function getQuantity()
+	{
+		$customer = $this->getStripeCustomer();
+
+		return $customer->subscription->quantity;
 	}
 
 	/**

@@ -3,10 +3,10 @@
 interface BillableRepositoryInterface {
 
 	/**
-	 * Find a BillableInterface implementation by Stripe ID.
+	 * Find a Billable implementation by Stripe ID.
 	 *
 	 * @param  string  $stripeId
-	 * @return \Laravel\Cashier\BillableInterface
+	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	public function find($stripeId);
 
