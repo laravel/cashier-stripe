@@ -245,7 +245,7 @@ class Invoice {
 	 */
 	public function dateString($timezone = null)
 	{
-		return $this->date()->toDayDateTimeString();
+		return $this->date($timezone)->toDayDateTimeString();
 	}
 
 	/**
