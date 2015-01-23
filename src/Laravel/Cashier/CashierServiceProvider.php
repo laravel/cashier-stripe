@@ -12,16 +12,6 @@ class CashierServiceProvider extends ServiceProvider {
 	protected $defer = false;
 
 	/**
-	 * Bootstrap the application events.
-	 *
-	 * @return void
-	 */
-	public function boot()
-	{
-		$this->package('laravel/cashier');
-	}
-
-	/**
 	 * Register the service provider.
 	 *
 	 * @return void
