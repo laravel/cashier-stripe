@@ -5,20 +5,13 @@ use Illuminate\Support\ServiceProvider;
 class CashierServiceProvider extends ServiceProvider {
 
 	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var bool
-	 */
-	protected $defer = false;
-
-	/**
 	 * Bootstrap the application events.
 	 *
 	 * @return void
 	 */
 	public function boot()
 	{
-		$this->package('laravel/cashier');
+		$this->loadViewsFrom('cashier', __DIR__.'/../../views');
 	}
 
 	/**
@@ -39,16 +32,6 @@ class CashierServiceProvider extends ServiceProvider {
 		});
 
 		$this->commands('command.cashier.table');
-	}
-
-	/**
-	 * Get the services provided by the provider.
-	 *
-	 * @return array
-	 */
-	public function provides()
-	{
-		return array();
 	}
 
 }
