@@ -415,7 +415,7 @@ trait Billable {
 	 */
 	public function getTrialEndDate()
 	{
-		return $this->trial_ends_at;
+		return Carbon::createFromFormat('Y-m-d H:i:s', $this->trial_ends_at);
 	}
 
 	/**
