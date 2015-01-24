@@ -118,8 +118,6 @@ class StripeGateway {
 			'quantity' => $this->quantity, 'trial_end' => $this->getTrialEndForUpdate(),
 		];
 
-		if ($this->coupon) $payload['coupon'] = $this->coupon;
-
 		return $payload;
 	}
 
