@@ -1,7 +1,9 @@
 <?php namespace Laravel\Cashier;
 
+use Stripe;
 use Carbon\Carbon;
-use Stripe_Invoice, Stripe_Customer;
+use Stripe_Invoice;
+use Stripe_Customer;
 use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class StripeGateway {
@@ -67,7 +69,7 @@ class StripeGateway {
 		$this->plan = $plan;
 		$this->billable = $billable;
 
-		\Stripe::setApiKey($this->getStripeKey());
+		Stripe::setApiKey($this->getStripeKey());
 	}
 
 	/**
