@@ -104,6 +104,18 @@ trait Billable {
 	}
 
 	/**
+	 * Get the local path of an invoice.
+	 *
+	 * @param  string  $id
+	 * @param  array   $data
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	public function invoicePath($id, array $data)
+	{
+		return $this->findInvoiceOrFail($id)->getInvoicePath($data);
+	}
+
+	/**
 	 * Get an array of the entity's invoices.
 	 *
 	 * @param  array  $parameters
