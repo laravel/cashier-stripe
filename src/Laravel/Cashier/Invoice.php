@@ -277,7 +277,7 @@ class Invoice {
 	 *
 	 * @param  array   $data
 	 * @param  string  $storagePath
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * @return string
 	 */
 	public function getInvoicePath(array $data, $storagePath = null)
 	{

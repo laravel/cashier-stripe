@@ -108,7 +108,7 @@ trait Billable {
 	 *
 	 * @param  string  $id
 	 * @param  array   $data
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * @return string
 	 */
 	public function invoicePath($id, array $data)
 	{
