@@ -11,7 +11,7 @@ class CashierServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$this->loadViewsFrom('cashier', __DIR__.'/../../views');
+		$this->loadViewsFrom(__DIR__.'/../../views', 'cashier');
 	}
 
 	/**
