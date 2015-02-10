@@ -21,7 +21,7 @@ class EloquentBillableRepository implements BillableRepositoryInterface {
 	/**
 	 * Create a new instance of the Auth model.
 	 *
-	 * @param  string  $model
+	 * @param  string  $class
 	 * @return \Laravel\Cashier\Contracts\Billable
 	 */
 	protected function createCashierModel($class)
