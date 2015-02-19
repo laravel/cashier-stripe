@@ -503,6 +503,7 @@ class StripeGateway {
 				->setLastFourCardDigits($this->getLastFourCardDigits($customer))
 				->setStripeIsActive(true)
 				->setSubscriptionEndDate(null)
+				->setTrialEndDate($this->getTrialEndForUpdate())
 				->saveBillableInstance();
 	}
 
