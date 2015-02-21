@@ -326,7 +326,7 @@ class Invoice {
 	 */
 	protected function writeViewForImaging(array $data, $storagePath)
 	{
-		$storagePath = $storagePath ?: storage_path().'/meta';
+		$storagePath = $storagePath ?: storage_path().'/framework';
 
 		$this->files->put($path = $storagePath.'/'.md5($this->id).'.pdf', $this->render($data));
 
