@@ -4,6 +4,7 @@ use Stripe;
 use Carbon\Carbon;
 use Stripe_Invoice;
 use Stripe_Customer;
+use Stripe_Coupon;
 use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class StripeGateway {
@@ -456,6 +457,25 @@ class StripeGateway {
 		$this->billable
 			 ->setLastFourCardDigits($this->getLastFourCardDigits($this->getStripeCustomer()))
 			 ->saveBillableInstance();
+	}
+
+	/**
+	 * Validate a coupon.
+	 *
+	 * @param  string  $coupon
+	 * @return bool
+	 */
+	public function validCoupon($coupon)
+	{
+		try
+		{
+			$coupon = Stripe_Coupon::retrieve($coupon);
+			return $coupon->valid;
+		}
+		catch (\Stripe_InvalidRequestError $e)
+		{
+			return false;
+		}
 	}
 
 	/**
