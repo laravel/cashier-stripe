@@ -273,6 +273,20 @@ class Invoice {
 	}
 
 	/**
+	 * Get the local path of an invoice.
+	 *
+	 * @param  array   $data
+	 * @param  string  $storagePath
+	 * @return string
+	 */
+	public function getInvoicePath(array $data, $storagePath = null)
+	{
+		$filename = $this->getDownloadFilename($data['product']);
+
+		return $this->writeInvoice($data, $storagePath);
+	}
+
+	/**
 	 * Create an invoice download response.
 	 *
 	 * @param  array   $data
