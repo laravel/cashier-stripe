@@ -1,5 +1,6 @@
 <?php namespace Laravel\Cashier;
 
+use Config;
 use Exception;
 use Stripe_Event;
 use Illuminate\Routing\Controller;
@@ -46,7 +47,7 @@ class WebhookController extends Controller {
 	{
 		try
 		{
-			return ! is_null(Stripe_Event::retrieve($id));
+			return ! is_null(Stripe_Event::retrieve($id, Config::get('services.stripe.secret')));
 		}
 		catch (Exception $e)
 		{
