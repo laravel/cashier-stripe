@@ -2,8 +2,11 @@
 
 use Stripe;
 use Carbon\Carbon;
+use Stripe_Charge;
 use Stripe_Invoice;
 use Stripe_Customer;
+use Stripe_CardError;
+use InvalidArgumentException;
 use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class StripeGateway {
@@ -70,6 +73,41 @@ class StripeGateway {
 		$this->billable = $billable;
 
 		Stripe::setApiKey($this->getStripeKey());
+	}
+
+	/**
+	 * Make a "one off" charge on the customer for the given amount.
+	 *
+	 * @param  int  $amount
+	 * @param  array  $options
+	 * @return bool|mixed
+	 */
+	public function charge($amount, array $options = array())
+	{
+		$options = array_merge([
+			'currency' => 'usd',
+		], $options);
+
+		if ( ! array_key_exists('source', $options) && $this->billable->hasStripeId())
+		{
+			$options['source'] = $this->billable->getStripeId();
+		}
+
+		if ( ! array_key_exists('source', $options))
+		{
+			throw new InvalidArgumentException("No payment source provided.");
+		}
+
+		try
+		{
+			$response = Stripe_Charge::create($options);
+		}
+		catch (Stripe_CardError $e)
+		{
+			return false;
+		}
+
+		return $response;
 	}
 
 	/**
