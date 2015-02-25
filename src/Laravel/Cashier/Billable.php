@@ -54,7 +54,6 @@ trait Billable {
 	{
 		return $this->subscription()->invoice();
 	}
-
 	/**
 	 * Find an invoice by ID.
 	 *
@@ -89,6 +88,18 @@ trait Billable {
 		{
 			return $invoice;
 		}
+	}
+
+	/**
+	 * Get an SplFileInfo instance for a given invoice.
+	 *
+	 * @param  string  $id
+	 * @param  array  $data
+	 * @return \SplFileInfo
+	 */
+	public function invoiceFile($id, array $data)
+	{
+		return $this->findInvoiceOrFail($id)->file($data);
 	}
 
 	/**

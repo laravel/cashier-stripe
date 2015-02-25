@@ -1,5 +1,6 @@
 <?php namespace Laravel\Cashier;
 
+use SplFileInfo;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use Illuminate\Filesystem\Filesystem;
@@ -246,6 +247,18 @@ class Invoice {
 	public function dateString($timezone = null)
 	{
 		return $this->date($timezone)->toDayDateTimeString();
+	}
+
+	/**
+	 * Get an SplFileInfo instance for the invoice with the given data.
+	 *
+	 * @param  array  $data
+	 * @param  string|null  $storagePath
+	 * @return \SplFileInfo
+	 */
+	public function file(array $data, $storagePath = null)
+	{
+		return new SplFileInfo($this->writeInvoice($data, $storagePath));
 	}
 
 	/**
