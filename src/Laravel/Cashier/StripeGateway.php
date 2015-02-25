@@ -88,12 +88,14 @@ class StripeGateway {
 			'currency' => 'usd',
 		], $options);
 
+		$options['amount'] = $amount;
+
 		if ( ! array_key_exists('source', $options) && $this->billable->hasStripeId())
 		{
-			$options['source'] = $this->billable->getStripeId();
+			$options['customer'] = $this->billable->getStripeId();
 		}
 
-		if ( ! array_key_exists('source', $options))
+		if ( ! array_key_exists('source', $options) && ! array_key_exists('customer', $options))
 		{
 			throw new InvalidArgumentException("No payment source provided.");
 		}
