@@ -514,7 +514,7 @@ class StripeGateway
      *
      * @param  string  $token
      * @param  array   $properties
-     * @return string
+     * @return \Stripe_Customer
      */
     public function createStripeCustomer($token, array $properties = array())
     {
