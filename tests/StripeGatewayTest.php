@@ -177,8 +177,8 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		$gateway->shouldReceive('getStripeCustomer')->andReturn($customer = m::mock('StdClass'));
 		$gateway->shouldReceive('getLastFourCardDigits')->once()->andReturn('1111');
 		$customer->subscription = (object) ['plan' => (object) ['id' => 1]];
-		$customer->cards = m::mock('StdClass');
-		$customer->cards->shouldReceive('create')->once()->with(['card' => 'token'])->andReturn($card = m::mock('StdClass'));
+		$customer->sources = m::mock('StdClass');
+		$customer->sources->shouldReceive('create')->once()->with(['card' => 'token'])->andReturn($card = m::mock('StdClass'));
 		$card->id = 'card_id';
 		$customer->shouldReceive('save')->once();
 
