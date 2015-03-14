@@ -546,7 +546,7 @@ class StripeGateway
     }
 
     /**
-     * Deteremine if the customer has a subscription.
+     * Determine if the customer has a subscription.
      *
      * @param  \Stripe_Customer  $customer
      * @return bool
