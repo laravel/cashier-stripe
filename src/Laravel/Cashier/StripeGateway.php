@@ -451,9 +451,9 @@ class StripeGateway
     {
         $customer = $this->getStripeCustomer();
 
-        $card = $customer->sources->create(['card' => $token]);
+        $card = $customer->sources->create(['source' => $token]);
 
-        $customer->default_card = $card->id;
+        $customer->default_source = $card->id;
 
         $customer->save();
 
@@ -523,7 +523,7 @@ class StripeGateway
         }
 
         $customer = Stripe_Customer::create(
-            array_merge(['card' => $token], $properties), $this->getStripeKey()
+            array_merge(['source' => $token], $properties), $this->getStripeKey()
         );
 
         return $this->getStripeCustomer($customer->id);
@@ -566,7 +566,7 @@ class StripeGateway
      */
     protected function getLastFourCardDigits($customer)
     {
-        return ($customer->default_card) ? $customer->cards->retrieve($customer->default_card)->last4 : null;
+        return ($customer->default_source) ? $customer->sources->retrieve($customer->default_source)->last4 : null;
     }
 
     /**
