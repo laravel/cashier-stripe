@@ -11,7 +11,6 @@ use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class StripeGateway
 {
-
     /**
      * The billable instance.
      *
@@ -64,8 +63,9 @@ class StripeGateway
     /**
      * Create a new Stripe gateway instance.
      *
-     * @param  \Laravel\Cashier\Contracts\Billable   $billable
-     * @param  string|null  $plan
+     * @param \Laravel\Cashier\Contracts\Billable $billable
+     * @param string|null                         $plan
+     *
      * @return void
      */
     public function __construct(BillableContract $billable, $plan = null)
@@ -79,11 +79,12 @@ class StripeGateway
     /**
      * Make a "one off" charge on the customer for the given amount.
      *
-     * @param  int  $amount
-     * @param  array  $options
+     * @param int   $amount
+     * @param array $options
+     *
      * @return bool|mixed
      */
-    public function charge($amount, array $options = array())
+    public function charge($amount, array $options = [])
     {
         $options = array_merge([
             'currency' => 'usd',
@@ -111,12 +112,13 @@ class StripeGateway
     /**
      * Subscribe to the plan for the first time.
      *
-     * @param  string  $token
-     * @param  array   $properties
-     * @param  object|null  $customer
+     * @param string      $token
+     * @param array       $properties
+     * @param object|null $customer
+     *
      * @return void
      */
-    public function create($token, array $properties = array(), $customer = null)
+    public function create($token, array $properties = [], $customer = null)
     {
         $freshCustomer = false;
 
@@ -159,7 +161,8 @@ class StripeGateway
     /**
      * Swap the billable entity to a new plan.
      *
-     * @param  int|null  $quantity
+     * @param int|null $quantity
+     *
      * @return void
      */
     public function swap($quantity = null)
@@ -195,7 +198,8 @@ class StripeGateway
     /**
      * Swap the billable entity to a new plan and invoice immediately.
      *
-     * @param  int|null  $quantity
+     * @param int|null $quantity
+     *
      * @return void
      */
     public function swapAndInvoice($quantity = null)
@@ -208,7 +212,8 @@ class StripeGateway
     /**
      * Resubscribe a customer to a given plan.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return void
      */
     public function resume($token = null)
@@ -239,7 +244,8 @@ class StripeGateway
     /**
      * Find an invoice by ID.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return \Laravel\Cashier\Invoice|null
      */
     public function findInvoice($id)
@@ -247,18 +253,19 @@ class StripeGateway
         try {
             return new Invoice($this->billable, Stripe_Invoice::retrieve($id, $this->getStripeKey()));
         } catch (\Exception $e) {
-            return null;
+            return;
         }
     }
 
     /**
      * Get an array of the entity's invoices.
      *
-     * @param  bool   $includePending
-     * @param  array  $parameters
+     * @param bool  $includePending
+     * @param array $parameters
+     *
      * @return array
      */
-    public function invoices($includePending = false, $parameters = array())
+    public function invoices($includePending = false, $parameters = [])
     {
         $invoices = [];
 
@@ -302,14 +309,15 @@ class StripeGateway
 
             return new Invoice($this->billable, $stripeInvoice);
         } catch (\Stripe_InvalidRequestError $e) {
-            return null;
+            return;
         }
     }
 
     /**
      * Increment the quantity of the subscription.
      *
-     * @param  int  $count
+     * @param int $count
+     *
      * @return void
      */
     public function increment($count = 1)
@@ -322,7 +330,8 @@ class StripeGateway
     /**
      *  Increment the quantity of the subscription. and invoice immediately.
      *
-     * @param  int|null  $quantity
+     * @param int|null $quantity
+     *
      * @return void
      */
     public function incrementAndInvoice($quantity = null)
@@ -335,7 +344,8 @@ class StripeGateway
     /**
      * Decrement the quantity of the subscription.
      *
-     * @param  int  $count
+     * @param int $count
+     *
      * @return void
      */
     public function decrement($count = 1)
@@ -348,8 +358,9 @@ class StripeGateway
     /**
      * Update the quantity of the subscription.
      *
-     * @param  \Stripe_Customer  $customer
-     * @param  int  $quantity
+     * @param \Stripe_Customer $customer
+     * @param int              $quantity
+     *
      * @return void
      */
     public function updateQuantity($customer, $quantity)
@@ -417,7 +428,8 @@ class StripeGateway
     /**
      * Get the subscription end timestamp for the customer.
      *
-     * @param  object  $customer
+     * @param object $customer
+     *
      * @return int
      */
     protected function getSubscriptionEndTimestamp($customer)
@@ -430,10 +442,10 @@ class StripeGateway
     }
 
     /**
-    * Get the current subscription period's end date
-    *
-    * @return \Carbon\Carbon
-    */
+     * Get the current subscription period's end date.
+     *
+     * @return \Carbon\Carbon
+     */
     public function getSubscriptionEndDate()
     {
         $customer = $this->getStripeCustomer();
@@ -444,7 +456,8 @@ class StripeGateway
     /**
      * Update the credit card attached to the entity.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return void
      */
     public function updateCard($token)
@@ -465,7 +478,8 @@ class StripeGateway
     /**
      * Apply a coupon to the billable entity.
      *
-     * @param  string  $coupon
+     * @param string $coupon
+     *
      * @return void
      */
     public function applyCoupon($coupon)
@@ -494,8 +508,9 @@ class StripeGateway
     /**
      * Update the local Stripe data in storage.
      *
-     * @param  \Stripe_Customer  $customer
-     * @param  string|null  $plan
+     * @param \Stripe_Customer $customer
+     * @param string|null      $plan
+     *
      * @return void
      */
     public function updateLocalStripeData($customer, $plan = null)
@@ -512,11 +527,12 @@ class StripeGateway
     /**
      * Create a new Stripe customer instance.
      *
-     * @param  string  $token
-     * @param  array   $properties
+     * @param string $token
+     * @param array  $properties
+     *
      * @return \Stripe_Customer
      */
-    public function createStripeCustomer($token, array $properties = array())
+    public function createStripeCustomer($token, array $properties = [])
     {
         if ($this->coupon) {
             $properties['coupon'] = $this->coupon;
@@ -548,7 +564,8 @@ class StripeGateway
     /**
      * Determine if the customer has a subscription.
      *
-     * @param  \Stripe_Customer  $customer
+     * @param \Stripe_Customer $customer
+     *
      * @return bool
      */
     protected function usingMultipleSubscriptionApi($customer)
@@ -561,7 +578,8 @@ class StripeGateway
     /**
      * Get the last four credit card digits for a customer.
      *
-     * @param  \Stripe_Customer  $customer
+     * @param \Stripe_Customer $customer
+     *
      * @return string
      */
     protected function getLastFourCardDigits($customer)
@@ -572,7 +590,8 @@ class StripeGateway
     /**
      * The coupon to apply to a new subscription.
      *
-     * @param  string  $coupon
+     * @param string $coupon
+     *
      * @return \Laravel\Cashier\StripeGateway
      */
     public function withCoupon($coupon)
@@ -621,7 +640,8 @@ class StripeGateway
     /**
      * Set the quantity to apply to the subscription.
      *
-     * @param  int  $quantity
+     * @param int $quantity
+     *
      * @return \Laravel\Cashier\StripeGateway
      */
     public function quantity($quantity)
@@ -646,7 +666,8 @@ class StripeGateway
     /**
      * Specify the ending date of the trial.
      *
-     * @param  \DateTime  $trialEnd
+     * @param \DateTime $trialEnd
+     *
      * @return \Laravel\Cashier\StripeGateway
      */
     public function trialFor(\DateTime $trialEnd)
@@ -701,7 +722,8 @@ class StripeGateway
     /**
      * Get the trial end date for the customer's subscription.
      *
-     * @param  object  $customer
+     * @param object $customer
+     *
      * @return \Carbon\Carbon|null
      */
     public function getTrialEndForCustomer($customer)
@@ -714,7 +736,8 @@ class StripeGateway
     /**
      * Calculate the remaining trial days based on the current trial end.
      *
-     * @param  \Carbon\Carbon  $trialEnd
+     * @param \Carbon\Carbon $trialEnd
+     *
      * @return void
      */
     protected function calculateRemainingTrialDays($trialEnd)

@@ -5,11 +5,11 @@ use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class EloquentBillableRepository implements BillableRepositoryInterface
 {
-
     /**
      * Find a Billable implementation by Stripe ID.
      *
-     * @param  string  $stripeId
+     * @param string $stripeId
+     *
      * @return \Laravel\Cashier\Contracts\Billable
      */
     public function find($stripeId)
@@ -22,7 +22,8 @@ class EloquentBillableRepository implements BillableRepositoryInterface
     /**
      * Create a new instance of the Auth model.
      *
-     * @param  string  $class
+     * @param string $class
+     *
      * @return \Laravel\Cashier\Contracts\Billable
      */
     protected function createCashierModel($class)

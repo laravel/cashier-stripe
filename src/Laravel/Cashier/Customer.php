@@ -5,7 +5,6 @@ use Stripe_Subscription;
 
 class Customer extends Stripe_Customer
 {
-
     /**
      * The subscription being managed by Cashier.
      *
@@ -34,7 +33,8 @@ class Customer extends Stripe_Customer
     /**
      * Find a subscription by ID.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return \Stripe_Subscription|null
      */
     public function findSubscription($id)
@@ -49,7 +49,8 @@ class Customer extends Stripe_Customer
     /**
      * Create the current subscription with the given data.
      *
-     * @param  array  $params
+     * @param array $params
+     *
      * @return void
      */
     protected function createSubscription(array $params)
@@ -60,7 +61,8 @@ class Customer extends Stripe_Customer
     /**
      * Update the current subscription with the given data.
      *
-     * @param  array  $params
+     * @param array $params
+     *
      * @return \Stripe_Subscription
      */
     public function updateSubscription($params = null)
@@ -75,7 +77,8 @@ class Customer extends Stripe_Customer
     /**
      * Save the current subscription with the given parameters.
      *
-     * @param  array  $params
+     * @param array $params
+     *
      * @return \Stripe_Subscription
      */
     protected function saveSubscription($params)
@@ -92,7 +95,8 @@ class Customer extends Stripe_Customer
     /**
      * Cancel the current subscription.
      *
-     * @param  array  $params
+     * @param array $params
+     *
      * @return void
      */
     public function cancelSubscription($params = null)
