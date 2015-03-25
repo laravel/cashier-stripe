@@ -69,7 +69,8 @@ class WebhookController extends Controller
     /**
      * Determine if the invoice has too many failed attempts.
      *
-     * @deprecated Use Stripe webhook 'customer.subscription.deleted' instead
+     * @deprecated Use Stripe webhook 'customer.subscription.deleted' instead.
+     * 
      * @param  array  $payload
      * @return bool
      */
