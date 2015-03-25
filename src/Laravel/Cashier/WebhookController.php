@@ -50,19 +50,17 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle a failed payment from a Stripe subscription.
+     * Handle a cancelled customer from a Stripe subscription.
      *
      * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function handleInvoicePaymentFailed(array $payload)
+    protected function handleCustomerSubscriptionDeleted(array $payload)
     {
-        if ($this->tooManyFailedPayments($payload)) {
-            $billable = $this->getBillable($payload['data']['object']['customer']);
+        $billable = $this->getBillable($payload['data']['object']['customer']);
 
-            if ($billable) {
-                $billable->subscription()->cancel();
-            }
+        if ($billable && $billable->subscribed()) {
+            $billable->subscription()->cancel();
         }
 
         return new Response('Webhook Handled', 200);
@@ -71,6 +69,8 @@ class WebhookController extends Controller
     /**
      * Determine if the invoice has too many failed attempts.
      *
+     * @deprecated Use Stripe webhook 'customer.subscription.deleted' instead.
+     * 
      * @param  array  $payload
      * @return bool
      */
