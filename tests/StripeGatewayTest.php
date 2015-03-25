@@ -177,8 +177,8 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		$gateway->shouldReceive('getStripeCustomer')->andReturn($customer = m::mock('StdClass'));
 		$gateway->shouldReceive('getLastFourCardDigits')->once()->andReturn('1111');
 		$customer->subscription = (object) ['plan' => (object) ['id' => 1]];
-		$customer->cards = m::mock('StdClass');
-		$customer->cards->shouldReceive('create')->once()->with(['card' => 'token'])->andReturn($card = m::mock('StdClass'));
+		$customer->sources = m::mock('StdClass');
+		$customer->sources->shouldReceive('create')->once()->with(['source' => 'token'])->andReturn($card = m::mock('StdClass'));
 		$card->id = 'card_id';
 		$customer->shouldReceive('save')->once();
 
@@ -223,11 +223,11 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		$billable->shouldReceive('setSubscriptionEndDate')->once()->with(null)->andReturn($billable);
 		$billable->shouldReceive('saveBillableInstance')->once()->andReturn($billable);
 		$customer = m::mock('StdClass');
-		$customer->cards = m::mock('StdClass');
+		$customer->sources = m::mock('StdClass');
 		$customer->id = 'id';
 		$customer->shouldReceive('getSubscriptionId')->andReturn('sub_id');
-		$customer->default_card = 'default-card';
-		$customer->cards->shouldReceive('retrieve')->once()->with('default-card')->andReturn((object) ['last4' => 'last-four']);
+		$customer->default_source = 'default-card';
+		$customer->sources->shouldReceive('retrieve')->once()->with('default-card')->andReturn((object) ['last4' => 'last-four']);
 
 		$gateway->updateLocalStripeData($customer);
 	}
