@@ -59,7 +59,7 @@ class WebhookController extends Controller
     {
         $billable = $this->getBillable($payload['data']['object']['customer']);
 
-        if (($billable) && ($billable->subscribed())) {
+        if ($billable && $billable->subscribed()) {
             $billable->subscription()->cancel();
         }
 
