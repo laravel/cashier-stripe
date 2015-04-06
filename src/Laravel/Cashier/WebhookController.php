@@ -2,7 +2,7 @@
 
 use Config;
 use Exception;
-use Stripe_Event;
+use Stripe\Event as StripeEvent;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
@@ -43,7 +43,7 @@ class WebhookController extends Controller
     protected function eventExistsOnStripe($id)
     {
         try {
-            return ! is_null(Stripe_Event::retrieve($id, Config::get('services.stripe.secret')));
+            return ! is_null(StripeEvent::retrieve($id, Config::get('services.stripe.secret')));
         } catch (Exception $e) {
             return false;
         }
