@@ -1,25 +1,17 @@
 <?php namespace Laravel\Cashier;
 
-use Stripe_Customer;
-use Stripe_Subscription;
+use Stripe\Customer as StripeCustomer;
+use Stripe\Subscription as StripeSubscription;
 
-class Customer extends Stripe_Customer
+class Customer extends StripeCustomer
 {
 
     /**
      * The subscription being managed by Cashier.
      *
-     * @var \Stripe_Subscription
+     * @var \Stripe\Subscription
      */
     public $subscription;
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function retrieve($id, $apiKey = null)
-    {
-        return self::_scopedRetrieve(get_called_class(), $id, $apiKey);
-    }
 
     /**
      * Get the current subscription ID.
@@ -35,7 +27,7 @@ class Customer extends Stripe_Customer
      * Find a subscription by ID.
      *
      * @param  string  $id
-     * @return \Stripe_Subscription|null
+     * @return \Stripe\Subscription|null
      */
     public function findSubscription($id)
     {
@@ -61,7 +53,7 @@ class Customer extends Stripe_Customer
      * Update the current subscription with the given data.
      *
      * @param  array  $params
-     * @return \Stripe_Subscription
+     * @return \Stripe\Subscription
      */
     public function updateSubscription($params = null)
     {
@@ -76,7 +68,7 @@ class Customer extends Stripe_Customer
      * Save the current subscription with the given parameters.
      *
      * @param  array  $params
-     * @return \Stripe_Subscription
+     * @return \Stripe\Subscription
      */
     protected function saveSubscription($params)
     {
