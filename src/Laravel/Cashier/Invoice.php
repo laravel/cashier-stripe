@@ -139,7 +139,7 @@ class Invoice
      */
     public function hasDiscount()
     {
-        return $this->subtotal > 0 && $this->subtotal != $this->total;
+        return $this->subtotal > 0 && $this->subtotal != $this->total && ! is_null($this->discount);
     }
 
     /**
