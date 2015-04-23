@@ -493,7 +493,7 @@ trait Billable
      * @return mixed
      */
     public function getTaxPercent() {
-        return null;
+        return;
     }
 
     /**
