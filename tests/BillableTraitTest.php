@@ -134,6 +134,22 @@ class BillableTraitTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+    public function testTaxPercentNullByDefault()
+    {
+        $billable = new BillableTraitTestStub;
+        $taxPercent = $billable->getTaxPercent();
+        $this->assertNull($taxPercent);
+    }
+
+
+    public function testTaxPercentCanBeOverridden()
+    {
+        $billable = new BillableTraitTaxTestStub;
+        $taxPercent = $billable->getTaxPercent();
+        $this->assertEquals(20, $taxPercent);
+    }
+
+
 	public function testGettingStripeKey()
 	{
 		Config::shouldReceive('get')->once()->with('services.stripe.secret')->andReturn('foo');
@@ -146,6 +162,13 @@ class BillableTraitTestStub implements Laravel\Cashier\Contracts\Billable {
 	use Laravel\Cashier\Billable;
 	public $cardUpFront = false;
 	public function save() {}
+}
+
+class BillableTraitTaxTestStub implements Laravel\Cashier\Contracts\Billable {
+    use Laravel\Cashier\Billable;
+    public $cardUpFront = false;
+    public function getTaxPercent() {return 20;}
+    public function save() {}
 }
 
 class BillableTraitCardUpFrontTestStub implements Laravel\Cashier\Contracts\Billable {

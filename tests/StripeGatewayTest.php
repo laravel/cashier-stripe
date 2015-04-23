@@ -23,6 +23,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			'prorate' => true,
 			'quantity' => 1,
 			'trial_end' => null,
+            'tax_percent' => 20
 		])->andReturn((object) ['id' => 'sub_id']);
 		$customer->id = 'foo';
 		$billable->shouldReceive('setStripeSubscription')->once()->with('sub_id');
@@ -44,6 +45,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			'prorate' => true,
 			'quantity' => 1,
 			'trial_end' => 'now',
+            'tax_percent' => 20
 		])->andReturn((object) ['id' => 'sub_id']);
 		$customer->id = 'foo';
 		$billable->shouldReceive('setStripeSubscription')->once()->with('sub_id');
@@ -273,7 +275,8 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 	protected function mockBillableInterface()
 	{
 		$billable = m::mock('Laravel\Cashier\Contracts\Billable');
-		$billable->shouldReceive('getStripeKey')->andReturn('key');
+        $billable->shouldReceive('getStripeKey')->andReturn('key');
+        $billable->shouldReceive('getTaxPercent')->andReturn(20);
 		return $billable;
 	}
 
