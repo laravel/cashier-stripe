@@ -87,7 +87,7 @@ class StripeGateway
     public function charge($amount, array $options = [])
     {
         $options = array_merge([
-            'currency' => 'usd',
+            'currency' => $this->getCurrency(),
         ], $options);
 
         $options['amount'] = $amount;
