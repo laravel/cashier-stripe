@@ -51,10 +51,10 @@ trait Billable
      * Get a new billing gateway instance for the given plan.
      *
      * @param  string|null  $plan
-     * @param  number|null  $tax_percent
+     * @param  float  $tax_percent
      * @return \Laravel\Cashier\StripeGateway
      */
-    public function subscription($plan = null, $tax_percent = null)
+    public function subscription($plan = null, $tax_percent = 0.0)
     {
         return new StripeGateway($this, $plan, $tax_percent);
     }
