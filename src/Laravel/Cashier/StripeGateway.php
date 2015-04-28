@@ -28,6 +28,13 @@ class StripeGateway
     protected $plan;
 
     /**
+    * The tax percentage.
+    *
+    * @var float
+    */
+    protected $tax_percent = 0.0;
+	
+    /**
      * The coupon to apply to the subscription.
      *
      * @var string
@@ -69,10 +76,12 @@ class StripeGateway
      * @param  string|null  $plan
      * @return void
      */
-    public function __construct(BillableContract $billable, $plan = null)
+    public function __construct(BillableContract $billable, $plan = null, $tax_percent = 0.0)
     {
+	$this->tax_percent = $tax_percent;
         $this->plan = $plan;
         $this->billable = $billable;
+
 
         Stripe::setApiKey($this->getStripeKey());
     }
@@ -152,6 +161,7 @@ class StripeGateway
         $payload = [
             'plan' => $this->plan, 'prorate' => $this->prorate,
             'quantity' => $this->quantity, 'trial_end' => $this->getTrialEndForUpdate(),
+            'tax_percent' => $this->tax_percent
         ];
 
         return $payload;
