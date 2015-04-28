@@ -27,12 +27,12 @@ class StripeGateway
      */
     protected $plan;
 
-	/**
-	 * The tax percentage.
-	 *
-	 * @var number
-	 */
-	protected $tax_percent;
+    /**
+    * The tax percentage.
+    *
+    * @var float
+    */
+    protected $tax_percent = 0.0;
 	
     /**
      * The coupon to apply to the subscription.
@@ -76,9 +76,9 @@ class StripeGateway
      * @param  string|null  $plan
      * @return void
      */
-    public function __construct(BillableContract $billable, $plan = null, $tax_percent = null)
+    public function __construct(BillableContract $billable, $plan = null, $tax_percent = 0.0)
     {
-	    $this->tax_percent = $tax_percent;
+	$this->tax_percent = $tax_percent;
         $this->plan = $plan;
         $this->billable = $billable;
 
