@@ -152,7 +152,7 @@ class StripeGateway
         $payload = [
             'plan' => $this->plan, 'prorate' => $this->prorate,
             'quantity' => $this->quantity, 'trial_end' => $this->getTrialEndForUpdate(),
-            'tax_percent' => $this->billable->getTaxPercent()
+            'tax_percent' => $this->billable->getTaxPercent(),
         ];
 
         return $payload;

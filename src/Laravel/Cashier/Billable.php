@@ -488,11 +488,12 @@ trait Billable
     }
 
     /**
-     * Get the percentage tax to apply to subscription
+     * Get the tax percentage to apply to the subscription.
      *
      * @return mixed
      */
-    public function getTaxPercent() {
+    public function getTaxPercent()
+    {
         //
     }
 

@@ -204,7 +204,7 @@ interface Billable
     public function getCurrencyLocale();
 
     /**
-     * Get the percentage tax to apply to subscription
+     * Get the tax percentage to apply to the subscription.
      *
      * @return mixed
      */
