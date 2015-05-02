@@ -67,6 +67,7 @@ trait Billable
     {
         return $this->subscription()->invoice();
     }
+    
     /**
      * Find an invoice by ID.
      *
