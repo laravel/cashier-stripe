@@ -1,6 +1,5 @@
 <?php namespace Laravel\Cashier;
 
-use Config;
 use Exception;
 use Stripe\Event as StripeEvent;
 use Illuminate\Routing\Controller;
