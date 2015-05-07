@@ -21,7 +21,7 @@ class WebhookController extends Controller
     {
         $payload = $this->getJsonPayload();
 
-        if (! Config::get('app.debug')) {
+        if (! Config::get('services.stripe.debug')) {
             if (! $this->eventExistsOnStripe($payload['id'])) {
                 return;
             }
