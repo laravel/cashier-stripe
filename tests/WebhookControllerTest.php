@@ -16,6 +16,7 @@ class WebhookControllerTest extends PHPUnit_Framework_TestCase {
 		$_SERVER['__received'] = false;
 		Request::shouldReceive('getContent')->andReturn(json_encode(['type' => 'charge.succeeded', 'id' => 'event-id']));
 		$controller = new WebhookControllerTestStub;
+		Config::shouldReceive('get')->once()->with('services.stripe.debug')->andReturn(false);
 		$controller->handleWebhook();
 
 		$this->assertTrue($_SERVER['__received']);
