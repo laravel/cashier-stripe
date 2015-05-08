@@ -1,11 +1,11 @@
 <?php namespace Laravel\Cashier;
 
-use Config;
 use Exception;
 use Stripe\Event as StripeEvent;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Config;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -21,8 +21,10 @@ class WebhookController extends Controller
     {
         $payload = $this->getJsonPayload();
 
-        if (! $this->eventExistsOnStripe($payload['id'])) {
-            return;
+        if (! Config::get('services.stripe.debug')) {
+            if (! $this->eventExistsOnStripe($payload['id'])) {
+                return;
+            }
         }
 
         $method = 'handle'.studly_case(str_replace('.', '_', $payload['type']));

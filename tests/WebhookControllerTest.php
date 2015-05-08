@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Config;
 
 class WebhookControllerTest extends PHPUnit_Framework_TestCase {
 
@@ -14,6 +15,7 @@ class WebhookControllerTest extends PHPUnit_Framework_TestCase {
 	{
 		$_SERVER['__received'] = false;
 		Request::shouldReceive('getContent')->andReturn(json_encode(['type' => 'charge.succeeded', 'id' => 'event-id']));
+		Config::shouldReceive('get')->once()->with('services.stripe.debug')->andReturn(false);
 		$controller = new WebhookControllerTestStub;
 		$controller->handleWebhook();
 
@@ -24,6 +26,7 @@ class WebhookControllerTest extends PHPUnit_Framework_TestCase {
 	public function testNormalResponseIsReturnedIfMethodIsMissing()
 	{
 		Request::shouldReceive('getContent')->andReturn(json_encode(['type' => 'foo.bar', 'id' => 'event-id']));
+		Config::shouldReceive('get')->once()->with('services.stripe.debug')->andReturn(false);
 		$controller = new WebhookControllerTestStub;
 		$response = $controller->handleWebhook();
 		$this->assertEquals(200, $response->getStatusCode());
