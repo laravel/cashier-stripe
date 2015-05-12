@@ -134,11 +134,11 @@ class BillableTraitTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-    public function testTaxPercentNullByDefault()
+    public function testTaxPercentZeroByDefault()
     {
         $billable = new BillableTraitTestStub;
         $taxPercent = $billable->getTaxPercent();
-        $this->assertNull($taxPercent);
+        $this->assertEquals(0, $taxPercent);
     }
 
 
