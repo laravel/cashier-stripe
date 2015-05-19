@@ -67,7 +67,7 @@ trait Billable
     {
         return $this->subscription()->invoice();
     }
-    
+
     /**
      * Find an invoice by ID.
      *
@@ -247,7 +247,7 @@ trait Billable
      */
     public function onPlan($plan)
     {
-        return $this->stripeIsActive() && $this->subscription()->planId() == $plan;
+        return $this->subscribed() && $this->stripe_plan == $plan;
     }
 
     /**
