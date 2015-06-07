@@ -318,7 +318,7 @@ class Invoice
         $viewPath = $this->writeViewForImaging($data, $storagePath);
 
         $this->getPhantomProcess($viewPath)
-                            ->setTimeout(10)->run();
+                            ->setTimeout(10)->mustRun();
 
         return $viewPath;
     }
