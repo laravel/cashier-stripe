@@ -93,7 +93,7 @@ class InvoiceTest extends PHPUnit_Framework_TestCase {
 		$files->shouldReceive('put')->once()->with($workPath, 'rendered');
 		$invoice->shouldReceive('getPhantomProcess')->once()->andReturn($process = m::mock('StdClass'));
 		$process->shouldReceive('setTimeout')->once()->andReturn($process);
-		$process->shouldReceive('run')->once();
+		$process->shouldReceive('mustRun')->once();
 		$files->shouldReceive('get')->once()->with($workPath)->andReturn('pdf-content');
 		$files->shouldReceive('delete')->once()->with($workPath);
 
