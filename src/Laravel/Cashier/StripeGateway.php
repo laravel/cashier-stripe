@@ -349,6 +349,19 @@ class StripeGateway
 
         $this->updateQuantity($customer, $customer->subscription->quantity - $count);
     }
+    
+    /**
+     * Set the new quantity of the subscription.
+     *
+     * @param  int  $quantity
+     * @return void
+     */
+    public function newQuantity($quantity)
+    {
+        $customer = $this->getStripeCustomer();
+
+        $this->updateQuantity($customer, $quantity);
+    }
 
     /**
      * Update the quantity of the subscription.
