@@ -97,7 +97,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 		]);
 
 		$gateway = new StripeGateway($this->mockBillableInterface(), 'plan');
-		$gateway->updateQuantity($customer, 5);
+		$gateway->updateQuantity(5, $customer);
 	}
 
 
@@ -113,7 +113,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 		$gateway = new StripeGateway($this->mockBillableInterface(), 'plan');
 		$gateway->skipTrial();
-		$gateway->updateQuantity($customer, 5);
+		$gateway->updateQuantity(5, $customer);
 	}
 
 
@@ -129,7 +129,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 
 		$gateway = new StripeGateway($this->mockBillableInterface(), 'plan');
 		$gateway->skipTrial();
-		$gateway->updateQuantity($customer, 5);
+		$gateway->updateQuantity(5, $customer);
 	}
 
 
