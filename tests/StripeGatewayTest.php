@@ -22,7 +22,6 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase {
 			'plan' => 'plan',
 			'prorate' => true,
 			'quantity' => 1,
-			'trial_end' => null,
 			'tax_percent' => 20
 		])->andReturn((object) ['id' => 'sub_id']);
 		$customer->id = 'foo';
