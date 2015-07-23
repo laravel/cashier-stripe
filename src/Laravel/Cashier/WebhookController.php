@@ -11,7 +11,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class WebhookController extends Controller
 {
-
     /**
      * Handle a Stripe webhook call.
      *
@@ -64,19 +63,6 @@ class WebhookController extends Controller
         }
 
         return new Response('Webhook Handled', 200);
-    }
-
-    /**
-     * Determine if the invoice has too many failed attempts.
-     *
-     * @deprecated Use Stripe webhook 'customer.subscription.deleted' instead.
-     * 
-     * @param  array  $payload
-     * @return bool
-     */
-    protected function tooManyFailedPayments(array $payload)
-    {
-        return $payload['data']['object']['attempt_count'] > 3;
     }
 
     /**
