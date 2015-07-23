@@ -282,9 +282,10 @@ class Invoice
      * Get the raw PDF bytes for the invoice.
      *
      * @param  array  $data
+     * @param  string|null  $storagePath
      * @return string
      */
-    public function pdf(array $data)
+    public function pdf(array $data, $storagePath = null)
     {
         $filename = $this->getDownloadFilename($data['product']);
 
