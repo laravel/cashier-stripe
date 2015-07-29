@@ -21,7 +21,7 @@ class WebhookController extends Controller
         $payload = $this->getJsonPayload();
 
         if (! $this->eventExistsOnStripe($payload['id'])) {
-            return new Response('Webhook Handled', 200);
+            return;
         }
 
         $method = 'handle'.studly_case(str_replace('.', '_', $payload['type']));
