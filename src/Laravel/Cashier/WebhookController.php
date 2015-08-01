@@ -1,4 +1,6 @@
-<?php namespace Laravel\Cashier;
+<?php
+
+namespace Laravel\Cashier;
 
 use Config;
 use Exception;
@@ -7,7 +9,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class WebhookController extends Controller
 {
@@ -92,7 +93,7 @@ class WebhookController extends Controller
      * @param  array   $parameters
      * @return mixed
      */
-    public function missingMethod($parameters = array())
+    public function missingMethod($parameters = [])
     {
         return new Response;
     }

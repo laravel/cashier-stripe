@@ -1,4 +1,6 @@
-<?php namespace Laravel\Cashier;
+<?php
+
+namespace Laravel\Cashier;
 
 use SplFileInfo;
 use Carbon\Carbon;
@@ -10,7 +12,6 @@ use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class Invoice
 {
-
     /**
      * The billable instance.
      *
@@ -57,7 +58,7 @@ class Invoice
     }
 
     /**
-     * Get the total amount for the line item in the currency symbol of your choice
+     * Get the total amount for the line item in the currency symbol of your choice.
      *
      * @param  string $symbol The Symbol you want to show
      * @return string
@@ -426,7 +427,7 @@ class Invoice
         } elseif (str_contains($uname, 'linux')) {
             return PHP_INT_SIZE === 4 ? 'linux-i686' : 'linux-x86_64';
         } else {
-            throw new \RuntimeException("Unknown operating system.");
+            throw new \RuntimeException('Unknown operating system.');
         }
     }
 
