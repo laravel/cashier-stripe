@@ -1,12 +1,14 @@
 <?php
 
+use Illuminate\Support\Facades\Facade;
+use Laravel\Cashier\WebhookController;
 use Illuminate\Support\Facades\Request;
 
 class WebhookControllerTest extends PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        Illuminate\Support\Facades\Facade::clearResolvedInstances();
+        Facade::clearResolvedInstances();
     }
 
     public function testProperMethodsAreCalledBasedOnStripeEvent()
@@ -28,18 +30,13 @@ class WebhookControllerTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class WebhookControllerTestStub extends Laravel\Cashier\WebhookController
+class WebhookControllerTestStub extends WebhookController
 {
     public function handleChargeSucceeded()
     {
         $_SERVER['__received'] = true;
     }
-    /**
-     * Verify with Stripe that the event is genuine.
-     *
-     * @param  string  $id
-     * @return bool
-     */
+
     protected function eventExistsOnStripe($id)
     {
         return true;
