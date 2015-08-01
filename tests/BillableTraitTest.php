@@ -3,136 +3,127 @@
 use Mockery as m;
 use Illuminate\Support\Facades\Config;
 
-class BillableTraitTest extends PHPUnit_Framework_TestCase {
+class BillableTraitTest extends PHPUnit_Framework_TestCase
+{
+    public function tearDown()
+    {
+        m::close();
+    }
 
-	public function tearDown()
-	{
-		m::close();
-	}
+    public function testFindInvoiceOrFailReturnsInvoice()
+    {
+        $billable = m::mock('BillableTraitTestStub[findInvoice]');
+        $billable->shouldReceive('findInvoice')->once()->with('id')->andReturn('foo');
 
+        $this->assertEquals('foo', $billable->findInvoiceOrFail('id'));
+    }
 
-	public function testFindInvoiceOrFailReturnsInvoice()
-	{
-		$billable = m::mock('BillableTraitTestStub[findInvoice]');
-		$billable->shouldReceive('findInvoice')->once()->with('id')->andReturn('foo');
+    /**
+     * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function testFindInvoiceOrFailsThrowsExceptionWhenNotFound()
+    {
+        $billable = m::mock('BillableTraitTestStub[findInvoice]');
+        $billable->shouldReceive('findInvoice')->once()->with('id')->andReturn(null);
 
-		$this->assertEquals('foo', $billable->findInvoiceOrFail('id'));
-	}
+        $billable->findInvoiceOrFail('id');
+    }
 
+    public function testDownloadCallsDownloadOnInvoice()
+    {
+        $billable = m::mock('BillableTraitTestStub[findInvoice]');
+        $billable->shouldReceive('findInvoice')->once()->with('id')->andReturn($invoice = m::mock('StdClass'));
+        $invoice->shouldReceive('download')->once()->with(['foo']);
 
-	/**
-	 * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-	 */
-	public function testFindInvoiceOrFailsThrowsExceptionWhenNotFound()
-	{
-		$billable = m::mock('BillableTraitTestStub[findInvoice]');
-		$billable->shouldReceive('findInvoice')->once()->with('id')->andReturn(null);
+        $billable->downloadInvoice('id', ['foo']);
+    }
 
-		$billable->findInvoiceOrFail('id');
-	}
+    public function testOnTrialMethodReturnsTrueIfTrialDateGreaterThanCurrentDate()
+    {
+        $billable = m::mock('BillableTraitTestStub[getTrialEndDate]');
+        $billable->shouldReceive('getTrialEndDate')->andReturn(Carbon\Carbon::now()->addDays(5));
 
+        $this->assertTrue($billable->onTrial());
+    }
 
-	public function testDownloadCallsDownloadOnInvoice()
-	{
-		$billable = m::mock('BillableTraitTestStub[findInvoice]');
-		$billable->shouldReceive('findInvoice')->once()->with('id')->andReturn($invoice = m::mock('StdClass'));
-		$invoice->shouldReceive('download')->once()->with(['foo']);
+    public function testOnTrialMethodReturnsFalseIfTrialDateLessThanCurrentDate()
+    {
+        $billable = m::mock('BillableTraitTestStub[getTrialEndDate]');
+        $billable->shouldReceive('getTrialEndDate')->andReturn(Carbon\Carbon::now()->subDays(5));
 
-		$billable->downloadInvoice('id', ['foo']);
-	}
+        $this->assertFalse($billable->onTrial());
+    }
 
+    public function testSubscribedChecksStripeIsActiveIfCardRequiredUpFront()
+    {
+        $billable = new BillableTraitCardUpFrontTestStub;
+        $billable->stripe_active = true;
+        $billable->subscription_ends_at = null;
+        $this->assertTrue($billable->subscribed());
 
-	public function testOnTrialMethodReturnsTrueIfTrialDateGreaterThanCurrentDate()
-	{
-		$billable = m::mock('BillableTraitTestStub[getTrialEndDate]');
-		$billable->shouldReceive('getTrialEndDate')->andReturn(Carbon\Carbon::now()->addDays(5));
+        $billable = new BillableTraitCardUpFrontTestStub;
+        $billable->stripe_active = false;
+        $billable->subscription_ends_at = null;
+        $this->assertFalse($billable->subscribed());
 
-		$this->assertTrue($billable->onTrial());
-	}
+        $billable = new BillableTraitCardUpFrontTestStub;
+        $billable->stripe_active = false;
+        $billable->subscription_ends_at = Carbon\Carbon::now()->addDays(5);
+        $this->assertTrue($billable->subscribed());
 
+        $billable = new BillableTraitCardUpFrontTestStub;
+        $billable->stripe_active = false;
+        $billable->subscription_ends_at = Carbon\Carbon::now()->subDays(5);
+        $this->assertFalse($billable->subscribed());
+    }
 
-	public function testOnTrialMethodReturnsFalseIfTrialDateLessThanCurrentDate()
-	{
-		$billable = m::mock('BillableTraitTestStub[getTrialEndDate]');
-		$billable->shouldReceive('getTrialEndDate')->andReturn(Carbon\Carbon::now()->subDays(5));
+    public function testSubscribedHandlesNoCardUpFront()
+    {
+        $billable = new BillableTraitTestStub;
+        $billable->trial_ends_at = null;
+        $billable->stripe_active = null;
+        $billable->subscription_ends_at = null;
+        $this->assertFalse($billable->subscribed());
 
-		$this->assertFalse($billable->onTrial());
-	}
+        $billable = new BillableTraitTestStub;
+        $billable->stripe_active = 0;
+        $billable->trial_ends_at = Carbon\Carbon::now()->addDays(5);
+        $this->assertTrue($billable->subscribed());
 
+        $billable = new BillableTraitTestStub;
+        $billable->stripe_active = true;
+        $billable->trial_ends_at = Carbon\Carbon::now()->subDays(5);
+        $this->assertTrue($billable->subscribed());
 
-	public function testSubscribedChecksStripeIsActiveIfCardRequiredUpFront()
-	{
-		$billable = new BillableTraitCardUpFrontTestStub;
-		$billable->stripe_active = true;
-		$billable->subscription_ends_at = null;
-		$this->assertTrue($billable->subscribed());
+        $billable = new BillableTraitTestStub;
+        $billable->stripe_active = false;
+        $billable->trial_ends_at = Carbon\Carbon::now()->subDays(5);
+        $billable->subscription_ends_at = null;
+        $this->assertFalse($billable->subscribed());
 
-		$billable = new BillableTraitCardUpFrontTestStub;
-		$billable->stripe_active = false;
-		$billable->subscription_ends_at = null;
-		$this->assertFalse($billable->subscribed());
+        $billable = new BillableTraitTestStub;
+        $billable->trial_ends_at = null;
+        $billable->stripe_active = null;
+        $billable->subscription_ends_at = Carbon\Carbon::now()->addDays(5);
+        $this->assertTrue($billable->subscribed());
 
-		$billable = new BillableTraitCardUpFrontTestStub;
-		$billable->stripe_active = false;
-		$billable->subscription_ends_at = Carbon\Carbon::now()->addDays(5);
-		$this->assertTrue($billable->subscribed());
+        $billable = new BillableTraitTestStub;
+        $billable->trial_ends_at = null;
+        $billable->stripe_active = null;
+        $billable->subscription_ends_at = Carbon\Carbon::now()->subDays(5);
+        $this->assertFalse($billable->subscribed());
+    }
 
-		$billable = new BillableTraitCardUpFrontTestStub;
-		$billable->stripe_active = false;
-		$billable->subscription_ends_at = Carbon\Carbon::now()->subDays(5);
-		$this->assertFalse($billable->subscribed());
-	}
+    public function testReadyForBillingChecksStripeReadiness()
+    {
+        $billable = new BillableTraitTestStub;
+        $billable->stripe_id = null;
+        $this->assertFalse($billable->readyForBilling());
 
-
-	public function testSubscribedHandlesNoCardUpFront()
-	{
-		$billable = new BillableTraitTestStub;
-		$billable->trial_ends_at = null;
-		$billable->stripe_active = null;
-		$billable->subscription_ends_at = null;
-		$this->assertFalse($billable->subscribed());
-
-		$billable = new BillableTraitTestStub;
-		$billable->stripe_active = 0;
-		$billable->trial_ends_at = Carbon\Carbon::now()->addDays(5);
-		$this->assertTrue($billable->subscribed());
-
-		$billable = new BillableTraitTestStub;
-		$billable->stripe_active = true;
-		$billable->trial_ends_at = Carbon\Carbon::now()->subDays(5);
-		$this->assertTrue($billable->subscribed());
-
-		$billable = new BillableTraitTestStub;
-		$billable->stripe_active = false;
-		$billable->trial_ends_at = Carbon\Carbon::now()->subDays(5);
-		$billable->subscription_ends_at = null;
-		$this->assertFalse($billable->subscribed());
-
-		$billable = new BillableTraitTestStub;
-		$billable->trial_ends_at = null;
-		$billable->stripe_active = null;
-		$billable->subscription_ends_at = Carbon\Carbon::now()->addDays(5);
-		$this->assertTrue($billable->subscribed());
-
-		$billable = new BillableTraitTestStub;
-		$billable->trial_ends_at = null;
-		$billable->stripe_active = null;
-		$billable->subscription_ends_at = Carbon\Carbon::now()->subDays(5);
-		$this->assertFalse($billable->subscribed());
-	}
-
-
-	public function testReadyForBillingChecksStripeReadiness()
-	{
-		$billable = new BillableTraitTestStub;
-		$billable->stripe_id = null;
-		$this->assertFalse($billable->readyForBilling());
-
-		$billable = new BillableTraitTestStub;
-		$billable->stripe_id = 1;
-		$this->assertTrue($billable->readyForBilling());
-	}
-
+        $billable = new BillableTraitTestStub;
+        $billable->stripe_id = 1;
+        $this->assertTrue($billable->readyForBilling());
+    }
 
     public function testTaxPercentZeroByDefault()
     {
@@ -141,7 +132,6 @@ class BillableTraitTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(0, $taxPercent);
     }
 
-
     public function testTaxPercentCanBeOverridden()
     {
         $billable = new BillableTraitTaxTestStub;
@@ -149,30 +139,40 @@ class BillableTraitTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(20, $taxPercent);
     }
 
-
-	public function testGettingStripeKey()
-	{
-		Config::shouldReceive('get')->once()->with('services.stripe.secret')->andReturn('foo');
-		$this->assertEquals('foo', BillableTraitTestStub::getStripeKey());
-	}
-
+    public function testGettingStripeKey()
+    {
+        Config::shouldReceive('get')->once()->with('services.stripe.secret')->andReturn('foo');
+        $this->assertEquals('foo', BillableTraitTestStub::getStripeKey());
+    }
 }
 
-class BillableTraitTestStub implements Laravel\Cashier\Contracts\Billable {
-	use Laravel\Cashier\Billable;
-	public $cardUpFront = false;
-	public function save() {}
-}
-
-class BillableTraitTaxTestStub implements Laravel\Cashier\Contracts\Billable {
+class BillableTraitTestStub implements Laravel\Cashier\Contracts\Billable
+{
     use Laravel\Cashier\Billable;
     public $cardUpFront = false;
-    public function getTaxPercent() {return 20;}
-    public function save() {}
+    public function save()
+    {
+    }
 }
 
-class BillableTraitCardUpFrontTestStub implements Laravel\Cashier\Contracts\Billable {
-	use Laravel\Cashier\Billable;
-	public $cardUpFront = true;
-	public function save() {}
+class BillableTraitTaxTestStub implements Laravel\Cashier\Contracts\Billable
+{
+    use Laravel\Cashier\Billable;
+    public $cardUpFront = false;
+    public function getTaxPercent()
+    {
+        return 20;
+    }
+    public function save()
+    {
+    }
+}
+
+class BillableTraitCardUpFrontTestStub implements Laravel\Cashier\Contracts\Billable
+{
+    use Laravel\Cashier\Billable;
+    public $cardUpFront = true;
+    public function save()
+    {
+    }
 }

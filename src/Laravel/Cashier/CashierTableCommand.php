@@ -1,12 +1,12 @@
-<?php namespace Laravel\Cashier;
+<?php
+
+namespace Laravel\Cashier;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 class CashierTableCommand extends Command
 {
-
     /**
      * The console command name.
      *
@@ -70,8 +70,8 @@ class CashierTableCommand extends Command
      */
     protected function getArguments()
     {
-        return array(
-            array('table', InputArgument::REQUIRED, 'The name of your billable table.'),
-        );
+        return [
+            ['table', InputArgument::REQUIRED, 'The name of your billable table.'],
+        ];
     }
 }
