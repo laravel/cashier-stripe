@@ -1,10 +1,11 @@
-<?php namespace Laravel\Cashier;
+<?php
+
+namespace Laravel\Cashier;
 
 use Illuminate\Support\ServiceProvider;
 
 class CashierServiceProvider extends ServiceProvider
 {
-
     /**
      * Bootstrap the application events.
      *
@@ -13,7 +14,7 @@ class CashierServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->loadViewsFrom(__DIR__.'/../../views', 'cashier');
-        
+
         $this->publishes([
             __DIR__.'/../../views' => base_path('resources/views/vendor/cashier'),
         ]);

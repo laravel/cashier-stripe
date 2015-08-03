@@ -1,5 +1,8 @@
-<?php namespace Laravel\Cashier;
+<?php
 
+namespace Laravel\Cashier;
+
+use Exception;
 use Carbon\Carbon;
 use Stripe\Stripe;
 use Stripe\Charge as StripeCharge;
@@ -12,7 +15,6 @@ use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class StripeGateway
 {
-
     /**
      * The billable instance.
      *
@@ -97,7 +99,7 @@ class StripeGateway
         }
 
         if (! array_key_exists('source', $options) && ! array_key_exists('customer', $options)) {
-            throw new InvalidArgumentException("No payment source provided.");
+            throw new InvalidArgumentException('No payment source provided.');
         }
 
         try {
@@ -151,7 +153,7 @@ class StripeGateway
     {
         $payload = [
             'plan' => $this->plan, 'prorate' => $this->prorate,
-            'quantity' => $this->quantity
+            'quantity' => $this->quantity,
         ];
 
         if ($trialEnd = $this->getTrialEndForUpdate()) {
@@ -255,8 +257,8 @@ class StripeGateway
     {
         try {
             return new Invoice($this->billable, StripeInvoice::retrieve($id, $this->getStripeKey()));
-        } catch (\Exception $e) {
-            return null;
+        } catch (Exception $e) {
+            //
         }
     }
 
@@ -311,7 +313,7 @@ class StripeGateway
 
             return new Invoice($this->billable, $stripeInvoice);
         } catch (StripeErrorInvalidRequest $e) {
-            return null;
+            //
         }
     }
 
@@ -441,10 +443,10 @@ class StripeGateway
     }
 
     /**
-    * Get the current subscription period's end date
-    *
-    * @return \Carbon\Carbon
-    */
+     * Get the current subscription period's end date.
+     *
+     * @return \Carbon\Carbon
+     */
     public function getSubscriptionEndDate()
     {
         $customer = $this->getStripeCustomer();
