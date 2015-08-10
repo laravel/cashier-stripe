@@ -55,7 +55,7 @@ trait Billable
      */
     public function subscription($plan = null)
     {
-        return new StripeGateway($this, $plan);
+        return app('Laravel\Cashier\StripeGateway', [$this, $plan]);
     }
 
     /**
