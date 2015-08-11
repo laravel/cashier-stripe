@@ -56,7 +56,7 @@ class WebhookController extends Controller
      */
     protected function isInTestingMode()
     {
-        return (bool) getenv('CASHIER_TESTING')
+        return (bool) getenv('CASHIER_TESTING');
     }
 
     /**
