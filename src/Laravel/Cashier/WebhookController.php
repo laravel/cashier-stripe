@@ -21,7 +21,7 @@ class WebhookController extends Controller
     {
         $payload = $this->getJsonPayload();
 
-        if (! $this->eventExistsOnStripe($payload['id'])) {
+        if (! $this->eventExistsOnStripe($payload['id']) && ! $this->isInTestingMode()) {
             return;
         }
 
@@ -47,6 +47,16 @@ class WebhookController extends Controller
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Check if testing mode is on
+     * 
+     * @return bool
+     */
+    protected function isInTestingMode()
+    {
+        return (bool) getenv('CASHIER_TESTING');
     }
 
     /**
