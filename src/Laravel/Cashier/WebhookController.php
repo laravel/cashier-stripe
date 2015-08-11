@@ -48,8 +48,8 @@ class WebhookController extends Controller
             return false;
         }
     }
-    
-    
+
+
     /**
      * Check if testing mode is on.
      * 
