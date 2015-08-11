@@ -49,7 +49,6 @@ class WebhookController extends Controller
         }
     }
 
-
     /**
      * Check if testing mode is on.
      * 
