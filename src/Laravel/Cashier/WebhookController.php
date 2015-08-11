@@ -50,7 +50,7 @@ class WebhookController extends Controller
     }
 
     /**
-     * Check if testing mode is on
+     * Verify if cashier is in testing mode.
      * 
      * @return bool
      */
