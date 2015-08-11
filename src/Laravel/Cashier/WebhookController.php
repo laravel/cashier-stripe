@@ -50,9 +50,9 @@ class WebhookController extends Controller
     }
     
     /**
-     * Check if testing mode is on
+     * Check if testing mode is on.
      * 
-     * @return boolean
+     * @return bool
      */
     protected function isInTestingMode()
     {
