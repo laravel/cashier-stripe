@@ -21,7 +21,7 @@ class WebhookController extends Controller
     {
         $payload = $this->getJsonPayload();
 
-        if (!$this->eventExistsOnStripe($payload['id']) && $payload['livemode']) {
+        if (! $this->eventExistsOnStripe($payload['id']) && $payload['livemode']) {
             return;
         }
 
