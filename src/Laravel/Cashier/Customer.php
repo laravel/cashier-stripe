@@ -1,11 +1,11 @@
-<?php namespace Laravel\Cashier;
+<?php
+
+namespace Laravel\Cashier;
 
 use Stripe\Customer as StripeCustomer;
-use Stripe\Subscription as StripeSubscription;
 
 class Customer extends StripeCustomer
 {
-
     /**
      * The subscription being managed by Cashier.
      *

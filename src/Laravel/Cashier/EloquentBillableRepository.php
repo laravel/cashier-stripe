@@ -1,11 +1,12 @@
-<?php namespace Laravel\Cashier;
+<?php
+
+namespace Laravel\Cashier;
 
 use Illuminate\Support\Facades\Config;
 use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class EloquentBillableRepository implements BillableRepositoryInterface
 {
-
     /**
      * Find a Billable implementation by Stripe ID.
      *
@@ -30,7 +31,7 @@ class EloquentBillableRepository implements BillableRepositoryInterface
         $model = new $class;
 
         if (! $model instanceof BillableContract) {
-            throw new \InvalidArgumentException("Model does not implement Billable.");
+            throw new \InvalidArgumentException('Model does not implement Billable.');
         }
 
         return $model;

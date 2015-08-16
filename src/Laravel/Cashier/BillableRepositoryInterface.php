@@ -1,8 +1,9 @@
-<?php namespace Laravel\Cashier;
+<?php
+
+namespace Laravel\Cashier;
 
 interface BillableRepositoryInterface
 {
-
     /**
      * Find a Billable implementation by Stripe ID.
      *
