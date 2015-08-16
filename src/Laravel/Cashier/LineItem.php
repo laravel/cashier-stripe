@@ -1,10 +1,11 @@
-<?php namespace Laravel\Cashier;
+<?php
+
+namespace Laravel\Cashier;
 
 use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class LineItem
 {
-
     /**
      * The billable instance.
      *

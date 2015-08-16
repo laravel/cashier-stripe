@@ -1,4 +1,6 @@
-<?php namespace Laravel\Cashier;
+<?php
+
+namespace Laravel\Cashier;
 
 use SplFileInfo;
 use Carbon\Carbon;
@@ -10,7 +12,6 @@ use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class Invoice
 {
-
     /**
      * The billable instance.
      *
@@ -57,7 +58,7 @@ class Invoice
     }
 
     /**
-     * Get the total amount for the line item in the currency symbol of your choice
+     * Get the total amount for the line item in the currency symbol of your choice.
      *
      * @param  string $symbol The Symbol you want to show
      * @return string
@@ -139,7 +140,7 @@ class Invoice
      */
     public function hasDiscount()
     {
-        return $this->subtotal > 0 && $this->subtotal != $this->total;
+        return $this->subtotal > 0 && $this->subtotal != $this->total && ! is_null($this->stripeInvoice->discount);
     }
 
     /**
@@ -279,6 +280,26 @@ class Invoice
     }
 
     /**
+     * Get the raw PDF bytes for the invoice.
+     *
+     * @param  array  $data
+     * @param  string|null  $storagePath
+     * @return string
+     */
+    public function pdf(array $data, $storagePath = null)
+    {
+        $filename = $this->getDownloadFilename($data['product']);
+
+        $document = $this->writeInvoice($data, $storagePath);
+
+        $pdf = $this->files->get($document);
+
+        $this->files->delete($document);
+
+        return $pdf;
+    }
+
+    /**
      * Create an invoice download response.
      *
      * @param  array   $data
@@ -318,7 +339,7 @@ class Invoice
         $viewPath = $this->writeViewForImaging($data, $storagePath);
 
         $this->getPhantomProcess($viewPath)
-                            ->setTimeout(10)->run();
+                            ->setTimeout(10)->mustRun();
 
         return $viewPath;
     }
@@ -406,7 +427,7 @@ class Invoice
         } elseif (str_contains($uname, 'linux')) {
             return PHP_INT_SIZE === 4 ? 'linux-i686' : 'linux-x86_64';
         } else {
-            throw new \RuntimeException("Unknown operating system.");
+            throw new \RuntimeException('Unknown operating system.');
         }
     }
 

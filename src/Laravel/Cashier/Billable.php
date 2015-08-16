@@ -1,13 +1,13 @@
-<?php namespace Laravel\Cashier;
+<?php
 
-use DateTime;
+namespace Laravel\Cashier;
+
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait Billable
 {
-
     /**
      * The Stripe API key.
      *
@@ -42,7 +42,7 @@ trait Billable
      * @param  array  $options
      * @return bool|mixed
      */
-    public function charge($amount, array $options = array())
+    public function charge($amount, array $options = [])
     {
         return (new StripeGateway($this))->charge($amount, $options);
     }
@@ -67,6 +67,7 @@ trait Billable
     {
         return $this->subscription()->invoice();
     }
+
     /**
      * Find an invoice by ID.
      *
@@ -129,7 +130,7 @@ trait Billable
      * @param  array  $parameters
      * @return array
      */
-    public function invoices($parameters = array())
+    public function invoices($parameters = [])
     {
         return $this->subscription()->invoices(false, $parameters);
     }
@@ -485,6 +486,16 @@ trait Billable
     public function getCurrencyLocale()
     {
         return 'en_US';
+    }
+
+    /**
+     * Get the tax percentage to apply to the subscription.
+     *
+     * @return int
+     */
+    public function getTaxPercent()
+    {
+        return 0;
     }
 
     /**

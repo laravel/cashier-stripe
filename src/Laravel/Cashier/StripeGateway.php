@@ -1,5 +1,8 @@
-<?php namespace Laravel\Cashier;
+<?php
 
+namespace Laravel\Cashier;
+
+use Exception;
 use Carbon\Carbon;
 use Stripe\Stripe;
 use Stripe\Charge as StripeCharge;
@@ -12,7 +15,6 @@ use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class StripeGateway
 {
-
     /**
      * The billable instance.
      *
@@ -87,7 +89,7 @@ class StripeGateway
     public function charge($amount, array $options = [])
     {
         $options = array_merge([
-            'currency' => 'usd',
+            'currency' => $this->getCurrency(),
         ], $options);
 
         $options['amount'] = $amount;
@@ -97,7 +99,7 @@ class StripeGateway
         }
 
         if (! array_key_exists('source', $options) && ! array_key_exists('customer', $options)) {
-            throw new InvalidArgumentException("No payment source provided.");
+            throw new InvalidArgumentException('No payment source provided.');
         }
 
         try {
@@ -151,8 +153,16 @@ class StripeGateway
     {
         $payload = [
             'plan' => $this->plan, 'prorate' => $this->prorate,
-            'quantity' => $this->quantity, 'trial_end' => $this->getTrialEndForUpdate(),
+            'quantity' => $this->quantity,
         ];
+
+        if ($trialEnd = $this->getTrialEndForUpdate()) {
+            $payload['trial_end'] = $trialEnd;
+        }
+
+        if ($taxPercent = $this->billable->getTaxPercent()) {
+            $payload['tax_percent'] = $taxPercent;
+        }
 
         return $payload;
     }
@@ -247,8 +257,8 @@ class StripeGateway
     {
         try {
             return new Invoice($this->billable, StripeInvoice::retrieve($id, $this->getStripeKey()));
-        } catch (\Exception $e) {
-            return null;
+        } catch (Exception $e) {
+            //
         }
     }
 
@@ -303,7 +313,7 @@ class StripeGateway
 
             return new Invoice($this->billable, $stripeInvoice);
         } catch (StripeErrorInvalidRequest $e) {
-            return null;
+            //
         }
     }
 
@@ -317,7 +327,7 @@ class StripeGateway
     {
         $customer = $this->getStripeCustomer();
 
-        $this->updateQuantity($customer, $customer->subscription->quantity + $count);
+        $this->updateQuantity($customer->subscription->quantity + $count, $customer);
     }
 
     /**
@@ -343,18 +353,20 @@ class StripeGateway
     {
         $customer = $this->getStripeCustomer();
 
-        $this->updateQuantity($customer, $customer->subscription->quantity - $count);
+        $this->updateQuantity($customer->subscription->quantity - $count, $customer);
     }
 
     /**
      * Update the quantity of the subscription.
      *
-     * @param  \Stripe\Customer  $customer
      * @param  int  $quantity
+     * @param  \Stripe\Customer|null  $customer
      * @return void
      */
-    public function updateQuantity($customer, $quantity)
+    public function updateQuantity($quantity, $customer = null)
     {
+        $customer = $customer ?: $this->getStripeCustomer();
+
         $subscription = [
             'plan' => $customer->subscription->plan->id,
             'quantity' => $quantity,
@@ -431,10 +443,10 @@ class StripeGateway
     }
 
     /**
-    * Get the current subscription period's end date
-    *
-    * @return \Carbon\Carbon
-    */
+     * Get the current subscription period's end date.
+     *
+     * @return \Carbon\Carbon
+     */
     public function getSubscriptionEndDate()
     {
         $customer = $this->getStripeCustomer();

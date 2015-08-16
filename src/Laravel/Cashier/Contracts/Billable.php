@@ -1,10 +1,9 @@
-<?php namespace Laravel\Cashier\Contracts;
+<?php
 
-use DateTime;
+namespace Laravel\Cashier\Contracts;
 
 interface Billable
 {
-
     /**
      * Get the name that should be shown on the entity's invoices.
      *
@@ -48,7 +47,7 @@ interface Billable
      * @param  array  $parameters
      * @return array
      */
-    public function invoices($parameters = array());
+    public function invoices($parameters = []);
 
     /**
      * Apply a coupon to the billable entity.
@@ -202,6 +201,13 @@ interface Billable
      * @return string
      */
     public function getCurrencyLocale();
+
+    /**
+     * Get the tax percentage to apply to the subscription.
+     *
+     * @return int
+     */
+    public function getTaxPercent();
 
     /**
      * Format the given currency for display, without the currency symbol.
