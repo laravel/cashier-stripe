@@ -21,7 +21,7 @@ class WebhookController extends Controller
     {
         $payload = $this->getJsonPayload();
 
-        if (! $this->eventExistsOnStripe($payload['id']) && ! $this->isInTestingMode()) {
+        if (! $this->eventExistsOnStripe($payload['id']) && ! $this->isInTestingEnvironment()) {
             return;
         }
 
@@ -47,16 +47,6 @@ class WebhookController extends Controller
         } catch (Exception $e) {
             return false;
         }
-    }
-
-    /**
-     * Verify if cashier is in testing mode.
-     * 
-     * @return bool
-     */
-    protected function isInTestingMode()
-    {
-        return (bool) getenv('CASHIER_TESTING');
     }
 
     /**
@@ -95,6 +85,16 @@ class WebhookController extends Controller
     protected function getJsonPayload()
     {
         return (array) json_decode(Request::getContent(), true);
+    }
+
+    /**
+     * Verify if cashier is in testing mode.
+     *
+     * @return bool
+     */
+    protected function isInTestingEnvironment()
+    {
+        return (bool) getenv('CASHIER_ENV') === 'testing';
     }
 
     /**
