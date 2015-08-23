@@ -551,7 +551,7 @@ class StripeGateway
     {
         $customer = Customer::retrieve($id ?: $this->billable->getStripeId(), $this->getStripeKey());
 
-        if ($this->usingMultipleSubscriptionApi($customer)) {
+        if ($customer->deleted === false && $this->usingMultipleSubscriptionApi($customer)) {
             $customer->subscription = $customer->findSubscription($this->billable->getStripeSubscription());
         }
 
