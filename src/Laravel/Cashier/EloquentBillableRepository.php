@@ -28,6 +28,8 @@ class EloquentBillableRepository implements BillableRepositoryInterface
                 return $result;
             }
         }
+
+        return null;
     }
 
     /**
