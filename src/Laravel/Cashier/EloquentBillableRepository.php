@@ -17,7 +17,7 @@ class EloquentBillableRepository implements BillableRepositoryInterface
     {
         $billableModels = Config::get('services.stripe.model');
 
-        if (!is_array($billableModels)) {
+        if (! is_array($billableModels)) {
             $billableModels = [$billableModels];
         }
 
@@ -28,8 +28,6 @@ class EloquentBillableRepository implements BillableRepositoryInterface
                 return $result;
             }
         }
-
-        return null;
     }
 
     /**
