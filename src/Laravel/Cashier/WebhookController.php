@@ -75,11 +75,11 @@ class WebhookController extends Controller
     protected function handleInvoicePaymentFailed(array $payload)
     {
         $billable = $this->getBillable($payload['data']['object']['customer']);
-
+        
         if($billable & $billable->subscribed() && !$billable->onTrial() && is_null($billable->getLastFourCardDigits()))
         {
             $billable->subscription->cancel(false);
-           return new Response('Webhook Handled', 200);
+            return new Response('Webhook Handled', 200);
         }
         
         return new Response;
