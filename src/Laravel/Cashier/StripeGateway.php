@@ -393,8 +393,6 @@ class StripeGateway
                 $this->billable->setSubscriptionEndDate(
                     Carbon::createFromTimestamp($this->getSubscriptionEndTimestamp($customer))
                 );
-            } else {
-                $this->billable->setSubscriptionEndDate(Carbon::now());
             }
 
             $customer->cancelSubscription(['at_period_end' => $atPeriodEnd]);
@@ -403,6 +401,7 @@ class StripeGateway
         if ($atPeriodEnd) {
             $this->billable->setStripeIsActive(false)->saveBillableInstance();
         } else {
+            $this->billable->setSubscriptionEndDate(Carbon::now());
             $this->billable->deactivateStripe()->saveBillableInstance();
         }
     }

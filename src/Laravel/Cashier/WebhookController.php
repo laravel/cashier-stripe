@@ -65,6 +65,25 @@ class WebhookController extends Controller
 
         return new Response('Webhook Handled', 200);
     }
+    
+    /**
+     * Handle a payment failure.  Cancels subscription if user is on trial and there is no credit card on file
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleInvoicePaymentFailed(array $payload)
+    {
+        $billable = $this->getBillable($payload['data']['object']['customer']);
+
+        if($billable & $billable->subscribed() && !$billable->onTrial() && is_null($billable->getLastFourCardDigits()))
+        {
+            $billable->->subscription->cancel(false);
+           return new Response(Webhook Handled, 200);
+        }
+       
+        return new Response;
+    }
 
     /**
      * Get the billable entity instance by Stripe ID.
