@@ -66,6 +66,12 @@ class WebhookController extends Controller
         return new Response('Webhook Handled', 200);
     }
     
+    /**
+     * Handle a failed payment.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     protected function handleInvoicePaymentFailed(array $payload)
     {
         $billable = $this->getBillable($payload['data']['object']['customer']);
