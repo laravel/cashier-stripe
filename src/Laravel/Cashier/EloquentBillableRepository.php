@@ -15,9 +15,19 @@ class EloquentBillableRepository implements BillableRepositoryInterface
      */
     public function find($stripeId)
     {
-        $model = $this->createCashierModel(Config::get('services.stripe.model'));
+        $billableModels = Config::get('services.stripe.model');
 
-        return $model->where($model->getStripeIdName(), $stripeId)->first();
+        if (! is_array($billableModels)) {
+            $billableModels = [$billableModels];
+        }
+
+        foreach ($billableModels as $billableModel) {
+            $model = $this->createCashierModel($billableModel);
+
+            if ($result = $model->where($model->getStripeIdName(), $stripeId)->first()) {
+                return $result;
+            }
+        }
     }
 
     /**
