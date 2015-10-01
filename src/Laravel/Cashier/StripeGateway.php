@@ -65,6 +65,16 @@ class StripeGateway
     protected $skipTrial = false;
 
     /**
+     * Indicates the plan's billing cycle anchor.
+     * Can be 'now', 'unchanged', or a Carbon date.
+     * Currently, an undocumented, but useful feature.
+     * See https://groups.google.com/a/lists.stripe.com/forum/#!msg/api-discuss/PsKhHPI7XIQ/viyqVPNwplYJ
+     *
+     * @var string|\Carbon\Carbon
+     */
+    protected $billingCycleAnchor;
+
+    /**
      * Create a new Stripe gateway instance.
      *
      * @param  \Laravel\Cashier\Contracts\Billable   $billable
@@ -162,6 +172,10 @@ class StripeGateway
 
         if ($taxPercent = $this->billable->getTaxPercent()) {
             $payload['tax_percent'] = $taxPercent;
+        }
+
+        if ($billingCycleAnchor = $this->getBillingCycleAnchorForUpdate()) {
+            $payload['billing_cycle_anchor'] = $billingCycleAnchor;
         }
 
         return $payload;
@@ -559,7 +573,7 @@ class StripeGateway
     }
 
     /**
-     * Deteremine if the customer has a subscription.
+     * Determine if the customer has a subscription.
      *
      * @param  \Stripe\Customer  $customer
      * @return bool
@@ -667,6 +681,33 @@ class StripeGateway
         $this->trialEnd = $trialEnd;
 
         return $this;
+    }
+
+    /**
+     * Specify when the billing cycle should be anchored.
+     *
+     * @param  \DateTime|string  $billingCycleAnchor Accepts a DateTime or the strings 'now' or 'unchanged'
+     * @return \Laravel\Cashier\StripeGateway
+     */
+    public function anchorBillingCycleOn($billingCycleAnchor)
+    {
+        $this->billingCycleAnchor = $billingCycleAnchor;
+
+        return $this;
+    }
+
+    /**
+     * Get the billing cycle anchor for subscription change.
+     *
+     * @return int
+     */
+    protected function getBillingCycleAnchorForUpdate()
+    {
+        if ($this->billingCycleAnchor == 'now' || $this->billingCycleAnchor == 'unchanged') {
+            return $this->billingCycleAnchor;
+        }
+
+        return $this->billingCycleAnchor ? $this->billingCycleAnchor->getTimestamp() : null;
     }
 
     /**
