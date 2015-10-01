@@ -175,7 +175,7 @@ class BillableTraitCardUpFrontTestStub implements Laravel\Cashier\Contracts\Bill
 {
     use Laravel\Cashier\Billable;
     public $cardUpFront = true;
-    
+
     public function save()
     {
     }
