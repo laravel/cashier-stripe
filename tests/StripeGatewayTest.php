@@ -253,18 +253,6 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($time, $gateway->getTrialEndForCustomer($customer)->getTimestamp());
     }
 
-    public function testgeBillingCycleAnchorForUpdateD()
-    {
-        $billable = $this->mockBillableInterface();
-        $billable->shouldReceive('readyForBilling')->once()->andReturn(true);
-        $gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,getTrialEndForCustomer]', [$billable, 'plan']);
-        $gateway->shouldReceive('getStripeCustomer')->once()->andReturn($customer = m::mock('StdClass'));
-        $gateway->shouldReceive('getTrialEndForCustomer')->once()->with($customer)->andReturn(null);
-        $gateway->maintainTrial();
-
-        $this->assertNull($gateway->getTrialFor());
-    }
-
     public function testCreateWithBillingCycleAnchorSetToNow()
     {
         $billable = $this->mockBillableInterface();
