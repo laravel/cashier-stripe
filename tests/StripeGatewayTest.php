@@ -272,7 +272,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase
         $gateway->shouldReceive('getStripeCustomer')->once()->with('foo');
         $gateway->shouldReceive('updateLocalStripeData')->once();
 
-        $gateway->anchorBillingCycleOn('now');
+        $gateway->anchorOn('now');
         $gateway->create('token', []);
     }
 
@@ -295,7 +295,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase
         $gateway->shouldReceive('getStripeCustomer')->once()->with('foo');
         $gateway->shouldReceive('updateLocalStripeData')->once();
 
-        $gateway->anchorBillingCycleOn($twoWeeksFromNow);
+        $gateway->anchorOn($twoWeeksFromNow);
         $gateway->create('token', []);
     }
 

@@ -65,12 +65,9 @@ class StripeGateway
     protected $skipTrial = false;
 
     /**
-     * Indicates the plan's billing cycle anchor.
-     * Can be 'now', 'unchanged', or a Carbon date.
-     * Currently, it's an undocumented feature.
-     * See https://groups.google.com/a/lists.stripe.com/forum/#!msg/api-discuss/PsKhHPI7XIQ/viyqVPNwplYJ for more info.
+     * The plan's billing cycle anchor.
      *
-     * @var string|\Carbon\Carbon
+     * @var \Carbon\Carbon|string
      */
     protected $billingCycleAnchor;
 
@@ -686,10 +683,10 @@ class StripeGateway
     /**
      * Specify when the billing cycle should be anchored.
      *
-     * @param  \DateTime|string  $billingCycleAnchor Accepts a DateTime or the strings 'now' or 'unchanged'
+     * @param  \DateTime|string  $billingCycleAnchor
      * @return \Laravel\Cashier\StripeGateway
      */
-    public function anchorBillingCycleOn($billingCycleAnchor)
+    public function anchorOn($billingCycleAnchor)
     {
         $this->billingCycleAnchor = $billingCycleAnchor;
 
@@ -699,7 +696,7 @@ class StripeGateway
     /**
      * Get the billing cycle anchor for subscription change.
      *
-     * @return int
+     * @return int|null
      */
     protected function getBillingCycleAnchorForUpdate()
     {
