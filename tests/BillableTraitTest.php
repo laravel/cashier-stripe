@@ -150,6 +150,7 @@ class BillableTraitTestStub implements Laravel\Cashier\Contracts\Billable
 {
     use Laravel\Cashier\Billable;
     public $cardUpFront = false;
+
     public function save()
     {
     }
@@ -159,10 +160,12 @@ class BillableTraitTaxTestStub implements Laravel\Cashier\Contracts\Billable
 {
     use Laravel\Cashier\Billable;
     public $cardUpFront = false;
+
     public function getTaxPercent()
     {
         return 20;
     }
+
     public function save()
     {
     }
@@ -172,6 +175,7 @@ class BillableTraitCardUpFrontTestStub implements Laravel\Cashier\Contracts\Bill
 {
     use Laravel\Cashier\Billable;
     public $cardUpFront = true;
+
     public function save()
     {
     }
