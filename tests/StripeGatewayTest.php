@@ -277,7 +277,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase
             'prorate' => true,
             'quantity' => 1,
             'tax_percent' => 20,
-            'billing_cycle_anchor' => 'now'
+            'billing_cycle_anchor' => 'now',
         ])->andReturn((object) ['id' => 'sub_id']);
         $customer->id = 'foo';
         $billable->shouldReceive('setStripeSubscription')->once()->with('sub_id');
@@ -300,7 +300,7 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase
             'prorate' => true,
             'quantity' => 1,
             'tax_percent' => 20,
-            'billing_cycle_anchor' => $twoWeeksFromNow->getTimestamp()
+            'billing_cycle_anchor' => $twoWeeksFromNow->getTimestamp(),
         ])->andReturn((object) ['id' => 'sub_id']);
         $customer->id = 'foo';
         $billable->shouldReceive('setStripeSubscription')->once()->with('sub_id');

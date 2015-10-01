@@ -67,8 +67,8 @@ class StripeGateway
     /**
      * Indicates the plan's billing cycle anchor.
      * Can be 'now', 'unchanged', or a Carbon date.
-     * Currently, an undocumented, but useful feature.
-     * See https://groups.google.com/a/lists.stripe.com/forum/#!msg/api-discuss/PsKhHPI7XIQ/viyqVPNwplYJ
+     * Currently, it's an undocumented feature.
+     * See https://groups.google.com/a/lists.stripe.com/forum/#!msg/api-discuss/PsKhHPI7XIQ/viyqVPNwplYJ for more info.
      *
      * @var string|\Carbon\Carbon
      */
