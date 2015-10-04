@@ -91,7 +91,7 @@ class WebhookController extends Controller
      */
     protected function userIsSubscribedWithoutACard($billable)
     {
-        return ($billable & $billable->subscribed() &&
+        return ($billable && $billable->subscribed() &&
             ! $billable->onTrial() && is_null($billable->getLastFourCardDigits()));
     }
 
