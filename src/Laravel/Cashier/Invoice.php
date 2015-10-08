@@ -67,9 +67,8 @@ class Invoice
     {
         if (starts_with($total = $this->total(), '-')) {
             return '-'.$this->billable->addCurrencySymbol(ltrim($total, '-'));
-        } else {
-            return $this->billable->addCurrencySymbol($total);
         }
+        return $this->billable->addCurrencySymbol($total);
     }
 
     /**
