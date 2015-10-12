@@ -16,7 +16,7 @@ If you have an idea for a new feature you would like to see added to Laravel, yo
 
 Laravel Cashier follows the [PSR-0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md) and [PSR-1](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md) coding standards. In addition to these standards, below is a list of other coding standards that should be followed:
 
-- Namespace declarations should be on the same line as `<?php`.
+- Namespace declarations should be two lines below `<?php`.
 - Class opening `{` should be on the same line as the class name.
 - Function and control structure opening `{` should be on a separate line.
 - Interface and Trait names are suffixed with `Interface` (`FooInterface`) and `Trait` (`FooTrait`) respectively.
