@@ -21,7 +21,7 @@ class WebhookController extends Controller
     {
         $payload = $this->getJsonPayload();
 
-        if (! $this->eventExistsOnStripe($payload['id'])) {
+        if (! $this->eventExistsOnStripe($payload['id']) && ! $this->isInTestingEnvironment()) {
             return;
         }
 
@@ -67,6 +67,35 @@ class WebhookController extends Controller
     }
 
     /**
+     * Handle a failed payment.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleInvoicePaymentFailed(array $payload)
+    {
+        $billable = $this->getBillable($payload['data']['object']['customer']);
+
+        if ($this->userIsSubscribedWithoutACard($billable)) {
+            $billable->subscription->cancel(false);
+        }
+
+        return new Response('Webhook Handled', 200);
+    }
+
+    /**
+     * Determine if the user is in a "subscribed" state but has no card on file.
+     *
+     * @param  \Laravel\Cashier\Contracts\Billable  $billable
+     * @return bool
+     */
+    protected function userIsSubscribedWithoutACard($billable)
+    {
+        return ($billable && $billable->subscribed() &&
+            ! $billable->onTrial() && is_null($billable->getLastFourCardDigits()));
+    }
+
+    /**
      * Get the billable entity instance by Stripe ID.
      *
      * @param  string  $stripeId
@@ -85,6 +114,16 @@ class WebhookController extends Controller
     protected function getJsonPayload()
     {
         return (array) json_decode(Request::getContent(), true);
+    }
+
+    /**
+     * Verify if cashier is in the testing environment.
+     *
+     * @return bool
+     */
+    protected function isInTestingEnvironment()
+    {
+        return getenv('CASHIER_ENV') === 'testing';
     }
 
     /**

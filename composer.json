@@ -14,7 +14,7 @@
         "illuminate/filesystem": "~5.0",
         "illuminate/support": "~5.0",
         "nesbot/carbon": "~1.0",
-        "stripe/stripe-php": "~2.0",
+        "stripe/stripe-php": "~3.0",
         "symfony/http-kernel": "~2.3"
     },
     "require-dev": {

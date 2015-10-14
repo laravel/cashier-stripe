@@ -253,6 +253,52 @@ class StripeGatewayTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($time, $gateway->getTrialEndForCustomer($customer)->getTimestamp());
     }
 
+    public function testCreateWithBillingCycleAnchorSetToNow()
+    {
+        $billable = $this->mockBillableInterface();
+        $billable->shouldReceive('getCurrency')->andReturn('usd');
+
+        $gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData]', [$billable, 'plan']);
+        $gateway->shouldReceive('createStripeCustomer')->andReturn($customer = m::mock('StdClass'));
+        $customer->shouldReceive('updateSubscription')->once()->with([
+            'plan' => 'plan',
+            'prorate' => true,
+            'quantity' => 1,
+            'tax_percent' => 20,
+            'billing_cycle_anchor' => 'now',
+        ])->andReturn((object) ['id' => 'sub_id']);
+        $customer->id = 'foo';
+        $billable->shouldReceive('setStripeSubscription')->once()->with('sub_id');
+        $gateway->shouldReceive('getStripeCustomer')->once()->with('foo');
+        $gateway->shouldReceive('updateLocalStripeData')->once();
+
+        $gateway->anchorOn('now');
+        $gateway->create('token', []);
+    }
+
+    public function testCreateWithBillingCycleAnchorSetToDate()
+    {
+        $billable = $this->mockBillableInterface();
+        $billable->shouldReceive('getCurrency')->andReturn('usd');
+        $twoWeeksFromNow = Carbon\Carbon::now()->addWeeks(2);
+        $gateway = m::mock('Laravel\Cashier\StripeGateway[getStripeCustomer,createStripeCustomer,updateLocalStripeData]', [$billable, 'plan']);
+        $gateway->shouldReceive('createStripeCustomer')->andReturn($customer = m::mock('StdClass'));
+        $customer->shouldReceive('updateSubscription')->once()->with([
+            'plan' => 'plan',
+            'prorate' => true,
+            'quantity' => 1,
+            'tax_percent' => 20,
+            'billing_cycle_anchor' => $twoWeeksFromNow->getTimestamp(),
+        ])->andReturn((object) ['id' => 'sub_id']);
+        $customer->id = 'foo';
+        $billable->shouldReceive('setStripeSubscription')->once()->with('sub_id');
+        $gateway->shouldReceive('getStripeCustomer')->once()->with('foo');
+        $gateway->shouldReceive('updateLocalStripeData')->once();
+
+        $gateway->anchorOn($twoWeeksFromNow);
+        $gateway->create('token', []);
+    }
+
     protected function mockBillableInterface()
     {
         $billable = m::mock('Laravel\Cashier\Contracts\Billable');

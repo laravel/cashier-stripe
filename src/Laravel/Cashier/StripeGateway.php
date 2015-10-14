@@ -65,6 +65,13 @@ class StripeGateway
     protected $skipTrial = false;
 
     /**
+     * The plan's billing cycle anchor.
+     *
+     * @var \Carbon\Carbon|string
+     */
+    protected $billingCycleAnchor;
+
+    /**
      * Create a new Stripe gateway instance.
      *
      * @param  \Laravel\Cashier\Contracts\Billable   $billable
@@ -162,6 +169,10 @@ class StripeGateway
 
         if ($taxPercent = $this->billable->getTaxPercent()) {
             $payload['tax_percent'] = $taxPercent;
+        }
+
+        if ($billingCycleAnchor = $this->getBillingCycleAnchorForUpdate()) {
+            $payload['billing_cycle_anchor'] = $billingCycleAnchor;
         }
 
         return $payload;
@@ -393,8 +404,6 @@ class StripeGateway
                 $this->billable->setSubscriptionEndDate(
                     Carbon::createFromTimestamp($this->getSubscriptionEndTimestamp($customer))
                 );
-            } else {
-                $this->billable->setSubscriptionEndDate(Carbon::now());
             }
 
             $customer->cancelSubscription(['at_period_end' => $atPeriodEnd]);
@@ -403,6 +412,8 @@ class StripeGateway
         if ($atPeriodEnd) {
             $this->billable->setStripeIsActive(false)->saveBillableInstance();
         } else {
+            $this->billable->setSubscriptionEndDate(Carbon::now());
+
             $this->billable->deactivateStripe()->saveBillableInstance();
         }
     }
@@ -551,7 +562,7 @@ class StripeGateway
     {
         $customer = Customer::retrieve($id ?: $this->billable->getStripeId(), $this->getStripeKey());
 
-        if ($this->usingMultipleSubscriptionApi($customer)) {
+        if (! isset($customer->deleted) && $this->usingMultipleSubscriptionApi($customer)) {
             $customer->subscription = $customer->findSubscription($this->billable->getStripeSubscription());
         }
 
@@ -559,7 +570,7 @@ class StripeGateway
     }
 
     /**
-     * Deteremine if the customer has a subscription.
+     * Determine if the customer has a subscription.
      *
      * @param  \Stripe\Customer  $customer
      * @return bool
@@ -667,6 +678,33 @@ class StripeGateway
         $this->trialEnd = $trialEnd;
 
         return $this;
+    }
+
+    /**
+     * Specify when the billing cycle should be anchored.
+     *
+     * @param  \DateTime|string  $billingCycleAnchor
+     * @return \Laravel\Cashier\StripeGateway
+     */
+    public function anchorOn($billingCycleAnchor)
+    {
+        $this->billingCycleAnchor = $billingCycleAnchor;
+
+        return $this;
+    }
+
+    /**
+     * Get the billing cycle anchor for subscription change.
+     *
+     * @return int|null
+     */
+    protected function getBillingCycleAnchorForUpdate()
+    {
+        if ($this->billingCycleAnchor == 'now' || $this->billingCycleAnchor == 'unchanged') {
+            return $this->billingCycleAnchor;
+        }
+
+        return $this->billingCycleAnchor ? $this->billingCycleAnchor->getTimestamp() : null;
     }
 
     /**
