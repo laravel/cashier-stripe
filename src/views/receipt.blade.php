@@ -146,6 +146,15 @@
 					</tr>
 				@endif
 
+				<!-- Existing Balance -->
+				@if (isset($invoice->starting_balance))
+					<tr>
+						<td>Starting Balance</td>
+						<td>&nbsp;</td>
+						<td>{{ $invoice->startingBalanceWithCurrency() }}</td>
+					</tr>
+				@endif
+
 				<!-- Display The Final Total -->
 				<tr style="border-top:2px solid #000;">
 					<td>&nbsp;</td>

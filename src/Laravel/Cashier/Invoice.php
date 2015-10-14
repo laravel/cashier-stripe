@@ -105,6 +105,24 @@ class Invoice
     }
 
     /**
+     * Get the starting balance for the invoice.
+     *
+     * @return string
+     */
+    public function startingBalanceWithCurrency()
+    {
+        if (isset($this->starting_balance)) {
+            $startingBalance = $this->starting_balance;
+        } else {
+            $startingBalance = 0;
+        }
+
+        return $this->billable->addCurrencySymbol(
+            $this->billable->formatCurrency($startingBalance)
+        );
+    }
+
+    /**
      * Get all of the "invoice item" line items.
      *
      * @return array
