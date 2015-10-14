@@ -79,7 +79,13 @@ class Invoice
      */
     public function total()
     {
-        return $this->billable->formatCurrency($this->total);
+        if (isset($this->starting_balance)) {
+            $startingBalance = $this->starting_balance;
+        } else {
+            $startingBalance = 0;
+        }
+
+        return $this->billable->formatCurrency(max(0, $this->total - $startingBalance));
     }
 
     /**
@@ -89,7 +95,13 @@ class Invoice
      */
     public function subtotal()
     {
-        return $this->billable->formatCurrency($this->subtotal);
+        if (isset($this->starting_balance)) {
+            $startingBalance = $this->starting_balance;
+        } else {
+            $startingBalance = 0;
+        }
+
+        return $this->billable->formatCurrency(max(0, $this->subtotal - $startingBalance));
     }
 
     /**
