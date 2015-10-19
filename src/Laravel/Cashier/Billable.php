@@ -138,7 +138,7 @@ trait Billable
     /**
      *  Get the entity's upcoming invoice.
      *
-     * @return @return \Laravel\Cashier\Invoice|null
+     * @return \Laravel\Cashier\Invoice|null
      */
     public function upcomingInvoice()
     {
