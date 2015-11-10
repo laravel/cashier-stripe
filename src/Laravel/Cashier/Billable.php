@@ -105,23 +105,26 @@ trait Billable
      *
      * @param  string  $id
      * @param  array  $data
+     * @param  null   $storagePath
      * @return \SplFileInfo
      */
-    public function invoiceFile($id, array $data)
+    public function invoiceFile($id, array $data, $storagePath = null)
     {
-        return $this->findInvoiceOrFail($id)->file($data);
+        return $this->findInvoiceOrFail($id)->file($data, $storagePath);
     }
 
     /**
      * Create an invoice download Response.
      *
-     * @param  string  $id
-     * @param  array   $data
+     * @param  string $id
+     * @param  array  $data
+     * @param  null   $storagePath
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws NotFoundHttpException
      */
-    public function downloadInvoice($id, array $data)
+    public function downloadInvoice($id, array $data, $storagePath = null)
     {
-        return $this->findInvoiceOrFail($id)->download($data);
+        return $this->findInvoiceOrFail($id)->download($data, $storagePath);
     }
 
     /**
