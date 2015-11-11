@@ -105,7 +105,7 @@ trait Billable
      *
      * @param  string  $id
      * @param  array  $data
-     * @param  null   $storagePath
+     * @param  string $storagePath
      * @return \SplFileInfo
      */
     public function invoiceFile($id, array $data, $storagePath = null)
@@ -116,11 +116,10 @@ trait Billable
     /**
      * Create an invoice download Response.
      *
-     * @param  string $id
-     * @param  array  $data
-     * @param  null   $storagePath
+     * @param  string  $id
+     * @param  array   $data
+     * @param  string  $storagePath
      * @return \Symfony\Component\HttpFoundation\Response
-     * @throws NotFoundHttpException
      */
     public function downloadInvoice($id, array $data, $storagePath = null)
     {
