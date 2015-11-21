@@ -27,11 +27,11 @@ class CashierServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bindShared('Laravel\Cashier\BillableRepositoryInterface', function () {
+        $this->app->singleton('Laravel\Cashier\BillableRepositoryInterface', function () {
             return new EloquentBillableRepository;
         });
 
-        $this->app->bindShared('command.cashier.table', function ($app) {
+        $this->app->singleton('command.cashier.table', function ($app) {
             return new CashierTableCommand;
         });
 

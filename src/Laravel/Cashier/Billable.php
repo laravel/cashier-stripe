@@ -105,11 +105,12 @@ trait Billable
      *
      * @param  string  $id
      * @param  array  $data
+     * @param  string $storagePath
      * @return \SplFileInfo
      */
-    public function invoiceFile($id, array $data)
+    public function invoiceFile($id, array $data, $storagePath = null)
     {
-        return $this->findInvoiceOrFail($id)->file($data);
+        return $this->findInvoiceOrFail($id)->file($data, $storagePath);
     }
 
     /**
@@ -117,11 +118,12 @@ trait Billable
      *
      * @param  string  $id
      * @param  array   $data
+     * @param  string  $storagePath
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function downloadInvoice($id, array $data)
+    public function downloadInvoice($id, array $data, $storagePath = null)
     {
-        return $this->findInvoiceOrFail($id)->download($data);
+        return $this->findInvoiceOrFail($id)->download($data, $storagePath);
     }
 
     /**
@@ -138,7 +140,7 @@ trait Billable
     /**
      *  Get the entity's upcoming invoice.
      *
-     * @return @return \Laravel\Cashier\Invoice|null
+     * @return \Laravel\Cashier\Invoice|null
      */
     public function upcomingInvoice()
     {
