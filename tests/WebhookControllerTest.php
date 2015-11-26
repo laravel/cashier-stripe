@@ -1,31 +1,25 @@
 <?php
 
-use Illuminate\Support\Facades\Facade;
-use Laravel\Cashier\WebhookController;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
+use Laravel\Cashier\Http\Controllers\WebhookController;
 
 class WebhookControllerTest extends PHPUnit_Framework_TestCase
 {
-    public function setUp()
-    {
-        Facade::clearResolvedInstances();
-    }
-
     public function testProperMethodsAreCalledBasedOnStripeEvent()
     {
         $_SERVER['__received'] = false;
-        Request::shouldReceive('getContent')->andReturn(json_encode(['type' => 'charge.succeeded', 'id' => 'event-id']));
+        $request = Request::create('/', 'POST', [], [], [], [], json_encode(['type' => 'charge.succeeded', 'id' => 'event-id']));
         $controller = new WebhookControllerTestStub;
-        $controller->handleWebhook();
+        $controller->handleWebhook($request);
 
         $this->assertTrue($_SERVER['__received']);
     }
 
     public function testNormalResponseIsReturnedIfMethodIsMissing()
     {
-        Request::shouldReceive('getContent')->andReturn(json_encode(['type' => 'foo.bar', 'id' => 'event-id']));
+        $request = Request::create('/', 'POST', [], [], [], [], json_encode(['type' => 'foo.bar', 'id' => 'event-id']));
         $controller = new WebhookControllerTestStub;
-        $response = $controller->handleWebhook();
+        $response = $controller->handleWebhook($request);
         $this->assertEquals(200, $response->getStatusCode());
     }
 }
