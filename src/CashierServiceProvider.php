@@ -27,10 +27,6 @@ class CashierServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('command.cashier.table', function ($app) {
-            return new CashierTableCommand;
-        });
-
-        $this->commands('command.cashier.table');
+        //
     }
 }
