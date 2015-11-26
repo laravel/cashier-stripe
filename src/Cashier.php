@@ -17,10 +17,10 @@ class Cashier
      * @param  callable  $callback
      * @return void
      */
-	public static function formatCurrencyUsing(callable $callback)
-	{
+    public static function formatCurrencyUsing(callable $callback)
+    {
         static::$formatCurrencyUsing = $callback;
-	}
+    }
 
     /**
      * Format the given amount into a displayable currency.
