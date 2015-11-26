@@ -3,7 +3,6 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
-use Stripe\Customer as StripeCustomer;
 
 class SubscriptionBuilder
 {
