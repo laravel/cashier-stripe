@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.0",
+        "php": ">=5.5.9",
         "illuminate/database": "~5.1",
         "illuminate/support": "~5.1",
         "nesbot/carbon": "~1.0",
