@@ -8,8 +8,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<style>
 			body {
-				background: #fff;
-				background-image: none;
+				background: #fff none;
 				font-size: 12px;
 			}
 			address{
@@ -25,12 +24,6 @@
 			.invoice-head td {
 				padding: 0 8px;
 			}
-			.invoice-body{
-				background-color:transparent;
-			}
-			.logo {
-				padding-bottom: 10px;
-			}
 			.table th {
 				vertical-align: bottom;
 				font-weight: bold;
@@ -44,9 +37,6 @@
 				text-align: left;
 				vertical-align: top;
 				border-top: 1px solid #dddddd;
-			}
-			.well {
-				margin-top: 15px;
 			}
 	</style>
 </head>

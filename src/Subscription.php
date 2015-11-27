@@ -90,7 +90,7 @@ class Subscription extends Model
      */
     public function incrementQuantity($count = 1)
     {
-        $this->updateQuantity($this->quantity + 1);
+        $this->updateQuantity($this->quantity + $count);
 
         return $this;
     }
@@ -116,7 +116,7 @@ class Subscription extends Model
      */
     public function decrementQuantity($count = 1)
     {
-        $this->updateQuantity(max(1, $this->quantity - 1));
+        $this->updateQuantity(max(1, $this->quantity - $count));
 
         return $this;
     }

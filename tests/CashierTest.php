@@ -270,7 +270,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
 
 class User extends Eloquent
 {
-    use Laravel\Cashier\Billable;
+    use Laravel\Cashier\BillableTrait;
 }
 
 class CashierTestControllerStub extends WebhookController

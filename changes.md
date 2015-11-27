@@ -2,7 +2,7 @@
 
 ## Version 2.0.4
 
-- Allow user to pass paramaters when fetching invoices.
+- Allow user to pass parameters when fetching invoices.
 - Added a method to get the current subscription period's end date.
 - If a webhook endpoint is not defined for a given hook, an empty 200 response will be returned.
 
