@@ -21,7 +21,7 @@ class Subscription extends Model
      */
     protected $dates = [
         'trial_ends_at', 'ends_at',
-        'created_at', 'updated_at'
+        'created_at', 'updated_at',
     ];
 
     /**
@@ -241,7 +241,7 @@ class Subscription extends Model
     public function resume()
     {
         if (! $this->onGracePeriod()) {
-            throw new \LogicException("Unable to resume subscription that is not within grace period.");
+            throw new \LogicException('Unable to resume subscription that is not within grace period.');
         }
 
         $subscription = $this->asStripeSubscription();

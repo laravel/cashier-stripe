@@ -2,14 +2,12 @@
 
 namespace Laravel\Cashier;
 
-use Carbon\Carbon;
 use InvalidArgumentException;
 use Stripe\Token as StripeToken;
 use Stripe\Charge as StripeCharge;
 use Illuminate\Support\Collection;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\Customer as StripeCustomer;
-use Illuminate\Support\Facades\Config;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -314,7 +312,7 @@ trait Billable
      * @param  string  $token
      * @param  array  $options
      */
-    public function createAsStripeCustomer($token, array $options = array())
+    public function createAsStripeCustomer($token, array $options = [])
     {
         $options = array_merge($options, ['email' => $this->email]);
 

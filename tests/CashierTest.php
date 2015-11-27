@@ -58,9 +58,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests
+     * Tests.
      */
-
     public function testSubscriptionsCanBeCreated()
     {
         $user = User::create([
@@ -222,7 +221,6 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $user->newSubscription('main', 'monthly-10-1')
                 ->create($this->getTestToken());
 
-
         $subscription = $user->subscription('main');
 
         $request = Request::create('/', 'POST', [], [], [], [], json_encode(['id' => 'foo', 'type' => 'customer.subscription.deleted',
@@ -257,9 +255,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Schema Helpers
+     * Schema Helpers.
      */
-
     protected function schema()
     {
         return $this->connection()->getSchemaBuilder();
@@ -271,11 +268,10 @@ class CashierTest extends PHPUnit_Framework_TestCase
     }
 }
 
-
-class User extends Eloquent {
+class User extends Eloquent
+{
     use Laravel\Cashier\Billable;
 }
-
 
 class CashierTestControllerStub extends WebhookController
 {
