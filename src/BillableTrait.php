@@ -11,7 +11,7 @@ use Stripe\Customer as StripeCustomer;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-trait Billable
+trait BillableTrait
 {
     /**
      * The Stripe API key.
@@ -107,7 +107,6 @@ trait Billable
     /**
      * Invoice the billable entity outside of regular billing cycle.
      *
-     * @param  string  $subscription
      * @return bool
      */
     public function invoice()
@@ -161,6 +160,7 @@ trait Billable
      *
      * @param  string  $id
      * @return \Laravel\Cashier\Invoice
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function findInvoiceOrFail($id)
     {
@@ -178,12 +178,11 @@ trait Billable
      *
      * @param  string  $id
      * @param  array   $data
-     * @param  string  $storagePath
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function downloadInvoice($id, array $data, $storagePath = null)
+    public function downloadInvoice($id, array $data)
     {
-        return $this->findInvoiceOrFail($id)->download($data, $storagePath);
+        return $this->findInvoiceOrFail($id)->download($data);
     }
 
     /**
@@ -218,7 +217,6 @@ trait Billable
     /**
      * Get an array of the entity's invoices.
      *
-     * @param  bool  $includePending
      * @param  array  $parameters
      * @return \Illuminate\Support\Collection
      */
@@ -270,7 +268,6 @@ trait Billable
     /**
      * Apply a coupon to the billable entity.
      *
-     * @param  string  $subscription
      * @param  string  $coupon
      * @return void
      */
