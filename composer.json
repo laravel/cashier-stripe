@@ -15,7 +15,7 @@
         "illuminate/support": "~5.1",
         "nesbot/carbon": "~1.0",
         "stripe/stripe-php": "~3.0",
-        "symfony/http-kernel": "2.8.*|3.0.*"
+        "symfony/http-kernel": "2.7.*|2.8.*|3.0.*"
     },
     "require-dev": {
         "dompdf/dompdf": "^0.6.1",
