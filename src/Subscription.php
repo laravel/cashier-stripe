@@ -175,7 +175,10 @@ class Subscription extends Model
 
         $this->user->invoice();
 
-        $this->fill(['stripe_plan' => $plan])->save();
+        $this->fill([
+            'stripe_plan' => $plan,
+            'ends_at' => null,
+        ])->save();
 
         return $this;
     }
