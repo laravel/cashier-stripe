@@ -118,6 +118,13 @@
 					<th align="right">Amount</th>
 				</tr>
 
+				<!-- Existing Balance -->
+				<tr>
+					<td>Starting Balance</td>
+					<td>&nbsp;</td>
+					<td>{{ $invoice->startingBalance() }}</td>
+				</tr>
+
 				<!-- Display The Invoice Items -->
 				@foreach ($invoice->invoiceItems() as $item)
 					<tr>
@@ -145,15 +152,6 @@
 						@endif
 						<td>&nbsp;</td>
 						<td>-{{ $invoice->discount() }}</td>
-					</tr>
-				@endif
-
-				<!-- Existing Balance -->
-				@if ($invoice->hasStartingBalance())
-					<tr>
-						<td>Starting Balance</td>
-						<td>&nbsp;</td>
-						<td>{{ $invoice->startingBalance() }}</td>
 					</tr>
 				@endif
 

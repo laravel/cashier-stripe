@@ -56,9 +56,11 @@ class Invoice
      */
     public function total()
     {
-        return $this->formatAmount(
-            max(0, $this->invoice->total - $this->rawStartingBalance())
+        $total = $this->formatAmount(
+            max(0, $this->invoice->total - ($this->rawStartingBalance() * -1))
         );
+
+        return $total;
     }
 
     /**
