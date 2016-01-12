@@ -98,12 +98,14 @@ class Subscription extends Model
     /**
      *  Increment the quantity of the subscription. and invoice immediately.
      *
-     * @param  int|null  $quantity
+     * @param  int  $count
      * @return $this
      */
-    public function incrementAndInvoice($quantity = null)
+    public function incrementAndInvoice($count = 1)
     {
-        $this->incrementQuantity($quantity);
+        $this->incrementQuantity($count);
+
+        $this->user->invoice();
 
         return $this;
     }
