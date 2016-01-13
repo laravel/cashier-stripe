@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier;
 
+use DOMPDF;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use Stripe\Invoice as StripeInvoice;
@@ -247,7 +248,7 @@ class Invoice
             require_once $configPath;
         }
 
-        $dompdf = new \DOMPDF;
+        $dompdf = new DOMPDF;
 
         $dompdf->load_html($this->view($data)->render());
 

@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
+use LogicException;
 use Illuminate\Database\Eloquent\Model;
 
 class Subscription extends Model
@@ -242,11 +243,13 @@ class Subscription extends Model
      * Resume the cancelled subscription.
      *
      * @return $this
+     *
+     * @throws \LogicException
      */
     public function resume()
     {
         if (! $this->onGracePeriod()) {
-            throw new \LogicException('Unable to resume subscription that is not within grace period.');
+            throw new LogicException('Unable to resume subscription that is not within grace period.');
         }
 
         $subscription = $this->asStripeSubscription();
