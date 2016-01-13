@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier;
 
+use Exception;
 use InvalidArgumentException;
 use Stripe\Token as StripeToken;
 use Stripe\Charge as StripeCharge;
