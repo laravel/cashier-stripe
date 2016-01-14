@@ -102,7 +102,7 @@ trait Billable
      */
     public function subscriptions()
     {
-        return $this->hasMany(Subscription::class)->orderBy('created_at', 'desc');
+        return $this->hasMany(Subscription::class, 'user_id')->orderBy('created_at', 'desc');
     }
 
     /**
