@@ -58,7 +58,7 @@ class WebhookController extends Controller
      * Get the billable entity instance by Stripe ID.
      *
      * @param  string  $stripeId
-     * @return \Laravel\Cashier\Contracts\Billable
+     * @return \Laravel\Cashier\Billable
      */
     protected function getUserByStripeId($stripeId)
     {
