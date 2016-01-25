@@ -1,5 +1,5 @@
 {
-    "name": "laravel/new-cashier",
+    "name": "laravel/cashier",
     "description": "Laravel Cashier provides an expressive, fluent interface to Stripe's subscription billing services.",
     "keywords": ["laravel", "stripe", "billing"],
     "license": "MIT",
