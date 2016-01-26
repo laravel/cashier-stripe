@@ -39,12 +39,13 @@ trait Billable
      * Make a "one off" charge on the customer for the given amount.
      *
      * @param  int  $amount
+     * @param  array  $params
      * @param  array  $options
      * @return bool|mixed
      */
-    public function charge($amount, array $options = [])
+    public function charge($amount, array $params = [], array $options = [])
     {
-        return (new StripeGateway($this))->charge($amount, $options);
+        return (new StripeGateway($this))->charge($amount, $params, $options);
     }
 
     /**

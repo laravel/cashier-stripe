@@ -90,27 +90,28 @@ class StripeGateway
      * Make a "one off" charge on the customer for the given amount.
      *
      * @param  int  $amount
+     * * @param  array  $params
      * @param  array  $options
      * @return bool|mixed
      */
-    public function charge($amount, array $options = [])
+    public function charge($amount, array $params = [], array $options = [])
     {
-        $options = array_merge([
+        $params = array_merge([
             'currency' => $this->getCurrency(),
-        ], $options);
+        ], $params);
 
-        $options['amount'] = $amount;
+        $params['amount'] = $amount;
 
-        if (! array_key_exists('source', $options) && $this->billable->hasStripeId()) {
-            $options['customer'] = $this->billable->getStripeId();
+        if (! array_key_exists('source', $params) && $this->billable->hasStripeId()) {
+            $params['customer'] = $this->billable->getStripeId();
         }
 
-        if (! array_key_exists('source', $options) && ! array_key_exists('customer', $options)) {
+        if (! array_key_exists('source', $params) && ! array_key_exists('customer', $params)) {
             throw new InvalidArgumentException('No payment source provided.');
         }
 
         try {
-            $response = StripeCharge::create($options);
+            $response = StripeCharge::create($params, $options);
         } catch (StripeErrorCard $e) {
             return false;
         }
