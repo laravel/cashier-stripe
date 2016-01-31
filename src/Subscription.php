@@ -34,7 +34,7 @@ class Subscription extends Model
         $model = getenv('STRIPE_MODEL') ?: config('services.stripe.model');
         $relation = config('services.stripe.relation') ?: Str::snake(class_basename($model)).'_id';
 
-        return $this->belongsTo($model, 'user_id');
+        return $this->belongsTo($model, $relation);
     }
 
     /**
