@@ -70,7 +70,7 @@ class Subscription extends Model
     }
 
     /**
-     * Determine if the subscription is within it's grace period after cancellation.
+     * Determine if the subscription is within its grace period after cancellation.
      *
      * @return bool
      */
