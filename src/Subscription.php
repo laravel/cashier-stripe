@@ -187,7 +187,7 @@ class Subscription extends Model
     }
 
     /**
-     * Cacnel the subscription at the end of the billing period.
+     * Cancel the subscription at the end of the billing period.
      *
      * @return $this
      */
