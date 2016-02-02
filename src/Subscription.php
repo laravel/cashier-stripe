@@ -36,7 +36,7 @@ class Subscription extends Model
     }
 
     /**
-     * Determine if the subscrition is active.
+     * Determine if the subscription is active.
      *
      * @return bool
      */
@@ -70,7 +70,7 @@ class Subscription extends Model
     }
 
     /**
-     * Determine if the subscription is within its grace period after cancellation.
+     * Determine if the subscription is within it's grace period after cancellation.
      *
      * @return bool
      */
@@ -97,7 +97,7 @@ class Subscription extends Model
     }
 
     /**
-     *  Increment the quantity of the subscription. and invoice immediately.
+     *  Increment the quantity of the subscription, and invoice immediately.
      *
      * @param  int  $count
      * @return $this
@@ -187,7 +187,7 @@ class Subscription extends Model
     }
 
     /**
-     * Cacnel the subscription at the end of the billing period.
+     * Cancel the subscription at the end of the billing period.
      *
      * @return $this
      */
