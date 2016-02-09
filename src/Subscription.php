@@ -30,9 +30,9 @@ class Subscription extends Model
      */
     public function user()
     {
-        $model       = getenv('STRIPE_MODEL') ?: config('services.stripe.model');
+        $model = getenv('STRIPE_MODEL') ?: config('services.stripe.model');
         $modelObject = explode('\\', $model);
-        $columnName  = strtolower(array_pop($modelObject));
+        $columnName = strtolower(array_pop($modelObject));
         
         return $this->belongsTo($model, $columnName . '_id');
     }
