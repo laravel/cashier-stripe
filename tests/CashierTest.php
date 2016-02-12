@@ -242,6 +242,23 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($subscription->cancelled());
     }
 
+    public function testCreatingOneOffInvoices()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        // Create Invoice
+        $user->createAsStripeCustomer($this->getTestToken());
+        $user->invoiceFor('Laravel Cashier', 1000);
+
+        // Invoice Tests
+        $invoice = $user->invoices()[0];
+        $this->assertEquals('$10.00', $invoice->total());
+        $this->assertEquals('Laravel Cashier', $invoice->invoiceItems()[0]->asStripeInvoiceItem()->description);
+    }
+
     protected function getTestToken()
     {
         return Stripe\Token::create([

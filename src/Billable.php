@@ -9,6 +9,7 @@ use Stripe\Charge as StripeCharge;
 use Illuminate\Support\Collection;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\Customer as StripeCustomer;
+use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -47,6 +48,36 @@ trait Billable
         }
 
         return StripeCharge::create($options, ['api_key' => $this->getStripeKey()]);
+    }
+
+    /**
+     * Invoice the customer for the given amount.
+     *
+     * @param  string  $description
+     * @param  int  $amount
+     * @param  array  $options
+     * @return bool|mixed
+     *
+     * @throws \Stripe\Error\Card
+     */
+    public function invoiceFor($description, $amount, array $options = [])
+    {
+        if (! $this->stripe_id) {
+            throw new InvalidArgumentException('User is not a customer. See the createAsStripeCustomer method.');
+        }
+
+        $options = array_merge([
+            'customer' => $this->stripe_id,
+            'amount' => $amount,
+            'currency' => $this->preferredCurrency(),
+            'description' => $description,
+        ], $options);
+
+        $lineItem = StripeInvoiceItem::create(
+            $options, ['api_key' => $this->getStripeKey()]
+        );
+
+        return $this->invoice();
     }
 
     /**
