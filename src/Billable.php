@@ -362,7 +362,9 @@ trait Billable
         // Next we will add the credit card to the user's account on Stripe using this
         // token that was provided to this method. This will allow us to bill users
         // when they subscribe to plans or we need to do one-off charges on them.
-        $this->updateCard($token);
+        if ($token !== null) {
+            $this->updateCard($token);
+        }
 
         return $customer;
     }
