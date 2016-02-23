@@ -271,7 +271,7 @@ trait Billable
 
         $token = StripeToken::retrieve($token, ['api_key' => $this->getStripeKey()]);
 
-        // If the given token already has the card as their default soruce, we can just
+        // If the given token already has the card as their default source, we can just
         // bail out of the method now. We don't need to keep adding the same card to
         // the user's account each time we go through this particular method call.
         if ($token->card->id === $customer->default_source) {
