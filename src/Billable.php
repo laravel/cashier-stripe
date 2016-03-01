@@ -103,11 +103,15 @@ trait Billable
     {
         $subscription = $this->subscription($subscription);
 
-        if (is_null($plan)) {
-            return $subscription && $subscription->active();
-        } else {
-            return $subscription && $subscription->active() && $subscription->stripe_plan === $plan;
+        if (is_null($subscription)) {
+            return false;
         }
+
+        if (is_null($plan)) {
+            return $subscription->active();
+        }
+
+        return $subscription->active() && $subscription->stripe_plan === $plan;
     }
 
     /**
@@ -200,9 +204,9 @@ trait Billable
 
         if (is_null($invoice)) {
             throw new NotFoundHttpException;
-        } else {
-            return $invoice;
         }
+
+        return $invoice;
     }
 
     /**
