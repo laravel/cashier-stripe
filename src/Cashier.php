@@ -38,8 +38,8 @@ class Cashier
 
         if (starts_with($amount, '-')) {
             return '-$'.ltrim($amount, '-');
-        } else {
-            return '$'.$amount;
         }
+
+        return '$'.$amount;
     }
 }
