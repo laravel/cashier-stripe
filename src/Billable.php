@@ -302,7 +302,6 @@ trait Billable
     /**
      * Apply a coupon to the billable entity.
      *
-     * @param  string  $subscription
      * @param  string  $coupon
      * @return void
      */
