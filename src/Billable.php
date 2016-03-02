@@ -93,6 +93,24 @@ trait Billable
     }
 
     /**
+     * Determine if the user is on trial.
+     *
+     * @param  string  $subscription
+     * @param  string|null  $plan
+     * @return bool
+     */
+    public function onTrial($subscription = 'default', $plan = null)
+    {
+        $subscription = $this->subscription($subscription);
+
+        if (is_null($plan)) {
+            return $subscription && $subscription->onTrial();
+        }
+
+        return $subscription && $subscription->onTrial() && $subscription->braintree_plan === $plan;
+    }
+
+    /**
      * Determine if the user has a given subscription.
      *
      * @param  string  $subscription
@@ -316,6 +334,30 @@ trait Billable
         $customer->coupon = $coupon;
 
         $customer->save();
+    }
+
+    /**
+     * Determine if the user is actively subscribed to one of the given plans.
+     *
+     * @param  array|string  $plans
+     * @param  string  $subscription
+     * @return bool
+     */
+    public function subscribedToPlan($plans, $subscription = 'default')
+    {
+        $subscription = $this->subscription($subscription);
+
+        if (! $subscription || (! $subscription->onTrial() && ! $subscription->active())) {
+            return false;
+        }
+
+        foreach ((array) $plans as $plan) {
+            if ($subscription->stripe_plan === $plan) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
