@@ -116,7 +116,7 @@ trait Billable
     }
 
     /**
-     * Determine if the user is on a "universal" trial at the user level.
+     * Determine if the user is on a "generic" trial at the user level.
      *
      * @return bool
      */
