@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Exception;
+use Carbon\Carbon;
 use InvalidArgumentException;
 use Stripe\Token as StripeToken;
 use Stripe\Charge as StripeCharge;
@@ -101,6 +102,10 @@ trait Billable
      */
     public function onTrial($subscription = 'default', $plan = null)
     {
+        if (func_num_args() === 0 && $this->onUniversalTrial()) {
+            return true;
+        }
+
         $subscription = $this->subscription($subscription);
 
         if (is_null($plan)) {
@@ -108,6 +113,16 @@ trait Billable
         }
 
         return $subscription && $subscription->onTrial() && $subscription->braintree_plan === $plan;
+    }
+
+    /**
+     * Determine if the user is on a "universal" trial at the user level.
+     *
+     * @return bool
+     */
+    public function onUniversalTrial()
+    {
+        return $this->trial_ends_at && Carbon::today()->lt($this->trial_ends_at);
     }
 
     /**
