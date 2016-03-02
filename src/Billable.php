@@ -102,7 +102,7 @@ trait Billable
      */
     public function onTrial($subscription = 'default', $plan = null)
     {
-        if (func_num_args() === 0 && $this->onUniversalTrial()) {
+        if (func_num_args() === 0 && $this->onGenericTrial()) {
             return true;
         }
 
@@ -120,7 +120,7 @@ trait Billable
      *
      * @return bool
      */
-    public function onUniversalTrial()
+    public function onGenericTrial()
     {
         return $this->trial_ends_at && Carbon::today()->lt($this->trial_ends_at);
     }

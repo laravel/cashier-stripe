@@ -161,17 +161,14 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($invoice->discountIsPercentage());
     }
 
-    /**
-     * @group shit
-     */
-    public function test_universal_trials()
+    public function test_generic_trials()
     {
         $user = new User;
-        $this->assertFalse($user->onUniversalTrial());
+        $this->assertFalse($user->onGenericTrial());
         $user->trial_ends_at = Carbon::tomorrow();
-        $this->assertTrue($user->onUniversalTrial());
+        $this->assertTrue($user->onGenericTrial());
         $user->trial_ends_at = Carbon::today()->subDays(5);
-        $this->assertFalse($user->onUniversalTrial());
+        $this->assertFalse($user->onGenericTrial());
     }
 
     public function test_creating_subscription_with_trial()
