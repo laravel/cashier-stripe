@@ -49,12 +49,12 @@ class SubscriptionBuilder
     protected $coupon;
     
     /**
-     * The metadate to apply to the subscription
+     * The metadate to apply to the subscription.
      * 
      * @var array
      */
     protected $metadata = [];
-    
+
     /**
      * Create a new subscription builder instance.
      *
@@ -108,7 +108,7 @@ class SubscriptionBuilder
 
         return $this;
     }
-    
+
     /**
      * The metadata to apply to a new subscription.
      *
