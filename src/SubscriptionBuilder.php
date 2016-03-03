@@ -188,11 +188,11 @@ class SubscriptionBuilder
     protected function buildPayload()
     {
         return array_filter([
-            'plan'        => $this->plan,
-            'quantity'    => $this->quantity,
-            'trial_end'   => $this->getTrialEndForPayload(),
+            'plan' => $this->plan,
+            'quantity' => $this->quantity,
+            'trial_end' => $this->getTrialEndForPayload(),
             'tax_percent' => $this->getTaxPercentageForPayload(),
-            'metadata'    => $this->metadata,
+            'metadata' => $this->metadata,
         ]);
     }
 
