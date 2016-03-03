@@ -47,7 +47,14 @@ class SubscriptionBuilder
      * @var string|null
      */
     protected $coupon;
-
+    
+    /**
+     * The metadate to apply to the subscription
+     * 
+     * @var array
+     */
+    protected $metadata = [];
+    
     /**
      * Create a new subscription builder instance.
      *
@@ -99,6 +106,19 @@ class SubscriptionBuilder
     {
         $this->coupon = $coupon;
 
+        return $this;
+    }
+    
+    /**
+     * The metadata to apply to a new subscription.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function withMetadata($metadata)
+    {
+        $this->metadata = $metadata;
+        
         return $this;
     }
 
@@ -168,10 +188,11 @@ class SubscriptionBuilder
     protected function buildPayload()
     {
         return array_filter([
-            'plan' => $this->plan,
-            'quantity' => $this->quantity,
-            'trial_end' => $this->getTrialEndForPayload(),
+            'plan'        => $this->plan,
+            'quantity'    => $this->quantity,
+            'trial_end'   => $this->getTrialEndForPayload(),
             'tax_percent' => $this->getTaxPercentageForPayload(),
+            'metadata'    => $this->metadata,
         ]);
     }
 
