@@ -9,7 +9,7 @@ class WebhookControllerTest extends PHPUnit_Framework_TestCase
     {
         $_SERVER['__received'] = false;
         $request = Request::create('/', 'POST', [], [], [], [], json_encode(['type' => 'charge.succeeded', 'id' => 'event-id']));
-        $controller = new WebhookControllerTestStub;
+        $controller = new WebhookControllerTestStub();
         $controller->handleWebhook($request);
 
         $this->assertTrue($_SERVER['__received']);
@@ -18,7 +18,7 @@ class WebhookControllerTest extends PHPUnit_Framework_TestCase
     public function testNormalResponseIsReturnedIfMethodIsMissing()
     {
         $request = Request::create('/', 'POST', [], [], [], [], json_encode(['type' => 'foo.bar', 'id' => 'event-id']));
-        $controller = new WebhookControllerTestStub;
+        $controller = new WebhookControllerTestStub();
         $response = $controller->handleWebhook($request);
         $this->assertEquals(200, $response->getStatusCode());
     }

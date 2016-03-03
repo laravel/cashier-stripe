@@ -4,8 +4,8 @@ namespace Laravel\Cashier\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
-use Stripe\Event as StripeEvent;
 use Illuminate\Routing\Controller;
+use Stripe\Event as StripeEvent;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
@@ -13,14 +13,15 @@ class WebhookController extends Controller
     /**
      * Handle a Stripe webhook call.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handleWebhook(Request $request)
     {
         $payload = json_decode($request->getContent(), true);
 
-        if (! $this->isInTestingEnvironment() && ! $this->eventExistsOnStripe($payload['id'])) {
+        if (!$this->isInTestingEnvironment() && !$this->eventExistsOnStripe($payload['id'])) {
             return;
         }
 
@@ -36,7 +37,8 @@ class WebhookController extends Controller
     /**
      * Handle a cancelled customer from a Stripe subscription.
      *
-     * @param  array  $payload
+     * @param array $payload
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleCustomerSubscriptionDeleted(array $payload)
@@ -57,26 +59,28 @@ class WebhookController extends Controller
     /**
      * Get the billable entity instance by Stripe ID.
      *
-     * @param  string  $stripeId
+     * @param string $stripeId
+     *
      * @return \Laravel\Cashier\Billable
      */
     protected function getUserByStripeId($stripeId)
     {
         $model = getenv('STRIPE_MODEL') ?: config('services.stripe.model');
 
-        return (new $model)->where('stripe_id', $stripeId)->first();
+        return (new $model())->where('stripe_id', $stripeId)->first();
     }
 
     /**
      * Verify with Stripe that the event is genuine.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return bool
      */
     protected function eventExistsOnStripe($id)
     {
         try {
-            return ! is_null(StripeEvent::retrieve($id, config('services.stripe.secret')));
+            return !is_null(StripeEvent::retrieve($id, config('services.stripe.secret')));
         } catch (Exception $e) {
             return false;
         }
@@ -95,11 +99,12 @@ class WebhookController extends Controller
     /**
      * Handle calls to missing methods on the controller.
      *
-     * @param  array   $parameters
+     * @param array $parameters
+     *
      * @return mixed
      */
     public function missingMethod($parameters = [])
     {
-        return new Response;
+        return new Response();
     }
 }

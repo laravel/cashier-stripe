@@ -49,11 +49,19 @@ class SubscriptionBuilder
     protected $coupon;
 
     /**
+     * The metadate to apply to the subscription.
+     *
+     * @var array
+     */
+    protected $metadata = [];
+
+    /**
      * Create a new subscription builder instance.
      *
-     * @param  mixed  $user
-     * @param  string  $name
-     * @param  string  $plan
+     * @param mixed  $user
+     * @param string $name
+     * @param string $plan
+     *
      * @return void
      */
     public function __construct($user, $name, $plan)
@@ -66,7 +74,8 @@ class SubscriptionBuilder
     /**
      * Specify the quantity of the subscription.
      *
-     * @param  int  $quantity
+     * @param int $quantity
+     *
      * @return $this
      */
     public function quantity($quantity)
@@ -79,7 +88,8 @@ class SubscriptionBuilder
     /**
      * Specify the ending date of the trial.
      *
-     * @param  int  $trialDays
+     * @param int $trialDays
+     *
      * @return $this
      */
     public function trialDays($trialDays)
@@ -92,7 +102,8 @@ class SubscriptionBuilder
     /**
      * The coupon to apply to a new subscription.
      *
-     * @param  string  $coupon
+     * @param string $coupon
+     *
      * @return $this
      */
     public function withCoupon($coupon)
@@ -103,9 +114,24 @@ class SubscriptionBuilder
     }
 
     /**
+     * The metadata to apply to a new subscription.
+     *
+     * @param array $metadata
+     *
+     * @return $this
+     */
+    public function withMetadata($metadata)
+    {
+        $this->metadata = $metadata;
+
+        return $this;
+    }
+
+    /**
      * Add a new Stripe subscription to the user.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return \Laravel\Cashier\Subscription
      */
     public function add(array $options = [])
@@ -116,8 +142,9 @@ class SubscriptionBuilder
     /**
      * Create a new Stripe subscription.
      *
-     * @param  string|null  $token
-     * @param  array  $options
+     * @param string|null $token
+     * @param array       $options
+     *
      * @return \Laravel\Cashier\Subscription
      */
     public function create($token = null, array $options = [])
@@ -127,25 +154,26 @@ class SubscriptionBuilder
         $subscription = $customer->subscriptions->create($this->buildPayload());
 
         return $this->user->subscriptions()->create([
-            'name' => $this->name,
-            'stripe_id' => $subscription->id,
-            'stripe_plan' => $this->plan,
-            'quantity' => $this->quantity,
+            'name'          => $this->name,
+            'stripe_id'     => $subscription->id,
+            'stripe_plan'   => $this->plan,
+            'quantity'      => $this->quantity,
             'trial_ends_at' => $this->trialDays ? Carbon::now()->addDays($this->trialDays) : null,
-            'ends_at' => null,
+            'ends_at'       => null,
         ]);
     }
 
     /**
      * Get the Stripe customer instance for the current user and token.
      *
-     * @param  string|null  $token
-     * @param  array  $options
+     * @param string|null $token
+     * @param array       $options
+     *
      * @return \Stripe\Customer
      */
     protected function getStripeCustomer($token = null, array $options = [])
     {
-        if (! $this->user->stripe_id) {
+        if (!$this->user->stripe_id) {
             $customer = $this->user->createAsStripeCustomer(
                 $token, array_merge($options, array_filter(['coupon' => $this->coupon]))
             );
@@ -168,10 +196,11 @@ class SubscriptionBuilder
     protected function buildPayload()
     {
         return array_filter([
-            'plan' => $this->plan,
-            'quantity' => $this->quantity,
-            'trial_end' => $this->getTrialEndForPayload(),
+            'plan'        => $this->plan,
+            'quantity'    => $this->quantity,
+            'trial_end'   => $this->getTrialEndForPayload(),
             'tax_percent' => $this->getTaxPercentageForPayload(),
+            'metadata'    => $this->metadata,
         ]);
     }
 

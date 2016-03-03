@@ -2,16 +2,16 @@
 
 namespace Laravel\Cashier;
 
-use Exception;
 use Carbon\Carbon;
-use InvalidArgumentException;
-use Stripe\Token as StripeToken;
-use Stripe\Charge as StripeCharge;
+use Exception;
 use Illuminate\Support\Collection;
-use Stripe\Invoice as StripeInvoice;
+use InvalidArgumentException;
+use Stripe\Charge as StripeCharge;
 use Stripe\Customer as StripeCustomer;
-use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
+use Stripe\Invoice as StripeInvoice;
+use Stripe\InvoiceItem as StripeInvoiceItem;
+use Stripe\Token as StripeToken;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait Billable
@@ -26,11 +26,12 @@ trait Billable
     /**
      * Make a "one off" charge on the customer for the given amount.
      *
-     * @param  int  $amount
-     * @param  array  $options
-     * @return bool|mixed
+     * @param int   $amount
+     * @param array $options
      *
      * @throws \Stripe\Error\Card
+     *
+     * @return bool|mixed
      */
     public function charge($amount, array $options = [])
     {
@@ -40,11 +41,11 @@ trait Billable
 
         $options['amount'] = $amount;
 
-        if (! array_key_exists('source', $options) && $this->stripe_id) {
+        if (!array_key_exists('source', $options) && $this->stripe_id) {
             $options['customer'] = $this->stripe_id;
         }
 
-        if (! array_key_exists('source', $options) && ! array_key_exists('customer', $options)) {
+        if (!array_key_exists('source', $options) && !array_key_exists('customer', $options)) {
             throw new InvalidArgumentException('No payment source provided.');
         }
 
@@ -54,23 +55,24 @@ trait Billable
     /**
      * Invoice the customer for the given amount.
      *
-     * @param  string  $description
-     * @param  int  $amount
-     * @param  array  $options
-     * @return bool|mixed
+     * @param string $description
+     * @param int    $amount
+     * @param array  $options
      *
      * @throws \Stripe\Error\Card
+     *
+     * @return bool|mixed
      */
     public function invoiceFor($description, $amount, array $options = [])
     {
-        if (! $this->stripe_id) {
+        if (!$this->stripe_id) {
             throw new InvalidArgumentException('User is not a customer. See the createAsStripeCustomer method.');
         }
 
         $options = array_merge([
-            'customer' => $this->stripe_id,
-            'amount' => $amount,
-            'currency' => $this->preferredCurrency(),
+            'customer'    => $this->stripe_id,
+            'amount'      => $amount,
+            'currency'    => $this->preferredCurrency(),
             'description' => $description,
         ], $options);
 
@@ -84,8 +86,9 @@ trait Billable
     /**
      * Begin creating a new subscription.
      *
-     * @param  string  $subscription
-     * @param  string  $plan
+     * @param string $subscription
+     * @param string $plan
+     *
      * @return \Laravel\Cashier\SubscriptionBuilder
      */
     public function newSubscription($subscription, $plan)
@@ -96,8 +99,9 @@ trait Billable
     /**
      * Determine if the user is on trial.
      *
-     * @param  string  $subscription
-     * @param  string|null  $plan
+     * @param string      $subscription
+     * @param string|null $plan
+     *
      * @return bool
      */
     public function onTrial($subscription = 'default', $plan = null)
@@ -128,8 +132,9 @@ trait Billable
     /**
      * Determine if the user has a given subscription.
      *
-     * @param  string  $subscription
-     * @param  string|null  $plan
+     * @param string      $subscription
+     * @param string|null $plan
+     *
      * @return bool
      */
     public function subscribed($subscription = 'default', $plan = null)
@@ -150,7 +155,8 @@ trait Billable
     /**
      * Get a subscription instance by name.
      *
-     * @param  string  $subscription
+     * @param string $subscription
+     *
      * @return \Laravel\Cashier\Subscription|null
      */
     public function subscription($subscription = 'default')
@@ -176,7 +182,8 @@ trait Billable
     /**
      * Invoice the billable entity outside of regular billing cycle.
      *
-     * @param  string  $subscription
+     * @param string $subscription
+     *
      * @return bool
      */
     public function invoice()
@@ -213,7 +220,8 @@ trait Billable
     /**
      * Find an invoice by ID.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return \Laravel\Cashier\Invoice|null
      */
     public function findInvoice($id)
@@ -228,7 +236,8 @@ trait Billable
     /**
      * Find an invoice or throw a 404 error.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return \Laravel\Cashier\Invoice
      */
     public function findInvoiceOrFail($id)
@@ -236,7 +245,7 @@ trait Billable
         $invoice = $this->findInvoice($id);
 
         if (is_null($invoice)) {
-            throw new NotFoundHttpException;
+            throw new NotFoundHttpException();
         }
 
         return $invoice;
@@ -245,9 +254,10 @@ trait Billable
     /**
      * Create an invoice download Response.
      *
-     * @param  string  $id
-     * @param  array   $data
-     * @param  string  $storagePath
+     * @param string $id
+     * @param array  $data
+     * @param string $storagePath
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function downloadInvoice($id, array $data, $storagePath = null)
@@ -258,8 +268,9 @@ trait Billable
     /**
      * Get a collection of the entity's invoices.
      *
-     * @param  bool  $includePending
-     * @param  array  $parameters
+     * @param bool  $includePending
+     * @param array $parameters
+     *
      * @return \Illuminate\Support\Collection
      */
     public function invoices($includePending = false, $parameters = [])
@@ -273,7 +284,7 @@ trait Billable
         // Here we will loop through the Stripe invoices and create our own custom Invoice
         // instances that have more helper methods and are generally more convenient to
         // work with than the plain Stripe objects are. Then, we'll return the array.
-        if (! is_null($stripeInvoices)) {
+        if (!is_null($stripeInvoices)) {
             foreach ($stripeInvoices->data as $invoice) {
                 if ($invoice->paid || $includePending) {
                     $invoices[] = new Invoice($this, $invoice);
@@ -287,8 +298,9 @@ trait Billable
     /**
      * Get an array of the entity's invoices.
      *
-     * @param  bool  $includePending
-     * @param  array  $parameters
+     * @param bool  $includePending
+     * @param array $parameters
+     *
      * @return \Illuminate\Support\Collection
      */
     public function invoicesIncludingPending(array $parameters = [])
@@ -299,7 +311,8 @@ trait Billable
     /**
      * Update customer's credit card.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return void
      */
     public function updateCard($token)
@@ -339,7 +352,8 @@ trait Billable
     /**
      * Apply a coupon to the billable entity.
      *
-     * @param  string  $coupon
+     * @param string $coupon
+     *
      * @return void
      */
     public function applyCoupon($coupon)
@@ -354,15 +368,16 @@ trait Billable
     /**
      * Determine if the user is actively subscribed to one of the given plans.
      *
-     * @param  array|string  $plans
-     * @param  string  $subscription
+     * @param array|string $plans
+     * @param string       $subscription
+     *
      * @return bool
      */
     public function subscribedToPlan($plans, $subscription = 'default')
     {
         $subscription = $this->subscription($subscription);
 
-        if (! $subscription || (! $subscription->onTrial() && ! $subscription->active())) {
+        if (!$subscription || (!$subscription->onTrial() && !$subscription->active())) {
             return false;
         }
 
@@ -378,12 +393,13 @@ trait Billable
     /**
      * Determine if the entity is on the given plan.
      *
-     * @param  string  $plan
+     * @param string $plan
+     *
      * @return bool
      */
     public function onPlan($plan)
     {
-        return ! is_null($this->subscriptions->first(function ($key, $value) use ($plan) {
+        return !is_null($this->subscriptions->first(function ($key, $value) use ($plan) {
             return $value->stripe_plan === $plan;
         }));
     }
@@ -395,14 +411,14 @@ trait Billable
      */
     public function hasStripeId()
     {
-        return ! is_null($this->stripe_id);
+        return !is_null($this->stripe_id);
     }
 
     /**
      * Create a Stripe customer for the given user.
      *
-     * @param  string  $token
-     * @param  array  $options
+     * @param string $token
+     * @param array  $options
      */
     public function createAsStripeCustomer($token, array $options = [])
     {
@@ -422,7 +438,7 @@ trait Billable
         // Next we will add the credit card to the user's account on Stripe using this
         // token that was provided to this method. This will allow us to bill users
         // when they subscribe to plans or we need to do one-off charges on them.
-        if (! is_null($token)) {
+        if (!is_null($token)) {
             $this->updateCard($token);
         }
 
@@ -472,7 +488,8 @@ trait Billable
     /**
      * Set the Stripe API key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return void
      */
     public static function setStripeKey($key)

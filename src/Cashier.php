@@ -14,7 +14,8 @@ class Cashier
     /**
      * Set the custom currency formatter.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return void
      */
     public static function formatCurrencyUsing(callable $callback)
@@ -25,7 +26,8 @@ class Cashier
     /**
      * Format the given amount into a displayable currency.
      *
-     * @param  int  $amount
+     * @param int $amount
+     *
      * @return string
      */
     public static function formatAmount($amount)

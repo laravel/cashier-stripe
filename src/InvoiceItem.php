@@ -21,8 +21,9 @@ class InvoiceItem
     /**
      * Create a new invoice item instance.
      *
-     * @param  \Illuminate\Database\Eloquent\User  $user
-     * @param  \Stripe\StripeObject  $item
+     * @param \Illuminate\Database\Eloquent\User $user
+     * @param \Stripe\StripeObject               $item
+     *
      * @return void
      */
     public function __construct($user, $item)
@@ -78,7 +79,8 @@ class InvoiceItem
     /**
      * Format the given amount into a string based on the user's preferences.
      *
-     * @param  int  $amount
+     * @param int $amount
+     *
      * @return string
      */
     protected function formatAmount($amount)
@@ -99,7 +101,8 @@ class InvoiceItem
     /**
      * Dynamically access the Stripe line item instance.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function __get($key)
