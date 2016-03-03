@@ -1,9 +1,9 @@
 <?php
 
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Http\Request;
 use Laravel\Cashier\Http\Controllers\WebhookController;
 
 class CashierTest extends PHPUnit_Framework_TestCase
@@ -20,9 +20,9 @@ class CashierTest extends PHPUnit_Framework_TestCase
     {
         Eloquent::unguard();
 
-        $db = new DB;
+        $db = new DB();
         $db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
         ]);
         $db->bootEloquent();
@@ -64,7 +64,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
     {
         $user = User::create([
             'email' => 'taylor@laravel.com',
-            'name' => 'Taylor Otwell',
+            'name'  => 'Taylor Otwell',
         ]);
 
         // Create Subscription
@@ -136,7 +136,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
     {
         $user = User::create([
             'email' => 'taylor@laravel.com',
-            'name' => 'Taylor Otwell',
+            'name'  => 'Taylor Otwell',
         ]);
 
         // Create Subscription
@@ -163,7 +163,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
 
     public function test_generic_trials()
     {
-        $user = new User;
+        $user = new User();
         $this->assertFalse($user->onGenericTrial());
         $user->trial_ends_at = Carbon::tomorrow();
         $this->assertTrue($user->onGenericTrial());
@@ -175,7 +175,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
     {
         $user = User::create([
             'email' => 'taylor@laravel.com',
-            'name' => 'Taylor Otwell',
+            'name'  => 'Taylor Otwell',
         ]);
 
         // Create Subscription
@@ -207,7 +207,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
     {
         $user = User::create([
             'email' => 'taylor@laravel.com',
-            'name' => 'Taylor Otwell',
+            'name'  => 'Taylor Otwell',
         ]);
 
         // Create Subscription
@@ -228,7 +228,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
     {
         $user = User::create([
             'email' => 'taylor@laravel.com',
-            'name' => 'Taylor Otwell',
+            'name'  => 'Taylor Otwell',
         ]);
 
         $user->newSubscription('main', 'monthly-10-1')
@@ -237,15 +237,15 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $subscription = $user->subscription('main');
 
         $request = Request::create('/', 'POST', [], [], [], [], json_encode(['id' => 'foo', 'type' => 'customer.subscription.deleted',
-            'data' => [
+            'data'                                                                => [
                 'object' => [
-                    'id' => $subscription->stripe_id,
+                    'id'       => $subscription->stripe_id,
                     'customer' => $user->stripe_id,
                 ],
             ],
         ]));
 
-        $controller = new CashierTestControllerStub;
+        $controller = new CashierTestControllerStub();
         $response = $controller->handleWebhook($request);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -259,7 +259,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
     {
         $user = User::create([
             'email' => 'taylor@laravel.com',
-            'name' => 'Taylor Otwell',
+            'name'  => 'Taylor Otwell',
         ]);
 
         // Create Invoice
@@ -276,10 +276,10 @@ class CashierTest extends PHPUnit_Framework_TestCase
     {
         return Stripe\Token::create([
             'card' => [
-                'number' => '4242424242424242',
+                'number'    => '4242424242424242',
                 'exp_month' => 5,
-                'exp_year' => 2020,
-                'cvc' => '123',
+                'exp_year'  => 2020,
+                'cvc'       => '123',
             ],
         ], ['api_key' => getenv('STRIPE_SECRET')])->id;
     }

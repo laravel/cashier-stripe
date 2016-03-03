@@ -3,8 +3,8 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
-use LogicException;
 use Illuminate\Database\Eloquent\Model;
+use LogicException;
 
 class Subscription extends Model
 {
@@ -52,7 +52,7 @@ class Subscription extends Model
      */
     public function cancelled()
     {
-        return ! is_null($this->ends_at);
+        return !is_null($this->ends_at);
     }
 
     /**
@@ -62,7 +62,7 @@ class Subscription extends Model
      */
     public function onTrial()
     {
-        if (! is_null($this->trial_ends_at)) {
+        if (!is_null($this->trial_ends_at)) {
             return Carbon::today()->lt($this->trial_ends_at);
         } else {
             return false;
@@ -76,7 +76,7 @@ class Subscription extends Model
      */
     public function onGracePeriod()
     {
-        if (! is_null($endsAt = $this->ends_at)) {
+        if (!is_null($endsAt = $this->ends_at)) {
             return Carbon::now()->lt(Carbon::instance($endsAt));
         } else {
             return false;
@@ -86,7 +86,8 @@ class Subscription extends Model
     /**
      * Increment the quantity of the subscription.
      *
-     * @param  int  $count
+     * @param int $count
+     *
      * @return $this
      */
     public function incrementQuantity($count = 1)
@@ -99,7 +100,8 @@ class Subscription extends Model
     /**
      *  Increment the quantity of the subscription, and invoice immediately.
      *
-     * @param  int  $count
+     * @param int $count
+     *
      * @return $this
      */
     public function incrementAndInvoice($count = 1)
@@ -114,7 +116,8 @@ class Subscription extends Model
     /**
      * Decrement the quantity of the subscription.
      *
-     * @param  int  $count
+     * @param int $count
+     *
      * @return $this
      */
     public function decrementQuantity($count = 1)
@@ -127,8 +130,9 @@ class Subscription extends Model
     /**
      * Update the quantity of the subscription.
      *
-     * @param  int  $quantity
-     * @param  \Stripe\Customer|null  $customer
+     * @param int                   $quantity
+     * @param \Stripe\Customer|null $customer
+     *
      * @return $this
      */
     public function updateQuantity($quantity, $customer = null)
@@ -149,7 +153,8 @@ class Subscription extends Model
     /**
      * Swap the subscription to a new Stripe plan.
      *
-     * @param  string  $plan
+     * @param string $plan
+     *
      * @return $this
      */
     public function swap($plan)
@@ -180,7 +185,7 @@ class Subscription extends Model
 
         $this->fill([
             'stripe_plan' => $plan,
-            'ends_at' => null,
+            'ends_at'     => null,
         ])->save();
 
         return $this;
@@ -242,13 +247,13 @@ class Subscription extends Model
     /**
      * Resume the cancelled subscription.
      *
-     * @return $this
-     *
      * @throws \LogicException
+     *
+     * @return $this
      */
     public function resume()
     {
-        if (! $this->onGracePeriod()) {
+        if (!$this->onGracePeriod()) {
             throw new LogicException('Unable to resume subscription that is not within grace period.');
         }
 
