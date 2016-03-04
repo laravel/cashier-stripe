@@ -42,6 +42,13 @@ class SubscriptionBuilder
     protected $trialDays;
 
     /**
+     * Indicates that the trial should end immediately.
+     *
+     * @var bool
+     */
+    protected $skipTrial = false;
+
+    /**
      * The coupon code being applied to the customer.
      *
      * @var string|null
@@ -85,6 +92,18 @@ class SubscriptionBuilder
     public function trialDays($trialDays)
     {
         $this->trialDays = $trialDays;
+
+        return $this;
+    }
+
+    /**
+     * Force the trial to end immediately.
+     *
+     * @return $this
+     */
+    public function skipTrial()
+    {
+        $this->skipTrial = true;
 
         return $this;
     }
@@ -182,6 +201,10 @@ class SubscriptionBuilder
      */
     protected function getTrialEndForPayload()
     {
+        if ($this->skipTrial) {
+            return 'now';
+        }
+
         if ($this->trialDays) {
             return Carbon::now()->addDays($this->trialDays)->getTimestamp();
         }
