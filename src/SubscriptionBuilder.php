@@ -49,6 +49,13 @@ class SubscriptionBuilder
     protected $coupon;
 
     /**
+     * The metadata to apply to the subscription.
+     *
+     * @var array|null
+     */
+    protected $metadata;
+
+    /**
      * Create a new subscription builder instance.
      *
      * @param  mixed  $user
@@ -99,6 +106,18 @@ class SubscriptionBuilder
     {
         $this->coupon = $coupon;
 
+        return $this;
+    }
+
+    /**
+     * The metadata to apply to a new subscription.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function withMetadata($metadata)
+    {
+        $this->metadata = $metadata;
         return $this;
     }
 
@@ -172,6 +191,7 @@ class SubscriptionBuilder
             'quantity' => $this->quantity,
             'trial_end' => $this->getTrialEndForPayload(),
             'tax_percent' => $this->getTaxPercentageForPayload(),
+            'metadata' => $this->metadata,
         ]);
     }
 
