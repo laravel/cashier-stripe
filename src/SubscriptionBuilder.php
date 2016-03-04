@@ -145,12 +145,18 @@ class SubscriptionBuilder
 
         $subscription = $customer->subscriptions->create($this->buildPayload());
 
+        if ($this->skipTrial) {
+            $trialEndsAt = null;
+        } else {
+            $trialEndsAt = $this->trialDays ? Carbon::now()->addDays($this->trialDays) : null;
+        }
+
         return $this->user->subscriptions()->create([
             'name' => $this->name,
             'stripe_id' => $subscription->id,
             'stripe_plan' => $this->plan,
             'quantity' => $this->quantity,
-            'trial_ends_at' => $this->trialDays ? Carbon::now()->addDays($this->trialDays) : null,
+            'trial_ends_at' => $trialEndsAt,
             'ends_at' => null,
         ]);
     }
