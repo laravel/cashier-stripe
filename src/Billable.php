@@ -141,10 +141,11 @@ trait Billable
         }
 
         if (is_null($plan)) {
-            return $subscription->active();
+            return $subscription->active() || $subscription->onTrial();
         }
 
-        return $subscription->active() && $subscription->stripe_plan === $plan;
+        return ($subscription->active() || $subscription->onTrial()) &&
+                $subscription->stripe_plan === $plan;
     }
 
     /**
