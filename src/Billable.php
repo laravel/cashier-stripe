@@ -112,7 +112,8 @@ trait Billable
             return $subscription && $subscription->onTrial();
         }
 
-        return $subscription && $subscription->onTrial() && $subscription->braintree_plan === $plan;
+        return $subscription && $subscription->onTrial() &&
+               $subscription->stripe_plan === $plan;
     }
 
     /**
@@ -141,11 +142,11 @@ trait Billable
         }
 
         if (is_null($plan)) {
-            return $subscription->active() || $subscription->onTrial();
+            return $subscription->valid();
         }
 
-        return ($subscription->active() || $subscription->onTrial()) &&
-                $subscription->stripe_plan === $plan;
+        return $subscription->valid() &&
+               $subscription->stripe_plan === $plan;
     }
 
     /**
@@ -363,7 +364,7 @@ trait Billable
     {
         $subscription = $this->subscription($subscription);
 
-        if (! $subscription || (! $subscription->onTrial() && ! $subscription->active())) {
+        if (! $subscription || ! $subscription->valid()) {
             return false;
         }
 

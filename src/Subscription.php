@@ -36,6 +36,16 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription is active, on trial, or within its grace period.
+     *
+     * @return bool
+     */
+    public function valid()
+    {
+        return $this->active() || $this->onTrial() || $this->onGracePeriod();
+    }
+
+    /**
      * Determine if the subscription is active.
      *
      * @return bool
