@@ -196,7 +196,11 @@ class Subscription extends Model
 
         $subscription->prorate = $this->prorate;
 
-        $subscription->billing_cycle_anchor = $this->billing_cycle_anchor;
+        // If billing_cycle_anchor is set add it to payload.
+        if(!is_null($this->billing_cycle_anchor))
+        {
+            $subscription->billing_cycle_anchor = $this->billing_cycle_anchor;
+        }
 
         // If no specific trial end date has been set, the default behavior should be
         // to maintain the current trial state, whether that is "active" or to run
