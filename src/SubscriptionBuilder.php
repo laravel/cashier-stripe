@@ -137,6 +137,7 @@ class SubscriptionBuilder
     public function withMetadata($metadata)
     {
         $this->metadata = $metadata;
+
         return $this;
     }
 
