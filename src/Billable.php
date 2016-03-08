@@ -28,7 +28,7 @@ trait Billable
      *
      * @param  int  $amount
      * @param  array  $options
-     * @return bool|mixed
+     * @return \Stripe\Charge
      *
      * @throws \Stripe\Error\Card
      */
@@ -57,7 +57,7 @@ trait Billable
      * @param  string  $description
      * @param  int  $amount
      * @param  array  $options
-     * @return bool|mixed
+     * @return bool
      *
      * @throws \Stripe\Error\Card
      */
