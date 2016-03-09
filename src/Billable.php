@@ -289,7 +289,6 @@ trait Billable
     /**
      * Get an array of the entity's invoices.
      *
-     * @param  bool  $includePending
      * @param  array  $parameters
      * @return \Illuminate\Support\Collection
      */
