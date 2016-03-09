@@ -188,7 +188,7 @@ class Subscription extends Model
      * @param string $date
      * @return $this
      */
-    public function billingCycleAnchor($date = "now")
+    public function billingCycleAnchor($date = 'now')
     {
         $this->billing_cycle_anchor = $date;
 
@@ -210,8 +210,7 @@ class Subscription extends Model
         $subscription->prorate = $this->prorate;
 
         // If billing_cycle_anchor is set add it to payload.
-        if(!is_null($this->billing_cycle_anchor))
-        {
+        if (! is_null($this->billing_cycle_anchor)) {
             $subscription->billing_cycle_anchor = $this->billing_cycle_anchor;
         }
 
