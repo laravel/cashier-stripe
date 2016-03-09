@@ -185,7 +185,9 @@ class Subscription extends Model
     /**
      * Change the billing cycle anchor on plan change.
      *
-     * @param string $date
+     * $date can be either a Unix timestamp or special value 'now'.
+     *
+     * @param int|string $date
      * @return $this
      */
     public function billingCycleAnchor($date = 'now')
