@@ -72,7 +72,7 @@
             <!-- Organization Name / Date -->
             <td>
                 <br><br>
-                <strong>To:</strong> {{ $user->email }}
+                <strong>To:</strong> {{ $user->email ?: $user->name }}
                 <br>
                 <strong>Date:</strong> {{ $invoice->date()->toFormattedDateString() }}
             </td>
