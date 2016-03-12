@@ -26,6 +26,20 @@ class Subscription extends Model
     ];
 
     /**
+     * Indicates if the plan change should be prorated.
+     *
+     * @var bool
+     */
+    protected $prorate = true;
+
+    /**
+     * Change the billing cycle anchor on plan change.
+     *
+     * @var string|null
+     */
+    protected $billing_cycle_anchor = null;
+
+    /**
      * Get the user that owns the subscription.
      */
     public function user()
@@ -157,6 +171,33 @@ class Subscription extends Model
     }
 
     /**
+     * Indicate that the plan change should be prorated.
+     *
+     * @return $this
+     */
+    public function noProrate()
+    {
+        $this->prorate = false;
+
+        return $this;
+    }
+
+    /**
+     * Change the billing cycle anchor on plan change.
+     *
+     * $date can be either a Unix timestamp or special value 'now'.
+     *
+     * @param int|string $date
+     * @return $this
+     */
+    public function billingCycleAnchor($date = 'now')
+    {
+        $this->billing_cycle_anchor = $date;
+
+        return $this;
+    }
+
+    /**
      * Swap the subscription to a new Stripe plan.
      *
      * @param  string  $plan
@@ -167,6 +208,13 @@ class Subscription extends Model
         $subscription = $this->asStripeSubscription();
 
         $subscription->plan = $plan;
+
+        $subscription->prorate = $this->prorate;
+
+        // If billing_cycle_anchor is set add it to payload.
+        if (! is_null($this->billing_cycle_anchor)) {
+            $subscription->billing_cycle_anchor = $this->billing_cycle_anchor;
+        }
 
         // If no specific trial end date has been set, the default behavior should be
         // to maintain the current trial state, whether that is "active" or to run
