@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use LogicException;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 
 class Subscription extends Model
@@ -33,11 +34,11 @@ class Subscription extends Model
     protected $prorate = true;
 
     /**
-     * Change the billing cycle anchor on plan change.
+     * The date on which the billing cycle should be anchored.
      *
      * @var string|null
      */
-    protected $billing_cycle_anchor = null;
+    protected $billingCycleAnchor = null;
 
     /**
      * Get the user that owns the subscription.
@@ -171,7 +172,7 @@ class Subscription extends Model
     }
 
     /**
-     * Indicate that the plan change should be prorated.
+     * Indicate that the plan change should not be prorated.
      *
      * @return $this
      */
@@ -183,16 +184,18 @@ class Subscription extends Model
     }
 
     /**
-     * Change the billing cycle anchor on plan change.
+     * Change the billing cycle anchor on a plan change.
      *
-     * $date can be either a Unix timestamp or special value 'now'.
-     *
-     * @param int|string $date
+     * @param  int|string  $date
      * @return $this
      */
-    public function billingCycleAnchor($date = 'now')
+    public function anchorBillingCycleOn($date = 'now')
     {
-        $this->billing_cycle_anchor = $date;
+        if ($date instanceof DateTimeInterface) {
+            $date = $date->getTimestamp();
+        }
+
+        $this->billingCycleAnchor = $date;
 
         return $this;
     }
@@ -211,9 +214,8 @@ class Subscription extends Model
 
         $subscription->prorate = $this->prorate;
 
-        // If billing_cycle_anchor is set add it to payload.
-        if (! is_null($this->billing_cycle_anchor)) {
-            $subscription->billing_cycle_anchor = $this->billing_cycle_anchor;
+        if (! is_null($this->billingCycleAnchor)) {
+            $subscription->billingCycleAnchor = $this->billingCycleAnchor;
         }
 
         // If no specific trial end date has been set, the default behavior should be
