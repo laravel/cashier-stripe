@@ -688,7 +688,7 @@ class StripeGateway {
 		// If there is still trial left on the current plan, we'll maintain that amount of
 		// time on the new plan. If there is no time left on the trial we will force it
 		// to skip any trials on this new plan, as this is the most expected actions.
-		$diff = Carbon::now()->diffInHours($trialEnd);
+		$diff = Carbon::now()->diffInHours($trialEnd, false);
 
 		return $diff > 0 ? $this->trialFor(Carbon::now()->addHours($diff)) : $this->skipTrial();
 	}
