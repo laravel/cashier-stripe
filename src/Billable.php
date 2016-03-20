@@ -74,7 +74,7 @@ trait Billable
             'description' => $description,
         ], $options);
 
-        $lineItem = StripeInvoiceItem::create(
+        StripeInvoiceItem::create(
             $options, ['api_key' => $this->getStripeKey()]
         );
 
@@ -178,7 +178,6 @@ trait Billable
     /**
      * Invoice the billable entity outside of regular billing cycle.
      *
-     * @param  string  $subscription
      * @return bool
      */
     public function invoice()
@@ -404,6 +403,7 @@ trait Billable
      *
      * @param  string  $token
      * @param  array  $options
+     * @return StripeCustomer
      */
     public function createAsStripeCustomer($token, array $options = [])
     {
