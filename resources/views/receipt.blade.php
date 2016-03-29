@@ -155,6 +155,15 @@
                         </tr>
                     @endif
 
+                    <!-- Display The Tax Amount -->
+                    @if ($invoice->tax_percent)
+                        <tr>
+                            <td>Tax ({{ $invoice->tax_percent }}%)</td>
+                            <td>&nbsp;</td>
+                            <td>{{ Laravel\Cashier\Cashier::formatAmount($invoice->tax) }}</td>
+                        </tr>
+                    @endif
+
                     <!-- Display The Final Total -->
                     <tr style="border-top:2px solid #000;">
                         <td>&nbsp;</td>
