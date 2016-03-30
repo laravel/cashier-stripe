@@ -98,7 +98,7 @@
                 <!-- Invoice Info -->
                 <p>
                     <strong>Product:</strong> {{ $product }}<br>
-                    <strong>Invoice Number:</strong> {{ $invoice->id }}<br>
+                    <strong>Invoice Number:</strong> {{ $id or $invoice->id }}<br>
                 </p>
 
                 <!-- Extra / VAT Information -->
