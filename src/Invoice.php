@@ -57,7 +57,7 @@ class Invoice
      */
     public function total()
     {
-        return $this->formatAmount($this->rawTotal() / 100);
+        return $this->formatAmount($this->rawTotal());
     }
 
     /**
@@ -67,7 +67,7 @@ class Invoice
      */
     public function rawTotal()
     {
-        return max(0, $this->invoice->total - ($this->rawStartingBalance() * -1)) * 100;
+        return max(0, $this->invoice->total - ($this->rawStartingBalance() * -1));
     }
 
     /**
