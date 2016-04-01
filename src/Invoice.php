@@ -63,7 +63,7 @@ class Invoice
     /**
      * Get the raw total amount that was paid (or will be paid).
      *
-     * @return string
+     * @return float
      */
     public function rawTotal()
     {
@@ -284,7 +284,7 @@ class Invoice
     /**
      * Get the raw starting balance for the invoice.
      *
-     * @return int
+     * @return float
      */
     public function rawStartingBalance()
     {
