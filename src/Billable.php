@@ -64,6 +64,7 @@ trait Billable
     public function refund($charge, array $options = [])
     {
         $options['charge'] = $charge;
+
         return StripeRefund::create($options, ['api_key' => $this->getStripeKey()]);
     }
 
