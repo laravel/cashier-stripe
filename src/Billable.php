@@ -206,6 +206,8 @@ trait Billable
                 return false;
             }
         }
+
+        return true;
     }
 
     /**
