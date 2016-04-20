@@ -55,7 +55,7 @@ trait Billable
     /**
      * Refund a customer for a charge.
      *
-     * @param  str  $charge
+     * @param  string $charge
      * @param  array  $options
      * @return \Stripe\Charge
      *
