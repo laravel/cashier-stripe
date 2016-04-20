@@ -53,7 +53,7 @@ trait Billable
     }
 
     /**
-     * Refund a customer for a charge
+     * Refund a customer for a charge.
      *
      * @param  str  $charge
      * @param  array  $options
