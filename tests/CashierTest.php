@@ -272,6 +272,24 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Laravel Cashier', $invoice->invoiceItems()[0]->asStripeInvoiceItem()->description);
     }
 
+    public function testRefunds()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        // Create Invoice
+        $user->createAsStripeCustomer($this->getTestToken());
+        $invoice = $user->invoiceFor('Laravel Cashier', 1000);
+
+        // Create the refund
+        $refund = $user->refund($invoice->charge);
+
+        // Refund Tests
+        $this->assertEquals(1000, $refund->amount);
+    }
+
     protected function getTestToken()
     {
         return Stripe\Token::create([

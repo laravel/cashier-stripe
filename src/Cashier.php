@@ -59,7 +59,7 @@ class Cashier
             case 'gbp':
                 return '£';
             default:
-                throw new Exception("Unable to guess symbol for currency. Please explicitly specify it.");
+                throw new Exception('Unable to guess symbol for currency. Please explicitly specify it.');
         }
     }
 
