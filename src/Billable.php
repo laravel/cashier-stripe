@@ -55,7 +55,7 @@ trait Billable
     /**
      * Refund a customer for a charge.
      *
-     * @param  string $charge
+     * @param  string  $charge
      * @param  array  $options
      * @return \Stripe\Charge
      *
@@ -195,7 +195,7 @@ trait Billable
     /**
      * Invoice the billable entity outside of regular billing cycle.
      *
-     * @return bool
+     * @return StripeInvoice|bool
      */
     public function invoice()
     {

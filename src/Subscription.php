@@ -46,9 +46,8 @@ class Subscription extends Model
     public function user()
     {
         $model = getenv('STRIPE_MODEL') ?: config('services.stripe.model', 'User');
-        $column = getenv('STRIPE_COLUMN') ?: config('services.stripe.column', 'user_id');
 
-        return $this->belongsTo($model, $column);
+        return $this->belongsTo($model, 'user_id');
     }
 
     /**
