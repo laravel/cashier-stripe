@@ -10,28 +10,30 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/filesystem": "~5.0",
-        "illuminate/support": "~5.0",
+        "php": ">=5.5.9",
+        "illuminate/database": "~5.1",
+        "illuminate/support": "~5.1",
+        "dompdf/dompdf": "^0.6.1",
         "nesbot/carbon": "~1.0",
-        "stripe/stripe-php": "~2.0",
-        "symfony/http-kernel": "~2.3"
+        "stripe/stripe-php": "~3.0",
+        "symfony/http-kernel": "~2.7|~3.0"
     },
     "require-dev": {
-        "illuminate/routing": "~5.0",
-        "illuminate/view": "~5.0",
+        "illuminate/routing": "~5.1",
+        "illuminate/http": "~5.1",
+        "illuminate/view": "~5.1",
         "mockery/mockery": "~0.9",
-        "phpunit/phpunit": "~4.0"
+        "phpunit/phpunit": "~4.0",
+        "vlucas/phpdotenv": "~2.0"
     },
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "Laravel\\Cashier\\": "src/"
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "6.0-dev"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }
