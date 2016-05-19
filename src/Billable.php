@@ -424,7 +424,7 @@ trait Billable
      */
     public function createAsStripeCustomer($token, array $options = [])
     {
-        $options = array_merge($options, ['email' => $this->email]);
+        $options = array_key_exists('email', $options) ? $options : array_merge($options, ['email' => $this->email]);
 
         // Here we will create the customer instance on Stripe and store the ID of the
         // user from Stripe. This ID will correspond with the Stripe user instances
