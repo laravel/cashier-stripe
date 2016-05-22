@@ -215,6 +215,7 @@ class SubscriptionBuilder
         return array_filter([
             'plan' => $this->plan,
             'quantity' => $this->quantity,
+            'coupon' => $this->coupon,
             'trial_end' => $this->getTrialEndForPayload(),
             'tax_percent' => $this->getTaxPercentageForPayload(),
             'metadata' => $this->metadata,
