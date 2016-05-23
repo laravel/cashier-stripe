@@ -89,7 +89,7 @@ trait Billable
             $this->fillCardDetails($source)->save();
         }
 
-        return (bool)$source;
+        return (bool) $source;
     }
 
     /**
@@ -104,6 +104,7 @@ trait Billable
             $this->card_brand = $source->brand;
             $this->card_last_four = $source->last4;
         }
+
         return $this;
     }
 
