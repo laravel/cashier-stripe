@@ -299,7 +299,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
                 'exp_year' => 2020,
                 'cvc' => '123',
             ],
-        ], ['api_key' => getenv('STRIPE_SECRET')])->id;
+        ], ['api_key' => config('services.stripe.secret')])->id;
     }
 
     /**

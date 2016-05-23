@@ -485,7 +485,7 @@ trait Billable
      */
     public static function getStripeKey()
     {
-        return static::$stripeKey ?: getenv('STRIPE_SECRET');
+        return static::$stripeKey ?: config('services.stripe.secret');
     }
 
     /**
