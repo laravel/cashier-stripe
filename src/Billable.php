@@ -385,10 +385,7 @@ trait Billable
                     ? $customer->sources->retrieve($customer->default_source)
                     : null;
 
-        if ($source) {
-            $this->card_brand = $source->brand;
-            $this->card_last_four = $source->last4;
-        }
+        $this->fillCardDetails($source);
 
         $this->save();
     }
