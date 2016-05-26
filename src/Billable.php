@@ -96,7 +96,7 @@ trait Billable
         // we'll set it back onto the user model and save it.
         $this->fillCardDetails($source)->save();
 
-        return (bool)$source;
+        return (bool) $source;
     }
 
     /**
