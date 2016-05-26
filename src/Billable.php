@@ -83,13 +83,20 @@ trait Billable
 
         $customer = $this->asStripeCustomer();
 
-        // If we determines that the customer has a card (desync?),
-        // we'll set it back onto the user model and save it.
-        if ($source = $customer->default_source) {
-            $this->fillCardDetails($source)->save();
+        $source = null;
+
+        foreach ($customer->sources->data as $card) {
+            if ($card->id === $customer->default_source) {
+                $source = $card;
+                continue;
+            }
         }
 
-        return (bool) $source;
+        // If we determines that the customer has a card (desync?),
+        // we'll set it back onto the user model and save it.
+        $this->fillCardDetails($source)->save();
+
+        return (bool)$source;
     }
 
     /**
