@@ -83,7 +83,8 @@ trait Billable
      *
      * @return $this
      */
-    public function syncCustomerCardDetails() {
+    public function syncCustomerCardDetails()
+    {
         $customer = $this->asStripeCustomer();
 
         // Let's go through all the users' sources (cards) until we find
