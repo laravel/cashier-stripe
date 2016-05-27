@@ -75,41 +75,48 @@ trait Billable
      */
     public function hasCardOnFile()
     {
-        // If we know already that there's a card on file, don't
-        // unnecessarily hit the Stripe API.
-        if ($this->card_brand !== null) {
-            return true;
-        }
-
-        $customer = $this->asStripeCustomer();
-
-        $source = null;
-
-        foreach ($customer->sources->data as $card) {
-            if ($card->id === $customer->default_source) {
-                $source = $card;
-                continue;
-            }
-        }
-
-        // If we determines that the customer has a card (desync?),
-        // we'll set it back onto the user model and save it.
-        $this->fillCardDetails($source)->save();
-
-        return (bool) $source;
+        return (bool) $this->card_brand;
     }
 
     /**
-     * Fills the user's properties that determine the card details.
+     * Synchronises the customer's card from Stripe back into our database.
      *
-     * @param \Stripe\Card  $source
      * @return $this
      */
-    protected function fillCardDetails($source)
+    public function syncCustomerCardDetails() {
+        $customer = $this->asStripeCustomer();
+
+        // Let's go through all the users' sources (cards) until we find
+        // the default source for the customer. We then have to update
+        // it in our own database to determine if they have a card.
+        foreach ($customer->sources->data as $card) {
+            if ($card->id === $customer->default_source) {
+                $this->fillCardDetails($card)->save();
+
+                return $this;
+            }
+        }
+
+        // We no longer have a card? We'll remove it from our database.
+        $this->fillCardDetails(null)->save();
+
+        return $this;
+    }
+
+    /**
+     * Fills the user's properties with the source from Stripe.
+     *
+     * @param \Stripe\Card|null  $card
+     * @return $this
+     */
+    protected function fillCardDetails($card)
     {
-        if ($source) {
-            $this->card_brand = $source->brand;
-            $this->card_last_four = $source->last4;
+        $this->card_brand = null;
+        $this->card_last_four = null;
+
+        if ($card) {
+            $this->card_brand = $card->brand;
+            $this->card_last_four = $card->last4;
         }
 
         return $this;
