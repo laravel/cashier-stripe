@@ -45,7 +45,7 @@ class Invoice
      */
     public function date($timezone = null)
     {
-        $carbon = Carbon::createFromTimestamp($this->invoice->date);
+        $carbon = Carbon::createFromTimestampUTC($this->invoice->date);
 
         return $timezone ? $carbon->setTimezone($timezone) : $carbon;
     }
