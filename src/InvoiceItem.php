@@ -51,7 +51,7 @@ class InvoiceItem
     public function startDate()
     {
         if ($this->isSubscription()) {
-            return date('M j, Y', $this->item->period->start);
+            return $this->startDateAsCarbon()->toFormattedDateString();
         }
     }
 
@@ -63,7 +63,7 @@ class InvoiceItem
     public function endDate()
     {
         if ($this->isSubscription()) {
-            return date('M j, Y', $this->item->period->end);
+            return $this->endDateAsCarbon()->toFormattedDateString();
         }
     }
 
