@@ -2,6 +2,8 @@
 
 namespace Laravel\Cashier;
 
+use Carbon\Carbon;
+
 class InvoiceItem
 {
     /**
@@ -49,7 +51,7 @@ class InvoiceItem
     public function startDate()
     {
         if ($this->isSubscription()) {
-            return date('M j, Y', $this->item->period->start);
+            return $this->startDateAsCarbon()->toFormattedDateString();
         }
     }
 
@@ -61,7 +63,31 @@ class InvoiceItem
     public function endDate()
     {
         if ($this->isSubscription()) {
-            return date('M j, Y', $this->item->period->end);
+            return $this->endDateAsCarbon()->toFormattedDateString();
+        }
+    }
+
+    /**
+     * Get a Carbon instance for the start date.
+     *
+     * @return \Carbon\Carbon
+     */
+    public function startDateAsCarbon()
+    {
+        if ($this->isSubscription()) {
+            return Carbon::createFromTimestampUTC($this->item->period->start);
+        }
+    }
+
+    /**
+     * Get a Carbon instance for the end date.
+     *
+     * @return \Carbon\Carbon
+     */
+    public function endDateAsCarbon()
+    {
+        if ($this->isSubscription()) {
+            return Carbon::createFromTimestampUTC($this->item->period->end);
         }
     }
 
