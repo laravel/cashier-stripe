@@ -255,7 +255,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($subscription->cancelled());
     }
 
-    public function testCreatingOneOffInvoices()
+    public function test_creating_one_off_invoices()
     {
         $user = User::create([
             'email' => 'taylor@laravel.com',
@@ -272,7 +272,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Laravel Cashier', $invoice->invoiceItems()[0]->asStripeInvoiceItem()->description);
     }
 
-    public function testRefunds()
+    public function test_refunds()
     {
         $user = User::create([
             'email' => 'taylor@laravel.com',
