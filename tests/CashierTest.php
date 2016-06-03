@@ -33,8 +33,16 @@ class CashierTest extends PHPUnit_Framework_TestCase
             $table->string('email');
             $table->string('name');
             $table->string('stripe_id')->nullable();
-            $table->string('card_brand')->nullable();
-            $table->string('card_last_four')->nullable();
+            $table->integer('default_card')->unsigned()->nullable();
+            $table->timestamps();
+        });
+
+        $this->schema()->create('cards', function ($table) {
+            $table->increments('id');
+            $table->integer('user_id');
+            $table->string('card_id');
+            $table->string('last_four');
+            $table->integer('brand');
             $table->timestamps();
         });
 
@@ -54,6 +62,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
     public function tearDown()
     {
         $this->schema()->drop('users');
+        $this->schema()->drop('cards');
         $this->schema()->drop('subscriptions');
     }
 
