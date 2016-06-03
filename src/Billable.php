@@ -17,7 +17,7 @@ use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Stripe\Token;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-trait BillableTrait
+trait Billable
 {
     /**
      * The Stripe API key.
