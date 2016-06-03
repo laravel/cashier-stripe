@@ -5,7 +5,7 @@ namespace Laravel\Cashier;
 use Exception;
 use Carbon\Carbon;
 use InvalidArgumentException;
-use Stripe\Card;
+use Stripe\Card as StripeCard;
 use Stripe\Token as StripeToken;
 use Stripe\Charge as StripeCharge;
 use Stripe\Refund as StripeRefund;
@@ -14,6 +14,7 @@ use Stripe\Invoice as StripeInvoice;
 use Stripe\Customer as StripeCustomer;
 use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
+use Stripe\Token;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait BillableTrait
@@ -330,10 +331,10 @@ trait BillableTrait
     }
 
     /**
-     * @param Card  $card
+     * @param string  $card
      * @return bool|\Stripe\Card
      */
-    public function hasCard(Card $card) {
+    public function hasCard($card) {
         $customer = $this->asStripeCustomer();
 
         $cards = collect();
@@ -342,10 +343,8 @@ trait BillableTrait
             $cards->push($item);
         }
 
-        if($card = $cards->first(function($item) use ($card) {
-            return $card->id === $item->id;
-        })) {
-           return $card;
+        if($card = $cards->where('id', $card)->first()) {
+           return $card->deleted ? false : $card;
         }
 
         return false;
@@ -356,14 +355,18 @@ trait BillableTrait
      *
      * @param $token
      * @param bool  $default
-     * @return $this
+     * @return Card
      */
     public function addCard($token, $default = true) {
         $customer = $this->asStripeCustomer();
 
+        if(!$token instanceof Token) {
+            $token = $this->retrieveToken($token);
+        }
+
         if($card = $this->hasCard($token->card)) {
             if($default) {
-                $this->default_card = $card->id;
+                $this->default_card = $card->card_id;
                 $this->save();
             }
 
@@ -372,7 +375,7 @@ trait BillableTrait
 
         $card = $customer->sources->create(['source' => $token]);
 
-        $this->cards()->create([
+        $newCardModel = $this->cards()->create([
             'card_id' => $card->id,
             'brand' => $card->brand,
             'last_four' => $card->last4,
@@ -386,7 +389,7 @@ trait BillableTrait
         $customer->save();
         $this->save();
 
-        return $this;
+        return $newCardModel;
     }
 
     /**
@@ -416,12 +419,19 @@ trait BillableTrait
     public function removeCard($card) {
         $customer = $this->asStripeCustomer();
 
+        /** @var StripeCard $item */
         foreach($customer->sources->data as $item) {
-            if($item->id === $card->id) {
+            if($item->id === $card) {
                 $item->delete();
                 break;
             }
         }
+
+        if($this->default_card === $card) {
+            $this->default_card = null;
+        }
+
+        $this->cards()->where('card_id', $card)->delete();
 
         return $this;
     }
@@ -565,7 +575,7 @@ trait BillableTrait
      * @param  array  $options
      * @return StripeCustomer
      */
-    public function createAsStripeCustomer($token, array $options = [])
+    public function createAsStripeCustomer($token = null, array $options = [])
     {
         $options = array_key_exists('email', $options)
                 ? $options : array_merge($options, ['email' => $this->email]);

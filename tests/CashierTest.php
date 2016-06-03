@@ -298,6 +298,27 @@ class CashierTest extends PHPUnit_Framework_TestCase
         // Refund Tests
         $this->assertEquals(1000, $refund->amount);
     }
+    
+    public function test_multiple_cards() {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+        
+        // Add card
+        $user->createAsStripeCustomer();
+        $card = $user->addCard($this->getTestToken());
+
+        $this->assertNotFalse($user->hasCard($card->card_id));
+        $this->assertFalse($user->hasCard('card_000000000000'));
+        $this->assertEquals(1, $user->cards()->count());
+        
+        // Remove card
+        $user->removeCard($card->card_id);
+        $this->assertFalse($user->hasCard($card->card_id));
+        $this->assertEquals(0, $user->cards()->count());
+        
+    }
 
     protected function getTestToken()
     {
