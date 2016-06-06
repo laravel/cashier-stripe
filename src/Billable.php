@@ -331,20 +331,19 @@ trait Billable
     }
 
     /**
-     * @param string  $card
+     * @param string  $fingerprint
      * @return bool|\Stripe\Card
      */
-    public function hasCard($card) {
+    public function hasCard($fingerprint) {
         $customer = $this->asStripeCustomer();
 
-        $cards = collect();
+        $cards = collect($customer->sources->data);
 
-        foreach($customer->sources->data as $item) {
-            $cards->push($item);
-        }
-
-        if($card = $cards->where('id', $card)->first()) {
-           return $card->deleted ? false : $card;
+        if($card = $cards->where('fingerprint', $fingerprint)->first()) {
+            if(property_exists($card, 'deleted') && $card->deleted) {
+                return false;
+            }
+            return $card;
         }
 
         return false;
@@ -364,9 +363,9 @@ trait Billable
             $token = $this->retrieveToken($token);
         }
 
-        if($card = $this->hasCard($token->card)) {
+        if($card = $this->hasCard($token->card->fingerprint)) {
             if($default) {
-                $this->default_card = $card->card_id;
+                $this->default_card = $card->id;
                 $this->save();
             }
 
@@ -377,6 +376,7 @@ trait Billable
 
         $newCardModel = $this->cards()->create([
             'card_id' => $card->id,
+            'fingerprint' => $card->fingerprint,
             'brand' => $card->brand,
             'last_four' => $card->last4,
         ]);
@@ -413,15 +413,15 @@ trait Billable
     /**
      * Removes the card from the customer.
      *
-     * @param string  $card
+     * @param string  $cardId
      * @return $this
      */
-    public function removeCard($card) {
+    public function removeCard($cardId) {
         $customer = $this->asStripeCustomer();
 
         /** @var StripeCard $item */
         foreach($customer->sources->data as $item) {
-            if($item->id === $card) {
+            if($item->id === $cardId) {
                 $item->delete();
                 break;
             }
@@ -613,7 +613,7 @@ trait Billable
 
     /**
      * Get the user's default card.
-     * 
+     *
      * @return \Laravel\Cashier\Card|null
      */
     public function defaultCard() {

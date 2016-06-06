@@ -41,6 +41,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
             $table->increments('id');
             $table->integer('user_id');
             $table->string('card_id');
+            $table->string('fingerprint');
             $table->string('last_four');
             $table->integer('brand');
             $table->timestamps();
@@ -309,15 +310,29 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $user->createAsStripeCustomer();
         $card = $user->addCard($this->getTestToken());
 
-        $this->assertNotFalse($user->hasCard($card->card_id));
+        $this->assertNotFalse($user->hasCard($card->fingerprint));
         $this->assertFalse($user->hasCard('card_000000000000'));
         $this->assertEquals(1, $user->cards()->count());
+        $this->assertEquals($user->defaultCard()->card_id, $card->card_id);
         
         // Remove card
         $user->removeCard($card->card_id);
         $this->assertFalse($user->hasCard($card->card_id));
         $this->assertEquals(0, $user->cards()->count());
-        
+
+        // Add same card multiple times
+        $user->addCard($this->getTestToken());
+        $user->addCard($this->getTestToken());
+        $user->addCard($this->getTestToken());
+        $this->assertEquals(1, $user->cards()->count());
+
+        // Add multiple cards
+        $user->addCard($this->getTestToken());
+        $default = $user->addCard($this->getOtherTestToken());
+        $this->assertEquals(2, $user->cards()->count());
+        $this->assertEquals($default->card_id, $user->defaultCard()->card_id);
+
+        $user->removeAllCards();
     }
 
     protected function getTestToken()
@@ -328,6 +343,18 @@ class CashierTest extends PHPUnit_Framework_TestCase
                 'exp_month' => 5,
                 'exp_year' => 2020,
                 'cvc' => '123',
+            ],
+        ], ['api_key' => getenv('STRIPE_SECRET')])->id;
+    }
+
+    protected function getOtherTestToken()
+    {
+        return Stripe\Token::create([
+            'card' => [
+                'number' => '5555555555554444',
+                'exp_month' => 4,
+                'exp_year' => 2025,
+                'cvc' => '321',
             ],
         ], ['api_key' => getenv('STRIPE_SECRET')])->id;
     }
@@ -348,7 +375,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
 
 class User extends Eloquent
 {
-    use Laravel\Cashier\BillableTrait;
+    use Laravel\Cashier\Billable;
 }
 
 class CashierTestControllerStub extends WebhookController
