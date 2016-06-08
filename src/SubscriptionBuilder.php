@@ -168,7 +168,8 @@ class SubscriptionBuilder
         if ($this->skipTrial) {
             $trialEndsAt = null;
         } else {
-            $trialEndsAt = $this->trialDays ? Carbon::now()->addDays($this->trialDays) : null;
+            $trialEndsAt = $subscription->trial_end ? Carbon::createFromTimestampUTC($subscription->trial_end)
+                ->toDateTimeString() : null;
         }
 
         return $this->user->subscriptions()->create([
