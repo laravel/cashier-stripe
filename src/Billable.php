@@ -336,21 +336,22 @@ trait Billable
      * @param string  $fingerprint
      * @return bool|\Stripe\Card
      */
-    public function hasCardByFingerprint($fingerprint) {
+    public function hasCardByFingerprint($fingerprint)
+    {
         $customer = $this->asStripeCustomer();
 
         $cards = collect($customer->sources->data);
 
-        if($card = $cards->where('fingerprint', $fingerprint)->first()) {
-            if(property_exists($card, 'deleted') && $card->deleted) {
+        if ($card = $cards->where('fingerprint', $fingerprint)->first()) {
+            if (property_exists($card, 'deleted') && $card->deleted) {
                 return false;
             }
+
             return $card;
         }
 
         return false;
     }
-
 
     /**
      * Determines if the user has the card already, by card ID.
@@ -358,8 +359,9 @@ trait Billable
      * @param string  $cardId
      * @return bool|\Stripe\Card
      */
-    public function hasCard($cardId) {
-        if($card = $this->cards()->where('card_id', $cardId)->first()) {
+    public function hasCard($cardId)
+    {
+        if ($card = $this->cards()->where('card_id', $cardId)->first()) {
             return $card->asStripeCard();
         }
 
@@ -373,15 +375,16 @@ trait Billable
      * @param bool  $default
      * @return Card
      */
-    public function addCard($token, $default = true) {
+    public function addCard($token, $default = true)
+    {
         $customer = $this->asStripeCustomer();
 
-        if(!$token instanceof Token) {
+        if (! $token instanceof Token) {
             $token = $this->retrieveToken($token);
         }
 
-        if($card = $this->hasCardByFingerprint($token->card->fingerprint)) {
-            if($default) {
+        if ($card = $this->hasCardByFingerprint($token->card->fingerprint)) {
+            if ($default) {
                 $this->default_card = $card->id;
                 $this->save();
             }
@@ -398,7 +401,7 @@ trait Billable
             'last_four' => $card->last4,
         ]);
 
-        if($default) {
+        if ($default) {
             $this->default_card = $card->id;
             $customer->default_source = $card->id;
         }
@@ -433,18 +436,19 @@ trait Billable
      * @param string  $cardId
      * @return $this
      */
-    public function removeCard($cardId) {
+    public function removeCard($cardId)
+    {
         $customer = $this->asStripeCustomer();
 
         /** @var StripeCard $item */
-        foreach($customer->sources->data as $item) {
-            if($item->id === $cardId) {
+        foreach ($customer->sources->data as $item) {
+            if ($item->id === $cardId) {
                 $item->delete();
                 break;
             }
         }
 
-        if($this->default_card === $cardId) {
+        if ($this->default_card === $cardId) {
             $this->default_card = null;
         }
 
@@ -458,7 +462,8 @@ trait Billable
      *
      * @return $this
      */
-    public function removeAllCards() {
+    public function removeAllCards()
+    {
         $customer = $this->asStripeCustomer();
 
         $this->cards()->delete();
@@ -466,7 +471,7 @@ trait Billable
 
         $this->save();
 
-        foreach($customer->sources->data as $card) {
+        foreach ($customer->sources->data as $card) {
             $card->delete();
         }
 
@@ -646,18 +651,17 @@ trait Billable
      */
     public function setDefaultCard($cardId)
     {
-        if($cardId instanceof \Laravel\Cashier\Card
-           || $cardId instanceof \Stripe\Card)
-        {
+        if ($cardId instanceof \Laravel\Cashier\Card
+           || $cardId instanceof \Stripe\Card) {
             $cardId = $cardId->card_id;
         }
 
-        if(!$this->hasCard($cardId)) {
+        if (! $this->hasCard($cardId)) {
             return false;
         }
-        
+
         $customer = $this->asStripeCustomer();
-        
+
         $customer->default_source = $cardId;
         $customer->save();
 
@@ -675,7 +679,7 @@ trait Billable
      */
     public function asStripeCustomer($fresh = false)
     {
-        if($fresh || !$this->stripeCustomer) {
+        if ($fresh || ! $this->stripeCustomer) {
             $this->stripeCustomer = StripeCustomer::retrieve($this->stripe_id, static::getStripeKey());
         }
 

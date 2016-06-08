@@ -338,7 +338,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $user->removeAllCards();
         $this->assertEquals(0, $user->cards()->count());
         $this->assertNull($user->defaultCard());
-        
+
         // Set user's default card
         $card1 = $user->addCard($this->getTestToken());
         $card2 = $user->addCard($this->getOtherTestToken());
