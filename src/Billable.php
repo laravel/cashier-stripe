@@ -82,7 +82,7 @@ trait Billable
      */
     public function hasCardOnFile()
     {
-        return (bool) $this->card_brand;
+        return (bool) $this->cards()->count();
     }
 
     /**
@@ -331,10 +331,12 @@ trait Billable
     }
 
     /**
+     * Determines if the user has the card already, by fingerprint.
+     *
      * @param string  $fingerprint
      * @return bool|\Stripe\Card
      */
-    public function hasCard($fingerprint) {
+    public function hasCardByFingerprint($fingerprint) {
         $customer = $this->asStripeCustomer();
 
         $cards = collect($customer->sources->data);
@@ -344,6 +346,21 @@ trait Billable
                 return false;
             }
             return $card;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Determines if the user has the card already, by card ID.
+     *
+     * @param string  $cardId
+     * @return bool|\Stripe\Card
+     */
+    public function hasCard($cardId) {
+        if($card = $this->cards()->where('card_id', $cardId)->first()) {
+            return $card->asStripeCard();
         }
 
         return false;
@@ -363,7 +380,7 @@ trait Billable
             $token = $this->retrieveToken($token);
         }
 
-        if($card = $this->hasCard($token->card->fingerprint)) {
+        if($card = $this->hasCardByFingerprint($token->card->fingerprint)) {
             if($default) {
                 $this->default_card = $card->id;
                 $this->save();
@@ -427,11 +444,11 @@ trait Billable
             }
         }
 
-        if($this->default_card === $card) {
+        if($this->default_card === $cardId) {
             $this->default_card = null;
         }
 
-        $this->cards()->where('card_id', $card)->delete();
+        $this->cards()->where('card_id', $cardId)->delete();
 
         return $this;
     }
@@ -616,8 +633,37 @@ trait Billable
      *
      * @return \Laravel\Cashier\Card|null
      */
-    public function defaultCard() {
+    public function defaultCard()
+    {
         return $this->cards()->where('card_id', $this->default_card)->first();
+    }
+
+    /**
+     * Sets the default card for the user.
+     *
+     * @param string|\Laravel\Cashier\Card|\Stripe\Card  $cardId
+     * @return bool
+     */
+    public function setDefaultCard($cardId)
+    {
+        if($cardId instanceof \Laravel\Cashier\Card
+           || $cardId instanceof \Stripe\Card)
+        {
+            $cardId = $cardId->card_id;
+        }
+
+        if(!$this->hasCard($cardId)) {
+            return false;
+        }
+        
+        $customer = $this->asStripeCustomer();
+        
+        $customer->default_source = $cardId;
+        $customer->save();
+
+        $this->default_card = $cardId;
+
+        return $this->save();
     }
 
     /**

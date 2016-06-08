@@ -33,15 +33,15 @@ class CashierTest extends PHPUnit_Framework_TestCase
             $table->string('email');
             $table->string('name');
             $table->string('stripe_id')->nullable();
-            $table->integer('default_card')->unsigned()->nullable();
+            $table->string('default_card')->nullable();
             $table->timestamps();
         });
 
         $this->schema()->create('cards', function ($table) {
             $table->increments('id');
-            $table->integer('user_id');
-            $table->string('card_id');
-            $table->string('fingerprint');
+            $table->integer('user_id')->index();
+            $table->string('card_id')->index();
+            $table->string('fingerprint')->index();
             $table->string('last_four');
             $table->integer('brand');
             $table->timestamps();
@@ -299,24 +299,26 @@ class CashierTest extends PHPUnit_Framework_TestCase
         // Refund Tests
         $this->assertEquals(1000, $refund->amount);
     }
-    
-    public function test_multiple_cards() {
+
+    public function test_multiple_cards()
+    {
         $user = User::create([
             'email' => 'taylor@laravel.com',
             'name' => 'Taylor Otwell',
         ]);
-        
-        // Add card
         $user->createAsStripeCustomer();
-        $card = $user->addCard($this->getTestToken());
 
-        $this->assertNotFalse($user->hasCard($card->fingerprint));
+        // Add card
+        $card = $user->addCard($this->getTestToken());
+        $this->assertNotFalse($user->hasCardByFingerprint($card->fingerprint));
+        $this->assertNotFalse($user->hasCard($card->card_id));
         $this->assertFalse($user->hasCard('card_000000000000'));
         $this->assertEquals(1, $user->cards()->count());
         $this->assertEquals($user->defaultCard()->card_id, $card->card_id);
-        
+
         // Remove card
         $user->removeCard($card->card_id);
+        $this->assertFalse($user->hasCardByFingerprint($card->fingerprint));
         $this->assertFalse($user->hasCard($card->card_id));
         $this->assertEquals(0, $user->cards()->count());
 
@@ -332,7 +334,19 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, $user->cards()->count());
         $this->assertEquals($default->card_id, $user->defaultCard()->card_id);
 
+        // Remove all cards
         $user->removeAllCards();
+        $this->assertEquals(0, $user->cards()->count());
+        $this->assertNull($user->defaultCard());
+        
+        // Set user's default card
+        $card1 = $user->addCard($this->getTestToken());
+        $card2 = $user->addCard($this->getOtherTestToken());
+        $this->assertEquals($card2->card_id, $user->defaultCard()->card_id);
+        $user->setDefaultCard($card1->card_id);
+        $this->assertEquals($card1->card_id, $user->defaultCard()->card_id);
+        $customer = $user->asStripeCustomer();
+        $this->assertEquals($card1->card_id, $customer->default_source);
     }
 
     protected function getTestToken()
