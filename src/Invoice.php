@@ -314,8 +314,8 @@ class Invoice
     }
     
     /**
-     * Return the description of the payment related with the invoice.
-     * 
+     * Return a description for a single charge.
+     *
      * @return string
      */
     public function paymentDescription()
