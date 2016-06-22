@@ -317,7 +317,7 @@ class Invoice
      * Return the description of the payment related with the invoice.
      * 
      * @return string
-     * /
+     */
     public function paymentDescription()
     {
         return $this->invoice->lines['data'][0]->description;
