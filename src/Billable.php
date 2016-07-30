@@ -188,9 +188,10 @@ trait Billable
             return $value->created_at->getTimestamp();
         })
         ->first(function ($value, $key) use ($subscription) {
-            if($key instanceof Subscription){
+            if ($key instanceof Subscription){
                 $value = $key;
             }
+
             return $value->name === $subscription;
         });
     }
