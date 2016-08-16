@@ -3,6 +3,8 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
+use LogicException;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 
 class Subscription extends Model
@@ -21,21 +23,45 @@ class Subscription extends Model
      */
     protected $dates = [
         'trial_ends_at', 'ends_at',
-        'created_at', 'updated_at'
+        'created_at', 'updated_at',
     ];
+
+    /**
+     * Indicates if the plan change should be prorated.
+     *
+     * @var bool
+     */
+    protected $prorate = true;
+
+    /**
+     * The date on which the billing cycle should be anchored.
+     *
+     * @var string|null
+     */
+    protected $billingCycleAnchor = null;
 
     /**
      * Get the user that owns the subscription.
      */
     public function user()
     {
-        $model = getenv('STRIPE_MODEL') ?: config('services.stripe.model');
+        $model = getenv('STRIPE_MODEL') ?: config('services.stripe.model', 'User');
 
         return $this->belongsTo($model, 'user_id');
     }
 
     /**
-     * Determine if the subscrition is active.
+     * Determine if the subscription is active, on trial, or within its grace period.
+     *
+     * @return bool
+     */
+    public function valid()
+    {
+        return $this->active() || $this->onTrial() || $this->onGracePeriod();
+    }
+
+    /**
+     * Determine if the subscription is active.
      *
      * @return bool
      */
@@ -90,20 +116,22 @@ class Subscription extends Model
      */
     public function incrementQuantity($count = 1)
     {
-        $this->updateQuantity($this->quantity + 1);
+        $this->updateQuantity($this->quantity + $count);
 
         return $this;
     }
 
     /**
-     *  Increment the quantity of the subscription. and invoice immediately.
+     *  Increment the quantity of the subscription, and invoice immediately.
      *
-     * @param  int|null  $quantity
+     * @param  int  $count
      * @return $this
      */
-    public function incrementAndInvoice($quantity = null)
+    public function incrementAndInvoice($count = 1)
     {
-        $this->incrementQuantity($quantity);
+        $this->incrementQuantity($count);
+
+        $this->user->invoice();
 
         return $this;
     }
@@ -116,7 +144,7 @@ class Subscription extends Model
      */
     public function decrementQuantity($count = 1)
     {
-        $this->updateQuantity(max(1, $this->quantity - 1));
+        $this->updateQuantity(max(1, $this->quantity - $count));
 
         return $this;
     }
@@ -144,6 +172,35 @@ class Subscription extends Model
     }
 
     /**
+     * Indicate that the plan change should not be prorated.
+     *
+     * @return $this
+     */
+    public function noProrate()
+    {
+        $this->prorate = false;
+
+        return $this;
+    }
+
+    /**
+     * Change the billing cycle anchor on a plan change.
+     *
+     * @param  int|string  $date
+     * @return $this
+     */
+    public function anchorBillingCycleOn($date = 'now')
+    {
+        if ($date instanceof DateTimeInterface) {
+            $date = $date->getTimestamp();
+        }
+
+        $this->billingCycleAnchor = $date;
+
+        return $this;
+    }
+
+    /**
      * Swap the subscription to a new Stripe plan.
      *
      * @param  string  $plan
@@ -154,6 +211,12 @@ class Subscription extends Model
         $subscription = $this->asStripeSubscription();
 
         $subscription->plan = $plan;
+
+        $subscription->prorate = $this->prorate;
+
+        if (! is_null($this->billingCycleAnchor)) {
+            $subscription->billingCycleAnchor = $this->billingCycleAnchor;
+        }
 
         // If no specific trial end date has been set, the default behavior should be
         // to maintain the current trial state, whether that is "active" or to run
@@ -175,13 +238,16 @@ class Subscription extends Model
 
         $this->user->invoice();
 
-        $this->fill(['stripe_plan' => $plan])->save();
+        $this->fill([
+            'stripe_plan' => $plan,
+            'ends_at' => null,
+        ])->save();
 
         return $this;
     }
 
     /**
-     * Cacnel the subscription at the end of the billing period.
+     * Cancel the subscription at the end of the billing period.
      *
      * @return $this
      */
@@ -237,11 +303,13 @@ class Subscription extends Model
      * Resume the cancelled subscription.
      *
      * @return $this
+     *
+     * @throws \LogicException
      */
     public function resume()
     {
         if (! $this->onGracePeriod()) {
-            throw new \LogicException("Unable to resume subscription that is not within grace period.");
+            throw new LogicException('Unable to resume subscription that is not within grace period.');
         }
 
         $subscription = $this->asStripeSubscription();

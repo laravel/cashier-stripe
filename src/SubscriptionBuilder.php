@@ -3,7 +3,6 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
-use Stripe\Customer as StripeCustomer;
 
 class SubscriptionBuilder
 {
@@ -43,11 +42,25 @@ class SubscriptionBuilder
     protected $trialDays;
 
     /**
+     * Indicates that the trial should end immediately.
+     *
+     * @var bool
+     */
+    protected $skipTrial = false;
+
+    /**
      * The coupon code being applied to the customer.
      *
      * @var string|null
      */
     protected $coupon;
+
+    /**
+     * The metadata to apply to the subscription.
+     *
+     * @var array|null
+     */
+    protected $metadata;
 
     /**
      * Create a new subscription builder instance.
@@ -91,6 +104,18 @@ class SubscriptionBuilder
     }
 
     /**
+     * Force the trial to end immediately.
+     *
+     * @return $this
+     */
+    public function skipTrial()
+    {
+        $this->skipTrial = true;
+
+        return $this;
+    }
+
+    /**
      * The coupon to apply to a new subscription.
      *
      * @param  string  $coupon
@@ -99,6 +124,19 @@ class SubscriptionBuilder
     public function withCoupon($coupon)
     {
         $this->coupon = $coupon;
+
+        return $this;
+    }
+
+    /**
+     * The metadata to apply to a new subscription.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function withMetadata($metadata)
+    {
+        $this->metadata = $metadata;
 
         return $this;
     }
@@ -127,12 +165,18 @@ class SubscriptionBuilder
 
         $subscription = $customer->subscriptions->create($this->buildPayload());
 
+        if ($this->skipTrial) {
+            $trialEndsAt = null;
+        } else {
+            $trialEndsAt = $this->trialDays ? Carbon::now()->addDays($this->trialDays) : null;
+        }
+
         return $this->user->subscriptions()->create([
             'name' => $this->name,
             'stripe_id' => $subscription->id,
             'stripe_plan' => $this->plan,
             'quantity' => $this->quantity,
-            'trial_ends_at' => $this->trialDays ? Carbon::now()->addDays($this->trialDays) : null,
+            'trial_ends_at' => $trialEndsAt,
             'ends_at' => null,
         ]);
     }
@@ -171,8 +215,10 @@ class SubscriptionBuilder
         return array_filter([
             'plan' => $this->plan,
             'quantity' => $this->quantity,
+            'coupon' => $this->coupon,
             'trial_end' => $this->getTrialEndForPayload(),
             'tax_percent' => $this->getTaxPercentageForPayload(),
+            'metadata' => $this->metadata,
         ]);
     }
 
@@ -183,6 +229,10 @@ class SubscriptionBuilder
      */
     protected function getTrialEndForPayload()
     {
+        if ($this->skipTrial) {
+            return 'now';
+        }
+
         if ($this->trialDays) {
             return Carbon::now()->addDays($this->trialDays)->getTimestamp();
         }

@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier;
 
+use DOMPDF;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use Stripe\Invoice as StripeInvoice;
@@ -44,7 +45,7 @@ class Invoice
      */
     public function date($timezone = null)
     {
-        $carbon = Carbon::createFromTimestamp($this->invoice->date);
+        $carbon = Carbon::createFromTimestampUTC($this->invoice->date);
 
         return $timezone ? $carbon->setTimezone($timezone) : $carbon;
     }
@@ -56,9 +57,17 @@ class Invoice
      */
     public function total()
     {
-        return $this->formatAmount(
-            max(0, $this->invoice->total - $this->rawStartingBalance())
-        );
+        return $this->formatAmount($this->rawTotal());
+    }
+
+    /**
+     * Get the raw total amount that was paid (or will be paid).
+     *
+     * @return float
+     */
+    public function rawTotal()
+    {
+        return max(0, $this->invoice->total - ($this->rawStartingBalance() * -1));
     }
 
     /**
@@ -245,7 +254,7 @@ class Invoice
             require_once $configPath;
         }
 
-        $dompdf = new \DOMPDF;
+        $dompdf = new DOMPDF;
 
         $dompdf->load_html($this->view($data)->render());
 
@@ -275,9 +284,9 @@ class Invoice
     /**
      * Get the raw starting balance for the invoice.
      *
-     * @return int
+     * @return float
      */
-    protected function rawStartingBalance()
+    public function rawStartingBalance()
     {
         return isset($this->invoice->starting_balance)
                    ? $this->invoice->starting_balance : 0;

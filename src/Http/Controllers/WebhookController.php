@@ -20,7 +20,7 @@ class WebhookController extends Controller
     {
         $payload = json_decode($request->getContent(), true);
 
-        if (! $this->eventExistsOnStripe($payload['id']) && ! $this->isInTestingEnvironment()) {
+        if (! $this->isInTestingEnvironment() && ! $this->eventExistsOnStripe($payload['id'])) {
             return;
         }
 
@@ -58,7 +58,7 @@ class WebhookController extends Controller
      * Get the billable entity instance by Stripe ID.
      *
      * @param  string  $stripeId
-     * @return \Laravel\Cashier\Contracts\Billable
+     * @return \Laravel\Cashier\Billable
      */
     protected function getUserByStripeId($stripeId)
     {

@@ -10,6 +10,28 @@
 
 Laravel Cashier provides an expressive, fluent interface to [Stripe's](https://stripe.com) subscription billing services. It handles almost all of the boilerplate subscription billing code you are dreading writing. In addition to basic subscription management, Cashier can handle coupons, swapping subscription, subscription "quantities", cancellation grace periods, and even generate invoice PDFs.
 
+## Test Setup
+
+You will need to set the following details locally and on your Stripe account in order to run the Cashier unit tests:
+
+### Local
+
+#### .env
+
+    STRIPE_API_KEY=
+    STRIPE_SECRET=
+
+### Stripe
+
+#### Plans
+
+    * monthly-10-1 ($10)
+    * monthly-10-2 ($10)
+
+#### Coupons
+
+    * coupon-1 ($5)
+
 ## Official Documentation
 
 Documentation for Cashier can be found on the [Laravel website](http://laravel.com/docs/billing).
@@ -18,6 +40,6 @@ Documentation for Cashier can be found on the [Laravel website](http://laravel.c
 
 Thank you for considering contributing to the Cashier. You can read the contribution guide lines [here](contributing.md).
 
-### License
+## License
 
 Laravel Cashier is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)

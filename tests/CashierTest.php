@@ -10,8 +10,10 @@ class CashierTest extends PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
-        $dotenv = new Dotenv\Dotenv(__DIR__.'/../');
-        $dotenv->load();
+        if (file_exists(__DIR__.'/../.env')) {
+            $dotenv = new Dotenv\Dotenv(__DIR__.'/../');
+            $dotenv->load();
+        }
     }
 
     public function setUp()
@@ -56,9 +58,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests
+     * Tests.
      */
-
     public function testSubscriptionsCanBeCreated()
     {
         $user = User::create([
@@ -73,6 +74,9 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($user->subscription('main')->stripe_id);
 
         $this->assertTrue($user->subscribed('main'));
+        $this->assertTrue($user->subscribedToPlan('monthly-10-1', 'main'));
+        $this->assertFalse($user->subscribedToPlan('monthly-10-1', 'something'));
+        $this->assertFalse($user->subscribedToPlan('monthly-10-2', 'main'));
         $this->assertTrue($user->subscribed('main', 'monthly-10-1'));
         $this->assertFalse($user->subscribed('main', 'monthly-10-2'));
         $this->assertTrue($user->subscription('main')->active());
@@ -157,6 +161,16 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($invoice->discountIsPercentage());
     }
 
+    public function test_generic_trials()
+    {
+        $user = new User;
+        $this->assertFalse($user->onGenericTrial());
+        $user->trial_ends_at = Carbon::tomorrow();
+        $this->assertTrue($user->onGenericTrial());
+        $user->trial_ends_at = Carbon::today()->subDays(5);
+        $this->assertFalse($user->onGenericTrial());
+    }
+
     public function test_creating_subscription_with_trial()
     {
         $user = User::create([
@@ -220,7 +234,6 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $user->newSubscription('main', 'monthly-10-1')
                 ->create($this->getTestToken());
 
-
         $subscription = $user->subscription('main');
 
         $request = Request::create('/', 'POST', [], [], [], [], json_encode(['id' => 'foo', 'type' => 'customer.subscription.deleted',
@@ -242,6 +255,41 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($subscription->cancelled());
     }
 
+    public function testCreatingOneOffInvoices()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        // Create Invoice
+        $user->createAsStripeCustomer($this->getTestToken());
+        $user->invoiceFor('Laravel Cashier', 1000);
+
+        // Invoice Tests
+        $invoice = $user->invoices()[0];
+        $this->assertEquals('$10.00', $invoice->total());
+        $this->assertEquals('Laravel Cashier', $invoice->invoiceItems()[0]->asStripeInvoiceItem()->description);
+    }
+
+    public function testRefunds()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        // Create Invoice
+        $user->createAsStripeCustomer($this->getTestToken());
+        $invoice = $user->invoiceFor('Laravel Cashier', 1000);
+
+        // Create the refund
+        $refund = $user->refund($invoice->charge);
+
+        // Refund Tests
+        $this->assertEquals(1000, $refund->amount);
+    }
+
     protected function getTestToken()
     {
         return Stripe\Token::create([
@@ -255,9 +303,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Schema Helpers
+     * Schema Helpers.
      */
-
     protected function schema()
     {
         return $this->connection()->getSchemaBuilder();
@@ -269,11 +316,10 @@ class CashierTest extends PHPUnit_Framework_TestCase
     }
 }
 
-
-class User extends Eloquent {
+class User extends Eloquent
+{
     use Laravel\Cashier\Billable;
 }
-
 
 class CashierTestControllerStub extends WebhookController
 {
