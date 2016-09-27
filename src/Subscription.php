@@ -5,6 +5,7 @@ namespace Laravel\Cashier;
 use Carbon\Carbon;
 use LogicException;
 use DateTimeInterface;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class Subscription extends Model
@@ -42,13 +43,24 @@ class Subscription extends Model
 
     /**
      * Get the user that owns the subscription.
+     * (Backwards compatibility)
      */
     public function user()
     {
-        $model = getenv('STRIPE_MODEL') ?: config('services.stripe.model', 'User');
-
-        return $this->belongsTo($model, 'user_id');
+        return $this->owner();
     }
+
+    /**
+     * Get the model related to the subscription
+     */
+    public function owner()
+    {
+        $model = getenv('STRIPE_MODEL') ?: config('services.stripe.model', 'User');
+        $foreignKey = Str::snake(class_basename($model)).'_id';
+
+        return $this->belongsTo($model, $foreignKey);
+    }
+        
 
     /**
      * Determine if the subscription is active, on trial, or within its grace period.

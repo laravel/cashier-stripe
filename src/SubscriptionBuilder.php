@@ -7,11 +7,11 @@ use Carbon\Carbon;
 class SubscriptionBuilder
 {
     /**
-     * The user model that is subscribing.
+     * The model that is subscribing.
      *
      * @var \Illuminate\Database\Eloquent\Model
      */
-    protected $user;
+    protected $owner;
 
     /**
      * The name of the subscription.
@@ -70,9 +70,9 @@ class SubscriptionBuilder
      * @param  string  $plan
      * @return void
      */
-    public function __construct($user, $name, $plan)
+    public function __construct($owner, $name, $plan)
     {
-        $this->user = $user;
+        $this->owner = $owner;
         $this->name = $name;
         $this->plan = $plan;
     }
@@ -142,7 +142,7 @@ class SubscriptionBuilder
     }
 
     /**
-     * Add a new Stripe subscription to the user.
+     * Add a new Stripe subscription to the Stripe model.
      *
      * @param  array  $options
      * @return \Laravel\Cashier\Subscription
@@ -171,7 +171,7 @@ class SubscriptionBuilder
             $trialEndsAt = $this->trialDays ? Carbon::now()->addDays($this->trialDays) : null;
         }
 
-        return $this->user->subscriptions()->create([
+        return $this->owner->subscriptions()->create([
             'name' => $this->name,
             'stripe_id' => $subscription->id,
             'stripe_plan' => $this->plan,
@@ -190,15 +190,15 @@ class SubscriptionBuilder
      */
     protected function getStripeCustomer($token = null, array $options = [])
     {
-        if (! $this->user->stripe_id) {
-            $customer = $this->user->createAsStripeCustomer(
+        if (! $this->owner->stripe_id) {
+            $customer = $this->owner->createAsStripeCustomer(
                 $token, array_merge($options, array_filter(['coupon' => $this->coupon]))
             );
         } else {
-            $customer = $this->user->asStripeCustomer();
+            $customer = $this->owner->asStripeCustomer();
 
             if ($token) {
-                $this->user->updateCard($token);
+                $this->owner->updateCard($token);
             }
         }
 
@@ -245,7 +245,7 @@ class SubscriptionBuilder
      */
     protected function getTaxPercentageForPayload()
     {
-        if ($taxPercentage = $this->user->taxPercentage()) {
+        if ($taxPercentage = $this->owner->taxPercentage()) {
             return $taxPercentage;
         }
     }

@@ -91,7 +91,7 @@ trait Billable
     public function invoiceFor($description, $amount, array $options = [])
     {
         if (! $this->stripe_id) {
-            throw new InvalidArgumentException('User is not a customer. See the createAsStripeCustomer method.');
+            throw new InvalidArgumentException(class_basename($this).' is not a Stripe customer. See the createAsStripeCustomer method.');
         }
 
         $options = array_merge([
@@ -121,7 +121,7 @@ trait Billable
     }
 
     /**
-     * Determine if the user is on trial.
+     * Determine if the Stripe model is on trial.
      *
      * @param  string  $subscription
      * @param  string|null  $plan
@@ -144,7 +144,7 @@ trait Billable
     }
 
     /**
-     * Determine if the user is on a "generic" trial at the user level.
+     * Determine if the Stripe model is on a "generic" trial at the model level.
      *
      * @return bool
      */
@@ -154,7 +154,7 @@ trait Billable
     }
 
     /**
-     * Determine if the user has a given subscription.
+     * Determine if the Stripe model has a given subscription.
      *
      * @param  string  $subscription
      * @param  string|null  $plan
@@ -193,13 +193,13 @@ trait Billable
     }
 
     /**
-     * Get all of the subscriptions for the user.
+     * Get all of the subscriptions for the Stripe model.
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function subscriptions()
     {
-        return $this->hasMany(Subscription::class, 'user_id')->orderBy('created_at', 'desc');
+        return $this->hasMany(Subscription::class, $this->getForeignKey())->orderBy('created_at', 'desc');
     }
 
     /**
@@ -337,7 +337,7 @@ trait Billable
 
         // If the given token already has the card as their default source, we can just
         // bail out of the method now. We don't need to keep adding the same card to
-        // the user's account each time we go through this particular method call.
+        // the model's account each time we go through this particular method call.
         if ($token->card->id === $customer->default_source) {
             return;
         }
@@ -348,8 +348,8 @@ trait Billable
 
         $customer->save();
 
-        // Next, we will get the default source for this user so we can update the last
-        // four digits and the card brand on this user record in the database, which
+        // Next, we will get the default source for this model so we can update the last
+        // four digits and the card brand on this model's record in the database, which
         // is convenient when displaying on the front-end when updating the cards.
         $source = $customer->default_source
                     ? $customer->sources->retrieve($customer->default_source)
@@ -391,7 +391,7 @@ trait Billable
     }
 
     /**
-     * Fills the user's properties with the source from Stripe.
+     * Fills the model's properties with the source from Stripe.
      *
      * @param \Stripe\Card|null  $card
      * @return $this
@@ -422,7 +422,7 @@ trait Billable
     }
 
     /**
-     * Determine if the user is actively subscribed to one of the given plans.
+     * Determine if the Stripe model is actively subscribed to one of the given plans.
      *
      * @param  array|string  $plans
      * @param  string  $subscription
@@ -469,7 +469,7 @@ trait Billable
     }
 
     /**
-     * Create a Stripe customer for the given user.
+     * Create a Stripe customer for the given Stripe model.
      *
      * @param  string  $token
      * @param  array  $options
@@ -502,11 +502,11 @@ trait Billable
     }
 
     /**
-     * Get the Stripe customer for the user.
+     * Get the Stripe customer for the Stripe model.
      *
      * @return \Stripe\Customer
      */
-    public function asStripeCustomer()
+        public function asStripeCustomer()
     {
         return StripeCustomer::retrieve($this->stripe_id, $this->getStripeKey());
     }

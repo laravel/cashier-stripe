@@ -11,11 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 class Invoice
 {
     /**
-     * The user instance.
+     * The Stripe model instance.
      *
      * @var \Illuminate\Database\Eloquent\Model
      */
-    protected $user;
+    protected $owner;
 
     /**
      * The Stripe invoice instance.
@@ -27,13 +27,13 @@ class Invoice
     /**
      * Create a new invoice instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $user
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @param  \Stripe\Invoice  $invoice
      * @return void
      */
-    public function __construct($user, StripeInvoice $invoice)
+    public function __construct($owner, StripeInvoice $invoice)
     {
-        $this->user = $user;
+        $this->owner = $owner;
         $this->invoice = $invoice;
     }
 
@@ -206,7 +206,7 @@ class Invoice
         if (isset($this->lines->data)) {
             foreach ($this->lines->data as $line) {
                 if ($line->type == $type) {
-                    $lineItems[] = new InvoiceItem($this->user, $line);
+                    $lineItems[] = new InvoiceItem($this->owner, $line);
                 }
             }
         }
@@ -215,7 +215,7 @@ class Invoice
     }
 
     /**
-     * Format the given amount into a string based on the user's preferences.
+     * Format the given amount into a string based on the Stripe model's preferences.
      *
      * @param  int  $amount
      * @return string
@@ -234,7 +234,7 @@ class Invoice
     public function view(array $data)
     {
         return View::make('cashier::receipt', array_merge(
-            $data, ['invoice' => $this, 'user' => $this->user]
+            $data, ['invoice' => $this, 'owner' => $this->owner]
         ));
     }
 

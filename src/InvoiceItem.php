@@ -7,11 +7,11 @@ use Carbon\Carbon;
 class InvoiceItem
 {
     /**
-     * The user instance.
+     * The Stripe model instance.
      *
      * @var \Illuminate\Database\Eloquent\Model
      */
-    protected $user;
+    protected $owner;
 
     /**
      * The Stripe invoice item instance.
@@ -23,13 +23,13 @@ class InvoiceItem
     /**
      * Create a new invoice item instance.
      *
-     * @param  \Illuminate\Database\Eloquent\User  $user
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @param  \Stripe\StripeObject  $item
      * @return void
      */
-    public function __construct($user, $item)
+    public function __construct($owner, $item)
     {
-        $this->user = $user;
+        $this->owner = $owner;
         $this->item = $item;
     }
 
@@ -102,7 +102,7 @@ class InvoiceItem
     }
 
     /**
-     * Format the given amount into a string based on the user's preferences.
+     * Format the given amount into a string based on the owner model's preferences.
      *
      * @param  int  $amount
      * @return string
