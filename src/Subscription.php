@@ -42,7 +42,7 @@ class Subscription extends Model
     protected $billingCycleAnchor = null;
 
     /**
-	 * Get the user that owns the subscription (Backwards compatibility)
+     * Get the user that owns the subscription (Backwards compatibility).
      */
     public function user()
     {
@@ -50,7 +50,7 @@ class Subscription extends Model
     }
 
     /**
-     * Get the model related to the subscription
+     * Get the model related to the subscription.
      */
     public function owner()
     {
