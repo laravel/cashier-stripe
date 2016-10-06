@@ -443,4 +443,16 @@ class Invoice
     {
         $this->stripeInvoice->{$key} = $value;
     }
+
+	/**
+	 * Dynamically call method on the Stripe invoice.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 */
+	public function __call($method, $parameters)
+	{
+		return call_user_func_array([$this->stripeInvoice, $method], $parameters);
+	}
 }
