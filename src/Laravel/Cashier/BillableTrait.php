@@ -117,6 +117,16 @@ trait BillableTrait {
 	}
 
 	/**
+	 *  Get the entity's upcoming invoice.
+	 *
+	 * @return @return \Laravel\Cashier\Invoice|null
+	 */
+	public function upcomingInvoice()
+	{
+		return $this->subscription()->upcomingInvoice();
+	}
+
+	/**
 	 * Update customer's credit card.
 	 *
 	 * @param  string  $token

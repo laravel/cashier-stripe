@@ -267,6 +267,16 @@ class StripeGateway {
 	}
 
 	/**
+	 *  Get the entity's upcoming invoice.
+	 *
+	 * @return @return \Laravel\Cashier\Invoice|null
+	 */
+	public function upcomingInvoice()
+	{
+		return $this->subscription()->upcomingInvoice();
+	}
+
+	/**
 	 * Increment the quantity of the subscription.
 	 *
 	 * @param  int  $count
@@ -711,6 +721,17 @@ class StripeGateway {
 	protected function getCurrency()
 	{
 		return $this->billable->getCurrency();
+	}
+
+	/**
+	 * Get the subscription quantity.
+ 	 *
+ 	 * @return int
+	 */
+	public function getQuantity()
+	{
+		$customer = $this->getStripeCustomer();
+		return $customer->subscription->quantity;
 	}
 
 }

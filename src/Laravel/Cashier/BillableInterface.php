@@ -50,6 +50,13 @@ interface BillableInterface {
 	public function invoices($parameters = array());
 
 	/**
+	 * Get the entitiy's upcoming invoice.
+	 *
+	 * @return \Laravel\Cashier\Invoice|null
+	 */
+	public function upcomingInvoice();
+
+	/**
 	 * Apply a coupon to the billable entity.
 	 *
 	 * @param  string  $coupon
