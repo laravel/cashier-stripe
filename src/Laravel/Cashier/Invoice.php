@@ -294,8 +294,13 @@ class Invoice
     public function view(array $data)
     {
         $data = array_merge($data, ['invoice' => $this, 'billable' => $this->billable]);
+        $view = 'cashier::receipt';
 
-        return View::make('cashier::receipt', $data);
+        if (isset($data['view'])) {
+            $view = $data['view'];
+        }
+
+        return View::make($view, $data);
     }
 
     /**
