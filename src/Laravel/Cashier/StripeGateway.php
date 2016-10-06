@@ -1,11 +1,12 @@
 <?php namespace Laravel\Cashier;
 
-use Stripe;
 use Carbon\Carbon;
-use Stripe_Charge;
-use Stripe_Invoice;
-use Stripe_Customer;
-use Stripe_CardError;
+use Stripe\Stripe;
+use Stripe\Charge as StripeCharge;
+use Stripe\Invoice as StripeInvoice;
+use Stripe\Customer as StripeCustomer;
+use Stripe\Error\Card as StripeErrorCard;
+use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use InvalidArgumentException;
 use Laravel\Cashier\Contracts\Billable as BillableContract;
 
@@ -83,7 +84,7 @@ class StripeGateway
      * @param  array  $options
      * @return bool|mixed
      */
-    public function charge($amount, array $options = array())
+    public function charge($amount, array $options = [])
     {
         $options = array_merge([
             'currency' => 'usd',
@@ -100,8 +101,8 @@ class StripeGateway
         }
 
         try {
-            $response = Stripe_Charge::create($options);
-        } catch (Stripe_CardError $e) {
+            $response = StripeCharge::create($options);
+        } catch (StripeErrorCard $e) {
             return false;
         }
 
@@ -116,7 +117,7 @@ class StripeGateway
      * @param  object|null  $customer
      * @return void
      */
-    public function create($token, array $properties = array(), $customer = null)
+    public function create($token, array $properties = [], $customer = null)
     {
         $freshCustomer = false;
 
@@ -228,10 +229,10 @@ class StripeGateway
         try {
             $customer = $this->getStripeCustomer();
 
-            Stripe_Invoice::create(['customer' => $customer->id], $this->getStripeKey())->pay();
+            StripeInvoice::create(['customer' => $customer->id], $this->getStripeKey())->pay();
 
             return true;
-        } catch (\Stripe_InvalidRequestError $e) {
+        } catch (StripeErrorInvalidRequest $e) {
             return false;
         }
     }
@@ -245,7 +246,7 @@ class StripeGateway
     public function findInvoice($id)
     {
         try {
-            return new Invoice($this->billable, Stripe_Invoice::retrieve($id, $this->getStripeKey()));
+            return new Invoice($this->billable, StripeInvoice::retrieve($id, $this->getStripeKey()));
         } catch (\Exception $e) {
             return null;
         }
@@ -258,7 +259,7 @@ class StripeGateway
      * @param  array  $parameters
      * @return array
      */
-    public function invoices($includePending = false, $parameters = array())
+    public function invoices($includePending = false, $parameters = [])
     {
         $invoices = [];
 
@@ -298,10 +299,10 @@ class StripeGateway
         try {
             $customer = $this->getStripeCustomer();
 
-            $stripeInvoice = Stripe_Invoice::upcoming(['customer' => $customer->id]);
+            $stripeInvoice = StripeInvoice::upcoming(['customer' => $customer->id]);
 
             return new Invoice($this->billable, $stripeInvoice);
-        } catch (\Stripe_InvalidRequestError $e) {
+        } catch (StripeErrorInvalidRequest $e) {
             return null;
         }
     }
@@ -348,7 +349,7 @@ class StripeGateway
     /**
      * Update the quantity of the subscription.
      *
-     * @param  \Stripe_Customer  $customer
+     * @param  \Stripe\Customer  $customer
      * @param  int  $quantity
      * @return void
      */
@@ -494,7 +495,7 @@ class StripeGateway
     /**
      * Update the local Stripe data in storage.
      *
-     * @param  \Stripe_Customer  $customer
+     * @param  \Stripe\Customer  $customer
      * @param  string|null  $plan
      * @return void
      */
@@ -514,15 +515,15 @@ class StripeGateway
      *
      * @param  string  $token
      * @param  array   $properties
-     * @return \Stripe_Customer
+     * @return \Stripe\Customer
      */
-    public function createStripeCustomer($token, array $properties = array())
+    public function createStripeCustomer($token, array $properties = [])
     {
         if ($this->coupon) {
             $properties['coupon'] = $this->coupon;
         }
 
-        $customer = Stripe_Customer::create(
+        $customer = StripeCustomer::create(
             array_merge(['source' => $token], $properties), $this->getStripeKey()
         );
 
@@ -532,7 +533,7 @@ class StripeGateway
     /**
      * Get the Stripe customer for entity.
      *
-     * @return \Stripe_Customer
+     * @return \Stripe\Customer
      */
     public function getStripeCustomer($id = null)
     {
@@ -548,7 +549,7 @@ class StripeGateway
     /**
      * Deteremine if the customer has a subscription.
      *
-     * @param  \Stripe_Customer  $customer
+     * @param  \Stripe\Customer  $customer
      * @return bool
      */
     protected function usingMultipleSubscriptionApi($customer)
@@ -561,7 +562,7 @@ class StripeGateway
     /**
      * Get the last four credit card digits for a customer.
      *
-     * @param  \Stripe_Customer  $customer
+     * @param  \Stripe\Customer  $customer
      * @return string
      */
     protected function getLastFourCardDigits($customer)
