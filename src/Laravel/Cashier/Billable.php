@@ -249,7 +249,7 @@ trait Billable
      */
     public function onPlan($plan)
     {
-        return $this->stripeIsActive() && $this->subscription()->planId() == $plan;
+        return $this->subscribed() && $this->stripe_plan == $plan;
     }
 
     /**
