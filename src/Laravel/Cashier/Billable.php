@@ -7,7 +7,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait Billable
 {
-
     /**
      * The Stripe API key.
      *
@@ -38,11 +37,12 @@ trait Billable
     /**
      * Make a "one off" charge on the customer for the given amount.
      *
-     * @param  int  $amount
-     * @param  array  $options
+     * @param int   $amount
+     * @param array $options
+     *
      * @return bool|mixed
      */
-    public function charge($amount, array $options = array())
+    public function charge($amount, array $options = [])
     {
         return (new StripeGateway($this))->charge($amount, $options);
     }
@@ -50,7 +50,8 @@ trait Billable
     /**
      * Get a new billing gateway instance for the given plan.
      *
-     * @param  string|null  $plan
+     * @param string|null $plan
+     *
      * @return \Laravel\Cashier\StripeGateway
      */
     public function subscription($plan = null)
@@ -70,7 +71,8 @@ trait Billable
     /**
      * Find an invoice by ID.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return \Laravel\Cashier\Invoice|null
      */
     public function findInvoice($id)
@@ -85,7 +87,8 @@ trait Billable
     /**
      * Find an invoice or throw a 404 error.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return \Laravel\Cashier\Invoice
      */
     public function findInvoiceOrFail($id)
@@ -102,8 +105,9 @@ trait Billable
     /**
      * Get an SplFileInfo instance for a given invoice.
      *
-     * @param  string  $id
-     * @param  array  $data
+     * @param string $id
+     * @param array  $data
+     *
      * @return \SplFileInfo
      */
     public function invoiceFile($id, array $data)
@@ -114,8 +118,9 @@ trait Billable
     /**
      * Create an invoice download Response.
      *
-     * @param  string  $id
-     * @param  array   $data
+     * @param string $id
+     * @param array  $data
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function downloadInvoice($id, array $data)
@@ -126,10 +131,11 @@ trait Billable
     /**
      * Get an array of the entity's invoices.
      *
-     * @param  array  $parameters
+     * @param array $parameters
+     *
      * @return array
      */
-    public function invoices($parameters = array())
+    public function invoices($parameters = [])
     {
         return $this->subscription()->invoices(false, $parameters);
     }
@@ -147,7 +153,8 @@ trait Billable
     /**
      * Update customer's credit card.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return void
      */
     public function updateCard($token)
@@ -158,7 +165,8 @@ trait Billable
     /**
      * Apply a coupon to the billable entity.
      *
-     * @param  string  $coupon
+     * @param string $coupon
+     *
      * @return void
      */
     public function applyCoupon($coupon)
@@ -241,7 +249,8 @@ trait Billable
     /**
      * Determine if the entity is on the given plan.
      *
-     * @param  string  $plan
+     * @param string $plan
+     *
      * @return bool
      */
     public function onPlan($plan)
@@ -286,7 +295,8 @@ trait Billable
     /**
      * Set whether the entity has a current Stripe subscription.
      *
-     * @param  bool  $active
+     * @param bool $active
+     *
      * @return \Laravel\Cashier\Contracts\Billable
      */
     public function setStripeIsActive($active = true)
@@ -343,7 +353,8 @@ trait Billable
     /**
      * Set the Stripe ID for the entity.
      *
-     * @param  string  $stripe_id
+     * @param string $stripe_id
+     *
      * @return \Laravel\Cashier\Contracts\Billable
      */
     public function setStripeId($stripe_id)
@@ -366,7 +377,8 @@ trait Billable
     /**
      * Set the current subscription ID.
      *
-     * @param  string  $subscription_id
+     * @param string $subscription_id
+     *
      * @return \Laravel\Cashier\Contracts\Billable
      */
     public function setStripeSubscription($subscription_id)
@@ -389,7 +401,8 @@ trait Billable
     /**
      * Set the Stripe plan ID.
      *
-     * @param  string  $plan
+     * @param string $plan
+     *
      * @return \Laravel\Cashier\Contracts\Billable
      */
     public function setStripePlan($plan)
@@ -434,7 +447,8 @@ trait Billable
     /**
      * Set the date on which the trial ends.
      *
-     * @param  \DateTime|null  $date
+     * @param \DateTime|null $date
+     *
      * @return \Laravel\Cashier\Contracts\Billable
      */
     public function setTrialEndDate($date)
@@ -457,7 +471,8 @@ trait Billable
     /**
      * Set the subscription end date for the entity.
      *
-     * @param  \DateTime|null  $date
+     * @param \DateTime|null $date
+     *
      * @return \Laravel\Cashier\Contracts\Billable
      */
     public function setSubscriptionEndDate($date)
@@ -490,7 +505,8 @@ trait Billable
     /**
      * Format the given currency for display, without the currency symbol.
      *
-     * @param  int  $amount
+     * @param int $amount
+     *
      * @return mixed
      */
     public function formatCurrency($amount)
@@ -501,7 +517,8 @@ trait Billable
     /**
      * Add the currency symbol to a given amount.
      *
-     * @param  string  $amount
+     * @param string $amount
+     *
      * @return string
      */
     public function addCurrencySymbol($amount)
@@ -522,7 +539,8 @@ trait Billable
     /**
      * Set the Stripe API key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return void
      */
     public static function setStripeKey($key)

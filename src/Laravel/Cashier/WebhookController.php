@@ -7,11 +7,9 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class WebhookController extends Controller
 {
-
     /**
      * Handle a Stripe webhook call.
      *
@@ -37,7 +35,8 @@ class WebhookController extends Controller
     /**
      * Verify with Stripe that the event is genuine.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return bool
      */
     protected function eventExistsOnStripe($id)
@@ -52,7 +51,8 @@ class WebhookController extends Controller
     /**
      * Handle a failed payment from a Stripe subscription.
      *
-     * @param  array  $payload
+     * @param array $payload
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleInvoicePaymentFailed(array $payload)
@@ -71,7 +71,8 @@ class WebhookController extends Controller
     /**
      * Determine if the invoice has too many failed attempts.
      *
-     * @param  array  $payload
+     * @param array $payload
+     *
      * @return bool
      */
     protected function tooManyFailedPayments(array $payload)
@@ -82,7 +83,8 @@ class WebhookController extends Controller
     /**
      * Get the billable entity instance by Stripe ID.
      *
-     * @param  string  $stripeId
+     * @param string $stripeId
+     *
      * @return \Laravel\Cashier\Contracts\Billable
      */
     protected function getBillable($stripeId)
@@ -103,10 +105,11 @@ class WebhookController extends Controller
     /**
      * Handle calls to missing methods on the controller.
      *
-     * @param  array   $parameters
+     * @param array $parameters
+     *
      * @return mixed
      */
-    public function missingMethod($parameters = array())
+    public function missingMethod($parameters = [])
     {
         return new Response;
     }

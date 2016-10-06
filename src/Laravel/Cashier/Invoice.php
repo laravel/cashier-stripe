@@ -10,7 +10,6 @@ use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class Invoice
 {
-
     /**
      * The billable instance.
      *
@@ -35,8 +34,9 @@ class Invoice
     /**
      * Create a new invoice instance.
      *
-     * @param  \Laravel\Cashier\Contracts\Billable  $billable
+     * @param \Laravel\Cashier\Contracts\Billable $billable
      * @param  object
+     *
      * @return void
      */
     public function __construct(BillableContract $billable, $invoice)
@@ -57,9 +57,10 @@ class Invoice
     }
 
     /**
-     * Get the total amount for the line item in the currency symbol of your choice
+     * Get the total amount for the line item in the currency symbol of your choice.
      *
-     * @param  string $symbol The Symbol you want to show
+     * @param string $symbol The Symbol you want to show
+     *
      * @return string
      */
     public function totalWithCurrency()
@@ -114,7 +115,8 @@ class Invoice
     /**
      * Get all of the line items by a given type.
      *
-     * @param  string  $type
+     * @param string $type
+     *
      * @return array
      */
     public function lineItemsByType($type)
@@ -221,7 +223,8 @@ class Invoice
     /**
      * Get a Carbon date for the invoice.
      *
-     * @param  \DateTimeZone|string  $timezone
+     * @param \DateTimeZone|string $timezone
+     *
      * @return \Carbon\Carbon
      */
     public function date($timezone = null)
@@ -234,7 +237,8 @@ class Invoice
     /**
      * Get a human readable date for the invoice.
      *
-     * @param  \DateTimeZone|string  $timezone
+     * @param \DateTimeZone|string $timezone
+     *
      * @return string
      */
     public function dateString($timezone = null)
@@ -245,8 +249,9 @@ class Invoice
     /**
      * Get an SplFileInfo instance for the invoice with the given data.
      *
-     * @param  array  $data
-     * @param  string|null  $storagePath
+     * @param array       $data
+     * @param string|null $storagePath
+     *
      * @return \SplFileInfo
      */
     public function file(array $data, $storagePath = null)
@@ -257,7 +262,8 @@ class Invoice
     /**
      * Get the View instance for the invoice.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return \Illuminate\View\View
      */
     public function view(array $data)
@@ -270,7 +276,8 @@ class Invoice
     /**
      * Get the rendered HTML content of the invoice view.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return string
      */
     public function render(array $data)
@@ -281,8 +288,9 @@ class Invoice
     /**
      * Create an invoice download response.
      *
-     * @param  array   $data
-     * @param  string  $storagePath
+     * @param array  $data
+     * @param string $storagePath
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function download(array $data, $storagePath = null)
@@ -306,8 +314,9 @@ class Invoice
     /**
      * Write the raw PDF bytes for the invoice via PhantomJS.
      *
-     * @param  array  $data
-     * @param  string  $storagePath
+     * @param array  $data
+     * @param string $storagePath
+     *
      * @return string
      */
     protected function writeInvoice(array $data, $storagePath)
@@ -326,8 +335,9 @@ class Invoice
     /**
      * Write the view HTML so PhantomJS can access it.
      *
-     * @param  array  $data
-     * @param  string  $storagePath
+     * @param array  $data
+     * @param string $storagePath
+     *
      * @return string
      */
     protected function writeViewForImaging(array $data, $storagePath)
@@ -342,7 +352,8 @@ class Invoice
     /**
      * Get the PhantomJS process instance.
      *
-     * @param  string  $viewPath
+     * @param string $viewPath
+     *
      * @return \Symfony\Component\Process\Process
      */
     public function getPhantomProcess($viewPath)
@@ -357,7 +368,8 @@ class Invoice
     /**
      * Get the filename for the invoice download.
      *
-     * @param  string  $prefix
+     * @param string $prefix
+     *
      * @return string
      */
     protected function getDownloadFilename($prefix)
@@ -371,6 +383,7 @@ class Invoice
      * Set the filesystem instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem
+     *
      * @return \Laravel\Cashier\Invoice
      */
     public function setFiles(Filesystem $files)
@@ -413,7 +426,8 @@ class Invoice
     /**
      * Get the binary extension for the system.
      *
-     * @param  string  $system
+     * @param string $system
+     *
      * @return string
      */
     protected function getExtension($system)
@@ -424,7 +438,8 @@ class Invoice
     /**
      * Dynamically get values from the Stripe invoice.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function __get($key)
@@ -435,8 +450,9 @@ class Invoice
     /**
      * Dynamically set values on the Stripe invoice.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function __set($key, $value)

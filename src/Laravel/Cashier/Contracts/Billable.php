@@ -4,7 +4,6 @@ use DateTime;
 
 interface Billable
 {
-
     /**
      * Get the name that should be shown on the entity's invoices.
      *
@@ -22,7 +21,8 @@ interface Billable
     /**
      * Get a new billing builder instance for the given plan.
      *
-     * @param  string|null  $plan
+     * @param string|null $plan
+     *
      * @return \Laravel\Cashier\Builder
      */
     public function subscription($plan = null);
@@ -37,7 +37,8 @@ interface Billable
     /**
      * Find an invoice by ID.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return \Laravel\Cashier\Invoice|null
      */
     public function findInvoice($id);
@@ -45,15 +46,17 @@ interface Billable
     /**
      * Get an array of the entity's invoices.
      *
-     * @param  array  $parameters
+     * @param array $parameters
+     *
      * @return array
      */
-    public function invoices($parameters = array());
+    public function invoices($parameters = []);
 
     /**
      * Apply a coupon to the billable entity.
      *
-     * @param  string  $coupon
+     * @param string $coupon
+     *
      * @return void
      */
     public function applyCoupon($coupon);
@@ -82,7 +85,8 @@ interface Billable
     /**
      * Determine if the entity is on the given plan.
      *
-     * @param  string  $plan
+     * @param string $plan
+     *
      * @return bool
      */
     public function onPlan($plan);
@@ -111,7 +115,8 @@ interface Billable
     /**
      * Set whether the entity has a current Stripe subscription.
      *
-     * @param  bool  $active
+     * @param bool $active
+     *
      * @return \Laravel\Cashier\Contracts\Billable
      */
     public function setStripeIsActive($active = true);
@@ -133,7 +138,8 @@ interface Billable
     /**
      * Set the Stripe ID for the entity.
      *
-     * @param  string  $stripe_id
+     * @param string $stripe_id
+     *
      * @return \Laravel\Cashier\Contracts\Billable
      */
     public function setStripeId($stripe_id);
@@ -148,7 +154,8 @@ interface Billable
     /**
      * Set the current subscription ID.
      *
-     * @param  string  $subscription_id
+     * @param string $subscription_id
+     *
      * @return \Laravel\Cashier\Contracts\Billable
      */
     public function setStripeSubscription($subscription_id);
@@ -184,7 +191,8 @@ interface Billable
     /**
      * Set the subscription end date for the entity.
      *
-     * @param  \DateTime|null  $date
+     * @param \DateTime|null $date
+     *
      * @return void
      */
     public function setSubscriptionEndDate($date);
@@ -206,7 +214,8 @@ interface Billable
     /**
      * Format the given currency for display, without the currency symbol.
      *
-     * @param  int  $amount
+     * @param int $amount
+     *
      * @return mixed
      */
     public function formatCurrency($amount);
@@ -214,7 +223,8 @@ interface Billable
     /**
      * Add the currency symbol to a given amount.
      *
-     * @param  string  $amount
+     * @param string $amount
+     *
      * @return string
      */
     public function addCurrencySymbol($amount);

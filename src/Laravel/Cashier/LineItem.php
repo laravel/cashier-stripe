@@ -4,7 +4,6 @@ use Laravel\Cashier\Contracts\Billable as BillableContract;
 
 class LineItem
 {
-
     /**
      * The billable instance.
      *
@@ -22,8 +21,9 @@ class LineItem
     /**
      * Create a new line item instance.
      *
-     * @param  Billable  $billable
-     * @param  object  $stripeLine
+     * @param Billable $billable
+     * @param object   $stripeLine
+     *
      * @return void
      */
     public function __construct(BillableContract $billable, $stripeLine)
@@ -35,7 +35,8 @@ class LineItem
     /**
      * Get the total amount for the line item in dollars.
      *
-     * @param  string $symbol The Symbol you want to show
+     * @param string $symbol The Symbol you want to show
+     *
      * @return string
      */
     public function dollars()
@@ -114,7 +115,8 @@ class LineItem
     /**
      * Dynamically access the Stripe line item instance.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function __get($key)
@@ -125,8 +127,9 @@ class LineItem
     /**
      * Dynamically set values on the Stripe line item instance.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return mixed
      */
     public function __set($key, $value)
