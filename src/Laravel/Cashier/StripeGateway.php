@@ -451,7 +451,7 @@ class StripeGateway
     {
         $customer = $this->getStripeCustomer();
 
-        $card = $customer->cards->create(['card' => $token]);
+        $card = $customer->sources->create(['card' => $token]);
 
         $customer->default_card = $card->id;
 
