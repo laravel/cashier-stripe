@@ -234,7 +234,7 @@ class Invoice
     public function view(array $data)
     {
         return View::make('cashier::receipt', array_merge(
-            $data, ['invoice' => $this, 'owner' => $this->owner]
+            $data, ['invoice' => $this, 'owner' => $this->owner, 'user' => $this->owner]
         ));
     }
 

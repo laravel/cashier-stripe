@@ -55,9 +55,9 @@ class Subscription extends Model
     public function owner()
     {
         $model = getenv('STRIPE_MODEL') ?: config('services.stripe.model', 'User');
-        $foreignKey = Str::snake(class_basename($model)).'_id';
+        $model = new $model;
 
-        return $this->belongsTo($model, $foreignKey);
+        return $this->belongsTo(get_class($model), $model->getForeignKey());
     }
 
     /**
