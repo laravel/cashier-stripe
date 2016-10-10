@@ -18,8 +18,9 @@ You will need to set the following details locally and on your Stripe account in
 
 #### .env
 
-    STRIPE_API_KEY=
+    STRIPE_KEY=
     STRIPE_SECRET=
+    STRIPE_MODEL=User
 
 ### Stripe
 
