@@ -29,8 +29,8 @@ class InvoiceItem
      */
     public function __construct($owner, $item)
     {
-        $this->owner = $owner;
         $this->item = $item;
+        $this->owner = $owner;
     }
 
     /**

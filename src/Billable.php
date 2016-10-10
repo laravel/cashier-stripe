@@ -337,7 +337,7 @@ trait Billable
 
         // If the given token already has the card as their default source, we can just
         // bail out of the method now. We don't need to keep adding the same card to
-        // the model's account each time we go through this particular method call.
+        // a model's account every time we go through this particular method call.
         if ($token->card->id === $customer->default_source) {
             return;
         }
@@ -348,9 +348,9 @@ trait Billable
 
         $customer->save();
 
-        // Next, we will get the default source for this model so we can update the last
-        // four digits and the card brand on this model's record in the database, which
-        // is convenient when displaying on the front-end when updating the cards.
+        // Next we will get the default source for this model so we can update the last
+        // four digits and the card brand on the record in the database. This allows
+        // us to display the information on the front-end when updating the cards.
         $source = $customer->default_source
                     ? $customer->sources->retrieve($customer->default_source)
                     : null;

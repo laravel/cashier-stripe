@@ -72,9 +72,9 @@ class SubscriptionBuilder
      */
     public function __construct($owner, $name, $plan)
     {
-        $this->owner = $owner;
         $this->name = $name;
         $this->plan = $plan;
+        $this->owner = $owner;
     }
 
     /**
