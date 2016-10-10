@@ -171,6 +171,8 @@ class Subscription extends Model
         $subscription = $this->asStripeSubscription();
 
         $subscription->quantity = $quantity;
+        
+        $subscription->prorate = $this->prorate;
 
         $subscription->save();
 
