@@ -105,7 +105,6 @@ trait Billable
         return StripeInvoiceItem::create(
             $options, ['api_key' => $this->getStripeKey()]
         );
-
     }
 
     /**
@@ -123,7 +122,6 @@ trait Billable
         $this->invoiceForUpcoming($description, $amount, $options);
 
         return $this->invoice();
-
     }
 
     /**
