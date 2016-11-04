@@ -79,16 +79,17 @@ trait Billable
     }
 
     /**
-     * Invoice the customer for the given amount.
+     * Invoice the customer for the given amount without generating an invoice,
+     * so that the invoice item will be included the next time an invoice is generated.
      *
      * @param  string  $description
      * @param  int  $amount
      * @param  array  $options
-     * @return bool
+     * @return \Stripe\InvoiceItem
      *
      * @throws \Stripe\Error\Card
      */
-    public function invoiceFor($description, $amount, array $options = [])
+    public function invoiceForUpcoming($description, $amount, array $options = [])
     {
         if (! $this->stripe_id) {
             throw new InvalidArgumentException(class_basename($this).' is not a Stripe customer. See the createAsStripeCustomer method.');
@@ -101,11 +102,28 @@ trait Billable
             'description' => $description,
         ], $options);
 
-        StripeInvoiceItem::create(
+        return StripeInvoiceItem::create(
             $options, ['api_key' => $this->getStripeKey()]
         );
 
+    }
+
+    /**
+     * Invoice the customer for the given amount and generate an invoice immediately.
+     *
+     * @param  string  $description
+     * @param  int  $amount
+     * @param  array  $options
+     * @return bool
+     *
+     * @throws \Stripe\Error\Card
+     */
+    public function invoiceFor($description, $amount, array $options = [])
+    {
+        $this->invoiceForUpcoming($description, $amount, $options);
+
         return $this->invoice();
+
     }
 
     /**
