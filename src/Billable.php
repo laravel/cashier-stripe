@@ -79,8 +79,7 @@ trait Billable
     }
 
     /**
-     * Invoice the customer for the given amount without generating an invoice,
-     * so that the invoice item will be included the next time an invoice is generated.
+     * Add an invoice item to the customer's upcoming invoice.
      *
      * @param  string  $description
      * @param  int  $amount
@@ -89,7 +88,7 @@ trait Billable
      *
      * @throws \Stripe\Error\Card
      */
-    public function invoiceForUpcoming($description, $amount, array $options = [])
+    public function tab($description, $amount, array $options = [])
     {
         if (! $this->stripe_id) {
             throw new InvalidArgumentException(class_basename($this).' is not a Stripe customer. See the createAsStripeCustomer method.');
@@ -119,7 +118,7 @@ trait Billable
      */
     public function invoiceFor($description, $amount, array $options = [])
     {
-        $this->invoiceForUpcoming($description, $amount, $options);
+        $this->tab($description, $amount, $options);
 
         return $this->invoice();
     }
