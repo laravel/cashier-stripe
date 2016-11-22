@@ -68,6 +68,7 @@ class SubscriptionBuilder
      * @param  mixed  $owner
      * @param  string  $name
      * @param  string  $plan
+     * @return void
      */
     public function __construct($owner, $name, $plan)
     {
