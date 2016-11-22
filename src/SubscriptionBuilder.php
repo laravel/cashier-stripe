@@ -65,10 +65,9 @@ class SubscriptionBuilder
     /**
      * Create a new subscription builder instance.
      *
-     * @param  mixed  $user
+     * @param  mixed  $owner
      * @param  string  $name
      * @param  string  $plan
-     * @return void
      */
     public function __construct($owner, $name, $plan)
     {
