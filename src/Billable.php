@@ -339,6 +339,43 @@ trait Billable
     }
 
     /**
+     * Get a collection of the entity's cards.
+     *
+     * @param  array  $parameters
+     * @return \Illuminate\Support\Collection
+     */
+    public function cards($parameters = [])
+    {
+        $cards = [];
+
+        $parameters = array_merge(['limit' => 24], $parameters);
+
+        $stripeCards = $this->asStripeCustomer()->sources->all(
+            ['object' => 'card'] + $parameters
+        );
+
+        if (! is_null($stripeCards)) {
+            foreach ($stripeCards->data as $card) {
+                $cards[] = new Card($this, $card);
+            }
+        }
+
+        return new Collection($cards);
+    }
+
+    /**
+     * Deletes the entity's cards.
+     *
+     * @return void
+     */
+    public function deleteCard()
+    {
+        $this->cards()->each(function ($card) {
+            $card->delete();
+        });
+    }
+
+    /**
      * Update customer's credit card.
      *
      * @param  string  $token
