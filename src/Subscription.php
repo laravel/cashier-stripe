@@ -215,6 +215,8 @@ class Subscription extends Model
     /**
      * Force the trial to end immediately.
      *
+     * This method must be combined with swap, resume, etc.
+     *
      * @return $this
      */
     public function skipTrial()
