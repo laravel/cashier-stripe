@@ -364,18 +364,6 @@ trait Billable
     }
 
     /**
-     * Deletes the entity's cards.
-     *
-     * @return void
-     */
-    public function deleteCard()
-    {
-        $this->cards()->each(function ($card) {
-            $card->delete();
-        });
-    }
-
-    /**
      * Update customer's credit card.
      *
      * @param  string  $token
@@ -456,6 +444,18 @@ trait Billable
         }
 
         return $this;
+    }
+
+    /**
+     * Deletes the entity's cards.
+     *
+     * @return void
+     */
+    public function deleteCards()
+    {
+        $this->cards()->each(function ($card) {
+            $card->delete();
+        });
     }
 
     /**
