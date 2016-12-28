@@ -1,10 +1,11 @@
-# Laravel Cashier
+<p align="center"><img src="https://laravel.com/assets/img/components/logo-cashier.svg"></p>
 
-[![Build Status](https://travis-ci.org/laravel/cashier.svg)](https://travis-ci.org/laravel/cashier)
-[![Total Downloads](https://poser.pugx.org/laravel/cashier/d/total.svg)](https://packagist.org/packages/laravel/cashier)
-[![Latest Stable Version](https://poser.pugx.org/laravel/cashier/v/stable.svg)](https://packagist.org/packages/laravel/cashier)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/cashier/v/unstable.svg)](https://packagist.org/packages/laravel/cashier)
-[![License](https://poser.pugx.org/laravel/cashier/license.svg)](https://packagist.org/packages/laravel/cashier)
+<p align="center">
+<a href="https://travis-ci.org/laravel/cashier"><img src="https://travis-ci.org/laravel/cashier.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/cashier"><img src="https://poser.pugx.org/laravel/cashier/d/total.svg" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/cashier"><img src="https://poser.pugx.org/laravel/cashier/v/stable.svg" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/cashier"><img src="https://poser.pugx.org/laravel/cashier/license.svg" alt="License"></a>
+</p>
 
 ## Introduction
 
