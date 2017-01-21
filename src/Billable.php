@@ -188,6 +188,11 @@ trait Billable
             return $value->created_at->getTimestamp();
         })
         ->first(function ($key, $value) use ($subscription) {
+            // here we will inspect if the $key is Subscription (this will true for laravel 5.3)
+            if ($key instanceof Subscription) {
+                return $key->name === $subscription;
+            }
+            // if laravel 5.2 then $value will be Subscription object
             return $value->name === $subscription;
         });
     }
