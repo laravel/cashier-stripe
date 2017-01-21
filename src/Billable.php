@@ -211,7 +211,13 @@ trait Billable
     {
         if ($this->stripe_id) {
             try {
-                return StripeInvoice::create(['customer' => $this->stripe_id], $this->getStripeKey())->pay();
+                $options = ['customer' => $this->stripe_id];
+
+                if ($taxPercentage = $this->taxPercentage()) {
+                    $options['tax_percent'] = $taxPercentage;
+                }
+
+                return StripeInvoice::create($options, $this->getStripeKey())->pay();
             } catch (StripeErrorInvalidRequest $e) {
                 return false;
             }
