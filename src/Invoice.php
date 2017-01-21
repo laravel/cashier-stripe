@@ -312,4 +312,14 @@ class Invoice
     {
         return $this->invoice->{$key};
     }
+    
+    /**
+     * Return a description for a single charge.
+     *
+     * @return string
+     */
+    public function paymentDescription()
+    {
+        return $this->invoice->lines['data'][0]->description;
+    }
 }
