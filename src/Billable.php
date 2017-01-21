@@ -5,6 +5,7 @@ namespace Laravel\Cashier;
 use Exception;
 use Carbon\Carbon;
 use InvalidArgumentException;
+use Stripe\Card as StripeCard;
 use Stripe\Token as StripeToken;
 use Stripe\Charge as StripeCharge;
 use Stripe\Refund as StripeRefund;
@@ -13,6 +14,7 @@ use Stripe\Invoice as StripeInvoice;
 use Stripe\Customer as StripeCustomer;
 use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
+use Stripe\Token;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait Billable
@@ -23,6 +25,11 @@ trait Billable
      * @var string
      */
     protected static $stripeKey;
+
+    /**
+     * @var \Stripe\Customer
+     */
+    protected $stripeCustomer;
 
     /**
      * Make a "one off" charge on the customer for the given amount.
@@ -75,7 +82,7 @@ trait Billable
      */
     public function hasCardOnFile()
     {
-        return (bool) $this->card_brand;
+        return (bool) $this->cards()->count();
     }
 
     /**
@@ -324,68 +331,178 @@ trait Billable
     }
 
     /**
-     * Update customer's credit card.
+     * Determines if the user has the card already, by fingerprint.
      *
-     * @param  string  $token
-     * @return void
+     * @param string  $fingerprint
+     * @return bool|\Stripe\Card
      */
-    public function updateCard($token)
+    public function hasCardByFingerprint($fingerprint)
     {
         $customer = $this->asStripeCustomer();
 
-        $token = StripeToken::retrieve($token, ['api_key' => $this->getStripeKey()]);
+        $cards = collect($customer->sources->data);
 
-        // If the given token already has the card as their default source, we can just
-        // bail out of the method now. We don't need to keep adding the same card to
-        // the user's account each time we go through this particular method call.
-        if ($token->card->id === $customer->default_source) {
-            return;
+        if ($card = $cards->where('fingerprint', $fingerprint)->first()) {
+            if (property_exists($card, 'deleted') && $card->deleted) {
+                return false;
+            }
+
+            return $card;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determines if the user has the card already, by card ID.
+     *
+     * @param string  $cardId
+     * @return bool|\Stripe\Card
+     */
+    public function hasCard($cardId)
+    {
+        if ($card = $this->cards()->where('card_id', $cardId)->first()) {
+            return $card->asStripeCard();
+        }
+
+        return false;
+    }
+
+    /**
+     * Adds a given card to a user.
+     *
+     * @param $token
+     * @param bool  $default
+     * @return Card
+     */
+    public function addCard($token, $default = true)
+    {
+        $customer = $this->asStripeCustomer();
+
+        if (! $token instanceof Token) {
+            $token = $this->retrieveToken($token);
+        }
+
+        if ($card = $this->hasCardByFingerprint($token->card->fingerprint)) {
+            if ($default) {
+                $this->default_card = $card->id;
+                $this->save();
+            }
+
+            return $this;
         }
 
         $card = $customer->sources->create(['source' => $token]);
 
-        $customer->default_source = $card->id;
+        $newCardModel = $this->cards()->create([
+            'card_id' => $card->id,
+            'fingerprint' => $card->fingerprint,
+            'brand' => $card->brand,
+            'last_four' => $card->last4,
+        ]);
+
+        if ($default) {
+            $this->default_card = $card->id;
+            $customer->default_source = $card->id;
+        }
 
         $customer->save();
-
-        // Next, we will get the default source for this user so we can update the last
-        // four digits and the card brand on this user record in the database, which
-        // is convenient when displaying on the front-end when updating the cards.
-        $source = $customer->default_source
-                    ? $customer->sources->retrieve($customer->default_source)
-                    : null;
-
-        $this->fillCardDetails($source);
-
         $this->save();
+
+        return $newCardModel;
     }
 
     /**
-     * Synchronises the customer's card from Stripe back into the database.
+     * Update customer's credit card. Removes all cards, adds the
+     * new one and sets it as default.
      *
+     * @param  string  $token
      * @return $this
      */
-    public function updateCardFromStripe()
+    public function updateCard($token)
+    {
+        $token = $this->retrieveToken($token);
+
+        $this->removeAllCards();
+
+        $this->addCard($token);
+
+        return $this;
+    }
+
+    /**
+     * Removes the card from the customer.
+     *
+     * @param string  $cardId
+     * @return $this
+     */
+    public function removeCard($cardId)
     {
         $customer = $this->asStripeCustomer();
 
-        $defaultCard = null;
-
-        foreach ($customer->sources->data as $card) {
-            if ($card->id === $customer->default_source) {
-                $defaultCard = $card;
+        /** @var StripeCard $item */
+        foreach ($customer->sources->data as $item) {
+            if ($item->id === $cardId) {
+                $item->delete();
                 break;
             }
         }
 
-        if ($defaultCard) {
-            $this->fillCardDetails($defaultCard)->save();
-        } else {
-            $this->forceFill([
-                'card_brand' => null,
-                'card_last_four' => null,
-            ])->save();
+        if ($this->default_card === $cardId) {
+            $this->default_card = null;
         }
+
+        $this->cards()->where('card_id', $cardId)->delete();
+
+        return $this;
+    }
+
+    /**
+     * Deletes all the customer's cards from his Stripe account.
+     *
+     * @return $this
+     */
+    public function removeAllCards()
+    {
+        $customer = $this->asStripeCustomer();
+
+        $this->cards()->delete();
+        $this->default_card = null;
+
+        $this->save();
+
+        foreach ($customer->sources->data as $card) {
+            $card->delete();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Synchronises the customer's cards from Stripe back into the database.
+     *
+     * @return $this
+     */
+    public function updateCardsFromStripe()
+    {
+        $customer = $this->asStripeCustomer();
+
+        $this->cards()->delete();
+        $this->default_card = null;
+
+        foreach ($customer->sources->data as $card) {
+            $id = $this->cards()->create([
+                'card_id' => $card->id,
+                'brand' => $card->brand,
+                'last_four' => $card->last4,
+            ]);
+
+            if ($card->id === $customer->default_source) {
+                $this->default_card = $id;
+            }
+        }
+
+        $this->save();
 
         return $this;
     }
@@ -399,8 +516,13 @@ trait Billable
     protected function fillCardDetails($card)
     {
         if ($card) {
-            $this->card_brand = $card->brand;
-            $this->card_last_four = $card->last4;
+            $id = $this->cards()->create([
+                'card_id' => $card->id,
+                'brand' => $card->brand,
+                'last_four' => $card->last4,
+            ]);
+
+            $this->default_card = $id;
         }
 
         return $this;
@@ -475,7 +597,7 @@ trait Billable
      * @param  array  $options
      * @return StripeCustomer
      */
-    public function createAsStripeCustomer($token, array $options = [])
+    public function createAsStripeCustomer($token = null, array $options = [])
     {
         $options = array_key_exists('email', $options)
                 ? $options : array_merge($options, ['email' => $this->email]);
@@ -502,13 +624,66 @@ trait Billable
     }
 
     /**
+     * Get all of the cards for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function cards()
+    {
+        return $this->hasMany(Card::class, 'user_id')->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get the user's default card.
+     *
+     * @return \Laravel\Cashier\Card|null
+     */
+    public function defaultCard()
+    {
+        return $this->cards()->where('card_id', $this->default_card)->first();
+    }
+
+    /**
+     * Sets the default card for the user.
+     *
+     * @param string|\Laravel\Cashier\Card|\Stripe\Card  $cardId
+     * @return bool
+     */
+    public function setDefaultCard($cardId)
+    {
+        if ($cardId instanceof \Laravel\Cashier\Card
+           || $cardId instanceof \Stripe\Card) {
+            $cardId = $cardId->card_id;
+        }
+
+        if (! $this->hasCard($cardId)) {
+            return false;
+        }
+
+        $customer = $this->asStripeCustomer();
+
+        $customer->default_source = $cardId;
+        $customer->save();
+
+        $this->default_card = $cardId;
+
+        return $this->save();
+    }
+
+    /**
      * Get the Stripe customer for the user.
      *
-     * @return \Stripe\Customer
+     * @param bool  $fresh
+     *
+     * @return StripeCustomer
      */
-    public function asStripeCustomer()
+    public function asStripeCustomer($fresh = false)
     {
-        return StripeCustomer::retrieve($this->stripe_id, $this->getStripeKey());
+        if ($fresh || ! $this->stripeCustomer) {
+            $this->stripeCustomer = StripeCustomer::retrieve($this->stripe_id, static::getStripeKey());
+        }
+
+        return $this->stripeCustomer;
     }
 
     /**
@@ -558,5 +733,17 @@ trait Billable
     public static function setStripeKey($key)
     {
         static::$stripeKey = $key;
+    }
+
+    /**
+     * Retrieves the token.
+     *
+     * @param string  $token
+     *
+     * @return StripeToken
+     */
+    protected function retrieveToken($token)
+    {
+        return StripeToken::retrieve($token, ['api_key' => static::getStripeKey()]);
     }
 }

@@ -33,8 +33,17 @@ class CashierTest extends PHPUnit_Framework_TestCase
             $table->string('email');
             $table->string('name');
             $table->string('stripe_id')->nullable();
-            $table->string('card_brand')->nullable();
-            $table->string('card_last_four')->nullable();
+            $table->string('default_card')->nullable();
+            $table->timestamps();
+        });
+
+        $this->schema()->create('cards', function ($table) {
+            $table->increments('id');
+            $table->integer('user_id')->index();
+            $table->string('card_id')->index();
+            $table->string('fingerprint')->index();
+            $table->string('last_four');
+            $table->integer('brand');
             $table->timestamps();
         });
 
@@ -54,6 +63,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
     public function tearDown()
     {
         $this->schema()->drop('users');
+        $this->schema()->drop('cards');
         $this->schema()->drop('subscriptions');
     }
 
@@ -290,6 +300,55 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1000, $refund->amount);
     }
 
+    public function test_multiple_cards()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+        $user->createAsStripeCustomer();
+
+        // Add card
+        $card = $user->addCard($this->getTestToken());
+        $this->assertNotFalse($user->hasCardByFingerprint($card->fingerprint));
+        $this->assertNotFalse($user->hasCard($card->card_id));
+        $this->assertFalse($user->hasCard('card_000000000000'));
+        $this->assertEquals(1, $user->cards()->count());
+        $this->assertEquals($user->defaultCard()->card_id, $card->card_id);
+
+        // Remove card
+        $user->removeCard($card->card_id);
+        $this->assertFalse($user->hasCardByFingerprint($card->fingerprint));
+        $this->assertFalse($user->hasCard($card->card_id));
+        $this->assertEquals(0, $user->cards()->count());
+
+        // Add same card multiple times
+        $user->addCard($this->getTestToken());
+        $user->addCard($this->getTestToken());
+        $user->addCard($this->getTestToken());
+        $this->assertEquals(1, $user->cards()->count());
+
+        // Add multiple cards
+        $user->addCard($this->getTestToken());
+        $default = $user->addCard($this->getOtherTestToken());
+        $this->assertEquals(2, $user->cards()->count());
+        $this->assertEquals($default->card_id, $user->defaultCard()->card_id);
+
+        // Remove all cards
+        $user->removeAllCards();
+        $this->assertEquals(0, $user->cards()->count());
+        $this->assertNull($user->defaultCard());
+
+        // Set user's default card
+        $card1 = $user->addCard($this->getTestToken());
+        $card2 = $user->addCard($this->getOtherTestToken());
+        $this->assertEquals($card2->card_id, $user->defaultCard()->card_id);
+        $user->setDefaultCard($card1->card_id);
+        $this->assertEquals($card1->card_id, $user->defaultCard()->card_id);
+        $customer = $user->asStripeCustomer();
+        $this->assertEquals($card1->card_id, $customer->default_source);
+    }
+
     protected function getTestToken()
     {
         return Stripe\Token::create([
@@ -298,6 +357,18 @@ class CashierTest extends PHPUnit_Framework_TestCase
                 'exp_month' => 5,
                 'exp_year' => 2020,
                 'cvc' => '123',
+            ],
+        ], ['api_key' => getenv('STRIPE_SECRET')])->id;
+    }
+
+    protected function getOtherTestToken()
+    {
+        return Stripe\Token::create([
+            'card' => [
+                'number' => '5555555555554444',
+                'exp_month' => 4,
+                'exp_year' => 2025,
+                'cvc' => '321',
             ],
         ], ['api_key' => getenv('STRIPE_SECRET')])->id;
     }
