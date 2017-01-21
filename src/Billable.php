@@ -187,7 +187,11 @@ trait Billable
         return $this->subscriptions->sortByDesc(function ($value) {
             return $value->created_at->getTimestamp();
         })
-        ->first(function ($key, $value) use ($subscription) {
+        ->first(function ($value, $key) use ($subscription) {
+            if ($key instanceof Subscription) {
+                $value = $key;
+            }
+
             return $value->name === $subscription;
         });
     }
