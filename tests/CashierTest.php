@@ -203,6 +203,38 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
     }
 
+    public function test_creating_subscription_with_explicit_trial()
+    {
+        $user = User::create([
+             'email' => 'taylor@laravel.com',
+             'name' => 'Taylor Otwell',
+        ]);
+
+        // Create Subscription
+        $user->newSubscription('main', 'monthly-10-1')
+             ->trialUntil(Carbon::tomorrow()->hour(3)->minute(15))->create($this->getTestToken());
+
+        $subscription = $user->subscription('main');
+
+        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->onTrial());
+        $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
+
+        // Cancel Subscription
+        $subscription->cancel();
+
+        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->onGracePeriod());
+
+        // Resume Subscription
+        $subscription->resume();
+
+        $this->assertTrue($subscription->active());
+        $this->assertFalse($subscription->onGracePeriod());
+        $this->assertTrue($subscription->onTrial());
+        $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
+    }
+
     public function test_applying_coupons_to_existing_customers()
     {
         $user = User::create([
