@@ -35,6 +35,13 @@ class SubscriptionBuilder
     protected $quantity = 1;
 
     /**
+     * The date and time the trial will expire.
+     *
+     * @var \Carbon\Carbon
+     */
+    protected $trialExpires;
+
+    /**
      * Indicates that the trial should end immediately.
      *
      * @var bool
@@ -54,11 +61,6 @@ class SubscriptionBuilder
      * @var array|null
      */
     protected $metadata;
-
-    /**
-     * @var Carbon
-     */
-    protected $trialExpires;
 
     /**
      * Create a new subscription builder instance.
@@ -104,7 +106,7 @@ class SubscriptionBuilder
     /**
      * Specify the ending date of the trial.
      *
-     * @param Carbon $trialUntil
+     * @param  \Carbon\Carbon  $trialUntil
      * @return $this
      */
     public function trialUntil(Carbon $trialUntil)
