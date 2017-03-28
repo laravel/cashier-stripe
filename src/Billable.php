@@ -187,8 +187,17 @@ trait Billable
             return $subscription->valid();
         }
 
-        return $subscription->valid() &&
-               $subscription->stripe_plan === $plan;
+        if ($subscription->valid() && $subscription->stripe_plan === $plan) {
+            return true;
+        }
+
+        $plan = $this->subscriptionItem($plan);
+
+        if (!is_null($plan) && $subscription->valid()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -492,6 +501,9 @@ trait Billable
             if ($subscription->stripe_plan === $plan) {
                 return true;
             }
+            if ($subscription->hasItem($plan)) {
+                return true;
+            }
         }
 
         return false;
@@ -505,9 +517,13 @@ trait Billable
      */
     public function onPlan($plan)
     {
-        return ! is_null($this->subscriptions->first(function ($value) use ($plan) {
-            return $value->stripe_plan === $plan && $value->valid();
-        }));
+        $subscription = $this->subscriptionByPlan($plan);
+
+        if (!is_null($subscription)) {
+            return $subscription->valid();
+        }
+
+        return false;
     }
 
     /**
@@ -610,5 +626,96 @@ trait Billable
     public static function setStripeKey($key)
     {
         static::$stripeKey = $key;
+    }
+
+    /**
+     * Begin creating a new multisubscription.
+     *
+     * @param  string  $subscription
+     * @param  string  $plan
+     * @return \Laravel\Cashier\SubscriptionBuilder
+     */
+    public function newMultisubscription()
+    {
+        return new MultisubscriptionBuilder($this);
+    }
+
+    /**
+     * Get all the subscription items for the user
+     */
+    public function subscriptionItems()
+    {
+        return $this->hasManyThrough(SubscriptionItem::class, Subscription::class)->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Gets a subscription item instance by name.
+     *
+     * @param  string  $plan
+     * @return \Laravel\Cashier\SubscriptionItem|null
+     */
+    public function subscriptionItem($plan)
+    {
+        $itemsTable = (new SubscriptionItem)->getTable();
+        return $this->subscriptionItems()->where($itemsTable.'.stripe_plan', $plan)->orderBy($itemsTable.'.created_at', 'desc')->first();
+    }
+
+    /**
+     * Adds a plan to the model's subscription
+     *
+     * @param string $plan The plan's ID
+     * @param integer $quantity The plan's quantity
+     * @param string $subscription The subscription's name
+     * @return \Laravel\Cashier\Subscription
+     */
+    public function addPlan($plan, $prorate = true, $quantity = 1, $subscription = 'default')
+    {
+        $subscription = $this->subscription($subscription);
+
+        if (!is_null($subscription)) {
+            return $subscription->addItem($plan, $prorate, $quantity);
+        }
+
+        return $this->newMultisubscription($subscription)->addPlan($plan, $prorate, $quantity)->create();
+    }
+
+    /**
+     * Removes a plan from the model's subscription
+     *
+     * @param string $plan The plan's ID
+     * @return \Laravel\Cashier\Subscription|null
+     */
+    public function removePlan($plan, $prorate = true, $subscription = 'default')
+    {
+        $subscription = $this->subscription($subscription);
+
+        if (is_null($subscription)) {
+            return null;
+        }
+
+        return $subscription->removeItem($plan, $prorate);
+    }
+
+    /**
+     * Gets the subscription that contains the given plan
+     *
+     * @param string $plan The plan's ID
+     * @return \Laravel\Cashier\Subscription|null
+     */
+    public function subscriptionByPlan($plan)
+    {
+        $subscription = $this->subscriptions()->where('stripe_plan', $plan)->first();
+
+        if (!is_null($subscription)) {
+            return $subscription;
+        }
+
+        $item = $this->subscriptionItem($plan);
+
+        if (is_null($item)) {
+            return null;
+        }
+
+        return $item->subscription;
     }
 }
