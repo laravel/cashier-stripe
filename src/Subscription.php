@@ -163,10 +163,9 @@ class Subscription extends Model
      * Update the quantity of the subscription.
      *
      * @param  int  $quantity
-     * @param  \Stripe\Customer|null  $customer
      * @return $this
      */
-    public function updateQuantity($quantity, $customer = null)
+    public function updateQuantity($quantity)
     {
         $subscription = $this->asStripeSubscription();
 
@@ -337,6 +336,10 @@ class Subscription extends Model
         if (! $this->onGracePeriod()) {
             throw new LogicException('Unable to resume subscription that is not within grace period.');
         }
+        
+        if (!$this->subscriptionItems->isEmpty()) {
+            throw new LogicException("Cannot update using plan parameter when multiple plans exist on the subscription. Updates must be made to individual items instead.");
+        }
 
         $subscription = $this->asStripeSubscription();
 
@@ -369,5 +372,95 @@ class Subscription extends Model
     public function asStripeSubscription()
     {
         return $this->user->asStripeCustomer()->subscriptions->retrieve($this->stripe_id);
+    }
+    
+    /**
+     * Get the subscription items for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function subscriptionItems()
+    {
+        return $this->hasMany(SubscriptionItem::class, $this->getForeignKey())->orderBy('created_at', 'desc');
+    }
+    
+    /**
+     * Adds a plan to the subscription
+     *
+     * @param string $plan The added plan's ID
+     * @param integer $quantity The quantity to be added
+     * @return $this
+     */
+    public function addItem($plan, $prorate = true, $quantity = 1)
+    {
+        // retrieves the subscription stored at Stripe
+        $stripeSubscription = $this->asStripeSubscription();
+        
+        // adds the new item at Stripe
+        $stripeSubscriptionItem = $stripeSubscription->items->create([
+            'plan' => $plan,
+            'prorate' => $prorate,
+            'quantity' => $quantity,
+        ]);
+        
+        // saves the new item in the database
+        $this->subscriptionItems()->create([
+            'stripe_id' => $stripeSubscriptionItem->id,
+            'stripe_plan' => $plan,
+            'quantity' => $quantity,
+        ]);
+        
+        return $this;
+    }
+    
+    /**
+     * Adds a plan from the subscription
+     *
+     * @param string $plan The removed plan's ID
+     * @return $this
+     */
+    public function removeItem($plan, $prorate = true)
+    {
+        $item = $this->subscriptionItems()->where('stripe_plan', $plan)->first();
+        
+        if (is_null($item)) {
+            // item not found
+            return $this;
+        }
+        
+        // retrieves the item stored at Stripe
+        $stripeItem = $item->asStripeSubscriptionItem();
+        
+        // deletes the item at Stripe
+        $stripeItem->delete([
+            'prorate' => $prorate,
+        ]);
+        
+        // removes the item from the database
+        $this->subscriptionItems()->where('stripe_plan', $plan)->delete();
+        
+        return $this;
+    }
+    
+    /**
+     * Gets the item by name
+     *
+     * @param string $plan The plan's ID
+     * @return Laravel\Cashier\SubscriptionItem|null
+     */
+    public function subscriptionItem($plan)
+    {
+        return $this->subscriptionItems()->where('stripe_plan', $plan)->first();
+    }
+    
+    /**
+     * Determines if the subscription contains the given plan
+     * 
+     * @param string $plan The plan's ID
+     * @return bool
+     */
+    public function hasItem($plan)
+    {
+        return !!$this->subscriptionItem($plan);
     }
 }
