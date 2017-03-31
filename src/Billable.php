@@ -401,6 +401,36 @@ trait Billable
     }
 
     /**
+     * Replace Customers Card by deleting the existing default source.
+     * and adding the new card as the source
+     *
+     * @return $this
+     */
+    public function replaceCard($token)
+    {
+        $customer = $this->asStripeCustomer();
+        $token = StripeToken::retrieve($token, ['api_key' => $this->getStripeKey()]);
+        // If the given token already has the card as their default source, we can just
+        // bail out of the method now. We don't need to keep adding the same card to
+        // a model's account every time we go through this particular method call.
+        if ($token->card->id === $customer->default_source) {
+            return;
+        }
+        //  Just pass `source: tok_xxx` to delete the previous default source and
+        //  set a new source. Any past_due invoices will be automatically retried after this
+        $customer->source = $token;
+        $customer->save();
+        // Next we will get the default source for this model so we can update the last
+        // four digits and the card brand on the record in the database. This allows
+        // us to display the information on the front-end when updating the cards.
+        $source = $customer->default_source
+                    ? $customer->sources->retrieve($customer->default_source)
+                    : null;
+        $this->fillCardDetails($source);
+        $this->save();
+    }
+
+    /**
      * Synchronises the customer's card from Stripe back into the database.
      *
      * @return $this
