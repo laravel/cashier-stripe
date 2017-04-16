@@ -1,5 +1,9 @@
 # Cashier Change Log
 
+## Version 3.0.0 (Upcoming)
+
+- Upgraded to Laravel 5, dropping Laravel 4 support.
+
 ## Version 2.0.4
 
 - Allow user to pass paramaters when fetching invoices.
