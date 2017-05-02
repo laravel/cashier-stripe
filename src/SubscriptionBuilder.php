@@ -98,7 +98,7 @@ class SubscriptionBuilder
      */
     public function trialDays($trialDays)
     {
-        $this->setTrialExpires(Carbon::now()->addDays($trialDays))
+        $this->setTrialExpires(Carbon::now()->addDays($trialDays));
 
         return $this;
     }
