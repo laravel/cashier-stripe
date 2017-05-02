@@ -98,7 +98,7 @@ class SubscriptionBuilder
      */
     public function trialDays($trialDays)
     {
-        $this->trialExpires = Carbon::now()->addDays($trialDays);
+        $this->setTrialExpires(Carbon::now()->addDays($trialDays))
 
         return $this;
     }
@@ -111,8 +111,8 @@ class SubscriptionBuilder
      */
     public function trialUntil(Carbon $trialUntil)
     {
-        $this->trialExpires = $trialUntil;
-
+        $this->setTrialExpires($trialUntil);
+        
         return $this;
     }
 
@@ -258,6 +258,21 @@ class SubscriptionBuilder
     {
         if ($taxPercentage = $this->owner->taxPercentage()) {
             return $taxPercentage;
+        }
+    }
+    
+    /**
+     * Sets the date/time the trial will expire and ensures it is in the future.
+     *
+     * @param  Carbon\Carbon  $trialEnd
+     * @return null
+     */
+    protected function setTrialExpires(Carbon $trialEnd)
+    {
+        if ($trialEnd->isFuture()) {
+            $this->trialExpires = $trialEnd;
+        } else {
+            $this->trialExpires = null;
         }
     }
 }
