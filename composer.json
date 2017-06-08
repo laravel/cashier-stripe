@@ -34,6 +34,11 @@
     "extra": {
         "branch-alias": {
             "dev-master": "8.0-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Laravel\\Cashier\\CashierServiceProvider"
+            ]
         }
     },
     "minimum-stability": "dev",
