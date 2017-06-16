@@ -6,9 +6,9 @@ use Exception;
 use Carbon\Carbon;
 use InvalidArgumentException;
 use Stripe\Token as StripeToken;
+use Illuminate\Support\Collection;
 use Stripe\Charge as StripeCharge;
 use Stripe\Refund as StripeRefund;
-use Illuminate\Support\Collection;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\Customer as StripeCustomer;
 use Stripe\InvoiceItem as StripeInvoiceItem;
@@ -31,7 +31,7 @@ trait Billable
      * @param  array  $options
      * @return \Stripe\Charge
      *
-     * @throws \Stripe\Error\Card
+     * @throws \InvalidArgumentException
      */
     public function charge($amount, array $options = [])
     {
@@ -59,7 +59,7 @@ trait Billable
      * @param  array  $options
      * @return \Stripe\Charge
      *
-     * @throws \Stripe\Error\Refund
+     * @throws \InvalidArgumentException
      */
     public function refund($charge, array $options = [])
     {
@@ -86,7 +86,7 @@ trait Billable
      * @param  array  $options
      * @return \Stripe\InvoiceItem
      *
-     * @throws \Stripe\Error\Card
+     * @throws \InvalidArgumentException
      */
     public function tab($description, $amount, array $options = [])
     {
@@ -112,9 +112,7 @@ trait Billable
      * @param  string  $description
      * @param  int  $amount
      * @param  array  $options
-     * @return bool
-     *
-     * @throws \Stripe\Error\Card
+     * @return \Laravel\Cashier\Invoice|bool
      */
     public function invoiceFor($description, $amount, array $options = [])
     {
@@ -220,7 +218,7 @@ trait Billable
     /**
      * Invoice the billable entity outside of regular billing cycle.
      *
-     * @return StripeInvoice|bool
+     * @return \Stripe\Invoice|bool
      */
     public function invoice()
     {
@@ -289,7 +287,7 @@ trait Billable
      * Create an invoice download Response.
      *
      * @param  string  $id
-     * @param  array   $data
+     * @param  array  $data
      * @param  string  $storagePath
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -433,7 +431,7 @@ trait Billable
     /**
      * Fills the model's properties with the source from Stripe.
      *
-     * @param \Stripe\Card|null  $card
+     * @param  \Stripe\Card|null  $card
      * @return $this
      */
     protected function fillCardDetails($card)
@@ -525,7 +523,7 @@ trait Billable
      *
      * @param  string  $token
      * @param  array  $options
-     * @return StripeCustomer
+     * @return \Stripe\Customer
      */
     public function createAsStripeCustomer($token, array $options = [])
     {

@@ -194,7 +194,7 @@ class Invoice
     }
 
     /**
-     * Get all of the invoie items by a given type.
+     * Get all of the invoice items by a given type.
      *
      * @param  string  $type
      * @return array
@@ -268,7 +268,7 @@ class Invoice
     /**
      * Create an invoice download response.
      *
-     * @param  array   $data
+     * @param  array  $data
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function download(array $data)
