@@ -194,7 +194,7 @@ class Invoice
     }
 
     /**
-     * Get all of the invoie items by a given type.
+     * Get all of the invoice items by a given type.
      *
      * @param  string  $type
      * @return array

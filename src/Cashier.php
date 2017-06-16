@@ -46,6 +46,7 @@ class Cashier
      *
      * @param  string  $currency
      * @return string
+     * @throws \Exception
      */
     protected static function guessCurrencySymbol($currency)
     {
