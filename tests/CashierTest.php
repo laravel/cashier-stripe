@@ -15,7 +15,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         if (file_exists(__DIR__.'/../.env')) {
-            $dotenv = new Dotenv\Dotenv(__DIR__.'/../');
+            $dotenv = new \Dotenv\Dotenv(__DIR__.'/../');
             $dotenv->load();
         }
     }
