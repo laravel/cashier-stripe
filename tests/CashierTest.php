@@ -1,10 +1,14 @@
 <?php
 
+namespace Laravel\Cashier\Tests;
+
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use PHPUnit_Framework_TestCase;
+use Laravel\Cashier\Tests\Fixtures\User;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Laravel\Cashier\Http\Controllers\WebhookController;
+use Laravel\Cashier\Tests\Fixtures\CashierTestControllerStub;
 
 class CashierTest extends PHPUnit_Framework_TestCase
 {
@@ -324,7 +328,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
 
     protected function getTestToken()
     {
-        return Stripe\Token::create([
+        return \Stripe\Token::create([
             'card' => [
                 'number' => '4242424242424242',
                 'exp_month' => 5,
@@ -345,18 +349,5 @@ class CashierTest extends PHPUnit_Framework_TestCase
     protected function connection()
     {
         return Eloquent::getConnectionResolver()->connection();
-    }
-}
-
-class User extends Eloquent
-{
-    use Laravel\Cashier\Billable;
-}
-
-class CashierTestControllerStub extends WebhookController
-{
-    protected function eventExistsOnStripe($id)
-    {
-        return true;
     }
 }
