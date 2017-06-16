@@ -268,7 +268,7 @@ class Invoice
     /**
      * Create an invoice download response.
      *
-     * @param  array   $data
+     * @param  array  $data
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function download(array $data)

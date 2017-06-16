@@ -95,7 +95,7 @@ class WebhookController extends Controller
     /**
      * Handle calls to missing methods on the controller.
      *
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function missingMethod($parameters = [])

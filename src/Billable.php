@@ -6,9 +6,9 @@ use Exception;
 use Carbon\Carbon;
 use InvalidArgumentException;
 use Stripe\Token as StripeToken;
+use Illuminate\Support\Collection;
 use Stripe\Charge as StripeCharge;
 use Stripe\Refund as StripeRefund;
-use Illuminate\Support\Collection;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\Customer as StripeCustomer;
 use Stripe\InvoiceItem as StripeInvoiceItem;
@@ -287,7 +287,7 @@ trait Billable
      * Create an invoice download Response.
      *
      * @param  string  $id
-     * @param  array   $data
+     * @param  array  $data
      * @param  string  $storagePath
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -431,7 +431,7 @@ trait Billable
     /**
      * Fills the model's properties with the source from Stripe.
      *
-     * @param \Stripe\Card|null  $card
+     * @param  \Stripe\Card|null  $card
      * @return $this
      */
     protected function fillCardDetails($card)
