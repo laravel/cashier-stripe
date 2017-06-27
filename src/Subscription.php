@@ -373,8 +373,9 @@ class Subscription extends Model
     public function asStripeSubscription()
     {
         $subscriptions = $this->user->asStripeCustomer()->subscriptions;
+
         if (! $subscriptions) {
-            throw new LogicException('Unable to retrieve subscription. Stripe customer has no any subscriptions');
+            throw new LogicException('The Stripe customer does not have any subscriptions.');
         }
 
         return $subscriptions->retrieve($this->stripe_id);
