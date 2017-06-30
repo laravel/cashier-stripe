@@ -134,6 +134,17 @@ trait Billable
     }
 
     /**
+     * Begin creating a new subscription.
+     *
+     * @param  array $subscriptions
+     * @return \Laravel\Cashier\SubscriptionsBuilder
+     */
+    public function newSubscriptions($subscriptions)
+    {
+        return new SubscriptionsBuilder($this, $subscriptions, '');
+    }
+
+    /**
      * Determine if the Stripe model is on trial.
      *
      * @param  string  $subscription
