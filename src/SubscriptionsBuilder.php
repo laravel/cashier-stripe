@@ -50,7 +50,7 @@ class SubscriptionsBuilder extends SubscriptionBuilder
         }
 
         $lastItem = null;
-        foreach($this->names AS $name) {
+        foreach ($this->names as $name) {
             $tmpItem = [
                 'name' => $name['name'],
                 'stripe_id' => $subscription->id,
@@ -66,14 +66,14 @@ class SubscriptionsBuilder extends SubscriptionBuilder
     }
 
     /**
-     * Process data into the assoc arrays
+     * Process data into the assoc arrays.
      *
      * @param array $plans
      */
     protected function _processPlans(array $plans)
     {
         if(! empty($plans)) {
-            foreach($plans AS $plan) {
+            foreach ($plans AS $plan) {
 
                 if (! isset($plan['plan'])) {
                     continue;
@@ -115,5 +115,4 @@ class SubscriptionsBuilder extends SubscriptionBuilder
             'items' => $this->plans,
         ]);
     }
-    
 }
