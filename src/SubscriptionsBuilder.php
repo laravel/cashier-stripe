@@ -72,8 +72,8 @@ class SubscriptionsBuilder extends SubscriptionBuilder
      */
     protected function _processPlans(array $plans)
     {
-        if(! empty($plans)) {
-            foreach ($plans AS $plan) {
+        if (! empty($plans)) {
+            foreach ($plans as $plan) {
 
                 if (! isset($plan['plan'])) {
                     continue;
