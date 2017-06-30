@@ -2,20 +2,18 @@
 
 namespace Laravel\Cashier;
 
-use Carbon\Carbon;
-
 class SubscriptionsBuilder extends SubscriptionBuilder
 {
 
     /**
-     * Array of plans being subscribed too
+     * Array of plans being subscribed too.
      *
      * @var array
      */
     protected $plans = [];
 
     /**
-     * Array of the plans being subscribed too
+     * Array of the plans being subscribed too.
      *
      * @var array
      */
@@ -74,21 +72,21 @@ class SubscriptionsBuilder extends SubscriptionBuilder
      */
     protected function _processPlans(array $plans)
     {
-        if(!empty($plans)) {
+        if(! empty($plans)) {
             foreach($plans AS $plan) {
 
-                if(!isset($plan['plan'])) {
+                if (! isset($plan['plan'])) {
                     continue;
                 }
 
-                if(!isset($plan['quantity'])) {
+                if (! isset($plan['quantity'])) {
                     continue;
                 }
 
-                if(!isset($plan['subscription'])) {
+                if (! isset($plan['subscription'])) {
                     continue;
                 }
-                
+
                 $this->plans[] = [
                     'plan' => $plan['plan'],
                     'quantity' => $plan['quantity'],
@@ -103,7 +101,7 @@ class SubscriptionsBuilder extends SubscriptionBuilder
     }
 
     /**
-     * Overwrite Payload class
+     * Overwrite Payload class.
      *
      * @return array
      */
@@ -117,4 +115,5 @@ class SubscriptionsBuilder extends SubscriptionBuilder
             'items' => $this->plans,
         ]);
     }
+    
 }

@@ -141,7 +141,7 @@ trait Billable
      */
     public function newSubscriptions($subscriptions)
     {
-        return new SubscriptionsBuilder($this, $subscriptions, "");
+        return new SubscriptionsBuilder($this, $subscriptions, '');
     }
 
     /**
