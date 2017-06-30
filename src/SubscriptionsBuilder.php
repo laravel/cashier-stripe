@@ -4,7 +4,6 @@ namespace Laravel\Cashier;
 
 class SubscriptionsBuilder extends SubscriptionBuilder
 {
-
     /**
      * Array of plans being subscribed too.
      *
@@ -62,6 +61,7 @@ class SubscriptionsBuilder extends SubscriptionBuilder
             // Seems to struggle when bundling multiple items through create?
             $lastItem = $this->owner->subscriptions()->create($tmpItem);
         }
+
         return $lastItem;
     }
 
@@ -74,7 +74,6 @@ class SubscriptionsBuilder extends SubscriptionBuilder
     {
         if (! empty($plans)) {
             foreach ($plans as $plan) {
-
                 if (! isset($plan['plan'])) {
                     continue;
                 }
