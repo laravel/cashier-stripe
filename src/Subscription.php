@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * Class Subscription
  *
  * @package Laravel\Cashier
- * @property-read HasGatewayId|Billable|Model $owner
+ * @property-read UsesPaymentGateway|Billable|Model $owner
  * @method static swap(string $plan)
  * @method static cancel()
  * @method static cancelNow()
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Subscription extends Model
 {
-    use HasGatewayId;
+    use UsesPaymentGateway;
 
     /**
      * The attributes that are not mass assignable.
@@ -151,7 +151,7 @@ class Subscription extends Model
 
     public function getPaymentGatewayPlanAttribute()
     {
-        // FIXME
+        // FIXME There needs to be a way to specify what gateway
     }
 
     public function createAsCustomer($gateway, $token, array $options = [])
@@ -187,10 +187,5 @@ class Subscription extends Model
         }
 
         return $this->subscriptionManager;
-    }
-
-    protected function getGateway()
-    {
-        return Cashier::gateway($this->getPaymentGatewayAttribute());
     }
 }

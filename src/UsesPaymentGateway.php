@@ -2,7 +2,7 @@
 
 namespace Laravel\Cashier;
 
-trait HasGatewayId
+trait UsesPaymentGateway
 {
     public function getPaymentGatewayAttribute()
     {
@@ -32,5 +32,10 @@ trait HasGatewayId
         }
 
         return $this->getAttribute('payment_gateway_id');
+    }
+
+    protected function getGateway()
+    {
+        return Cashier::gateway($this->getPaymentGatewayAttribute());
     }
 }

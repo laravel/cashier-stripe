@@ -2,72 +2,72 @@
 
 namespace Laravel\Cashier;
 
-use Exception;
 use Carbon\Carbon;
-use InvalidArgumentException;
-use Stripe\Token as StripeToken;
+use Exception;
 use Illuminate\Support\Collection;
-use Stripe\Charge as StripeCharge;
-use Stripe\Refund as StripeRefund;
-use Stripe\Invoice as StripeInvoice;
+use InvalidArgumentException;
+use Laravel\Cashier\Gateway\StripeGateway;
 use Stripe\Customer as StripeCustomer;
-use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
+use Stripe\Invoice as StripeInvoice;
+use Stripe\InvoiceItem as StripeInvoiceItem;
+use Stripe\Refund as StripeRefund;
+use Stripe\Token as StripeToken;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Trait Billable
+ *
+ * @package Laravel\Cashier
+ * @mixin \Illuminate\Database\Eloquent\Model
+ */
 trait Billable
 {
-    use HasGatewayId;
+    use UsesPaymentGateway;
 
     /**
-     * The Stripe API key.
+     * Set the Stripe API key.
      *
-     * @var string
+     * @param  string $key
+     * @return void
      */
-    protected static $stripeKey;
+    public static function setStripeKey($key)
+    {
+        StripeGateway::setApiKey($key);
+    }
+
+    /**
+     * Get the Stripe API key.
+     *
+     * @return string
+     */
+    public static function getStripeKey()
+    {
+        return StripeGateway::getApiKey();
+    }
 
     /**
      * Make a "one off" charge on the customer for the given amount.
      *
-     * @param  int  $amount
-     * @param  array  $options
-     * @return \Stripe\Charge
-     *
-     * @throws \InvalidArgumentException
+     * @param  int $amount
+     * @param  array $options
+     * @return \Stripe\Charge|array
      */
     public function charge($amount, array $options = [])
     {
-        $options = array_merge([
-            'currency' => $this->preferredCurrency(),
-        ], $options);
-
-        $options['amount'] = $amount;
-
-        if (! array_key_exists('source', $options) && $this->stripe_id) {
-            $options['customer'] = $this->stripe_id;
-        }
-
-        if (! array_key_exists('source', $options) && ! array_key_exists('customer', $options)) {
-            throw new InvalidArgumentException('No payment source provided.');
-        }
-
-        return StripeCharge::create($options, ['api_key' => $this->getStripeKey()]);
+        return $this->getGateway()->charge($amount, $options);
     }
 
     /**
      * Refund a customer for a charge.
      *
-     * @param  string  $charge
-     * @param  array  $options
-     * @return \Stripe\Charge
-     *
-     * @throws \InvalidArgumentException
+     * @param  string $charge
+     * @param  array $options
+     * @return \Stripe\Charge|mixed
      */
     public function refund($charge, array $options = [])
     {
-        $options['charge'] = $charge;
-
-        return StripeRefund::create($options, ['api_key' => $this->getStripeKey()]);
+        return $this->getGateway()->refund($charge, $options);
     }
 
     /**
@@ -83,63 +83,68 @@ trait Billable
     /**
      * Add an invoice item to the customer's upcoming invoice.
      *
-     * @param  string  $description
-     * @param  int  $amount
-     * @param  array  $options
+     * @param  string $description
+     * @param  int $amount
+     * @param  array $options
      * @return \Stripe\InvoiceItem
      *
      * @throws \InvalidArgumentException
      */
     public function tab($description, $amount, array $options = [])
     {
-        if (! $this->stripe_id) {
-            throw new InvalidArgumentException(class_basename($this).' is not a Stripe customer. See the createAsStripeCustomer method.');
-        }
-
-        $options = array_merge([
-            'customer' => $this->stripe_id,
-            'amount' => $amount,
-            'currency' => $this->preferredCurrency(),
-            'description' => $description,
-        ], $options);
-
-        return StripeInvoiceItem::create(
-            $options, ['api_key' => $this->getStripeKey()]
-        );
+        return $this->getGateway()->tab($description, $amount, $options);
     }
 
     /**
      * Invoice the customer for the given amount and generate an invoice immediately.
      *
-     * @param  string  $description
-     * @param  int  $amount
-     * @param  array  $options
+     * @param  string $description
+     * @param  int $amount
+     * @param  array $options
      * @return \Laravel\Cashier\Invoice|bool
      */
     public function invoiceFor($description, $amount, array $options = [])
     {
-        $this->tab($description, $amount, $options);
+        return $this->getGateway()->invoiceFor($description, $amount, $options);
+    }
 
-        return $this->invoice();
+    /**
+     * Get the Stripe supported currency used by the entity.
+     *
+     * @return string
+     */
+    public function preferredCurrency()
+    {
+        return Cashier::usesCurrency();
+    }
+
+    /**
+     * Invoice the billable entity outside of regular billing cycle.
+     *
+     * @return \Stripe\Invoice|bool
+     */
+    public function invoice()
+    {
+        // FIXME
     }
 
     /**
      * Begin creating a new subscription.
      *
-     * @param  string  $subscription
-     * @param  string  $plan
+     * @param  string $subscription
+     * @param  string $plan
      * @return \Laravel\Cashier\SubscriptionBuilder
      */
     public function newSubscription($subscription, $plan)
     {
-        return new SubscriptionBuilder($this, $subscription, $plan);
+        $this->getGateway()->buildSubscription($this, $subscription, $plan);
     }
 
     /**
      * Determine if the Stripe model is on trial.
      *
-     * @param  string  $subscription
-     * @param  string|null  $plan
+     * @param  string $subscription
+     * @param  string|null $plan
      * @return bool
      */
     public function onTrial($subscription = 'default', $plan = null)
@@ -154,8 +159,7 @@ trait Billable
             return $subscription && $subscription->onTrial();
         }
 
-        return $subscription && $subscription->onTrial() &&
-               $subscription->stripe_plan === $plan;
+        return $subscription && $subscription->onTrial() && $subscription->getPaymentGatewayPlanAttribute() === $plan;
     }
 
     /**
@@ -169,10 +173,25 @@ trait Billable
     }
 
     /**
+     * Get a subscription instance by name.
+     *
+     * @param  string $subscription
+     * @return \Laravel\Cashier\Subscription|null
+     */
+    public function subscription($subscription = 'default')
+    {
+        return $this->subscriptions->sortByDesc(function ($value) {
+            return $value->created_at->getTimestamp();
+        })->first(function ($value) use ($subscription) {
+                return $value->name === $subscription;
+            });
+    }
+
+    /**
      * Determine if the Stripe model has a given subscription.
      *
-     * @param  string  $subscription
-     * @param  string|null  $plan
+     * @param  string $subscription
+     * @param  string|null $plan
      * @return bool
      */
     public function subscribed($subscription = 'default', $plan = null)
@@ -187,24 +206,7 @@ trait Billable
             return $subscription->valid();
         }
 
-        return $subscription->valid() &&
-               $subscription->stripe_plan === $plan;
-    }
-
-    /**
-     * Get a subscription instance by name.
-     *
-     * @param  string  $subscription
-     * @return \Laravel\Cashier\Subscription|null
-     */
-    public function subscription($subscription = 'default')
-    {
-        return $this->subscriptions->sortByDesc(function ($value) {
-            return $value->created_at->getTimestamp();
-        })
-        ->first(function ($value) use ($subscription) {
-            return $value->name === $subscription;
-        });
+        return $subscription->valid() && $subscription->getPaymentGatewayPlanAttribute() === $plan;
     }
 
     /**
@@ -218,34 +220,15 @@ trait Billable
     }
 
     /**
-     * Invoice the billable entity outside of regular billing cycle.
-     *
-     * @return \Stripe\Invoice|bool
-     */
-    public function invoice()
-    {
-        if ($this->stripe_id) {
-            try {
-                return StripeInvoice::create(['customer' => $this->stripe_id], $this->getStripeKey())->pay();
-            } catch (StripeErrorInvalidRequest $e) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Get the entity's upcoming invoice.
      *
      * @return \Laravel\Cashier\Invoice|null
      */
     public function upcomingInvoice()
     {
+        // FIXME: Not in braintree
         try {
-            $stripeInvoice = StripeInvoice::upcoming(
-                ['customer' => $this->stripe_id], ['api_key' => $this->getStripeKey()]
-            );
+            $stripeInvoice = StripeInvoice::upcoming(['customer' => $this->stripe_id], ['api_key' => $this->getStripeKey()]);
 
             return new Invoice($this, $stripeInvoice);
         } catch (StripeErrorInvalidRequest $e) {
@@ -254,83 +237,44 @@ trait Billable
     }
 
     /**
-     * Find an invoice by ID.
-     *
-     * @param  string  $id
-     * @return \Laravel\Cashier\Invoice|null
-     */
-    public function findInvoice($id)
-    {
-        try {
-            return new Invoice($this, StripeInvoice::retrieve($id, $this->getStripeKey()));
-        } catch (Exception $e) {
-            //
-        }
-    }
-
-    /**
      * Find an invoice or throw a 404 error.
      *
-     * @param  string  $id
+     * @param  string $id
      * @return \Laravel\Cashier\Invoice
      */
     public function findInvoiceOrFail($id)
     {
-        $invoice = $this->findInvoice($id);
+        return $this->findInvoiceOrFail($id);
+    }
 
-        if (is_null($invoice)) {
-            throw new NotFoundHttpException;
-        }
-
-        return $invoice;
+    /**
+     * Find an invoice by ID.
+     *
+     * @param  string $id
+     * @return \Laravel\Cashier\Invoice|null
+     */
+    public function findInvoice($id)
+    {
+        return $this->findInvoice($id);
     }
 
     /**
      * Create an invoice download Response.
      *
-     * @param  string  $id
-     * @param  array  $data
-     * @param  string  $storagePath
+     * @param  string $id
+     * @param  array $data
+     * @param  string $storagePath
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function downloadInvoice($id, array $data, $storagePath = null)
     {
-        return $this->findInvoiceOrFail($id)->download($data, $storagePath);
-    }
-
-    /**
-     * Get a collection of the entity's invoices.
-     *
-     * @param  bool  $includePending
-     * @param  array  $parameters
-     * @return \Illuminate\Support\Collection
-     */
-    public function invoices($includePending = false, $parameters = [])
-    {
-        $invoices = [];
-
-        $parameters = array_merge(['limit' => 24], $parameters);
-
-        $stripeInvoices = $this->asStripeCustomer()->invoices($parameters);
-
-        // Here we will loop through the Stripe invoices and create our own custom Invoice
-        // instances that have more helper methods and are generally more convenient to
-        // work with than the plain Stripe objects are. Then, we'll return the array.
-        if (! is_null($stripeInvoices)) {
-            foreach ($stripeInvoices->data as $invoice) {
-                if ($invoice->paid || $includePending) {
-                    $invoices[] = new Invoice($this, $invoice);
-                }
-            }
-        }
-
-        return new Collection($invoices);
+        return $this->getGateway()->downloadInvoice($id, $data, $storagePath);
     }
 
     /**
      * Get an array of the entity's invoices.
      *
-     * @param  array  $parameters
+     * @param  array $parameters
      * @return \Illuminate\Support\Collection
      */
     public function invoicesIncludingPending(array $parameters = [])
@@ -339,65 +283,25 @@ trait Billable
     }
 
     /**
-     * Get a collection of the entity's cards.
+     * Get a collection of the entity's invoices.
      *
-     * @param  array  $parameters
+     * @param  bool $includePending
+     * @param  array $parameters
      * @return \Illuminate\Support\Collection
      */
-    public function cards($parameters = [])
+    public function invoices($includePending = false, $parameters = [])
     {
-        $cards = [];
-
-        $parameters = array_merge(['limit' => 24], $parameters);
-
-        $stripeCards = $this->asStripeCustomer()->sources->all(
-            ['object' => 'card'] + $parameters
-        );
-
-        if (! is_null($stripeCards)) {
-            foreach ($stripeCards->data as $card) {
-                $cards[] = new Card($this, $card);
-            }
-        }
-
-        return new Collection($cards);
+        return $this->getGateway()->invoices($includePending, $parameters);
     }
 
     /**
-     * Update customer's credit card.
+     * Get the Stripe customer for the Stripe model.
      *
-     * @param  string  $token
-     * @return void
+     * @return \Stripe\Customer
      */
-    public function updateCard($token)
+    public function asStripeCustomer()
     {
-        $customer = $this->asStripeCustomer();
-
-        $token = StripeToken::retrieve($token, ['api_key' => $this->getStripeKey()]);
-
-        // If the given token already has the card as their default source, we can just
-        // bail out of the method now. We don't need to keep adding the same card to
-        // a model's account every time we go through this particular method call.
-        if ($token->card->id === $customer->default_source) {
-            return;
-        }
-
-        $card = $customer->sources->create(['source' => $token]);
-
-        $customer->default_source = $card->id;
-
-        $customer->save();
-
-        // Next we will get the default source for this model so we can update the last
-        // four digits and the card brand on the record in the database. This allows
-        // us to display the information on the front-end when updating the cards.
-        $source = $customer->default_source
-                    ? $customer->sources->retrieve($customer->default_source)
-                    : null;
-
-        $this->fillCardDetails($source);
-
-        $this->save();
+        return $this->asCustomer('stripe');
     }
 
     /**
@@ -433,7 +337,7 @@ trait Billable
     /**
      * Fills the model's properties with the source from Stripe.
      *
-     * @param  \Stripe\Card|null  $card
+     * @param  \Stripe\Card|null $card
      * @return $this
      */
     protected function fillCardDetails($card)
@@ -459,9 +363,32 @@ trait Billable
     }
 
     /**
+     * Get a collection of the entity's cards.
+     *
+     * @param  array $parameters
+     * @return \Illuminate\Support\Collection
+     */
+    public function cards($parameters = [])
+    {
+        $cards = [];
+
+        $parameters = array_merge(['limit' => 24], $parameters);
+
+        $stripeCards = $this->asStripeCustomer()->sources->all(['object' => 'card'] + $parameters);
+
+        if (! is_null($stripeCards)) {
+            foreach ($stripeCards->data as $card) {
+                $cards[] = new Card($this, $card);
+            }
+        }
+
+        return new Collection($cards);
+    }
+
+    /**
      * Apply a coupon to the billable entity.
      *
-     * @param  string  $coupon
+     * @param  string $coupon
      * @return void
      */
     public function applyCoupon($coupon)
@@ -476,8 +403,8 @@ trait Billable
     /**
      * Determine if the Stripe model is actively subscribed to one of the given plans.
      *
-     * @param  array|string  $plans
-     * @param  string  $subscription
+     * @param  array|string $plans
+     * @param  string $subscription
      * @return bool
      */
     public function subscribedToPlan($plans, $subscription = 'default')
@@ -489,7 +416,7 @@ trait Billable
         }
 
         foreach ((array) $plans as $plan) {
-            if ($subscription->stripe_plan === $plan) {
+            if ($subscription->getPaymentGatewayPlanAttribute() === $plan) {
                 return true;
             }
         }
@@ -500,77 +427,25 @@ trait Billable
     /**
      * Determine if the entity is on the given plan.
      *
-     * @param  string  $plan
+     * @param  string $plan
      * @return bool
      */
     public function onPlan($plan)
     {
-        return ! is_null($this->subscriptions->first(function ($value) use ($plan) {
-            return $value->stripe_plan === $plan && $value->valid();
+        return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($plan) {
+            return $subscription->getPaymentGatewayPlanAttribute() === $plan && $subscription->valid();
         }));
     }
 
     /**
-     * Determine if the entity has a Stripe customer ID.
+     * Update customer's credit card.
      *
-     * @return bool
+     * @param  string $token
+     * @return void
      */
-    public function hasStripeId()
+    public function updateCard($token, array $options = [])
     {
-        return ! is_null($this->stripe_id);
-    }
-
-    /**
-     * Create a Stripe customer for the given Stripe model.
-     *
-     * @param  string  $token
-     * @param  array  $options
-     * @return \Stripe\Customer
-     */
-    public function createAsStripeCustomer($token, array $options = [])
-    {
-        $options = array_key_exists('email', $options)
-                ? $options : array_merge($options, ['email' => $this->email]);
-
-        // Here we will create the customer instance on Stripe and store the ID of the
-        // user from Stripe. This ID will correspond with the Stripe user instances
-        // and allow us to retrieve users from Stripe later when we need to work.
-        $customer = StripeCustomer::create(
-            $options, $this->getStripeKey()
-        );
-
-        $this->stripe_id = $customer->id;
-
-        $this->save();
-
-        // Next we will add the credit card to the user's account on Stripe using this
-        // token that was provided to this method. This will allow us to bill users
-        // when they subscribe to plans or we need to do one-off charges on them.
-        if (! is_null($token)) {
-            $this->updateCard($token);
-        }
-
-        return $customer;
-    }
-
-    /**
-     * Get the Stripe customer for the Stripe model.
-     *
-     * @return \Stripe\Customer
-     */
-    public function asStripeCustomer()
-    {
-        return StripeCustomer::retrieve($this->stripe_id, $this->getStripeKey());
-    }
-
-    /**
-     * Get the Stripe supported currency used by the entity.
-     *
-     * @return string
-     */
-    public function preferredCurrency()
-    {
-        return Cashier::usesCurrency();
+        $this->getGateway()->updateCard($token, $options);
     }
 
     /**
@@ -581,35 +456,6 @@ trait Billable
     public function taxPercentage()
     {
         return 0;
-    }
-
-    /**
-     * Get the Stripe API key.
-     *
-     * @return string
-     */
-    public static function getStripeKey()
-    {
-        if (static::$stripeKey) {
-            return static::$stripeKey;
-        }
-
-        if ($key = getenv('STRIPE_SECRET')) {
-            return $key;
-        }
-
-        return config('services.stripe.secret');
-    }
-
-    /**
-     * Set the Stripe API key.
-     *
-     * @param  string  $key
-     * @return void
-     */
-    public static function setStripeKey($key)
-    {
-        static::$stripeKey = $key;
     }
 
     /**
@@ -624,6 +470,8 @@ trait Billable
         if (method_exists($this, $oldMethodName)) {
             return $this->$oldMethodName($token, $options);
         }
+
+        // FIXME
     }
 
     /**
@@ -636,5 +484,7 @@ trait Billable
         if (method_exists($this, $oldMethodName)) {
             return $this->$oldMethodName();
         }
+
+        return Cashier::gateway($gateway)->asCustomer($this);
     }
 }
