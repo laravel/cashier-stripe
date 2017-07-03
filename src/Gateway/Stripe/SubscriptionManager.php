@@ -22,7 +22,7 @@ class SubscriptionManager extends BaseManager
             throw new LogicException('The Stripe customer does not have any subscriptions.');
         }
 
-        return $subscriptions->retrieve($this->subscription->getPaymentGatewayIdAttribute());
+        return $subscriptions->retrieve($this->subscription->payment_gateway_id);
     }
 
     /**

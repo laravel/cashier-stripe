@@ -79,7 +79,7 @@ class Gateway extends BaseGateway
      */
     public function asCustomer(Billable $billable)
     {
-        return BraintreeCustomer::find($billable->getPaymentGatewayIdAttribute());
+        return BraintreeCustomer::find($billable->payment_gateway_id);
     }
 
     /**
@@ -172,7 +172,7 @@ class Gateway extends BaseGateway
     {
         foreach ($billable->subscriptions as $subscription) {
             if ($subscription->active()) {
-                BraintreeSubscription::update($subscription->getPaymentGatewayIdAttribute(), [
+                BraintreeSubscription::update($subscription->payment_gateway_id, [
                     'paymentMethodToken' => $token,
                 ]);
             }
@@ -317,7 +317,7 @@ class Gateway extends BaseGateway
         try {
             $invoice = BraintreeTransaction::find($id);
 
-            if ($invoice->customerDetails->id != $billable->getPaymentGatewayIdAttribute()) {
+            if ($invoice->customerDetails->id != $billable->payment_gateway_id) {
                 return;
             }
 

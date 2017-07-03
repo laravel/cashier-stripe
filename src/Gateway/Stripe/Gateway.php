@@ -87,7 +87,7 @@ class Gateway extends BaseGateway
      */
     public function asCustomer(Billable $billable)
     {
-        return StripeCustomer::retrieve($billable->getPaymentGatewayIdAttribute(), static::getApiKey());
+        return StripeCustomer::retrieve($billable->payment_gateway_id, static::getApiKey());
     }
 
     /**
@@ -193,8 +193,8 @@ class Gateway extends BaseGateway
 
         $options['amount'] = $this->convertZeroDecimalValue($amount); // FIXME
 
-        if (! array_key_exists('source', $options) && $billable->getPaymentGatewayIdAttribute()) {
-            $options['customer'] = $billable->getPaymentGatewayIdAttribute();
+        if (! array_key_exists('source', $options) && $billable->payment_gateway_id) {
+            $options['customer'] = $billable->payment_gateway_id;
         }
 
         if (! array_key_exists('source', $options) && ! array_key_exists('customer', $options)) {
@@ -230,12 +230,12 @@ class Gateway extends BaseGateway
      */
     public function tab(Billable $billable, $description, $amount, array $options = [])
     {
-        if (! $billable->getPaymentGatewayIdAttribute()) {
+        if (! $billable->payment_gateway_id) {
             throw new InvalidArgumentException(class_basename($this).' is not a Stripe customer. See the createAsStripeCustomer method.');
         }
 
         $options = array_merge([
-            'customer' => $billable->getPaymentGatewayIdAttribute(),
+            'customer' => $billable->payment_gateway_id,
             'amount' => $amount,
             'currency' => $billable->preferredCurrency(),
             'description' => $description,
@@ -270,9 +270,9 @@ class Gateway extends BaseGateway
     {
         // FIXME: not in braintree
 
-        if ($billable->getPaymentGatewayIdAttribute()) {
+        if ($billable->payment_gateway_id) {
             try {
-                return StripeInvoice::create(['customer' => $billable->getPaymentGatewayIdAttribute()], static::getApiKey())->pay();
+                return StripeInvoice::create(['customer' => $billable->payment_gateway_id], static::getApiKey())->pay();
             } catch (StripeErrorInvalidRequest $e) {
                 return false;
             }

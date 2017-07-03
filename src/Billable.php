@@ -133,7 +133,7 @@ trait Billable
             return $subscription && $subscription->onTrial();
         }
 
-        return $subscription && $subscription->onTrial() && $subscription->getPaymentGatewayPlanAttribute() === $plan;
+        return $subscription && $subscription->onTrial() && $subscription->payment_gateway_plan === $plan;
     }
 
     /**
@@ -180,7 +180,7 @@ trait Billable
             return $subscription->valid();
         }
 
-        return $subscription->valid() && $subscription->getPaymentGatewayPlanAttribute() === $plan;
+        return $subscription->valid() && $subscription->payment_gateway_plan === $plan;
     }
 
     /**
@@ -390,7 +390,7 @@ trait Billable
         }
 
         foreach ((array) $plans as $plan) {
-            if ($subscription->getPaymentGatewayPlanAttribute() === $plan) {
+            if ($subscription->payment_gateway_plan === $plan) {
                 return true;
             }
         }
@@ -407,7 +407,7 @@ trait Billable
     public function onPlan($plan)
     {
         return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($plan) {
-            return $subscription->getPaymentGatewayPlanAttribute() === $plan && $subscription->valid();
+            return $subscription->payment_gateway_plan === $plan && $subscription->valid();
         }));
     }
 

@@ -149,11 +149,6 @@ class Subscription extends Model
         $this->fill(['ends_at' => Carbon::now()])->save();
     }
 
-    public function getPaymentGatewayPlanAttribute()
-    {
-        // FIXME There needs to be a way to specify what gateway
-    }
-
     public function createAsCustomer($gateway, $token, array $options = [])
     {
         $oldMethodName = 'createAs'.Str::studly($gateway).'Customer';

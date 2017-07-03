@@ -91,7 +91,7 @@ class SubscriptionManager extends BaseManager
      */
     public function asBraintreeSubscription()
     {
-        return BraintreeSubscription::find($this->subscription->getPaymentGatewayIdAttribute());
+        return BraintreeSubscription::find($this->subscription->payment_gateway_id);
     }
 
     /**
@@ -187,7 +187,7 @@ class SubscriptionManager extends BaseManager
             throw new InvalidArgumentException("Unable to apply coupon. Subscription not active.");
         }
 
-        BraintreeSubscription::update($this->subscription->getPaymentGatewayIdAttribute(), [
+        BraintreeSubscription::update($this->subscription->payment_gateway_id, [
             'discounts' => [
                 'add' => [
                     [
