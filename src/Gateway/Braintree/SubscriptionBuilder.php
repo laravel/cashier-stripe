@@ -5,7 +5,6 @@ namespace Laravel\Cashier\Gateway\Braintree;
 use Braintree\Customer;
 use Braintree\Subscription as BraintreeSubscription;
 use Carbon\Carbon;
-use Laravel\Cashier\Gateway\BraintreeGateway;
 use Laravel\Cashier\SubscriptionBuilder as BaseBuilder;
 
 class SubscriptionBuilder extends BaseBuilder
@@ -112,7 +111,7 @@ class SubscriptionBuilder extends BaseBuilder
      */
     protected function getSubscriptionPayload(Customer $customer, array $options = [])
     {
-        $plan = BraintreeGateway::findPlan($this->plan);
+        $plan = Gateway::findPlan($this->plan);
 
         return array_merge([
             'planId' => $this->plan,

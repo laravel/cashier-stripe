@@ -2,11 +2,10 @@
 
 namespace Laravel\Cashier\Gateway\Braintree;
 
-use Braintree\Subscription as BraintreeSubscription;
 use Braintree\Plan as BraintreePlan;
+use Braintree\Subscription as BraintreeSubscription;
 use Carbon\Carbon;
 use InvalidArgumentException;
-use Laravel\Cashier\Gateway\BraintreeGateway;
 use Laravel\Cashier\SubscriptionManager as BaseManager;
 use LogicException;
 
@@ -29,7 +28,7 @@ class SubscriptionManager extends BaseManager
             return $this->subscription->owner->newSubscription($this->subscription->name, $plan)->skipTrial()->create();
         }
 
-        $plan = BraintreeGateway::findPlan($plan);
+        $plan = Gateway::findPlan($plan);
 
         if ($this->wouldChangeBillingFrequency($plan) && $this->prorate) {
             return $this->swapAcrossFrequencies($plan);
@@ -105,7 +104,7 @@ class SubscriptionManager extends BaseManager
      */
     protected function wouldChangeBillingFrequency(BraintreePlan $plan)
     {
-        return $plan->billingFrequency !== BraintreeGateway::findPlan($this->subscription->braintree_plan)->billingFrequency;
+        return $plan->billingFrequency !== Gateway::findPlan($this->subscription->braintree_plan)->billingFrequency;
     }
 
     /**
@@ -116,7 +115,7 @@ class SubscriptionManager extends BaseManager
      */
     protected function swapAcrossFrequencies(BraintreePlan $plan)
     {
-        $currentPlan = BraintreeGateway::findPlan($this->subscription->braintree_plan);
+        $currentPlan = Gateway::findPlan($this->subscription->braintree_plan);
 
         $discount = $this->switchingToMonthlyPlan($currentPlan, $plan)
             ? $this->getDiscountForSwitchToMonthly($currentPlan, $plan)

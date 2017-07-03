@@ -1,28 +1,25 @@
 <?php
 
-namespace Laravel\Cashier\Gateway;
+namespace Laravel\Cashier\Gateway\Braintree;
 
-use Braintree\Plan as BraintreePlan;
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Cashier\Billable;
-use Laravel\Cashier\Gateway\Braintree\Exception;
-use Laravel\Cashier\Gateway\Braintree\Invoice;
-use Laravel\Cashier\Gateway\Braintree\SubscriptionBuilder;
-use Laravel\Cashier\Gateway\Braintree\SubscriptionManager;
-use Laravel\Cashier\Subscription;
-
-use Illuminate\Support\Arr;
+use Braintree\Customer as BraintreeCustomer;
 use Braintree\PaymentMethod;
 use Braintree\PayPalAccount;
-use InvalidArgumentException;
-use Braintree\TransactionSearch;
-use Illuminate\Support\Collection;
-use Braintree\Customer as BraintreeCustomer;
-use Braintree\Transaction as BraintreeTransaction;
+use Braintree\Plan as BraintreePlan;
 use Braintree\Subscription as BraintreeSubscription;
+use Braintree\Transaction as BraintreeTransaction;
+use Braintree\TransactionSearch;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use InvalidArgumentException;
+use Laravel\Cashier\Billable;
+use Laravel\Cashier\Gateway\Carbon;
+use Laravel\Cashier\Gateway\Gateway as BaseGateway;
+use Laravel\Cashier\Subscription;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class BraintreeGateway extends Gateway
+class Gateway extends BaseGateway
 {
     /**
      * Get the Braintree plan that has the given ID.

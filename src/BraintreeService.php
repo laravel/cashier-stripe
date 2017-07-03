@@ -2,7 +2,7 @@
 
 namespace Laravel\Cashier;
 
-use Laravel\Cashier\Gateway\BraintreeGateway;
+use Laravel\Cashier\Gateway\Braintree\Gateway;
 
 class BraintreeService
 {
@@ -15,6 +15,6 @@ class BraintreeService
      */
     public static function findPlan($id)
     {
-        return BraintreeGateway::findPlan($id);
+        return Gateway::findPlan($id);
     }
 }
