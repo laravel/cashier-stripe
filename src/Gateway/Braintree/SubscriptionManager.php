@@ -3,9 +3,10 @@
 namespace Laravel\Cashier\Gateway\Braintree;
 
 use Braintree\Subscription as BraintreeSubscription;
+use Braintree\Plan as BraintreePlan;
 use Carbon\Carbon;
-use Exception;
 use InvalidArgumentException;
+use Laravel\Cashier\Gateway\BraintreeGateway;
 use Laravel\Cashier\SubscriptionManager as BaseManager;
 use LogicException;
 
@@ -20,18 +21,18 @@ class SubscriptionManager extends BaseManager
      */
     public function swap($plan)
     {
-        if ($this->subscription->onGracePeriod() && $this->subscription->braintree_plan === $plan) {
-            return $this->subscription->resume();
+        if ($this->subscription->onGracePeriod() && $this->subscription->getPaymentGatewayPlanAttribute() === $plan) {
+            return $this->resume();
         }
 
         if (! $this->subscription->active()) {
             return $this->subscription->owner->newSubscription($this->subscription->name, $plan)->skipTrial()->create();
         }
 
-        $plan = BraintreeService::findPlan($plan);
+        $plan = BraintreeGateway::findPlan($plan);
 
-        if ($this->subscription->wouldChangeBillingFrequency($plan) && $this->subscription->prorate) {
-            return $this->subscription->swapAcrossFrequencies($plan);
+        if ($this->wouldChangeBillingFrequency($plan) && $this->prorate) {
+            return $this->swapAcrossFrequencies($plan);
         }
 
         $subscription = $this->asBraintreeSubscription();
@@ -42,13 +43,13 @@ class SubscriptionManager extends BaseManager
             'neverExpires' => true,
             'numberOfBillingCycles' => null,
             'options' => [
-                'prorateCharges' => $this->subscription->prorate,
+                'prorateCharges' => $this->prorate,
             ],
         ]);
 
         if ($response->success) {
             $this->subscription->fill([
-                'braintree_plan' => $plan->id,
+                'braintree_plan' => $plan->id, // FIXME
                 'ends_at' => null,
             ])->save();
         } else {
@@ -91,31 +92,35 @@ class SubscriptionManager extends BaseManager
      */
     public function asBraintreeSubscription()
     {
-        return BraintreeSubscription::find($this->subscription->braintree_id);
+        return BraintreeSubscription::find($this->subscription->getPaymentGatewayIdAttribute());
     }
 
     /**
      * Determine if the given plan would alter the billing frequency.
      *
-     * @param  string $plan
+     * @param  BraintreePlan  $plan
      * @return bool
+     *
+     * @throws \Laravel\Cashier\Gateway\Braintree\Exception
      */
-    protected function wouldChangeBillingFrequency($plan)
+    protected function wouldChangeBillingFrequency(BraintreePlan $plan)
     {
-        return $plan->billingFrequency !== BraintreeService::findPlan($this->subscription->braintree_plan)->billingFrequency;
+        return $plan->billingFrequency !== BraintreeGateway::findPlan($this->subscription->braintree_plan)->billingFrequency;
     }
 
     /**
      * Swap the subscription to a new Braintree plan with a different frequency.
      *
-     * @param  string $plan
+     * @param  BraintreePlan $plan
      * @return \Laravel\Cashier\Subscription
      */
-    protected function swapAcrossFrequencies($plan)
+    protected function swapAcrossFrequencies(BraintreePlan $plan)
     {
-        $currentPlan = BraintreeService::findPlan($this->subscription->braintree_plan);
+        $currentPlan = BraintreeGateway::findPlan($this->subscription->braintree_plan);
 
-        $discount = $this->subscription->switchingToMonthlyPlan($currentPlan, $plan) ? $this->subscription->getDiscountForSwitchToMonthly($currentPlan, $plan) : $this->subscription->getDiscountForSwitchToYearly();
+        $discount = $this->switchingToMonthlyPlan($currentPlan, $plan)
+            ? $this->getDiscountForSwitchToMonthly($currentPlan, $plan)
+            : $this->getDiscountForSwitchToYearly();
 
         $options = [];
 
@@ -133,19 +138,22 @@ class SubscriptionManager extends BaseManager
             ];
         }
 
-        $this->subscription->cancelNow();
+        $this->cancelNow();
 
-        return $this->subscription->owner->newSubscription($this->subscription->name, $plan->id)->skipTrial()->create(null, [], $options);
+        return $this->subscription->owner
+            ->newSubscription($this->subscription->name, $plan->id)
+            ->skipTrial()
+            ->create(null, [], $options);
     }
 
     /**
      * Determine if the user is switching form yearly to monthly billing.
      *
-     * @param  \Braintree\Plan $currentPlan
-     * @param  \Braintree\Plan $plan
+     * @param  BraintreePlan $currentPlan
+     * @param  BraintreePlan $plan
      * @return bool
      */
-    protected function switchingToMonthlyPlan($currentPlan, $plan)
+    protected function switchingToMonthlyPlan(BraintreePlan $currentPlan, BraintreePlan $plan)
     {
         return $currentPlan->billingFrequency == 12 && $plan->billingFrequency == 1;
     }
@@ -153,30 +161,49 @@ class SubscriptionManager extends BaseManager
     /**
      * Get the discount to apply when switching to a monthly plan.
      *
-     * @param  \Braintree\Plan $currentPlan
-     * @param  \Braintree\Plan $plan
+     * @param  BraintreePlan $currentPlan
+     * @param  BraintreePlan $plan
      * @return object
      */
-    protected function getDiscountForSwitchToMonthly($currentPlan, $plan)
+    protected function getDiscountForSwitchToMonthly(BraintreePlan $currentPlan, BraintreePlan $plan)
     {
         return (object) [
             'amount' => $plan->price,
-            'numberOfBillingCycles' => floor($this->subscription->moneyRemainingOnYearlyPlan($currentPlan) / $plan->price),
+            'numberOfBillingCycles' => floor($this->moneyRemainingOnYearlyPlan($currentPlan) / $plan->price),
         ];
     }
 
-    /*
+    /**
      * Apply a coupon to the subscription.
      *
      * @param  string  $coupon
      * @param  bool  $removeOthers
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
+    public function applyCoupon($coupon, $removeOthers = false)
+    {
+        if (! $this->subscription->active()) {
+            throw new InvalidArgumentException("Unable to apply coupon. Subscription not active.");
+        }
+
+        BraintreeSubscription::update($this->subscription->getPaymentGatewayIdAttribute(), [
+            'discounts' => [
+                'add' => [
+                    [
+                        'inheritedFromId' => $coupon,
+                    ],
+                ],
+                'remove' => $removeOthers ? $this->currentDiscounts() : [],
+            ],
+        ]);
+    }
 
     /**
      * Calculate the amount of discount to apply to a swap to monthly billing.
      *
-     * @param  \Braintree\Plan $plan
+     * @param  BraintreePlan $plan
      * @return float
      */
     protected function moneyRemainingOnYearlyPlan($plan)
@@ -194,7 +221,7 @@ class SubscriptionManager extends BaseManager
         $amount = 0;
 
         foreach ($this->asBraintreeSubscription()->discounts as $discount) {
-            if ($discount->id == 'plan-credit') {
+            if ($discount->id === 'plan-credit') {
                 $amount += (float) $discount->amount * $discount->numberOfBillingCycles;
             }
         }
@@ -219,24 +246,6 @@ class SubscriptionManager extends BaseManager
         $this->subscription->markAsCancelled();
 
         return $this->subscription;
-    }
-
-    public function applyCoupon($coupon, $removeOthers = false)
-    {
-        if (! $this->subscription->active()) {
-            throw new InvalidArgumentException("Unable to apply coupon. Subscription not active.");
-        }
-
-        BraintreeSubscription::update($this->subscription->braintree_id, [
-            'discounts' => [
-                'add' => [
-                    [
-                        'inheritedFromId' => $coupon,
-                    ],
-                ],
-                'remove' => $removeOthers ? $this->subscription->currentDiscounts() : [],
-            ],
-        ]);
     }
 
     /**
