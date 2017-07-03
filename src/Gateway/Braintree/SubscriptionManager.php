@@ -6,7 +6,7 @@ use Braintree\Plan as BraintreePlan;
 use Braintree\Subscription as BraintreeSubscription;
 use Carbon\Carbon;
 use InvalidArgumentException;
-use Laravel\Cashier\SubscriptionManager as BaseManager;
+use Laravel\Cashier\Gateway\SubscriptionManager as BaseManager;
 use LogicException;
 
 class SubscriptionManager extends BaseManager

@@ -2,13 +2,13 @@
 
 namespace Laravel\Cashier\Gateway\Braintree;
 
+use Braintree\Transaction as BraintreeTransaction;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\View;
 use Symfony\Component\HttpFoundation\Response;
-use Braintree\Transaction as BraintreeTransaction;
 
-class Invoice extends \Laravel\Cashier\Invoice
+class Invoice extends \Laravel\Cashier\Gateway\Invoice
 {
     /**
      * The model instance.

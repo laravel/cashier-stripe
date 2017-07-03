@@ -1,8 +1,9 @@
 <?php
 
-namespace Laravel\Cashier;
+namespace Laravel\Cashier\Gateway;
 
-use \DateTimeInterface;
+use DateTimeInterface;
+use Laravel\Cashier\Subscription;
 
 abstract class SubscriptionManager
 {

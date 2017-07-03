@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Cashier;
+namespace Laravel\Cashier\Gateway;
 
 use Carbon\Carbon;
 use Illuminate\Support\Str;

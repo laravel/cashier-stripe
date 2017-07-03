@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\View;
 use Stripe\Invoice as StripeInvoice;
 use Symfony\Component\HttpFoundation\Response;
 
-class Invoice extends \Laravel\Cashier\Invoice
+class Invoice extends \Laravel\Cashier\Gateway\Invoice
 {
     /**
      * The Stripe model instance.

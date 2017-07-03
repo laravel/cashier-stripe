@@ -3,7 +3,7 @@
 namespace Laravel\Cashier\Gateway\Stripe;
 
 use Carbon\Carbon;
-use Laravel\Cashier\SubscriptionBuilder as BaseBuilder;
+use Laravel\Cashier\Gateway\SubscriptionBuilder as BaseBuilder;
 
 class SubscriptionBuilder extends BaseBuilder
 {

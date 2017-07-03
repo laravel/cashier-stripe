@@ -1,10 +1,11 @@
 <?php
 
-namespace Laravel\Cashier;
+namespace Laravel\Cashier\Gateway\Stripe;
 
+use Laravel\Cashier\Gateway\Card as CashierCard;
 use Stripe\Card as StripeCard;
 
-class Card
+class Card extends CashierCard
 {
     /**
      * The Stripe model instance.

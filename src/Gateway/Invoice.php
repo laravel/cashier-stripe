@@ -1,10 +1,11 @@
 <?php
 
-namespace Laravel\Cashier;
+namespace Laravel\Cashier\Gateway;
 
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\View;
+use Laravel\Cashier\Cashier;
 use Stripe\Invoice as StripeInvoice;
 use Symfony\Component\HttpFoundation\Response;
 

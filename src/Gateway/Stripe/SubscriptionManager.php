@@ -2,8 +2,8 @@
 
 namespace Laravel\Cashier\Gateway\Stripe;
 
-use \LogicException;
-use Laravel\Cashier\SubscriptionManager as BaseManager;
+use Laravel\Cashier\Gateway\SubscriptionManager as BaseManager;
+use LogicException;
 
 class SubscriptionManager extends BaseManager
 {

@@ -255,7 +255,7 @@ class Gateway extends BaseGateway
      * @param  string $description
      * @param  int $amount
      * @param  array $options
-     * @return bool|\Laravel\Cashier\Invoice
+     * @return bool|\Laravel\Cashier\Gateway\Invoice
      */
     public function invoiceFor(Billable $billable, $description, $amount, array $options = [])
     {
@@ -331,7 +331,7 @@ class Gateway extends BaseGateway
      * Find an invoice or throw a 404 error.
      *
      * @param  string $id
-     * @return \Laravel\Cashier\Invoice
+     * @return \Laravel\Cashier\Gateway\Invoice
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function findInvoiceOrFail(Billable $billable, $id)
@@ -349,7 +349,7 @@ class Gateway extends BaseGateway
      * Find an invoice by ID.
      *
      * @param  string $id
-     * @return \Laravel\Cashier\Invoice|null
+     * @return \Laravel\Cashier\Gateway\Invoice|null
      */
     public function findInvoice(Billable $billable, $id)
     {

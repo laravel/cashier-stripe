@@ -4,6 +4,8 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Laravel\Cashier\Gateway\Invoice;
+use Laravel\Cashier\Gateway\Stripe\Card;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Stripe\Invoice as StripeInvoice;
 
@@ -73,7 +75,7 @@ trait Billable
      * @param  string $description
      * @param  int $amount
      * @param  array $options
-     * @return \Laravel\Cashier\Invoice|bool
+     * @return \Laravel\Cashier\Gateway\Invoice|bool
      */
     public function invoiceFor($description, $amount, array $options = [])
     {
@@ -105,7 +107,7 @@ trait Billable
      *
      * @param  string $subscription
      * @param  string $plan
-     * @return \Laravel\Cashier\SubscriptionBuilder
+     * @return \Laravel\Cashier\Gateway\SubscriptionBuilder
      */
     public function newSubscription($subscription, $plan)
     {
@@ -194,7 +196,7 @@ trait Billable
     /**
      * Get the entity's upcoming invoice.
      *
-     * @return \Laravel\Cashier\Invoice|null
+     * @return \Laravel\Cashier\Gateway\Invoice|null
      */
     public function upcomingInvoice()
     {
@@ -212,7 +214,7 @@ trait Billable
      * Find an invoice or throw a 404 error.
      *
      * @param  string $id
-     * @return \Laravel\Cashier\Invoice
+     * @return \Laravel\Cashier\Gateway\Invoice
      */
     public function findInvoiceOrFail($id)
     {
@@ -223,7 +225,7 @@ trait Billable
      * Find an invoice by ID.
      *
      * @param  string $id
-     * @return \Laravel\Cashier\Invoice|null
+     * @return \Laravel\Cashier\Gateway\Invoice|null
      */
     public function findInvoice($id)
     {

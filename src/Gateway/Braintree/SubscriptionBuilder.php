@@ -5,7 +5,7 @@ namespace Laravel\Cashier\Gateway\Braintree;
 use Braintree\Customer;
 use Braintree\Subscription as BraintreeSubscription;
 use Carbon\Carbon;
-use Laravel\Cashier\SubscriptionBuilder as BaseBuilder;
+use Laravel\Cashier\Gateway\SubscriptionBuilder as BaseBuilder;
 
 class SubscriptionBuilder extends BaseBuilder
 {

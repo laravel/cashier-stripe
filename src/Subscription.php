@@ -41,7 +41,7 @@ class Subscription extends Model
     /**
      * This subscription's manager.
      *
-     * @var \Laravel\Cashier\SubscriptionManager
+     * @var \Laravel\Cashier\Gateway\SubscriptionManager
      */
     protected $subscriptionManager;
 

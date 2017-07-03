@@ -310,7 +310,7 @@ class Gateway extends BaseGateway
      * Find an invoice by ID.
      *
      * @param  string  $id
-     * @return \Laravel\Cashier\Invoice|null
+     * @return \Laravel\Cashier\Gateway\Invoice|null
      */
     public function findInvoice(Billable $billable, $id)
     {
@@ -331,7 +331,7 @@ class Gateway extends BaseGateway
      * Find an invoice or throw a 404 error.
      *
      * @param  string  $id
-     * @return \Laravel\Cashier\Invoice
+     * @return \Laravel\Cashier\Gateway\Invoice
      */
     public function findInvoiceOrFail(Billable $billable, $id)
     {
