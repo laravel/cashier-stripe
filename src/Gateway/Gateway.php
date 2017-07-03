@@ -24,6 +24,14 @@ abstract class Gateway
     }
 
     /**
+     * Register gateway with Cashier.
+     */
+    public function register()
+    {
+        $this->cashier->addGateway($this);
+    }
+
+    /**
      * Convert a zero-decimal value (eg. cents) into the value appropriate for this gateway.
      *
      * @param  int  $value
@@ -33,4 +41,11 @@ abstract class Gateway
     {
         return $value;
     }
+
+    /**
+     * Get the name of the gateway.
+     *
+     * @return string
+     */
+    abstract public function getName();
 }

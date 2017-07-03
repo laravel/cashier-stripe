@@ -6,6 +6,8 @@ use Exception;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Exception as CashierException;
+use Laravel\Cashier\Gateway\Gateway;
 
 class Cashier
 {
@@ -97,42 +99,49 @@ class Cashier
     }
 
     /**
-     * @param string|null $gatewayName
-     * @return \Laravel\Cashier\Gateway\Gateway
+     * Add a gateway to Cashier.
+     *
+     * @param  \Laravel\Cashier\Gateway\Gateway  $gateway
+     * @return static
      */
-    public function gateway($gatewayName = null)
+    public function addGateway(Gateway $gateway)
     {
-        $gatewayName = $gatewayName ?: $this->defaultGateway;
+        $this->gateways[$gateway->getName()] = $gateway;
 
-        if (!isset($this->gateways[$gatewayName])) {
-            $this->gateways[$gatewayName] = $this->app->make($this->getGatewayClass($gatewayName));
-        }
-
-        return $this->gateways[$gatewayName];
+        return $this;
     }
 
     /**
-     * @param  string  $gatewayName
+     * @param string|null $name
+     * @return \Laravel\Cashier\Gateway\Gateway
+     * @throws \Laravel\Cashier\Exception
+     */
+    public function gateway($name = null)
+    {
+        if (!$this->hasGateway($name)) {
+            throw new CashierException("Gateway '{$name}' not registered.");
+        }
+
+        return $this->gateways[$name];
+    }
+
+    /**
+     * @param  string  $name
      * @return bool
      */
-    public function hasGateway($gatewayName)
+    public function hasGateway($name = null)
     {
-        try {
-            $this->gateway($gatewayName);
-            return true;
-        } catch (\ReflectionException $e) {
-            return false;
-        }
+        return isset($this->gateways[$name ?: $this->defaultGateway]);
     }
 
     /**
-     * @param  string  $gatewayName
-     * @return string
+     * Get array of registered gateways.
+     *
+     * @return Gateway[]
      */
-    protected function getGatewayClass($gatewayName)
+    public function getGateways()
     {
-        // TODO: Maybe resolve via container as 'stripe.gateway.braintree' for easier replacement?
-        return '\\Laravel\\Cashier\\Gateway\\'.Str::studly($gatewayName).'Gateway';
+        return $this->gateways;
     }
 
     /**

@@ -28,6 +28,16 @@ class BraintreeGateway extends Gateway
     }
 
     /**
+     * Get the name of this gateway.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'braintree';
+    }
+
+    /**
      * Convert value as cents into dollars.
      *
      * @param  int  $value
