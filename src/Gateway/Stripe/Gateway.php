@@ -33,10 +33,6 @@ class Gateway extends BaseGateway
      */
     public static function getApiKey()
     {
-        if (null === static::$apiKey) {
-            static::$apiKey = getenv('STRIPE_SECRET', config('services.stripe.secret'));
-        }
-
         return static::$apiKey;
     }
 

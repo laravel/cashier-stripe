@@ -19,14 +19,9 @@ class CashierServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cashier');
 
-        $viewPath = Arr::first(
-            $this->app
-                ->make('config')
-                ->get('view.paths', [
-                    $this->app->basePath('resources/views/'),
-                ])
-        );
-
+        $viewPath = Arr::first($this->app->make('config')->get('view.paths', [
+                $this->app->basePath('resources/views/'),
+            ]));
 
         $this->publishes([
             __DIR__.'/../resources/views' => $viewPath.'vendor/cashier',
@@ -41,11 +36,17 @@ class CashierServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(StripeGateway::class, function(Container $app) {
+        $this->app->singleton(StripeGateway::class, function (Container $app) {
+            $config = $app->make('config');
+            if ($key = getenv('STRIPE_SECRET', $config->get('services.stripe.secret'))) {
+                StripeGateway::setApiKey($key);
+            }
+
             return new StripeGateway();
         });
 
-        $this->app->singleton(BraintreeGateway::class, function(Container $app) {
+        $this->app->singleton(BraintreeGateway::class, function (Container $app) {
+            // TODO: Braintree config
             return new BraintreeGateway();
         });
 
