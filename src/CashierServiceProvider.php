@@ -5,8 +5,8 @@ namespace Laravel\Cashier;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Cashier\Gateway\BraintreeGateway;
-use Laravel\Cashier\Gateway\StripeGateway;
+use Laravel\Cashier\Gateway\BraintreeGateway as BraintreeGateway;
+use Laravel\Cashier\Gateway\Stripe\Gateway as StripeGateway;
 
 class CashierServiceProvider extends ServiceProvider
 {

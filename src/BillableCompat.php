@@ -2,8 +2,31 @@
 
 namespace Laravel\Cashier;
 
+use Laravel\Cashier\Gateway\Stripe\Gateway as StripeGateway;
+
 trait BillableCompat
 {
+    /**
+     * Set the Stripe API key.
+     *
+     * @param  string $key
+     * @return void
+     */
+    public static function setStripeKey($key)
+    {
+        StripeGateway::setApiKey($key);
+    }
+
+    /**
+     * Get the Stripe API key.
+     *
+     * @return string
+     */
+    public static function getStripeKey()
+    {
+        return StripeGateway::getApiKey();
+    }
+
     /**
      * Determine if the entity has a Stripe customer ID.
      *

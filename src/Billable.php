@@ -3,17 +3,9 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Support\Collection;
-use InvalidArgumentException;
-use Laravel\Cashier\Gateway\StripeGateway;
-use Stripe\Customer as StripeCustomer;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Stripe\Invoice as StripeInvoice;
-use Stripe\InvoiceItem as StripeInvoiceItem;
-use Stripe\Refund as StripeRefund;
-use Stripe\Token as StripeToken;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Trait Billable
@@ -25,27 +17,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 trait Billable
 {
     use UsesPaymentGateway;
-
-    /**
-     * Set the Stripe API key.
-     *
-     * @param  string $key
-     * @return void
-     */
-    public static function setStripeKey($key)
-    {
-        StripeGateway::setApiKey($key);
-    }
-
-    /**
-     * Get the Stripe API key.
-     *
-     * @return string
-     */
-    public static function getStripeKey()
-    {
-        return StripeGateway::getApiKey();
-    }
 
     /**
      * Make a "one off" charge on the customer for the given amount.

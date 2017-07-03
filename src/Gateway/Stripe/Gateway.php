@@ -1,25 +1,23 @@
 <?php
 
-namespace Laravel\Cashier\Gateway;
+namespace Laravel\Cashier\Gateway\Stripe;
 
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Cashier\Billable;
-use Laravel\Cashier\Gateway\Stripe\SubscriptionBuilder;
-use Laravel\Cashier\Gateway\Stripe\SubscriptionManager;
-use Laravel\Cashier\Gateway\Stripe\Invoice;
-use Laravel\Cashier\Subscription;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Laravel\Cashier\Billable;
+use Laravel\Cashier\Gateway\Gateway as BaseGateway;
+use Laravel\Cashier\Subscription;
+use Stripe\Charge as StripeCharge;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\Refund as StripeRefund;
 use Stripe\Token as StripeToken;
-use Stripe\Charge as StripeCharge;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class StripeGateway extends Gateway
+class Gateway extends BaseGateway
 {
     /**
      * Stripe API key.
