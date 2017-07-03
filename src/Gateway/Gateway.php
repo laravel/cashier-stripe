@@ -3,32 +3,16 @@
 namespace Laravel\Cashier\Gateway;
 
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Subscription;
 
 abstract class Gateway
 {
-    /**
-     * Cashier instance.
-     *
-     * @var \Laravel\Cashier\Cashier
-     */
-    protected $cashier;
-
-    /**
-     * Create gateway.
-     *
-     * @param  \Laravel\Cashier\Cashier  $cashier
-     */
-    public function __construct(Cashier $cashier)
-    {
-        $this->cashier = $cashier;
-    }
-
     /**
      * Register gateway with Cashier.
      */
     public function register()
     {
-        $this->cashier->addGateway($this);
+        Cashier::addGateway($this);
     }
 
     /**
@@ -41,6 +25,8 @@ abstract class Gateway
     {
         return $value;
     }
+
+    abstract public function manageSubscription(Subscription $subscription);
 
     /**
      * Get the name of the gateway.

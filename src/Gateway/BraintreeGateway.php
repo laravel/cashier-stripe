@@ -4,6 +4,8 @@ namespace Laravel\Cashier\Gateway;
 
 use Braintree\Plan as BraintreePlan;
 use Laravel\Cashier\Gateway\Braintree\Exception;
+use Laravel\Cashier\Gateway\Braintree\SubscriptionManager;
+use Laravel\Cashier\Subscription;
 
 class BraintreeGateway extends Gateway
 {
@@ -46,5 +48,10 @@ class BraintreeGateway extends Gateway
     public function convertZeroDecimalValue($value)
     {
         return (float) $value / 100;
+    }
+
+    public function manageSubscription(Subscription $subscription)
+    {
+        return new SubscriptionManager($subscription);
     }
 }

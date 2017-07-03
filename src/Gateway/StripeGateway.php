@@ -2,6 +2,9 @@
 
 namespace Laravel\Cashier\Gateway;
 
+use Laravel\Cashier\Gateway\Stripe\SubscriptionManager;
+use Laravel\Cashier\Subscription;
+
 class StripeGateway extends Gateway
 {
     /**
@@ -12,5 +15,10 @@ class StripeGateway extends Gateway
     public function getName()
     {
         return 'stripe';
+    }
+
+    public function manageSubscription(Subscription $subscription)
+    {
+        return new SubscriptionManager($subscription);
     }
 }

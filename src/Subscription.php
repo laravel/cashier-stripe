@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subscription extends Model
 {
+    use HasGatewayId;
+
     /**
      * The attributes that are not mass assignable.
      *
@@ -39,6 +41,13 @@ class Subscription extends Model
      * @var string|null
      */
     protected $billingCycleAnchor = null;
+
+    /**
+     * This subscription's manager.
+     *
+     * @var \Laravel\Cashier\SubscriptionManager
+     */
+    protected $subscriptionManager;
 
     /**
      * Get the user that owns the subscription.
@@ -379,5 +388,47 @@ class Subscription extends Model
         }
 
         return $subscriptions->retrieve($this->stripe_id);
+    }
+
+
+
+    public function createAsCustomer($gateway, $token, array $options = [])
+    {
+        $oldMethodName = 'createAs'.Str::studly($gateway).'Customer';
+        if (method_exists($this, $oldMethodName)) {
+            return $this->$oldMethodName($token, $options);
+        }
+    }
+
+    public function asCustomer($gateway)
+    {
+        $oldMethodName = 'as'.Str::studly($gateway).'Customer';
+        if (method_exists($this, $oldMethodName)) {
+            return $this->$oldMethodName();
+        }
+    }
+
+    protected function getGateway()
+    {
+        return Cashier::gateway($this->getPaymentGatewayAttribute());
+    }
+
+    protected function getSubscriptionManager()
+    {
+        if (null === $this->subscriptionManager) {
+            $this->subscriptionManager = $this->getGateway()->manageSubscription($this);
+        }
+
+        return $this->subscriptionManager;
+    }
+
+    public function __call($method, $parameters)
+    {
+        $manager = $this->getSubscriptionManager();
+        if (method_exists($manager, $method)) {
+            return $manager->$method(...$parameters);
+        }
+
+        return parent::__call($method, $parameters);
     }
 }

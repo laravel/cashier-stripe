@@ -9,85 +9,81 @@ use Illuminate\Support\Str;
 use Laravel\Cashier\Exception as CashierException;
 use Laravel\Cashier\Gateway\Gateway;
 
+/**
+ * Class Cashier
+ *
+ * @package Laravel\Cashier
+ */
 class Cashier
 {
-    /**
-     * Singleton instance to allow for backwards-compatible static calls.
-     *
-     * @var static
-     */
-    protected static $instance;
-
     /**
      * Cache of gateway instances.
      *
      * @var array
      */
-    protected $gateways = [];
+    protected static $gateways = [];
 
     /**
      * The current currency.
      *
      * @var string
      */
-    protected $currency = 'usd';
+    protected static $currency = 'usd';
 
     /**
      * The current currency symbol.
      *
      * @var string
      */
-    protected $currencySymbol = '$';
+    protected static $currencySymbol = '$';
 
     /**
      * The custom currency formatter.
      *
      * @var callable
      */
-    protected $formatCurrencyUsing;
-
-    /**
-     * The service container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $app;
+    protected static $formatCurrencyUsing;
 
     /**
      * The default payment gateway.
      *
      * @var string
      */
-    protected $defaultGateway = 'stripe';
+    protected static $defaultGateway = 'stripe';
 
     /**
-     * Create a new Cashier instance.
+     * Get the default gateway.
      *
-     * @param \Illuminate\Contracts\Container\Container $app
+     * @return string
      */
-    public function __construct(Container $app)
+    public static function getDefaultGateway()
     {
-        $this->app = $app;
-
-        $config = $this->app->make(Repository::class);
-        $this->defaultGateway = $config->get('cashier.default_gateway', $this->defaultGateway);
+        return static::$defaultGateway;
     }
 
     /**
      * Set the singleton instance.
      *
-     * @param  \Laravel\Cashier\Cashier $instance
-     * @return \Laravel\Cashier\Cashier
+     * @param \Laravel\Cashier\Gateway\Gateway $gateway
      */
-    public static function setInstance(Cashier $instance)
+    public static function setDefaultGateway(Gateway $gateway)
     {
-        static::$instance = $instance;
-
-        return $instance;
+        static::addGateway($gateway);
+        static::$defaultGateway = $gateway->getName();
     }
 
     /**
-     * Allow for backwards-compatible static calls
+     * Add a gateway to Cashier.
+     *
+     * @param  \Laravel\Cashier\Gateway\Gateway $gateway
+     */
+    public static function addGateway(Gateway $gateway)
+    {
+        static::$gateways[$gateway->getName()] = $gateway;
+    }
+
+    /**
+     * Allow for static calls.
      *
      * @param  string $name
      * @param  array $arguments
@@ -95,20 +91,7 @@ class Cashier
      */
     public static function __callStatic($name, $arguments)
     {
-        return call_user_func_array([self::$instance], $arguments);
-    }
-
-    /**
-     * Add a gateway to Cashier.
-     *
-     * @param  \Laravel\Cashier\Gateway\Gateway  $gateway
-     * @return static
-     */
-    public function addGateway(Gateway $gateway)
-    {
-        $this->gateways[$gateway->getName()] = $gateway;
-
-        return $this;
+        return call_user_func_array([static::gateway(), $name], $arguments);
     }
 
     /**
@@ -116,22 +99,22 @@ class Cashier
      * @return \Laravel\Cashier\Gateway\Gateway
      * @throws \Laravel\Cashier\Exception
      */
-    public function gateway($name = null)
+    public static function gateway($name = null)
     {
-        if (!$this->hasGateway($name)) {
+        if (! static::hasGateway($name)) {
             throw new CashierException("Gateway '{$name}' not registered.");
         }
 
-        return $this->gateways[$name];
+        return static::$gateways[$name];
     }
 
     /**
-     * @param  string  $name
+     * @param  string $name
      * @return bool
      */
-    public function hasGateway($name = null)
+    public static function hasGateway($name = null)
     {
-        return isset($this->gateways[$name ?: $this->defaultGateway]);
+        return isset(static::$gateways[$name ?: static::getDefaultGateway()]);
     }
 
     /**
@@ -139,9 +122,9 @@ class Cashier
      *
      * @return Gateway[]
      */
-    public function getGateways()
+    public static function getGateways()
     {
-        return $this->gateways;
+        return static::$gateways;
     }
 
     /**
@@ -151,11 +134,11 @@ class Cashier
      * @param  string|null $symbol
      * @return void
      */
-    public function useCurrency($currency, $symbol = null)
+    public static function useCurrency($currency, $symbol = null)
     {
-        $this->currency = $currency;
+        static::$currency = $currency;
 
-        $this->useCurrencySymbol($symbol ?: static::guessCurrencySymbol($currency));
+        static::useCurrencySymbol($symbol ?: static::guessCurrencySymbol($currency));
     }
 
     /**
@@ -164,9 +147,9 @@ class Cashier
      * @param  string $symbol
      * @return void
      */
-    public function useCurrencySymbol($symbol)
+    public static function useCurrencySymbol($symbol)
     {
-        $this->currencySymbol = $symbol;
+        static::$currencySymbol = $symbol;
     }
 
     /**
@@ -197,9 +180,9 @@ class Cashier
      *
      * @return string
      */
-    public function usesCurrency()
+    public static function usesCurrency()
     {
-        return $this->currency;
+        return static::$currency;
     }
 
     /**
@@ -208,9 +191,9 @@ class Cashier
      * @param  callable $callback
      * @return void
      */
-    public function formatCurrencyUsing(callable $callback)
+    public static function formatCurrencyUsing(callable $callback)
     {
-        $this->formatCurrencyUsing = $callback;
+        static::$formatCurrencyUsing = $callback;
     }
 
     /**
@@ -219,19 +202,19 @@ class Cashier
      * @param  int $amount
      * @return string
      */
-    public function formatAmount($amount)
+    public static function formatAmount($amount)
     {
-        if ($this->formatCurrencyUsing) {
-            return call_user_func($this->formatCurrencyUsing, $amount);
+        if (static::$formatCurrencyUsing) {
+            return call_user_func(static::$formatCurrencyUsing, $amount);
         }
 
         $amount = number_format($amount / 100, 2);
 
         if (Str::startsWith($amount, '-')) {
-            return '-'.$this->usesCurrencySymbol().ltrim($amount, '-');
+            return '-'.static::usesCurrencySymbol().ltrim($amount, '-');
         }
 
-        return $this->usesCurrencySymbol().$amount;
+        return static::usesCurrencySymbol().$amount;
     }
 
     /**
@@ -239,46 +222,8 @@ class Cashier
      *
      * @return string
      */
-    public function usesCurrencySymbol()
+    public static function usesCurrencySymbol()
     {
-        return $this->currencySymbol;
-    }
-
-    /**
-     * @param  string  $name
-     * @param  array  $arguments
-     * @return mixed
-     */
-    public function __call($name, array $arguments)
-    {
-        return call_user_func_array([$this->gateway(), $name], $arguments);
-    }
-
-    /**
-     * @param  string  $name
-     * @return bool
-     */
-    public function __isset($name)
-    {
-        return $this->hasGateway($name);
-    }
-
-    /**
-     * @param  string  $name
-     * @return \Laravel\Cashier\Contracts\Gateway
-     */
-    public function __get($name)
-    {
-        return $this->gateway($name);
-    }
-
-    /**
-     * @param  string  $name
-     * @param  mixed  $value
-     * @throws \Exception
-     */
-    public function __set($name, $value)
-    {
-        throw new Exception('Cashier::__set() not allowed.');
+        return static::$currencySymbol;
     }
 }
