@@ -17,6 +17,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait Billable
 {
+    use HasGatewayId;
+
     /**
      * The Stripe API key.
      *
@@ -608,5 +610,31 @@ trait Billable
     public static function setStripeKey($key)
     {
         static::$stripeKey = $key;
+    }
+
+    /**
+     * @param $gateway
+     * @param $token
+     * @param array $options
+     * @return \Stripe\Customer|\Braintree\Customer|mixed
+     */
+    public function createAsCustomer($gateway, $token, array $options = [])
+    {
+        $oldMethodName = 'createAs'.Str::studly($gateway).'Customer';
+        if (method_exists($this, $oldMethodName)) {
+            return $this->$oldMethodName($token, $options);
+        }
+    }
+
+    /**
+     * @param $gateway
+     * @return \Stripe\Customer|\Braintree\Customer|mixed
+     */
+    public function asCustomer($gateway)
+    {
+        $oldMethodName = 'as'.Str::studly($gateway).'Customer';
+        if (method_exists($this, $oldMethodName)) {
+            return $this->$oldMethodName();
+        }
     }
 }

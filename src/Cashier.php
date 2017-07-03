@@ -3,8 +3,6 @@
 namespace Laravel\Cashier;
 
 use Exception;
-use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Exception as CashierException;
 use Laravel\Cashier\Gateway\Gateway;
@@ -52,6 +50,73 @@ class Cashier
     protected static $defaultGateway = 'stripe';
 
     /**
+     * Name of model that subscriptions are attached to
+     *
+     * @var string
+     */
+    protected static $modelName;
+
+    /**
+     * Get the model to attach subscriptions to.
+     *
+     * @return string
+     */
+    public static function getModelName()
+    {
+        if (null === static::$modelName) {
+            if (
+                ($model = getenv('STRIPE_MODEL')) ||
+                ($model = getenv('BRAINTREE_MODEL')) ||
+                ($model = config('services.stripe.model')) ||
+                ($model = config('services.braintree.model')) ||
+                ($model = config('cashier.model')) ||
+                ($model = 'App\\User')
+            ) {
+                static::$modelName = $model;
+            }
+        }
+
+        return static::$modelName;
+    }
+
+    /**
+     * Pass calls to default gateway.
+     *
+     * @param  string $name
+     * @param  array $arguments
+     * @return mixed
+     */
+    public static function __callStatic($name, $arguments)
+    {
+        return call_user_func_array([static::gateway(), $name], $arguments);
+    }
+
+    /**
+     * @param string|null $name
+     * @return \Laravel\Cashier\Gateway\Gateway
+     * @throws \Laravel\Cashier\Exception
+     */
+    public static function gateway($name = null)
+    {
+        $name = $name ?: static::getDefaultGateway();
+
+        if (! static::hasGateway($name)) {
+            throw new CashierException("Gateway '{$name}' not registered.");
+        }
+
+        return static::$gateways[$name];
+    }
+
+    /**
+     * @param  string $name
+     * @return bool
+     */
+    public static function hasGateway($name = null)
+    {
+        return isset(static::$gateways[$name ?: static::getDefaultGateway()]);
+    }
+
+    /**
      * Get the default gateway.
      *
      * @return string
@@ -80,41 +145,6 @@ class Cashier
     public static function addGateway(Gateway $gateway)
     {
         static::$gateways[$gateway->getName()] = $gateway;
-    }
-
-    /**
-     * Allow for static calls.
-     *
-     * @param  string $name
-     * @param  array $arguments
-     * @return mixed
-     */
-    public static function __callStatic($name, $arguments)
-    {
-        return call_user_func_array([static::gateway(), $name], $arguments);
-    }
-
-    /**
-     * @param string|null $name
-     * @return \Laravel\Cashier\Gateway\Gateway
-     * @throws \Laravel\Cashier\Exception
-     */
-    public static function gateway($name = null)
-    {
-        if (! static::hasGateway($name)) {
-            throw new CashierException("Gateway '{$name}' not registered.");
-        }
-
-        return static::$gateways[$name];
-    }
-
-    /**
-     * @param  string $name
-     * @return bool
-     */
-    public static function hasGateway($name = null)
-    {
-        return isset(static::$gateways[$name ?: static::getDefaultGateway()]);
     }
 
     /**
