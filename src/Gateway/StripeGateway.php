@@ -6,13 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Billable;
 use Laravel\Cashier\Gateway\Stripe\SubscriptionBuilder;
 use Laravel\Cashier\Gateway\Stripe\SubscriptionManager;
-use Laravel\Cashier\Invoice;
+use Laravel\Cashier\Gateway\Stripe\Invoice;
 use Laravel\Cashier\Subscription;
-
-use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
-use Laravel\Cashier\Gateway\StripeGateway;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Stripe\Invoice as StripeInvoice;
@@ -21,7 +18,6 @@ use Stripe\Refund as StripeRefund;
 use Stripe\Token as StripeToken;
 use Stripe\Charge as StripeCharge;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
 
 class StripeGateway extends Gateway
 {

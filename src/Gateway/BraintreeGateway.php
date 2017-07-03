@@ -6,6 +6,7 @@ use Braintree\Plan as BraintreePlan;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Billable;
 use Laravel\Cashier\Gateway\Braintree\Exception;
+use Laravel\Cashier\Gateway\Braintree\Invoice;
 use Laravel\Cashier\Gateway\Braintree\SubscriptionBuilder;
 use Laravel\Cashier\Gateway\Braintree\SubscriptionManager;
 use Laravel\Cashier\Subscription;
@@ -96,9 +97,9 @@ class BraintreeGateway extends Gateway
     {
         $response = BraintreeCustomer::create(
             array_replace_recursive([
-                'firstName' => Arr::get(explode(' ', $this->name), 0),
-                'lastName' => Arr::get(explode(' ', $this->name), 1),
-                'email' => $this->email,
+                'firstName' => Arr::get(explode(' ', $billable->name), 0),
+                'lastName' => Arr::get(explode(' ', $billable->name), 1),
+                'email' => $billable->email,
                 'paymentMethodNonce' => $token,
                 'creditCard' => [
                     'options' => [
@@ -116,9 +117,9 @@ class BraintreeGateway extends Gateway
 
         $paypalAccount = $paymentMethod instanceof PayPalAccount;
 
-        $this->forceFill([
-            'braintree_id' => $response->customer->id,
-            'paypal_email' => $paypalAccount ? $paymentMethod->email : null,
+        $billable->forceFill([
+            'braintree_id' => $response->customer->id, // FIXME
+            'paypal_email' => $paypalAccount ? $paymentMethod->email : null, // FIXME
             'card_brand' => ! $paypalAccount ? $paymentMethod->cardType : null,
             'card_last_four' => ! $paypalAccount ? $paymentMethod->last4 : null,
         ])->save();
@@ -134,9 +135,9 @@ class BraintreeGateway extends Gateway
      * @return void
      * @throws \Exception
      */
-    public function updateCard($token, array $options = [])
+    public function updateCard(Billable $billable, $token, array $options = [])
     {
-        $customer = $this->asBraintreeCustomer();
+        $customer = $this->asCustomer($billable);
 
         $response = PaymentMethod::create(
             array_replace_recursive([
@@ -155,15 +156,13 @@ class BraintreeGateway extends Gateway
 
         $paypalAccount = $response->paymentMethod instanceof PaypalAccount;
 
-        $this->forceFill([
-            'paypal_email' => $paypalAccount ? $response->paymentMethod->email : null,
+        $billable->forceFill([
+            'paypal_email' => $paypalAccount ? $response->paymentMethod->email : null, // FIXME
             'card_brand' => $paypalAccount ? null : $response->paymentMethod->cardType,
             'card_last_four' => $paypalAccount ? null : $response->paymentMethod->last4,
         ])->save();
 
-        $this->updateSubscriptionsToPaymentMethod(
-            $response->paymentMethod->token
-        );
+        $this->updateSubscriptionsToPaymentMethod($billable, $response->paymentMethod->token);
     }
 
     /**
@@ -172,11 +171,11 @@ class BraintreeGateway extends Gateway
      * @param  string  $token
      * @return void
      */
-    protected function updateSubscriptionsToPaymentMethod($token)
+    protected function updateSubscriptionsToPaymentMethod(Billable $billable, $token)
     {
-        foreach ($this->subscriptions as $subscription) {
+        foreach ($billable->subscriptions as $subscription) {
             if ($subscription->active()) {
-                BraintreeSubscription::update($subscription->braintree_id, [
+                BraintreeSubscription::update($subscription->getPaymentGatewayIdAttribute(), [
                     'paymentMethodToken' => $token,
                 ]);
             }
@@ -192,15 +191,17 @@ class BraintreeGateway extends Gateway
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function applyCoupon($coupon, $subscription = 'default', $removeOthers = false)
+    public function applyCoupon(Billable $billable, $coupon, $subscription = 'default', $removeOthers = false)
     {
-        $subscription = $this->subscription($subscription);
+        // FIXME: The signature is different between Stripe and Braintree
+        
+        $subscription = $billable->subscription($subscription);
 
         if (! $subscription) {
             throw new InvalidArgumentException("Unable to apply coupon. Subscription does not exist.");
         }
 
-        $subscription->applyCoupon($coupon, $removeOthers);
+        $subscription->applyCoupon($coupon, $removeOthers); // TODO: Can this be done at Stripe, too?
     }
 
     /**
@@ -211,12 +212,12 @@ class BraintreeGateway extends Gateway
      * @return array
      * @throws \Exception
      */
-    public function charge($amount, array $options = [])
+    public function charge(Billable $billable, $amount, array $options = [])
     {
-        $customer = $this->asBraintreeCustomer();
+        $customer = $this->asCustomer($billable);
 
         $response = BraintreeTransaction::sale(array_merge([
-            'amount' => (string) round($amount * (1 + ($this->taxPercentage() / 100)), 2),
+            'amount' => (string) round($amount * (1 + ($billable->taxPercentage() / 100)), 2),
             'paymentMethodToken' => $customer->paymentMethods[0]->token,
             'options' => [
                 'submitForSettlement' => true,
@@ -231,7 +232,7 @@ class BraintreeGateway extends Gateway
         return $response;
     }
 
-    public function refund($charge, array $options = [])
+    public function refund(Billable $billable, $charge, array $options = [])
     {
         // FIXME
     }
@@ -243,10 +244,13 @@ class BraintreeGateway extends Gateway
      * @param  int  $amount
      * @param  array  $options
      * @return array
+     *
+     * @throws \Exception
      */
-    public function tab($description, $amount, array $options = [])
+    public function tab(Billable $billable, $description, $amount, array $options = [])
     {
-        return $this->charge($amount, array_merge($options, [
+        // FIXME: Issues with cross compat
+        return $this->charge($billable, $amount, array_merge($options, [
             'customFields' => [
                 'description' => $description,
             ],
@@ -260,10 +264,12 @@ class BraintreeGateway extends Gateway
      * @param  int  $amount
      * @param  array  $options
      * @return array
+     *
+     * @throws \Exception
      */
-    public function invoiceFor($description, $amount, array $options = [])
+    public function invoiceFor(Billable $billable, $description, $amount, array $options = [])
     {
-        return $this->tab($description, $amount, $options);
+        return $this->tab($billable, $description, $amount, $options);
     }
 
     /**
@@ -273,11 +279,11 @@ class BraintreeGateway extends Gateway
      * @param  array  $parameters
      * @return \Illuminate\Support\Collection
      */
-    public function invoices($includePending = false, $parameters = [])
+    public function invoices(Billable $billable, $includePending = false, $parameters = [])
     {
         $invoices = [];
 
-        $customer = $this->asBraintreeCustomer();
+        $customer = $this->asCustomer($billable);
 
         $parameters = array_merge([
             'id' => TransactionSearch::customerId()->is($customer->id),
@@ -292,10 +298,10 @@ class BraintreeGateway extends Gateway
         // Here we will loop through the Braintree invoices and create our own custom Invoice
         // instance that gets more helper methods and is generally more convenient to work
         // work than the plain Braintree objects are. Then, we'll return the full array.
-        if (! is_null($transactions)) {
+        if (null !== $transactions) {
             foreach ($transactions as $transaction) {
                 if ($transaction->status == BraintreeTransaction::SETTLED || $includePending) {
-                    $invoices[] = new Invoice($this, $transaction);
+                    $invoices[] = new Invoice($billable, $transaction); // FIXME
                 }
             }
         }
@@ -309,16 +315,16 @@ class BraintreeGateway extends Gateway
      * @param  string  $id
      * @return \Laravel\Cashier\Invoice|null
      */
-    public function findInvoice($id)
+    public function findInvoice(Billable $billable, $id)
     {
         try {
             $invoice = BraintreeTransaction::find($id);
 
-            if ($invoice->customerDetails->id != $this->braintree_id) {
+            if ($invoice->customerDetails->id != $billable->getPaymentGatewayIdAttribute()) {
                 return;
             }
 
-            return new Invoice($this, $invoice);
+            return new Invoice($billable, $invoice);
         } catch (Exception $e) {
             //
         }
@@ -330,11 +336,11 @@ class BraintreeGateway extends Gateway
      * @param  string  $id
      * @return \Laravel\Cashier\Invoice
      */
-    public function findInvoiceOrFail($id)
+    public function findInvoiceOrFail(Billable $billable, $id)
     {
-        $invoice = $this->findInvoice($id);
+        $invoice = $this->findInvoice($billable, $id);
 
-        if (is_null($invoice)) {
+        if (null === $invoice) {
             throw new NotFoundHttpException;
         }
 
@@ -349,8 +355,8 @@ class BraintreeGateway extends Gateway
      * @param  string  $storagePath
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function downloadInvoice($id, array $data, $storagePath = null)
+    public function downloadInvoice(Billable $billable, $id, array $data, $storagePath = null)
     {
-        return $this->findInvoiceOrFail($id)->download($data, $storagePath);
+        return $this->findInvoiceOrFail($billable, $id)->download($data, $storagePath);
     }
 }

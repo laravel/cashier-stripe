@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @package Laravel\Cashier
  * @mixin \Illuminate\Database\Eloquent\Model
+ * @property-read \Laravel\Cashier\Subscription[] $subscriptions
  */
 trait Billable
 {
