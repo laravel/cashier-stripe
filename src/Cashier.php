@@ -17,6 +17,13 @@ class Cashier
     protected static $instance;
 
     /**
+     * Cache of gateway instances.
+     *
+     * @var array
+     */
+    protected $gateways = [];
+
+    /**
      * The current currency.
      *
      * @var string
@@ -91,13 +98,17 @@ class Cashier
 
     /**
      * @param string|null $gatewayName
-     * @return \Laravel\Cashier\Contracts\Gateway
+     * @return \Laravel\Cashier\Gateway\Gateway
      */
     public function gateway($gatewayName = null)
     {
-        return $this->app->make(
-            $this->getGatewayClass($gatewayName ?: $this->defaultGateway)
-        );
+        $gatewayName = $gatewayName ?: $this->defaultGateway;
+
+        if (!isset($this->gateways[$gatewayName])) {
+            $this->gateways[$gatewayName] = $this->app->make($this->getGatewayClass($gatewayName));
+        }
+
+        return $this->gateways[$gatewayName];
     }
 
     /**
@@ -106,9 +117,12 @@ class Cashier
      */
     public function hasGateway($gatewayName)
     {
-        return $this->app->bound(
-            $this->getGatewayClass($gatewayName)
-        );
+        try {
+            $this->gateway($gatewayName);
+            return true;
+        } catch (\ReflectionException $e) {
+            return false;
+        }
     }
 
     /**
@@ -117,6 +131,7 @@ class Cashier
      */
     protected function getGatewayClass($gatewayName)
     {
+        // TODO: Maybe resolve via container as 'stripe.gateway.braintree' for easier replacement?
         return '\\Laravel\\Cashier\\Gateway\\'.Str::studly($gatewayName).'Gateway';
     }
 

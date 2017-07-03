@@ -3,9 +3,8 @@
 namespace Laravel\Cashier\Gateway;
 
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Contracts\Gateway as GatewayContract;
 
-abstract class Gateway implements GatewayContract
+abstract class Gateway
 {
     /**
      * Cashier instance.
