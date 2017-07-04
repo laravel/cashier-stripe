@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Cashier;
+namespace Laravel\Cashier\Gateway\Stripe;
 
 use Carbon\Carbon;
 use Dompdf\Dompdf;
@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\View;
 use Stripe\Invoice as StripeInvoice;
 use Symfony\Component\HttpFoundation\Response;
 
-class Invoice
+class Invoice extends \Laravel\Cashier\Gateway\Invoice
 {
     /**
      * The Stripe model instance.

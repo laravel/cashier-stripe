@@ -1,32 +1,12 @@
 <?php
 
-namespace Laravel\Cashier;
+namespace Laravel\Cashier\Gateway\Stripe;
 
 use Carbon\Carbon;
+use Laravel\Cashier\Gateway\SubscriptionBuilder as BaseBuilder;
 
-class SubscriptionBuilder
+class SubscriptionBuilder extends BaseBuilder
 {
-    /**
-     * The model that is subscribing.
-     *
-     * @var \Illuminate\Database\Eloquent\Model
-     */
-    protected $owner;
-
-    /**
-     * The name of the subscription.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * The name of the plan being subscribed to.
-     *
-     * @var string
-     */
-    protected $plan;
-
     /**
      * The quantity of the subscription.
      *
@@ -35,25 +15,9 @@ class SubscriptionBuilder
     protected $quantity = 1;
 
     /**
-     * The date and time the trial will expire.
-     *
-     * @var \Carbon\Carbon
+     * @var Carbon
      */
     protected $trialExpires;
-
-    /**
-     * Indicates that the trial should end immediately.
-     *
-     * @var bool
-     */
-    protected $skipTrial = false;
-
-    /**
-     * The coupon code being applied to the customer.
-     *
-     * @var string|null
-     */
-    protected $coupon;
 
     /**
      * The metadata to apply to the subscription.
@@ -61,21 +25,6 @@ class SubscriptionBuilder
      * @var array|null
      */
     protected $metadata;
-
-    /**
-     * Create a new subscription builder instance.
-     *
-     * @param  mixed  $owner
-     * @param  string  $name
-     * @param  string  $plan
-     * @return void
-     */
-    public function __construct($owner, $name, $plan)
-    {
-        $this->name = $name;
-        $this->plan = $plan;
-        $this->owner = $owner;
-    }
 
     /**
      * Specify the quantity of the subscription.
@@ -117,31 +66,6 @@ class SubscriptionBuilder
     }
 
     /**
-     * Force the trial to end immediately.
-     *
-     * @return $this
-     */
-    public function skipTrial()
-    {
-        $this->skipTrial = true;
-
-        return $this;
-    }
-
-    /**
-     * The coupon to apply to a new subscription.
-     *
-     * @param  string  $coupon
-     * @return $this
-     */
-    public function withCoupon($coupon)
-    {
-        $this->coupon = $coupon;
-
-        return $this;
-    }
-
-    /**
      * The metadata to apply to a new subscription.
      *
      * @param  array  $metadata
@@ -155,41 +79,26 @@ class SubscriptionBuilder
     }
 
     /**
-     * Add a new Stripe subscription to the Stripe model.
-     *
-     * @param  array  $options
-     * @return \Laravel\Cashier\Subscription
-     */
-    public function add(array $options = [])
-    {
-        return $this->create(null, $options);
-    }
-
-    /**
      * Create a new Stripe subscription.
      *
      * @param  string|null  $token
      * @param  array  $options
      * @return \Laravel\Cashier\Subscription
+     * @throws \Laravel\Cashier\Gateway\Stripe\Exception
      */
     public function create($token = null, array $options = [])
     {
         $customer = $this->getStripeCustomer($token, $options);
 
+        // TODO: How to handle Cashier Exceptions vs. Stripe Errors
         $subscription = $customer->subscriptions->create($this->buildPayload());
-
-        if ($this->skipTrial) {
-            $trialEndsAt = null;
-        } else {
-            $trialEndsAt = $this->trialExpires;
-        }
 
         return $this->owner->subscriptions()->create([
             'name' => $this->name,
-            'stripe_id' => $subscription->id,
-            'stripe_plan' => $this->plan,
+            'stripe_id' => $subscription->id, // FIXME
+            'stripe_plan' => $this->plan, // FIXME
             'quantity' => $this->quantity,
-            'trial_ends_at' => $trialEndsAt,
+            'trial_ends_at' => ! $this->skipTrial && $this->trialExpires ? $this->trialExpires : null,
             'ends_at' => null,
         ]);
     }
@@ -200,20 +109,15 @@ class SubscriptionBuilder
      * @param  string|null  $token
      * @param  array  $options
      * @return \Stripe\Customer
+     * @throws \Laravel\Cashier\Gateway\Stripe\Exception
      */
     protected function getStripeCustomer($token = null, array $options = [])
     {
-        if (! $this->owner->stripe_id) {
-            $customer = $this->owner->createAsStripeCustomer($token, $options);
-        } else {
-            $customer = $this->owner->asStripeCustomer();
-
-            if ($token) {
-                $this->owner->updateCard($token);
-            }
+        if (isset($this->owner->payment_gateway) && 'stripe' !== $this->owner->payment_gateway) {
+            throw new Exception('Customer is not using the Stripe payment gateway.');
         }
 
-        return $customer;
+        return $this->getCustomerForGateway('stripe', $token, $options);
     }
 
     /**

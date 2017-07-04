@@ -3,9 +3,24 @@
 namespace Laravel\Cashier;
 
 use Exception;
+use Illuminate\Support\Str;
+use Laravel\Cashier\Exception as CashierException;
+use Laravel\Cashier\Gateway\Gateway;
 
+/**
+ * Class Cashier
+ *
+ * @package Laravel\Cashier
+ */
 class Cashier
 {
+    /**
+     * Cache of gateway instances.
+     *
+     * @var array
+     */
+    protected static $gateways = [];
+
     /**
      * The current currency.
      *
@@ -28,10 +43,125 @@ class Cashier
     protected static $formatCurrencyUsing;
 
     /**
-     * Set the currency to be used when billing Stripe models.
+     * The default payment gateway.
      *
-     * @param  string  $currency
-     * @param  string|null  $symbol
+     * @var string
+     */
+    protected static $defaultGateway = 'stripe';
+
+    /**
+     * Name of model that subscriptions are attached to
+     *
+     * @var string
+     */
+    protected static $modelName;
+
+    /**
+     * Get the model to attach subscriptions to.
+     *
+     * @return string
+     */
+    public static function getModelName()
+    {
+        if (null === static::$modelName) {
+            if (
+                ($model = getenv('STRIPE_MODEL')) ||
+                ($model = getenv('BRAINTREE_MODEL')) ||
+                ($model = config('services.stripe.model')) ||
+                ($model = config('services.braintree.model')) ||
+                ($model = config('cashier.model')) ||
+                ($model = 'App\\User')
+            ) {
+                static::$modelName = $model;
+            }
+        }
+
+        return static::$modelName;
+    }
+
+    /**
+     * Pass calls to default gateway.
+     *
+     * @param  string $name
+     * @param  array $arguments
+     * @return mixed
+     */
+    public static function __callStatic($name, $arguments)
+    {
+        return call_user_func_array([static::gateway(), $name], $arguments);
+    }
+
+    /**
+     * @param string|null $name
+     * @return \Laravel\Cashier\Gateway\Gateway
+     * @throws \Laravel\Cashier\Exception
+     */
+    public static function gateway($name = null)
+    {
+        $name = $name ?: static::getDefaultGateway();
+
+        if (! static::hasGateway($name)) {
+            throw new CashierException("Gateway '{$name}' not registered.");
+        }
+
+        return static::$gateways[$name];
+    }
+
+    /**
+     * @param  string $name
+     * @return bool
+     */
+    public static function hasGateway($name = null)
+    {
+        return isset(static::$gateways[$name ?: static::getDefaultGateway()]);
+    }
+
+    /**
+     * Get the default gateway.
+     *
+     * @return string
+     */
+    public static function getDefaultGateway()
+    {
+        return static::$defaultGateway;
+    }
+
+    /**
+     * Set the singleton instance.
+     *
+     * @param \Laravel\Cashier\Gateway\Gateway $gateway
+     */
+    public static function setDefaultGateway(Gateway $gateway)
+    {
+        static::addGateway($gateway);
+        static::$defaultGateway = $gateway->getName();
+    }
+
+    /**
+     * Add a gateway to Cashier.
+     *
+     * @param  \Laravel\Cashier\Gateway\Gateway $gateway
+     */
+    public static function addGateway(Gateway $gateway)
+    {
+        static::$gateways[$gateway->getName()] = $gateway;
+    }
+
+    /**
+     * Get array of registered gateways.
+     *
+     * @return Gateway[]
+     */
+    public static function getGateways()
+    {
+        return static::$gateways;
+    }
+
+    /**
+     * Set the currency to be used when billing models.
+     *
+     * @param  string $currency
+     * @param  string|null $symbol
      * @return void
      */
     public static function useCurrency($currency, $symbol = null)
@@ -42,9 +172,20 @@ class Cashier
     }
 
     /**
+     * Set the currency symbol to be used when formatting currency.
+     *
+     * @param  string $symbol
+     * @return void
+     */
+    public static function useCurrencySymbol($symbol)
+    {
+        static::$currencySymbol = $symbol;
+    }
+
+    /**
      * Guess the currency symbol for the given currency.
      *
-     * @param  string  $currency
+     * @param  string $currency
      * @return string
      * @throws \Exception
      */
@@ -75,30 +216,9 @@ class Cashier
     }
 
     /**
-     * Set the currency symbol to be used when formatting currency.
-     *
-     * @param  string  $symbol
-     * @return void
-     */
-    public static function useCurrencySymbol($symbol)
-    {
-        static::$currencySymbol = $symbol;
-    }
-
-    /**
-     * Get the currency symbol currently in use.
-     *
-     * @return string
-     */
-    public static function usesCurrencySymbol()
-    {
-        return static::$currencySymbol;
-    }
-
-    /**
      * Set the custom currency formatter.
      *
-     * @param  callable  $callback
+     * @param  callable $callback
      * @return void
      */
     public static function formatCurrencyUsing(callable $callback)
@@ -109,7 +229,7 @@ class Cashier
     /**
      * Format the given amount into a displayable currency.
      *
-     * @param  int  $amount
+     * @param  int $amount
      * @return string
      */
     public static function formatAmount($amount)
@@ -120,10 +240,20 @@ class Cashier
 
         $amount = number_format($amount / 100, 2);
 
-        if (starts_with($amount, '-')) {
+        if (Str::startsWith($amount, '-')) {
             return '-'.static::usesCurrencySymbol().ltrim($amount, '-');
         }
 
         return static::usesCurrencySymbol().$amount;
+    }
+
+    /**
+     * Get the currency symbol currently in use.
+     *
+     * @return string
+     */
+    public static function usesCurrencySymbol()
+    {
+        return static::$currencySymbol;
     }
 }
