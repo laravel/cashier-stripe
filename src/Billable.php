@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
+use Closure;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Gateway\Invoice;
 use Laravel\Cashier\Gateway\Stripe\Card;
@@ -14,22 +15,29 @@ use Stripe\Invoice as StripeInvoice;
  *
  * @package Laravel\Cashier
  * @mixin \Illuminate\Database\Eloquent\Model
- * @property-read \Laravel\Cashier\Subscription[] $subscriptions
+ * @property-read \Laravel\Cashier\Subscription[]|Collection $subscriptions
  */
 trait Billable
 {
     use UsesPaymentGateway;
 
     /**
+     * Assigned billing manager.
+     *
+     * @var \Laravel\Cashier\Gateway\BillingManager
+     */
+    protected $billingManager;
+
+    /**
      * Make a "one off" charge on the customer for the given amount.
      *
      * @param  int $amount
      * @param  array $options
-     * @return \Stripe\Charge|array
+     * @return mixed
      */
     public function charge($amount, array $options = [])
     {
-        return $this->getGateway()->charge($amount, $options);
+        return $this->getBillingManager()->charge($amount, $options);
     }
 
     /**
@@ -37,11 +45,11 @@ trait Billable
      *
      * @param  string $charge
      * @param  array $options
-     * @return \Stripe\Charge|mixed
+     * @return mixed
      */
     public function refund($charge, array $options = [])
     {
-        return $this->getGateway()->refund($charge, $options);
+        return $this->getBillingManager()->refund($charge, $options);
     }
 
     /**
@@ -60,13 +68,13 @@ trait Billable
      * @param  string $description
      * @param  int $amount
      * @param  array $options
-     * @return \Stripe\InvoiceItem
+     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
     public function tab($description, $amount, array $options = [])
     {
-        return $this->getGateway()->tab($description, $amount, $options);
+        return $this->getBillingManager()->tab($description, $amount, $options);
     }
 
     /**
@@ -75,11 +83,11 @@ trait Billable
      * @param  string $description
      * @param  int $amount
      * @param  array $options
-     * @return \Laravel\Cashier\Gateway\Invoice|bool
+     * @return mixed
      */
     public function invoiceFor($description, $amount, array $options = [])
     {
-        return $this->getGateway()->invoiceFor($description, $amount, $options);
+        return $this->getBillingManager()->invoiceFor($description, $amount, $options);
     }
 
     /**
@@ -90,16 +98,6 @@ trait Billable
     public function preferredCurrency()
     {
         return Cashier::usesCurrency();
-    }
-
-    /**
-     * Invoice the billable entity outside of regular billing cycle.
-     *
-     * @return \Stripe\Invoice|bool
-     */
-    public function invoice()
-    {
-        // FIXME
     }
 
     /**
@@ -117,19 +115,19 @@ trait Billable
     /**
      * Determine if the Stripe model is on trial.
      *
-     * @param  string $subscription
-     * @param  string|null $plan
+     * @param  string  $subscriptionName
+     * @param  string|null  $plan
      * @return bool
      */
-    public function onTrial($subscription = 'default', $plan = null)
+    public function onTrial($subscriptionName = 'default', $plan = null)
     {
         if (func_num_args() === 0 && $this->onGenericTrial()) {
             return true;
         }
 
-        $subscription = $this->subscription($subscription);
+        $subscription = $this->subscription($subscriptionName);
 
-        if (is_null($plan)) {
+        if (null === $plan) {
             return $subscription && $subscription->onTrial();
         }
 
@@ -149,34 +147,34 @@ trait Billable
     /**
      * Get a subscription instance by name.
      *
-     * @param  string $subscription
+     * @param  string $subscriptionName
      * @return \Laravel\Cashier\Subscription|null
      */
-    public function subscription($subscription = 'default')
+    public function subscription($subscriptionName = 'default')
     {
-        return $this->subscriptions->sortByDesc(function ($value) {
-            return $value->created_at->getTimestamp();
-        })->first(function ($value) use ($subscription) {
-                return $value->name === $subscription;
-            });
+        return $this->subscriptions->sortByDesc(function ($subscription) {
+            return $subscription->created_at->getTimestamp();
+        })->first(function ($subscription) use ($subscriptionName) {
+            return $subscription->name === $subscriptionName;
+        });
     }
 
     /**
      * Determine if the Stripe model has a given subscription.
      *
-     * @param  string $subscription
+     * @param  string $subscriptionName
      * @param  string|null $plan
      * @return bool
      */
-    public function subscribed($subscription = 'default', $plan = null)
+    public function subscribed($subscriptionName = 'default', $plan = null)
     {
-        $subscription = $this->subscription($subscription);
+        $subscription = $this->subscription($subscriptionName);
 
-        if (is_null($subscription)) {
+        if (null === $subscription) {
             return false;
         }
 
-        if (is_null($plan)) {
+        if (null === $plan) {
             return $subscription->valid();
         }
 
@@ -194,23 +192,6 @@ trait Billable
     }
 
     /**
-     * Get the entity's upcoming invoice.
-     *
-     * @return \Laravel\Cashier\Gateway\Invoice|null
-     */
-    public function upcomingInvoice()
-    {
-        // FIXME: Not in braintree
-        try {
-            $stripeInvoice = StripeInvoice::upcoming(['customer' => $this->stripe_id], ['api_key' => $this->getStripeKey()]);
-
-            return new Invoice($this, $stripeInvoice);
-        } catch (StripeErrorInvalidRequest $e) {
-            //
-        }
-    }
-
-    /**
      * Find an invoice or throw a 404 error.
      *
      * @param  string $id
@@ -218,31 +199,31 @@ trait Billable
      */
     public function findInvoiceOrFail($id)
     {
-        return $this->findInvoiceOrFail($id);
+        return $this->getBillingManager()->findInvoiceOrFail($id);
     }
 
     /**
      * Find an invoice by ID.
      *
      * @param  string $id
-     * @return \Laravel\Cashier\Gateway\Invoice|null
+     * @return Invoice|null
      */
     public function findInvoice($id)
     {
-        return $this->findInvoice($id);
+        return $this->getBillingManager()->findInvoice($id);
     }
 
     /**
      * Create an invoice download Response.
      *
-     * @param  string $id
-     * @param  array $data
-     * @param  string $storagePath
+     * @param  string  $id
+     * @param  array  $data
+     * @param  string  $storagePath
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function downloadInvoice($id, array $data, $storagePath = null)
     {
-        return $this->getGateway()->downloadInvoice($id, $data, $storagePath);
+        return $this->getBillingManager()->downloadInvoice($id, $data, $storagePath);
     }
 
     /**
@@ -265,98 +246,7 @@ trait Billable
      */
     public function invoices($includePending = false, $parameters = [])
     {
-        return $this->getGateway()->invoices($includePending, $parameters);
-    }
-
-    /**
-     * Get the Stripe customer for the Stripe model.
-     *
-     * @return \Stripe\Customer
-     */
-    public function asStripeCustomer()
-    {
-        return $this->asCustomer('stripe');
-    }
-
-    /**
-     * Synchronises the customer's card from Stripe back into the database.
-     *
-     * @return $this
-     */
-    public function updateCardFromStripe()
-    {
-        $customer = $this->asStripeCustomer();
-
-        $defaultCard = null;
-
-        foreach ($customer->sources->data as $card) {
-            if ($card->id === $customer->default_source) {
-                $defaultCard = $card;
-                break;
-            }
-        }
-
-        if ($defaultCard) {
-            $this->fillCardDetails($defaultCard)->save();
-        } else {
-            $this->forceFill([
-                'card_brand' => null,
-                'card_last_four' => null,
-            ])->save();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Fills the model's properties with the source from Stripe.
-     *
-     * @param  \Stripe\Card|null $card
-     * @return $this
-     */
-    protected function fillCardDetails($card)
-    {
-        if ($card) {
-            $this->card_brand = $card->brand;
-            $this->card_last_four = $card->last4;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Deletes the entity's cards.
-     *
-     * @return void
-     */
-    public function deleteCards()
-    {
-        $this->cards()->each(function ($card) {
-            $card->delete();
-        });
-    }
-
-    /**
-     * Get a collection of the entity's cards.
-     *
-     * @param  array $parameters
-     * @return \Illuminate\Support\Collection
-     */
-    public function cards($parameters = [])
-    {
-        $cards = [];
-
-        $parameters = array_merge(['limit' => 24], $parameters);
-
-        $stripeCards = $this->asStripeCustomer()->sources->all(['object' => 'card'] + $parameters);
-
-        if (! is_null($stripeCards)) {
-            foreach ($stripeCards->data as $card) {
-                $cards[] = new Card($this, $card);
-            }
-        }
-
-        return new Collection($cards);
+        return $this->getBillingManager()->invoices($includePending, $parameters);
     }
 
     /**
@@ -419,7 +309,7 @@ trait Billable
      */
     public function updateCard($token, array $options = [])
     {
-        $this->getGateway()->updateCard($token, $options);
+        $this->getBillingManager()->updateCard($token, $options);
     }
 
     /**
@@ -433,32 +323,57 @@ trait Billable
     }
 
     /**
-     * @param $gateway
-     * @param $token
-     * @param array $options
-     * @return \Stripe\Customer|\Braintree\Customer|mixed
+     * Allow for dynamic calls to billing manager.
+     *
+     * @param $name
+     * @param $arguments
+     * @return \Laravel\Cashier\Gateway\BillingManager|mixed
      */
-    public function createAsCustomer($gateway, $token, array $options = [])
+    public function __call($name, $arguments)
     {
-        $oldMethodName = 'createAs'.Str::studly($gateway).'Customer';
-        if (method_exists($this, $oldMethodName)) {
-            return $this->$oldMethodName($token, $options);
+        if (empty($arguments) && Cashier::hasGateway($name)) {
+            if (!$this->getAssignedPaymentGateway()) {
+                $this->billingManager = Cashier::gateway($name)->manageBilling($this);
+            }
+
+            $billingManager = $this->getBillingManager();
+            if ($billingManager->getGateway()->getName() === $name) {
+                return $billingManager;
+            }
         }
 
-        // FIXME
+        return parent::__call($name, $arguments);
     }
 
     /**
-     * @param $gateway
-     * @return \Stripe\Customer|\Braintree\Customer|mixed
+     * Only run code for specific gateway.
+     *
+     * @param  string  $gateway
+     * @param  \Closure  $callback
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exception
      */
-    public function asCustomer($gateway)
+    protected function ifGateway($gateway, Closure $callback)
     {
-        $oldMethodName = 'as'.Str::studly($gateway).'Customer';
-        if (method_exists($this, $oldMethodName)) {
-            return $this->$oldMethodName();
+        if ($gateway === $this->payment_gateway) {
+            $callback($this->getBillingManager());
         }
 
-        return Cashier::gateway($gateway)->asCustomer($this);
+        return $this;
+    }
+
+    /**
+     * Get the billing manager.
+     *
+     * @return \Laravel\Cashier\Gateway\BillingManager
+     */
+    protected function getBillingManager()
+    {
+        if (null === $this->billingManager) {
+            $this->billingManager = $this->getGateway()->manageBilling($this);
+        }
+
+        return $this->billingManager;
     }
 }

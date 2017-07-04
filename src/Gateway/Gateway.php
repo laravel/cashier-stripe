@@ -32,34 +32,12 @@ abstract class Gateway
 
     abstract public function buildSubscription(Model $billable, $subscription, $plan);
 
+    abstract public function manageBilling(Billable $billable);
+
     /**
      * Get the name of the gateway.
      *
      * @return string
      */
     abstract public function getName();
-
-    abstract public function asCustomer(Billable $billable);
-
-    abstract public function createAsCustomer(Billable $billable, $token, array $options = []);
-
-    abstract public function applyCoupon(Billable $billable, $coupon, $subscription = 'default', $removeOthers = false);
-
-    abstract public function updateCard(Billable $billable, $token, array $options = []);
-
-    abstract public function charge(Billable $billable, $amount, array $options = []);
-
-    abstract public function refund(Billable $billable, $charge, array $options = []);
-
-    abstract public function tab(Billable $billable, $description, $amount, array $options = []);
-
-    abstract public function invoiceFor(Billable $billable, $description, $amount, array $options = []);
-
-    abstract public function invoices(Billable $billable, $includePending = false, $parameters = []);
-
-    abstract public function findInvoice(Billable $billable, $id);
-
-    abstract public function findInvoiceOrFail(Billable $billable, $id);
-
-    abstract public function downloadInvoice(Billable $billable, $id, array $data, $storagePath = null);
 }

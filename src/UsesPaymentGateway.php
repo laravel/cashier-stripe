@@ -12,11 +12,18 @@ namespace Laravel\Cashier;
 trait UsesPaymentGateway
 {
     /**
-     * Accessor for 'payment_gateway'
+     * Whether to use gateway attributes like stripe_id or standard attributes like payment_gateway_id
      *
-     * @return string
+     * @var bool
      */
-    public function getPaymentGatewayAttribute()
+    protected $namespacedGatewayAttributes = false;
+
+    /**
+     * Get the explicitly assigned gateway.
+     *
+     * @return null|string
+     */
+    public function getAssignedPaymentGateway()
     {
         if ($gateway = $this->getAttribute('payment_gateway')) {
             return $gateway;
@@ -28,6 +35,20 @@ trait UsesPaymentGateway
 
         if ($this->getAttribute('braintree_id')) {
             return 'braintree';
+        }
+
+        return null;
+    }
+
+    /**
+     * Accessor for 'payment_gateway'
+     *
+     * @return string
+     */
+    public function getPaymentGatewayAttribute()
+    {
+        if ($gateway = $this->getAssignedPaymentGateway()) {
+            return $gateway;
         }
 
         return Cashier::getDefaultGateway();
@@ -51,6 +72,25 @@ trait UsesPaymentGateway
         return $this->getAttribute('payment_gateway_id');
     }
 
+    public function setPaymentGatewayId($id, $gateway = null)
+    {
+        $gateway = $gateway ?: $this->payment_gateway;
+
+        if ($this->namespacedGatewayAttributes) {
+            $this->attributes["{$gateway}_id"] = $id;
+            return;
+        }
+
+        $this->attributes['payment_gateway'] = $gateway;
+        $this->attributes['payment_gateway_id'] = $id;
+
+    }
+
+    public function setPaymentGatewayIdAttribute($id)
+    {
+        return $this->setPaymentGatewayId($id);
+    }
+
     /**
      * Accessor for 'payment_gateway_plan'
      *
@@ -69,6 +109,25 @@ trait UsesPaymentGateway
         return $this->getAttribute('payment_gateway_plan');
     }
 
+    public function setPaymentGatewayPlan($plan, $gateway = null)
+    {
+        $gateway = $gateway ?: $this->payment_gateway;
+
+        if ($this->namespacedGatewayAttributes) {
+            $this->attributes["{$gateway}_plan"] = $plan;
+            return;
+        }
+
+        $this->attributes['payment_gateway'] = $gateway;
+        $this->attributes['payment_gateway_plan'] = $plan;
+
+    }
+
+    public function setPaymentGatewayPlanAttribute($plan)
+    {
+        return $this->setPaymentGatewayPlan($plan);
+    }
+
     /**
      * Get the gateway for this model.
      *
@@ -77,23 +136,5 @@ trait UsesPaymentGateway
     protected function getGateway()
     {
         return Cashier::gateway($this->payment_gateway);
-    }
-
-    /**
-     * Only run code for specific gateway.
-     *
-     * @param  string  $gateway
-     * @param  \Closure  $callback
-     * @return $this
-     *
-     * @throws \Laravel\Cashier\Exception
-     */
-    protected function forGateway($gateway, \Closure $callback)
-    {
-        if ($gateway === $this->getPaymentGatewayPlanAttribute()) {
-            $callback(Cashier::gateway($gateway)); // FIXME
-        }
-
-        return $this;
     }
 }
