@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Cashier;
+namespace Laravel\Cashier\Gateway\Stripe;
 
 use Carbon\Carbon;
 use Dompdf\Dompdf;
@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\View;
 use Stripe\Invoice as StripeInvoice;
 use Symfony\Component\HttpFoundation\Response;
 
-class Invoice
+class Invoice extends \Laravel\Cashier\Gateway\Invoice
 {
     /**
      * The Stripe model instance.
@@ -194,7 +194,7 @@ class Invoice
     }
 
     /**
-     * Get all of the invoie items by a given type.
+     * Get all of the invoice items by a given type.
      *
      * @param  string  $type
      * @return array
@@ -268,7 +268,7 @@ class Invoice
     /**
      * Create an invoice download response.
      *
-     * @param  array   $data
+     * @param  array  $data
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function download(array $data)

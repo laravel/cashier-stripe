@@ -1,17 +1,21 @@
 <?php
 
+namespace Laravel\Cashier\Tests;
+
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use PHPUnit_Framework_TestCase;
+use Laravel\Cashier\Tests\Fixtures\User;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Laravel\Cashier\Http\Controllers\WebhookController;
+use Laravel\Cashier\Tests\Fixtures\CashierTestControllerStub;
 
 class CashierTest extends PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
         if (file_exists(__DIR__.'/../.env')) {
-            $dotenv = new Dotenv\Dotenv(__DIR__.'/../');
+            $dotenv = new \Dotenv\Dotenv(__DIR__.'/../');
             $dotenv->load();
         }
     }
@@ -203,6 +207,38 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
     }
 
+    public function test_creating_subscription_with_explicit_trial()
+    {
+        $user = User::create([
+             'email' => 'taylor@laravel.com',
+             'name' => 'Taylor Otwell',
+        ]);
+
+        // Create Subscription
+        $user->newSubscription('main', 'monthly-10-1')
+             ->trialUntil(Carbon::tomorrow()->hour(3)->minute(15))->create($this->getTestToken());
+
+        $subscription = $user->subscription('main');
+
+        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->onTrial());
+        $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
+
+        // Cancel Subscription
+        $subscription->cancel();
+
+        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->onGracePeriod());
+
+        // Resume Subscription
+        $subscription->resume();
+
+        $this->assertTrue($subscription->active());
+        $this->assertFalse($subscription->onGracePeriod());
+        $this->assertTrue($subscription->onTrial());
+        $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
+    }
+
     public function test_applying_coupons_to_existing_customers()
     {
         $user = User::create([
@@ -292,7 +328,7 @@ class CashierTest extends PHPUnit_Framework_TestCase
 
     protected function getTestToken()
     {
-        return Stripe\Token::create([
+        return \Stripe\Token::create([
             'card' => [
                 'number' => '4242424242424242',
                 'exp_month' => 5,
@@ -313,18 +349,5 @@ class CashierTest extends PHPUnit_Framework_TestCase
     protected function connection()
     {
         return Eloquent::getConnectionResolver()->connection();
-    }
-}
-
-class User extends Eloquent
-{
-    use Laravel\Cashier\Billable;
-}
-
-class CashierTestControllerStub extends WebhookController
-{
-    protected function eventExistsOnStripe($id)
-    {
-        return true;
     }
 }

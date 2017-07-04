@@ -2,7 +2,11 @@
 
 namespace Laravel\Cashier;
 
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Cashier\Gateway\Braintree\Gateway as BraintreeGateway;
+use Laravel\Cashier\Gateway\Stripe\Gateway as StripeGateway;
 
 class CashierServiceProvider extends ServiceProvider
 {
@@ -15,8 +19,13 @@ class CashierServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cashier');
 
+        $viewPath = Arr::first($this->app->make('config')->get('view.paths', [
+                $this->app->basePath('resources/views/'),
+            ]));
+
         $this->publishes([
-            __DIR__.'/../resources/views' => base_path('resources/views/vendor/cashier'),
+            __DIR__.'/../resources/views' => $viewPath.'vendor/cashier',
+            __DIR__.'/../config/cashier.php' => $this->app->basePath('config/cashier.php'),
         ]);
     }
 
@@ -27,6 +36,30 @@ class CashierServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(StripeGateway::class, function (Container $app) {
+            $config = $app->make('config');
+            if ($key = getenv('STRIPE_SECRET', $config->get('services.stripe.secret'))) {
+                StripeGateway::setApiKey($key);
+            }
+
+            return new StripeGateway();
+        });
+
+        $this->app->singleton(BraintreeGateway::class, function (Container $app) {
+            // TODO: Braintree config
+            return new BraintreeGateway();
+        });
+
+        $this->app->alias(Cashier::class, 'cashier');
+        $this->app->alias(StripeGateway::class, 'cashier.stripe');
+        $this->app->alias(BraintreeGateway::class, 'cashier.braintree');
+
+        if (class_exists('Stripe\\Stripe')) {
+            $this->app->make(StripeGateway::class)->register();
+        }
+
+        if (class_exists('Braintree\\Version')) {
+            $this->app->make(BraintreeGateway::class)->register();
+        }
     }
 }

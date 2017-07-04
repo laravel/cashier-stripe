@@ -8,6 +8,8 @@ use Stripe\Event as StripeEvent;
 use Illuminate\Routing\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
+// FIXME: Braintree
+
 class WebhookController extends Controller
 {
     /**
@@ -95,8 +97,8 @@ class WebhookController extends Controller
     /**
      * Handle calls to missing methods on the controller.
      *
-     * @param  array   $parameters
-     * @return mixed
+     * @param  array  $parameters
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function missingMethod($parameters = [])
     {
