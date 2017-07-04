@@ -8,6 +8,8 @@ use Stripe\Event as StripeEvent;
 use Illuminate\Routing\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
+// FIXME: Braintree
+
 class WebhookController extends Controller
 {
     /**
