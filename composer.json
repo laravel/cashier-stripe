@@ -3,6 +3,10 @@
     "description": "Laravel Cashier provides an expressive, fluent interface to Stripe's subscription billing services.",
     "keywords": ["laravel", "stripe", "billing"],
     "license": "MIT",
+    "support": {
+        "issues": "https://github.com/laravel/cashier/issues",
+        "source": "https://github.com/laravel/cashier"
+    },
     "authors": [
         {
             "name": "Taylor Otwell",
@@ -11,16 +15,16 @@
     ],
     "require": {
         "php": ">=5.5.9",
+        "dompdf/dompdf": "^0.8.0",
         "illuminate/database": "~5.3",
         "illuminate/support": "~5.3",
-        "dompdf/dompdf": "^0.8.0",
         "nesbot/carbon": "~1.0",
         "stripe/stripe-php": "~4.0",
         "symfony/http-kernel": "~2.7|~3.0"
     },
     "require-dev": {
-        "illuminate/routing": "~5.3",
         "illuminate/http": "~5.3",
+        "illuminate/routing": "~5.3",
         "illuminate/view": "~5.3",
         "mockery/mockery": "~0.9",
         "phpunit/phpunit": "~4.0",
@@ -45,6 +49,9 @@
                 "Laravel\\Cashier\\CashierServiceProvider"
             ]
         }
+    },
+    "config": {
+        "sort-packages": true
     },
     "minimum-stability": "dev",
     "prefer-stable": true
