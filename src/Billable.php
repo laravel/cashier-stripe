@@ -7,6 +7,8 @@ use Carbon\Carbon;
 use InvalidArgumentException;
 use Stripe\Token as StripeToken;
 use Illuminate\Support\Collection;
+use Stripe\BankAccount as StripeBankAccount;
+use Stripe\Card as StripeCard;
 use Stripe\Charge as StripeCharge;
 use Stripe\Refund as StripeRefund;
 use Stripe\Invoice as StripeInvoice;
@@ -376,7 +378,7 @@ trait Billable
         // If the given token already has the card as their default source, we can just
         // bail out of the method now. We don't need to keep adding the same card to
         // a model's account every time we go through this particular method call.
-        if ($token->card->id === $customer->default_source) {
+        if ($token[$token->type]->id === $customer->default_source) {
             return;
         }
 
@@ -431,13 +433,16 @@ trait Billable
     /**
      * Fills the model's properties with the source from Stripe.
      *
-     * @param  \Stripe\Card|null  $card
+     * @param  \Stripe\Card|\Stripe\BankAccount|null  $card
      * @return $this
      */
     protected function fillCardDetails($card)
     {
-        if ($card) {
+        if ($card instanceof StripeCard) {
             $this->card_brand = $card->brand;
+            $this->card_last_four = $card->last4;
+        } else if ($card instanceof StripeBankAccount) {
+            $this->card_brand = 'Bank Account';
             $this->card_last_four = $card->last4;
         }
 
