@@ -25,7 +25,7 @@ You will need to set the following details locally and on your Stripe account in
 
     STRIPE_KEY=
     STRIPE_SECRET=
-    STRIPE_MODEL=User
+    STRIPE_MODEL=Laravel\Cashier\Tests\Fixtures\User
 
 ### Stripe
 
