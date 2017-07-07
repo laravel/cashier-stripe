@@ -5,14 +5,14 @@ namespace Laravel\Cashier;
 use Exception;
 use Carbon\Carbon;
 use InvalidArgumentException;
+use Stripe\Card as StripeCard;
 use Stripe\Token as StripeToken;
 use Illuminate\Support\Collection;
-use Stripe\BankAccount as StripeBankAccount;
-use Stripe\Card as StripeCard;
 use Stripe\Charge as StripeCharge;
 use Stripe\Refund as StripeRefund;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\Customer as StripeCustomer;
+use Stripe\BankAccount as StripeBankAccount;
 use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -441,7 +441,7 @@ trait Billable
         if ($card instanceof StripeCard) {
             $this->card_brand = $card->brand;
             $this->card_last_four = $card->last4;
-        } else if ($card instanceof StripeBankAccount) {
+        } elseif ($card instanceof StripeBankAccount) {
             $this->card_brand = 'Bank Account';
             $this->card_last_four = $card->last4;
         }
