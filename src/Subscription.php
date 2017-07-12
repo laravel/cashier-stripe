@@ -100,7 +100,7 @@ class Subscription extends Model
     public function onTrial()
     {
         if (! is_null($this->trial_ends_at)) {
-            return Carbon::today()->lt($this->trial_ends_at);
+            return Carbon::now()->lt($this->trial_ends_at);
         } else {
             return false;
         }
