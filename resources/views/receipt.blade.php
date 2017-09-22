@@ -90,6 +90,9 @@
                 @if (isset($phone))
                     <strong>T</strong> {{ $phone }}<br>
                 @endif
+                @if (isset($vendorVat))
+                    {{ $vendorVat }}<br>
+                @endif
                 @if (isset($url))
                     <a href="{{ $url }}">{{ $url }}</a>
                 @endif
