@@ -25,7 +25,7 @@ You will need to set the following details locally and on your Stripe account in
 
     STRIPE_KEY=
     STRIPE_SECRET=
-    STRIPE_MODEL=User
+    STRIPE_MODEL=Laravel\Cashier\Tests\Fixtures\User
 
 ### Stripe
 
@@ -44,4 +44,4 @@ Thank you for considering contributing to the Cashier. You can read the contribu
 
 ## License
 
-Laravel Cashier is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+Laravel Cashier is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
