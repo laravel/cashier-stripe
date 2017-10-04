@@ -232,9 +232,10 @@ class Subscription extends Model
      * Swap the subscription to a new Stripe plan.
      *
      * @param  string  $plan
+     * @param  string  $name
      * @return $this
      */
-    public function swap($plan)
+    public function swap($plan, $name = null)
     {
         $subscription = $this->asStripeSubscription();
 
@@ -266,10 +267,16 @@ class Subscription extends Model
 
         $this->user->invoice();
 
-        $this->fill([
-            'stripe_plan' => $plan,
-            'ends_at' => null,
-        ])->save();
+        $attributes = [
+             'stripe_plan' => $plan,
+             'ends_at' => null,
+        ];
+
+        if ($name) {
+            $attributes['name'] = $name;
+        }
+
+        $this->fill($attributes)->save();
 
         return $this;
     }
