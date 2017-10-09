@@ -4,8 +4,10 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Support\Facades\View;
 use Stripe\Invoice as StripeInvoice;
+use Illuminate\Support\Facades\Config;
 use Symfony\Component\HttpFoundation\Response;
 
 class Invoice
@@ -252,11 +254,9 @@ class Invoice
             define('DOMPDF_ENABLE_AUTOLOAD', false);
         }
 
-        if (file_exists($configPath = base_path().'/vendor/dompdf/dompdf/dompdf_config.inc.php')) {
-            require_once $configPath;
-        }
+        $config = new Options(Config::get('dompdf' , null));
 
-        $dompdf = new Dompdf;
+        $dompdf = new Dompdf($config);
 
         $dompdf->loadHtml($this->view($data)->render());
 

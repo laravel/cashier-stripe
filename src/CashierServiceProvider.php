@@ -13,6 +13,11 @@ class CashierServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $configPathForPDFs = __DIR__ . '/../config/dompdf.php';
+        if (file_exists($configPathForPDFs)) {
+            $this->mergeConfigFrom($configPathForPDFs, 'dompdf');
+        }
+
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cashier');
 
         $this->publishes([
