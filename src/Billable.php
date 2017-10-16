@@ -20,6 +20,34 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 trait Billable
 {
     /**
+      * The Eloquent subscription model name.
+      *
+      * @var string
+      */
+     protected static $subscriptionModel = Subscription::class;
+ 
+     /**
+      * Set the Subscription Model
+      * - Allows for override in constructor
+      *
+      * @param $model
+      */
+     public function setSubscriptionModel($model)
+     {
+         self::$subscriptionModel = $model;
+     }
+ 
+     /**
+      * Get Subscription Model
+      *
+      * @return string
+      */
+     public function getSubscriptionModel()
+     {
+         return self::$subscriptionModel;
+     }
+    
+    /**
      * The Stripe API key.
      *
      * @var string
@@ -214,7 +242,7 @@ trait Billable
      */
     public function subscriptions()
     {
-        return $this->hasMany(Subscription::class, $this->getForeignKey())->orderBy('created_at', 'desc');
+        return $this->hasMany(self::$subscriptionModel, $this->getForeignKey())->orderBy('created_at', 'desc');
     }
 
     /**
