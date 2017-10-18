@@ -366,9 +366,9 @@ trait Billable
     /**
      * Returns the default card of the Customer.
      *
-     * @return \Stripe\Card | null
+     * @return \Stripe\Card|null
      */
-    public function default_card()
+    public function getDefaultCard()
     {
         $customer = $this->asStripeCustomer();
 
@@ -425,7 +425,7 @@ trait Billable
      */
     public function updateCardFromStripe()
     {
-        $defaultCard = $this->default_card();
+        $defaultCard = $this->getDefaultCard();
 
         if ($defaultCard) {
             $this->fillCardDetails($defaultCard)->save();
