@@ -364,6 +364,24 @@ trait Billable
     }
 
     /**
+     * Returns the default card of the Customer.
+     *
+     * @return \Stripe\Card | null
+     */
+    public function default_card()
+    {
+        $customer = $this->asStripeCustomer();
+
+        foreach ($customer->sources->data as $card) {
+            if ($card->id === $customer->default_source) {
+                return $card;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Update customer's credit card.
      *
      * @param  string  $token
@@ -407,16 +425,7 @@ trait Billable
      */
     public function updateCardFromStripe()
     {
-        $customer = $this->asStripeCustomer();
-
-        $defaultCard = null;
-
-        foreach ($customer->sources->data as $card) {
-            if ($card->id === $customer->default_source) {
-                $defaultCard = $card;
-                break;
-            }
-        }
+        $defaultCard = $this->default_card();
 
         if ($defaultCard) {
             $this->fillCardDetails($defaultCard)->save();
