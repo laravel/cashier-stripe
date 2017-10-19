@@ -364,11 +364,11 @@ trait Billable
     }
 
     /**
-     * Returns the default card of the Customer.
+     * Get the default card for the entity.
      *
      * @return \Stripe\Card|null
      */
-    public function getDefaultCard()
+    public function defaultCard()
     {
         $customer = $this->asStripeCustomer();
 
@@ -425,7 +425,7 @@ trait Billable
      */
     public function updateCardFromStripe()
     {
-        $defaultCard = $this->getDefaultCard();
+        $defaultCard = $this->defaultCard();
 
         if ($defaultCard) {
             $this->fillCardDetails($defaultCard)->save();
