@@ -623,4 +623,20 @@ trait Billable
     {
         static::$stripeKey = $key;
     }
+
+    /**
+     * Get the account balance/credit for the entity.
+     *
+     * @return null|string
+     */
+    public function credit()
+    {
+        $balance = $this->asStripeCustomer()->account_balance;
+
+        if ($balance) {
+            return Cashier::formatAmount(-$balance);
+        }
+
+        return 0;
+    }
 }
