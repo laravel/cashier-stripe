@@ -634,9 +634,9 @@ trait Billable
         $balance = $this->asStripeCustomer()->account_balance;
 
         if ($balance) {
-            return Cashier::formatAmount(- $balance);
+            return Cashier::formatAmount(-$balance);
         }
 
-        return null;
+        return 0;
     }
 }
