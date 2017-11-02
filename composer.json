@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=7.0",
         "dompdf/dompdf": "^0.8.0",
         "illuminate/database": "~5.3",
         "illuminate/support": "~5.3",
@@ -27,7 +27,7 @@
         "illuminate/routing": "~5.3",
         "illuminate/view": "~5.3",
         "mockery/mockery": "~1.0",
-        "phpunit/phpunit": "~5.0",
+        "phpunit/phpunit": "~6.0",
         "vlucas/phpdotenv": "~2.0"
     },
     "autoload": {
