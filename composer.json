@@ -20,7 +20,7 @@
         "illuminate/support": "~5.3",
         "nesbot/carbon": "~1.0",
         "stripe/stripe-php": "~5.0",
-        "symfony/http-kernel": "~2.7|~3.0"
+        "symfony/http-kernel": "~2.7|~3.0|~4.0"
     },
     "require-dev": {
         "illuminate/http": "~5.3",
