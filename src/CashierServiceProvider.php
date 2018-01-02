@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class CashierServiceProvider extends ServiceProvider
@@ -18,6 +19,8 @@ class CashierServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/views' => $this->app->basePath('resources/views/vendor/cashier'),
         ]);
+
+        $this->registerBladeExtensions();
     }
 
     /**
@@ -28,5 +31,17 @@ class CashierServiceProvider extends ServiceProvider
     public function register()
     {
         //
+    }
+
+    /**
+     * Register custom blade directives.
+     *
+     * @return void
+     */
+    public function registerBladeExtensions()
+    {
+        Blade::if('subscribed', function ($plan) {
+            return auth()->user()->subscribed($plan);
+        });
     }
 }

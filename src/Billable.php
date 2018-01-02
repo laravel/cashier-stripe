@@ -104,7 +104,8 @@ trait Billable
         ], $options);
 
         return StripeInvoiceItem::create(
-            $options, ['api_key' => $this->getStripeKey()]
+            $options,
+            ['api_key' => $this->getStripeKey()]
         );
     }
 
@@ -244,7 +245,8 @@ trait Billable
     {
         try {
             $stripeInvoice = StripeInvoice::upcoming(
-                ['customer' => $this->stripe_id], ['api_key' => $this->getStripeKey()]
+                ['customer' => $this->stripe_id],
+                ['api_key' => $this->getStripeKey()]
             );
 
             return new Invoice($this, $stripeInvoice);
@@ -468,7 +470,7 @@ trait Billable
         $this->cards()->each(function ($card) {
             $card->delete();
         });
-        
+
         $this->updateCardFromStripe();
     }
 
@@ -550,7 +552,8 @@ trait Billable
         // user from Stripe. This ID will correspond with the Stripe user instances
         // and allow us to retrieve users from Stripe later when we need to work.
         $customer = StripeCustomer::create(
-            $options, $this->getStripeKey()
+            $options,
+            $this->getStripeKey()
         );
 
         $this->stripe_id = $customer->id;
