@@ -32,7 +32,7 @@ class CashierServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register custom blade directives
+     * Register custom blade directives.
      *
      * @return void
      */
