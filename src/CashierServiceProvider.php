@@ -19,6 +19,8 @@ class CashierServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/views' => $this->app->basePath('resources/views/vendor/cashier'),
         ]);
+
+        $this->registerBladeExtensions();
     }
 
     /**
@@ -28,7 +30,7 @@ class CashierServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerBladeExtensions();
+        //
     }
 
     /**
