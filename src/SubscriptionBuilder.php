@@ -63,6 +63,13 @@ class SubscriptionBuilder
     protected $metadata;
 
     /**
+     * The parameters to apply to the subscription.
+     *
+     * @var array
+     */
+    protected $params = [];
+
+    /**
      * Create a new subscription builder instance.
      *
      * @param  mixed  $owner
@@ -155,6 +162,19 @@ class SubscriptionBuilder
     }
 
     /**
+     * The parameters to apply to a new subscription.
+     *
+     * @param array $params
+     * @return $this
+     */
+    public function withParams(array $params)
+    {
+        $this->params = $params;
+
+        return $this;
+    }
+
+    /**
      * Add a new Stripe subscription to the Stripe model.
      *
      * @param  array  $options
@@ -223,14 +243,14 @@ class SubscriptionBuilder
      */
     protected function buildPayload()
     {
-        return array_filter([
+        return array_filter(array_merge([
             'plan' => $this->plan,
             'quantity' => $this->quantity,
             'coupon' => $this->coupon,
             'trial_end' => $this->getTrialEndForPayload(),
             'tax_percent' => $this->getTaxPercentageForPayload(),
             'metadata' => $this->metadata,
-        ]);
+        ], $this->params));
     }
 
     /**
