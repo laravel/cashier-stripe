@@ -15,6 +15,7 @@ use Stripe\Customer as StripeCustomer;
 use Stripe\BankAccount as StripeBankAccount;
 use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait Billable
@@ -282,6 +283,10 @@ trait Billable
             throw new NotFoundHttpException;
         }
 
+        if ($invoice->customer !== $this->stripe_id) {
+            throw new AccessDeniedHttpException;
+        }
+
         return $invoice;
     }
 
@@ -468,7 +473,7 @@ trait Billable
         $this->cards()->each(function ($card) {
             $card->delete();
         });
-        
+
         $this->updateCardFromStripe();
     }
 
