@@ -15,8 +15,8 @@ use Stripe\Customer as StripeCustomer;
 use Stripe\BankAccount as StripeBankAccount;
 use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 trait Billable
 {
