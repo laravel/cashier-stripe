@@ -120,7 +120,7 @@ class Invoice
      */
     public function discount()
     {
-        return $this->formatAmount($this->invoice->subtotal - $this->invoice->total);
+        return $this->formatAmount($this->invoice->subtotal + $this->invoice->tax - $this->invoice->total);
     }
 
     /**

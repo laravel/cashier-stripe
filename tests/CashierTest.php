@@ -4,13 +4,13 @@ namespace Laravel\Cashier\Tests;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Laravel\Cashier\Tests\Fixtures\CashierTestControllerStub;
 
-class CashierTest extends PHPUnit_Framework_TestCase
+class CashierTest extends TestCase
 {
     public static function setUpBeforeClass()
     {
@@ -122,7 +122,12 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $subscription->quantity);
 
         // Swap Plan
-        $subscription->swap('monthly-10-2');
+        $subscription->swap('monthly-10-2', 'premium');
+        $this->assertEquals('premium', $subscription->name);
+
+        // Rename Plan
+        $subscription->swap('monthly-10-2', 'main');
+        $this->assertEquals('main', $subscription->name);
 
         $this->assertEquals('monthly-10-2', $subscription->stripe_plan);
 
