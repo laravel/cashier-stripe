@@ -170,13 +170,14 @@ class SubscriptionBuilder
      *
      * @param  string|null  $token
      * @param  array  $options
+     * @param  array $defaultPayload
      * @return \Laravel\Cashier\Subscription
      */
-    public function create($token = null, array $options = [])
+    public function create($token = null, array $options = [], array $defaultPayload = [])
     {
         $customer = $this->getStripeCustomer($token, $options);
 
-        $subscription = $customer->subscriptions->create($this->buildPayload());
+        $subscription = $customer->subscriptions->create($this->buildPayload($defaultPayload));
 
         if ($this->skipTrial) {
             $trialEndsAt = null;
@@ -219,18 +220,19 @@ class SubscriptionBuilder
     /**
      * Build the payload for subscription creation.
      *
+     * @param  array $defaultPayload
      * @return array
      */
-    protected function buildPayload()
+    protected function buildPayload(array $defaultPayload = [])
     {
-        return array_filter([
+        return array_filter(array_merge($defaultPayload, [
             'plan' => $this->plan,
             'quantity' => $this->quantity,
             'coupon' => $this->coupon,
             'trial_end' => $this->getTrialEndForPayload(),
             'tax_percent' => $this->getTaxPercentageForPayload(),
             'metadata' => $this->metadata,
-        ]);
+        ]));
     }
 
     /**
