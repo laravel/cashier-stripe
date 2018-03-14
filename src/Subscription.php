@@ -243,7 +243,7 @@ class Subscription extends Model
         $subscription->prorate = $this->prorate;
 
         if (! is_null($this->billingCycleAnchor)) {
-            $subscription->billingCycleAnchor = $this->billingCycleAnchor;
+            $subscription->billing_cycle_anchor = $this->billingCycleAnchor;
         }
 
         // If no specific trial end date has been set, the default behavior should be
