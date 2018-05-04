@@ -331,6 +331,47 @@ class CashierTest extends TestCase
         $this->assertEquals(1000, $refund->amount);
     }
 
+    public function testStateCheckMethods()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        // State: on trial
+        $subscription = $user->newSubscription('main', 'monthly-10-1')
+                ->trialDays(10)
+                ->create($this->getTestToken());
+
+        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->valid());
+
+        // State: on trial + cancelled
+        $subscription->cancel();
+
+        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->valid());
+
+        // State: recurring
+        $subscription = $user->newSubscription('main', 'monthly-10-1')
+                ->create($this->getTestToken());
+
+        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->valid());
+
+        // State: recurring + cancelled
+        $subscription->cancel();
+
+        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->valid());
+
+        // State: ended
+        $subscription->cancelNow();
+
+        $this->assertFalse($subscription->active());
+        $this->assertFalse($subscription->valid());
+    }
+
     protected function getTestToken()
     {
         return \Stripe\Token::create([
