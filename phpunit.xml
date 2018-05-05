@@ -15,4 +15,8 @@
             <directory suffix=".php">./tests/</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <env name="STRIPE_SECRET" value=""/>
+        <env name="STRIPE_MODEL" value="Laravel\Cashier\Tests\Fixtures\User"/>
+    </php>
 </phpunit>
