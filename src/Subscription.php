@@ -93,6 +93,26 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription is recurring.
+     *
+     * @return bool
+     */
+    public function recurring()
+    {
+        return ! $this->onTrial() && ! $this->cancelled();
+    }
+
+    /**
+     * Determine if the subscription has ended.
+     *
+     * @return bool
+     */
+    public function ended()
+    {
+        return $this->cancelled() && ! $this->onGracePeriod();
+    }
+
+    /**
      * Determine if the subscription is within its trial period.
      *
      * @return bool

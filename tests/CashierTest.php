@@ -86,6 +86,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($user->subscription('main')->active());
         $this->assertFalse($user->subscription('main')->cancelled());
         $this->assertFalse($user->subscription('main')->onGracePeriod());
+        $this->assertTrue($user->subscription('main')->recurring());
+        $this->assertFalse($user->subscription('main')->ended());
 
         // Cancel Subscription
         $subscription = $user->subscription('main');
@@ -94,6 +96,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($subscription->active());
         $this->assertTrue($subscription->cancelled());
         $this->assertTrue($subscription->onGracePeriod());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
 
         // Modify Ends Date To Past
         $oldGracePeriod = $subscription->ends_at;
@@ -102,6 +106,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($subscription->active());
         $this->assertTrue($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
+        $this->assertFalse($subscription->recurring());
+        $this->assertTrue($subscription->ended());
 
         $subscription->fill(['ends_at' => $oldGracePeriod])->save();
 
@@ -111,6 +117,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
+        $this->assertTrue($subscription->recurring());
+        $this->assertFalse($subscription->ended());
 
         // Increment & Decrement
         $subscription->incrementQuantity();
@@ -155,6 +163,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
+        $this->assertTrue($subscription->recurring());
+        $this->assertFalse($subscription->ended());
 
         // Invoice Tests
         $invoice = $user->invoices()[0];
@@ -190,6 +200,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($subscription->active());
         $this->assertTrue($subscription->onTrial());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
         $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
 
         // Cancel Subscription
@@ -197,6 +209,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($subscription->active());
         $this->assertTrue($subscription->onGracePeriod());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
 
         // Resume Subscription
         $subscription->resume();
@@ -204,6 +218,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->onGracePeriod());
         $this->assertTrue($subscription->onTrial());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
         $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
     }
 
@@ -222,6 +238,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($subscription->active());
         $this->assertTrue($subscription->onTrial());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
         $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
 
         // Cancel Subscription
@@ -229,6 +247,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($subscription->active());
         $this->assertTrue($subscription->onGracePeriod());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
 
         // Resume Subscription
         $subscription->resume();
@@ -236,6 +256,8 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->onGracePeriod());
         $this->assertTrue($subscription->onTrial());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
         $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
     }
 
