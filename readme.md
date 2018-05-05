@@ -26,7 +26,7 @@ You will need to set the following details locally and on your Stripe account in
     STRIPE_SECRET=
     STRIPE_MODEL=Laravel\Cashier\Tests\Fixtures\User
 
-You can set these in the `phpunit.xml`
+You can set these variables in the `phpunit.xml` file.
 
 ### Stripe
 
