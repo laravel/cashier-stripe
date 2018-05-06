@@ -211,7 +211,7 @@ trait Billable
     /**
      * Get all of the subscriptions for the Stripe model.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function subscriptions()
     {
