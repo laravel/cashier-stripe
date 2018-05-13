@@ -119,11 +119,7 @@ class Subscription extends Model
      */
     public function onTrial()
     {
-        if (! is_null($this->trial_ends_at)) {
-            return Carbon::now()->lt($this->trial_ends_at);
-        } else {
-            return false;
-        }
+        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
     }
 
     /**
@@ -133,11 +129,7 @@ class Subscription extends Model
      */
     public function onGracePeriod()
     {
-        if (! is_null($endsAt = $this->ends_at)) {
-            return Carbon::now()->lt(Carbon::instance($endsAt));
-        } else {
-            return false;
-        }
+        return $this->ends_at && $this->ends_at->isFuture();
     }
 
     /**
