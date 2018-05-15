@@ -63,6 +63,13 @@ class SubscriptionBuilder
     protected $metadata;
 
     /**
+     * The Stripe Connect application fee to apply to the subscription.
+     *
+     * @var int|null
+     */
+    protected $application_fee_percent = null;
+
+    /**
      * Create a new subscription builder instance.
      *
      * @param  mixed  $owner
@@ -166,6 +173,19 @@ class SubscriptionBuilder
     }
 
     /**
+     * If you are using Stripe Connect, you can add an application fee to the subscription
+     *
+     * @param  int  $percentage
+     * @return \Laravel\Cashier\Subscription
+     */
+    public function applicationFeePercent($percentage)
+    {
+        $this->application_fee_percent = $percentage;
+
+        return $this;
+    }
+
+    /**
      * Create a new Stripe subscription.
      *
      * @param  string|null  $token
@@ -229,6 +249,7 @@ class SubscriptionBuilder
             'coupon' => $this->coupon,
             'trial_end' => $this->getTrialEndForPayload(),
             'tax_percent' => $this->getTaxPercentageForPayload(),
+            'application_fee_percent' => $this->application_fee_percent,
             'metadata' => $this->metadata,
         ]);
     }
