@@ -71,7 +71,7 @@ class ConnectTest extends PHPUnit_Framework_TestCase
             'name' => 'Taylor Otwell',
         ]);
 
-        $application_fee_percent = rand(1,100);
+        $application_fee_percent = rand(1, 100);
         // Create Subscription
         $user
             ->billingAccount(getenv('STRIPE_CONNECT_ACCOUNT_ID'))
@@ -83,7 +83,7 @@ class ConnectTest extends PHPUnit_Framework_TestCase
         $subscription->user->billingAccount(getenv('STRIPE_CONNECT_ACCOUNT_ID'));
         $this->assertEquals($application_fee_percent, $subscription->asStripeSubscription()->application_fee_percent);
     }
-    
+
     public function testSubscriptionsCanBeCreated()
     {
         $user = User::create([
@@ -96,7 +96,7 @@ class ConnectTest extends PHPUnit_Framework_TestCase
             ->billingAccount(getenv('STRIPE_CONNECT_ACCOUNT_ID'))
             ->newSubscription('main', 'monthly-10-1')
             ->create($this->getTestToken($user));
-            
+
         $this->assertEquals(1, count($user->subscriptions));
         $this->assertNotNull($user->subscription('main')->stripe_id);
 

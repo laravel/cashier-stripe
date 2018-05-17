@@ -390,8 +390,6 @@ trait Billable
                 return $card;
             }
         }
-
-        return null;
     }
 
     /**
@@ -612,7 +610,7 @@ trait Billable
     }
 
     /**
-     * Set a Connect account to process the charges
+     * Set a Connect account to process the charges.
      *
      * @param  string  $account_id
      * @return void
@@ -620,17 +618,19 @@ trait Billable
     public function billingAccount($account_id)
     {
         $this->account_id = $account_id;
+
         return $this;
     }
 
     public function getStripeOptions()
     {
         $options = ['api_key' => $this->getStripeKey()];
-        if($this->account_id) {
+        if ($this->account_id) {
             $options = array_merge($options, [
                 'stripe_account' => $this->account_id,
             ]);
         }
+
         return $options;
     }
 

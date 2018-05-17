@@ -173,7 +173,7 @@ class SubscriptionBuilder
     }
 
     /**
-     * If you are using Stripe Connect, you can add an application fee to the subscription
+     * If you are using Stripe Connect, you can add an application fee to the subscription.
      *
      * @param  int  $percentage
      * @return \Laravel\Cashier\Subscription
