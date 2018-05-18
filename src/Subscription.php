@@ -55,7 +55,7 @@ class Subscription extends Model
      */
     public function owner()
     {
-        $class = getenv('STRIPE_MODEL') ?: config('services.stripe.model', 'App\\User');
+        $class = Cashier::stripeModel();
 
         return $this->belongsTo($class, (new $class)->getForeignKey());
     }

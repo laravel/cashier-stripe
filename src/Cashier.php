@@ -126,4 +126,9 @@ class Cashier
 
         return static::usesCurrencySymbol().$amount;
     }
+
+    public static function stripeModel()
+    {
+        return getenv('STRIPE_MODEL') ?: config('services.stripe.model', 'App\\User');
+    }
 }
