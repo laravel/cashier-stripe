@@ -28,6 +28,16 @@ class Cashier
     protected static $formatCurrencyUsing;
 
     /**
+     * Get the class name of the billable model.
+     *
+     * @return string
+     */
+    public static function stripeModel()
+    {
+        return getenv('STRIPE_MODEL') ?: config('services.stripe.model', 'App\\User');
+    }
+
+    /**
      * Set the currency to be used when billing Stripe models.
      *
      * @param  string  $currency
@@ -125,10 +135,5 @@ class Cashier
         }
 
         return static::usesCurrencySymbol().$amount;
-    }
-
-    public static function stripeModel()
-    {
-        return getenv('STRIPE_MODEL') ?: config('services.stripe.model', 'App\\User');
     }
 }
