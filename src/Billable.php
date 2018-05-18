@@ -27,6 +27,13 @@ trait Billable
     protected static $stripeKey;
 
     /**
+     * The Connect account ID key.
+     *
+     * @var string
+     */
+    protected $account_id;
+
+    /**
      * Make a "one off" charge on the customer for the given amount.
      *
      * @param  int  $amount
@@ -51,7 +58,7 @@ trait Billable
             throw new InvalidArgumentException('No payment source provided.');
         }
 
-        return StripeCharge::create($options, ['api_key' => $this->getStripeKey()]);
+        return StripeCharge::create($options, $this->getStripeOptions());
     }
 
     /**
@@ -67,7 +74,7 @@ trait Billable
     {
         $options['charge'] = $charge;
 
-        return StripeRefund::create($options, ['api_key' => $this->getStripeKey()]);
+        return StripeRefund::create($options, $this->getStripeOptions());
     }
 
     /**
@@ -104,7 +111,8 @@ trait Billable
         ], $options);
 
         return StripeInvoiceItem::create(
-            $options, ['api_key' => $this->getStripeKey()]
+            $options,
+            $this->getStripeOptions()
         );
     }
 
@@ -226,7 +234,7 @@ trait Billable
     {
         if ($this->stripe_id) {
             try {
-                return StripeInvoice::create(['customer' => $this->stripe_id], $this->getStripeKey())->pay();
+                return StripeInvoice::create(['customer' => $this->stripe_id], $this->getStripeOptions())->pay();
             } catch (StripeErrorInvalidRequest $e) {
                 return false;
             }
@@ -244,7 +252,8 @@ trait Billable
     {
         try {
             $stripeInvoice = StripeInvoice::upcoming(
-                ['customer' => $this->stripe_id], ['api_key' => $this->getStripeKey()]
+                ['customer' => $this->stripe_id],
+                $this->getStripeOptions()
             );
 
             return new Invoice($this, $stripeInvoice);
@@ -262,7 +271,7 @@ trait Billable
     public function findInvoice($id)
     {
         try {
-            return new Invoice($this, StripeInvoice::retrieve($id, $this->getStripeKey()));
+            return new Invoice($this, StripeInvoice::retrieve($id, $this->getStripeOptions()));
         } catch (Exception $e) {
             //
         }
@@ -381,8 +390,6 @@ trait Billable
                 return $card;
             }
         }
-
-        return null;
     }
 
     /**
@@ -395,7 +402,7 @@ trait Billable
     {
         $customer = $this->asStripeCustomer();
 
-        $token = StripeToken::retrieve($token, ['api_key' => $this->getStripeKey()]);
+        $token = StripeToken::retrieve($token, $this->getStripeOptions());
 
         // If the given token already has the card as their default source, we can just
         // bail out of the method now. We don't need to keep adding the same card to
@@ -554,7 +561,8 @@ trait Billable
         // user from Stripe. This ID will correspond with the Stripe user instances
         // and allow us to retrieve users from Stripe later when we need to work.
         $customer = StripeCustomer::create(
-            $options, $this->getStripeKey()
+            $options,
+            $this->getStripeOptions()
         );
 
         $this->stripe_id = $customer->id;
@@ -578,7 +586,7 @@ trait Billable
      */
     public function asStripeCustomer()
     {
-        return StripeCustomer::retrieve($this->stripe_id, $this->getStripeKey());
+        return StripeCustomer::retrieve($this->stripe_id, $this->getStripeOptions());
     }
 
     /**
@@ -599,6 +607,31 @@ trait Billable
     public function taxPercentage()
     {
         return 0;
+    }
+
+    /**
+     * Set a Connect account to process the charges.
+     *
+     * @param  string  $account_id
+     * @return void
+     */
+    public function billingAccount($account_id)
+    {
+        $this->account_id = $account_id;
+
+        return $this;
+    }
+
+    public function getStripeOptions()
+    {
+        $options = ['api_key' => $this->getStripeKey()];
+        if ($this->account_id) {
+            $options = array_merge($options, [
+                'stripe_account' => $this->account_id,
+            ]);
+        }
+
+        return $options;
     }
 
     /**
