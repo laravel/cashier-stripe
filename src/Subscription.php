@@ -353,6 +353,8 @@ class Subscription extends Model
         }
 
         $subscription = $this->asStripeSubscription();
+        
+        $subscription->cancel_at_period_end = false;
 
         // To resume the subscription we need to set the plan parameter on the Stripe
         // subscription object. This will force Stripe to resume this subscription
