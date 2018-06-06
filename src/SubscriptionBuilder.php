@@ -52,7 +52,7 @@ class SubscriptionBuilder
     /**
      * The date on which the billing cycle should be anchored.
      *
-     * @var string|null
+     * @var int|null
      */
     protected $billingCycleAnchor = null;
 
@@ -249,13 +249,13 @@ class SubscriptionBuilder
     protected function buildPayload()
     {
         return array_filter([
+            'billing_cycle_anchor' => $this->billingCycleAnchor,
+            'coupon' => $this->coupon,
+            'metadata' => $this->metadata,
             'plan' => $this->plan,
             'quantity' => $this->quantity,
-            'coupon' => $this->coupon,
-            'trial_end' => $this->getTrialEndForPayload(),
             'tax_percent' => $this->getTaxPercentageForPayload(),
-            'billing_cycle_anchor' => $this->billingCycleAnchor,
-            'metadata' => $this->metadata,
+            'trial_end' => $this->getTrialEndForPayload(),
         ]);
     }
 
