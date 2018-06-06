@@ -175,6 +175,43 @@ class CashierTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($invoice->discountIsPercentage());
     }
 
+    public function test_creating_subscription_with_an_anchored_billing_cycle()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        // Create Subscription
+        $user->newSubscription('main', 'monthly-10-1')
+            ->anchorBillingCycleOn(new \DateTime('first day of next month'))
+            ->create($this->getTestToken());
+
+        $subscription = $user->subscription('main');
+
+        $this->assertTrue($user->subscribed('main'));
+        $this->assertTrue($user->subscribed('main', 'monthly-10-1'));
+        $this->assertFalse($user->subscribed('main', 'monthly-10-2'));
+        $this->assertTrue($subscription->active());
+        $this->assertFalse($subscription->cancelled());
+        $this->assertFalse($subscription->onGracePeriod());
+        $this->assertTrue($subscription->recurring());
+        $this->assertFalse($subscription->ended());
+
+        // Invoice Tests
+        $invoice = $user->invoices()[0];
+        $invoicePeriod = $invoice->invoiceItems()[0]->period;
+
+        $this->assertEquals(
+            (new \DateTime('now'))->format('Y-m-d'),
+            date('Y-m-d', $invoicePeriod->start)
+        );
+        $this->assertEquals(
+            (new \DateTime('first day of next month'))->format('Y-m-d'),
+            date('Y-m-d', $invoicePeriod->end)
+        );
+    }
+
     public function test_generic_trials()
     {
         $user = new User;
