@@ -152,9 +152,9 @@
                     @if ($invoice->hasDiscount())
                         <tr>
                             @if ($invoice->discountIsPercentage())
-                                <td>{{ $invoice->coupon() }} ({{ $invoice->percentOff() }}% Off)</td>
+                                <td>{{ $invoice->couponName() }} ({{ $invoice->percentOff() }}% Off)</td>
                             @else
-                                <td>{{ $invoice->coupon() }} ({{ $invoice->amountOff() }} Off)</td>
+                                <td>{{ $invoice->couponName() }} ({{ $invoice->amountOff() }} Off)</td>
                             @endif
                             <td>&nbsp;</td>
                             <td>-{{ $invoice->discount() }}</td>
