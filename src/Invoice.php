@@ -134,6 +134,18 @@ class Invoice
             return $this->invoice->discount->coupon->id;
         }
     }
+    
+    /**
+     * Get the coupon name applied to the invoice.
+     *
+     * @return string|null
+     */
+    public function couponName()
+    {
+        if (isset($this->invoice->discount)) {
+            return $this->invoice->discount->coupon->name;
+        }
+    }
 
     /**
      * Determine if the discount is a percentage.
