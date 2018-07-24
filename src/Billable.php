@@ -127,12 +127,12 @@ trait Billable
      * Begin creating a new subscription.
      *
      * @param  string  $subscription
-     * @param  string  $plan
+     * @param  string[]|string  $plan
      * @return \Laravel\Cashier\SubscriptionBuilder
      */
     public function newSubscription($subscription, $plan)
     {
-        return new SubscriptionBuilder($this, $subscription, $plan);
+        return new SubscriptionBuilder($this, $subscription, (array) $plan);
     }
 
     /**
@@ -188,7 +188,7 @@ trait Billable
         }
 
         return $subscription->valid() &&
-               $subscription->stripe_plan === $plan;
+               $subscription->hasPlan($plan);
     }
 
     /**
@@ -507,8 +507,11 @@ trait Billable
         }
 
         foreach ((array) $plans as $plan) {
-            if ($subscription->stripe_plan === $plan) {
-                return true;
+            foreach($subscription->subscriptionItems as $subscriptionItem)
+            {
+                if ($subscriptionItem->stripe_plan === $plan) {
+                    return true;
+                }
             }
         }
 
