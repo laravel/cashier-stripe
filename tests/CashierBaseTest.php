@@ -43,10 +43,17 @@ abstract class CashierBaseTest extends PHPUnit_Framework_TestCase
             $table->integer('user_id');
             $table->string('name');
             $table->string('stripe_id');
-            $table->string('stripe_plan');
-            $table->integer('quantity');
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('ends_at')->nullable();
+            $table->timestamps();
+        });
+
+        $this->schema()->create('subscription_items', function ($table) {
+            $table->increments('id');
+            $table->integer('subscription_id');
+            $table->string('stripe_id');
+            $table->string('stripe_plan');
+            $table->integer('quantity')->nullable();
             $table->timestamps();
         });
     }
@@ -55,6 +62,7 @@ abstract class CashierBaseTest extends PHPUnit_Framework_TestCase
     {
         $this->schema()->drop('users');
         $this->schema()->drop('subscriptions');
+        $this->schema()->drop('subscription_items');
     }
 
     protected function getTestToken()
