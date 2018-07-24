@@ -30,10 +30,14 @@ You can set these variables in the `phpunit.xml` file.
 
 ### Stripe
 
-#### Plans
+#### Products (Plans)
+
+Set the following as the product *id*
 
     * monthly-10-1 ($10)
     * monthly-10-2 ($10)
+    * monthly-10-3 ($10)
+    * monthly-10-4 ($10)
 
 #### Coupons
 

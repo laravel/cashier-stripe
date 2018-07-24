@@ -22,8 +22,10 @@ class Subscription extends Model
      * @var array
      */
     protected $dates = [
-        'trial_ends_at', 'ends_at',
-        'created_at', 'updated_at',
+        'trial_ends_at',
+        'ends_at',
+        'created_at',
+        'updated_at',
     ];
 
     /**
@@ -63,6 +65,31 @@ class Subscription extends Model
     }
 
     /**
+     * Get all of the subscription items (plans)
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function subscriptionItems()
+    {
+        return $this->hasMany(SubscriptionItem::class);
+    }
+
+    /**
+     * @param string $stripePlanId
+     * @return bool
+     */
+    public function hasPlan($stripePlanId)
+    {
+        foreach ($this->subscriptionItems as $subscriptionItem) {
+            if ($subscriptionItem->stripe_plan === $stripePlanId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if the subscription is active, on trial, or within its grace period.
      *
      * @return bool
@@ -89,7 +116,7 @@ class Subscription extends Model
      */
     public function recurring()
     {
-        return ! $this->onTrial() && ! $this->cancelled();
+        return !$this->onTrial() && !$this->cancelled();
     }
 
     /**
@@ -99,7 +126,7 @@ class Subscription extends Model
      */
     public function cancelled()
     {
-        return ! is_null($this->ends_at);
+        return !is_null($this->ends_at);
     }
 
     /**
@@ -109,7 +136,7 @@ class Subscription extends Model
      */
     public function ended()
     {
-        return $this->cancelled() && ! $this->onGracePeriod();
+        return $this->cancelled() && !$this->onGracePeriod();
     }
 
     /**
@@ -135,7 +162,7 @@ class Subscription extends Model
     /**
      * Increment the quantity of the subscription.
      *
-     * @param  int  $count
+     * @param  int $count
      * @return $this
      */
     public function incrementQuantity($count = 1)
@@ -148,7 +175,7 @@ class Subscription extends Model
     /**
      *  Increment the quantity of the subscription, and invoice immediately.
      *
-     * @param  int  $count
+     * @param  int $count
      * @return $this
      */
     public function incrementAndInvoice($count = 1)
@@ -163,7 +190,7 @@ class Subscription extends Model
     /**
      * Decrement the quantity of the subscription.
      *
-     * @param  int  $count
+     * @param  int $count
      * @return $this
      */
     public function decrementQuantity($count = 1)
@@ -176,8 +203,8 @@ class Subscription extends Model
     /**
      * Update the quantity of the subscription.
      *
-     * @param  int  $quantity
-     * @param  \Stripe\Customer|null  $customer
+     * @param  int $quantity
+     * @param  \Stripe\Customer|null $customer
      * @return $this
      */
     public function updateQuantity($quantity, $customer = null)
@@ -212,7 +239,7 @@ class Subscription extends Model
     /**
      * Change the billing cycle anchor on a plan change.
      *
-     * @param  \DateTimeInterface|int|string  $date
+     * @param  \DateTimeInterface|int|string $date
      * @return $this
      */
     public function anchorBillingCycleOn($date = 'now')
@@ -243,7 +270,7 @@ class Subscription extends Model
     /**
      * Swap the subscription to a new Stripe plan.
      *
-     * @param  string  $plan
+     * @param  string $plan
      * @return $this
      */
     public function swap($plan)
@@ -254,7 +281,7 @@ class Subscription extends Model
 
         $subscription->prorate = $this->prorate;
 
-        if (! is_null($this->billingCycleAnchor)) {
+        if (!is_null($this->billingCycleAnchor)) {
             $subscription->billing_cycle_anchor = $this->billingCycleAnchor;
         }
 
@@ -278,10 +305,12 @@ class Subscription extends Model
 
         $this->user->invoice();
 
-        $this->fill([
-            'stripe_plan' => $plan,
-            'ends_at' => null,
-        ])->save();
+        $this->fill(
+            [
+                'stripe_plan' => $plan,
+                'ends_at'     => null,
+            ]
+        )->save();
 
         return $this;
     }
@@ -348,12 +377,12 @@ class Subscription extends Model
      */
     public function resume()
     {
-        if (! $this->onGracePeriod()) {
+        if (!$this->onGracePeriod()) {
             throw new LogicException('Unable to resume subscription that is not within grace period.');
         }
 
         $subscription = $this->asStripeSubscription();
-        
+
         $subscription->cancel_at_period_end = false;
 
         // To resume the subscription we need to set the plan parameter on the Stripe
@@ -388,7 +417,7 @@ class Subscription extends Model
     {
         $subscriptions = $this->user->asStripeCustomer()->subscriptions;
 
-        if (! $subscriptions) {
+        if (!$subscriptions) {
             throw new LogicException('The Stripe customer does not have any subscriptions.');
         }
 

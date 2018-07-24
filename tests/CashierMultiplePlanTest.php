@@ -8,9 +8,9 @@ use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Tests\Fixtures\CashierTestControllerStub;
 
 /**
- * Class CashierSinglePlanTest.
+ * Class CashierMultiplePlanTest
  */
-final class CashierSinglePlanTest extends CashierBaseTest
+final class CashierMultiplePlanTest extends CashierBaseTest
 {
     /**
      * Tests.
@@ -26,7 +26,7 @@ final class CashierSinglePlanTest extends CashierBaseTest
         );
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')->create($this->getTestToken());
+        $user->newSubscription('main', ['monthly-10-1', 'monthly-10-2'])->create($this->getTestToken());
 
         $this->assertEquals(1, count($user->subscriptions));
         $this->assertNotNull($user->subscription('main')->stripe_id);
@@ -34,9 +34,9 @@ final class CashierSinglePlanTest extends CashierBaseTest
         $this->assertTrue($user->subscribed('main'));
         $this->assertTrue($user->subscribedToPlan('monthly-10-1', 'main'));
         $this->assertFalse($user->subscribedToPlan('monthly-10-1', 'something'));
-        $this->assertFalse($user->subscribedToPlan('monthly-10-2', 'main'));
+        $this->assertFalse($user->subscribedToPlan('monthly-10-3', 'main'));
         $this->assertTrue($user->subscribed('main', 'monthly-10-1'));
-        $this->assertFalse($user->subscribed('main', 'monthly-10-2'));
+        $this->assertFalse($user->subscribed('main', 'monthly-10-3'));
         $this->assertTrue($user->subscription('main')->active());
         $this->assertFalse($user->subscription('main')->cancelled());
         $this->assertFalse($user->subscription('main')->onGracePeriod());

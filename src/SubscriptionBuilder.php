@@ -4,6 +4,8 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use DateTimeInterface;
+use Laravel\Cashier\Exceptions\SubscriptionPlanNotFound;
+use Stripe\Error\InvalidRequest;
 
 class SubscriptionBuilder
 {
@@ -24,9 +26,9 @@ class SubscriptionBuilder
     /**
      * The name of the plan being subscribed to.
      *
-     * @var string
+     * @var array
      */
-    protected $plan;
+    protected $plans;
 
     /**
      * The quantity of the subscription.
@@ -73,27 +75,43 @@ class SubscriptionBuilder
     /**
      * Create a new subscription builder instance.
      *
-     * @param  mixed  $owner
-     * @param  string  $name
-     * @param  string  $plan
+     * @param  mixed $owner
+     * @param  string $name
+     * @param  array $plans
      * @return void
      */
-    public function __construct($owner, $name, $plan)
+    public function __construct($owner, $name, $plans)
     {
         $this->name = $name;
-        $this->plan = $plan;
+        array_walk(
+            $plans,
+            function ($plan) {
+                $this->plans[$plan] = 1;
+            }
+        );
         $this->owner = $owner;
     }
 
     /**
      * Specify the quantity of the subscription.
      *
-     * @param  int  $quantity
+     * @param  int $quantity
+     * @param null $planName
      * @return $this
+     * @throws SubscriptionPlanNotFound
      */
-    public function quantity($quantity)
+    public function quantity($quantity, $planName = null)
     {
-        $this->quantity = $quantity;
+        if ($planName === null) {
+            $this->plans[key($this->plans)[0]] = $quantity;
+
+            return $this;
+        }
+        if (!isset($this->plans[$planName])) {
+            throw new SubscriptionPlanNotFound($planName, $this->name);
+        }
+
+        $this->plans[$planName] = $quantity;
 
         return $this;
     }
@@ -101,7 +119,7 @@ class SubscriptionBuilder
     /**
      * Specify the number of days of the trial.
      *
-     * @param  int  $trialDays
+     * @param  int $trialDays
      * @return $this
      */
     public function trialDays($trialDays)
@@ -114,7 +132,7 @@ class SubscriptionBuilder
     /**
      * Specify the ending date of the trial.
      *
-     * @param  \Carbon\Carbon  $trialUntil
+     * @param  \Carbon\Carbon $trialUntil
      * @return $this
      */
     public function trialUntil(Carbon $trialUntil)
@@ -139,7 +157,7 @@ class SubscriptionBuilder
     /**
      * Change the billing cycle anchor on a plan creation.
      *
-     * @param  \DateTimeInterface|int  $date
+     * @param  \DateTimeInterface|int $date
      * @return $this
      */
     public function anchorBillingCycleOn($date)
@@ -156,7 +174,7 @@ class SubscriptionBuilder
     /**
      * The coupon to apply to a new subscription.
      *
-     * @param  string  $coupon
+     * @param  string $coupon
      * @return $this
      */
     public function withCoupon($coupon)
@@ -169,7 +187,7 @@ class SubscriptionBuilder
     /**
      * The metadata to apply to a new subscription.
      *
-     * @param  array  $metadata
+     * @param  array $metadata
      * @return $this
      */
     public function withMetadata($metadata)
@@ -182,7 +200,7 @@ class SubscriptionBuilder
     /**
      * Add a new Stripe subscription to the Stripe model.
      *
-     * @param  array  $options
+     * @param  array $options
      * @return \Laravel\Cashier\Subscription
      */
     public function add(array $options = [])
@@ -193,15 +211,15 @@ class SubscriptionBuilder
     /**
      * Create a new Stripe subscription.
      *
-     * @param  string|null  $token
-     * @param  array  $options
+     * @param  string|null $token
+     * @param  array $options
      * @return \Laravel\Cashier\Subscription
      */
     public function create($token = null, array $options = [])
     {
         $customer = $this->getStripeCustomer($token, $options);
 
-        $subscription = $customer->subscriptions->create($this->buildPayload());
+        $subscriptionStripe = $customer->subscriptions->create($this->buildPayload());
 
         if ($this->skipTrial) {
             $trialEndsAt = null;
@@ -209,26 +227,40 @@ class SubscriptionBuilder
             $trialEndsAt = $this->trialExpires;
         }
 
-        return $this->owner->subscriptions()->create([
-            'name' => $this->name,
-            'stripe_id' => $subscription->id,
-            'stripe_plan' => $this->plan,
-            'quantity' => $this->quantity,
-            'trial_ends_at' => $trialEndsAt,
-            'ends_at' => null,
-        ]);
+        /** @var Subscription $subscription */
+        $subscription = $this->owner->subscriptions()->create(
+            [
+                'name'          => $this->name,
+                'stripe_id'     => $subscriptionStripe->id,
+                'trial_ends_at' => $trialEndsAt,
+                'ends_at'       => null,
+            ]
+        );
+
+        /** @var \Stripe\SubscriptionItem $subscriptionItem */
+        foreach ($subscriptionStripe['items']['data'] as $subscriptionItem) {
+            $subscription->subscriptionItems()->create(
+                [
+                    'stripe_id'   => $subscriptionItem->id,
+                    'stripe_plan' => $subscriptionItem->plan->id,
+                    'quantity'    => $subscriptionItem->quantity,
+                ]
+            );
+        }
+
+        return $subscription;
     }
 
     /**
      * Get the Stripe customer instance for the current user and token.
      *
-     * @param  string|null  $token
-     * @param  array  $options
+     * @param  string|null $token
+     * @param  array $options
      * @return \Stripe\Customer
      */
     protected function getStripeCustomer($token = null, array $options = [])
     {
-        if (! $this->owner->stripe_id) {
+        if (!$this->owner->stripe_id) {
             $customer = $this->owner->createAsStripeCustomer($token, $options);
         } else {
             $customer = $this->owner->asStripeCustomer();
@@ -248,15 +280,22 @@ class SubscriptionBuilder
      */
     protected function buildPayload()
     {
-        return array_filter([
-            'billing_cycle_anchor' => $this->billingCycleAnchor,
-            'coupon' => $this->coupon,
-            'metadata' => $this->metadata,
-            'plan' => $this->plan,
-            'quantity' => $this->quantity,
-            'tax_percent' => $this->getTaxPercentageForPayload(),
-            'trial_end' => $this->getTrialEndForPayload(),
-        ]);
+        $itemsArray = [];
+
+        foreach ($this->plans as $planName => $quantity) {
+            $itemsArray[] = ['plan' => $planName, 'quantity' => $quantity];
+        }
+
+        return array_filter(
+            [
+                'billing_cycle_anchor' => $this->billingCycleAnchor,
+                'coupon'               => $this->coupon,
+                'metadata'             => $this->metadata,
+                'items'                => $itemsArray,
+                'tax_percent'          => $this->getTaxPercentageForPayload(),
+                'trial_end'            => $this->getTrialEndForPayload(),
+            ]
+        );
     }
 
     /**
