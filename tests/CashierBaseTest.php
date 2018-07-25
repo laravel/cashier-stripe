@@ -12,7 +12,7 @@ abstract class CashierBaseTest extends PHPUnit_Framework_TestCase
     {
         if (file_exists(__DIR__.'/../.env')) {
             $dotenv = new \Dotenv\Dotenv(__DIR__.'/../');
-            $dotenv->load();
+            $dotenv->overload();
         }
     }
 
