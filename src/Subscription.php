@@ -41,6 +41,18 @@ class Subscription extends Model
     protected $billingCycleAnchor = null;
 
     /**
+     * Create a new Subscriptions Collection instance.
+     *
+     * @param  array $models
+     *
+     * @return Subscriptions
+     */
+    public function newCollection(array $models = [])
+    {
+        return new Subscriptions($models);
+    }
+
+    /**
      * Get the user that owns the subscription.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -353,7 +365,7 @@ class Subscription extends Model
         }
 
         $subscription = $this->asStripeSubscription();
-        
+
         $subscription->cancel_at_period_end = false;
 
         // To resume the subscription we need to set the plan parameter on the Stripe
