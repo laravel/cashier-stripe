@@ -4,11 +4,6 @@ namespace Laravel\Cashier;
 
 use Illuminate\Database\Eloquent\Collection;
 
-/**
- * Class SubscribersCollection
- *
- * @package App\Support
- */
 class Subscriptions extends Collection
 {
     /**
