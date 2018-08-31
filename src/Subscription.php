@@ -296,6 +296,7 @@ class Subscription extends Model
         $subscription = $this->asStripeSubscription();
 
         $subscription->cancel_at_period_end = true;
+
         $subscription->save();
 
         // If the user was on trial, we will set the grace period to end when the trial
@@ -354,7 +355,7 @@ class Subscription extends Model
         }
 
         $subscription = $this->asStripeSubscription();
-        
+
         $subscription->cancel_at_period_end = false;
 
         // To resume the subscription we need to set the plan parameter on the Stripe
