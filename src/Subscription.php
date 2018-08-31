@@ -295,7 +295,8 @@ class Subscription extends Model
     {
         $subscription = $this->asStripeSubscription();
 
-        $subscription->cancel(['at_period_end' => true]);
+        $subscription->cancel_at_period_end = true;
+        $subscription->save();
 
         // If the user was on trial, we will set the grace period to end when the trial
         // would have ended. Otherwise, we'll retrieve the end of the billing period
