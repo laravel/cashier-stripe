@@ -13,7 +13,7 @@ Laravel Cashier provides an expressive, fluent interface to [Stripe's](https://s
 
 ## Official Documentation
 
-Documentation for Cashier can be found on the [Laravel website](http://laravel.com/docs/billing).
+Documentation for Cashier can be found on the [Laravel website](https://laravel.com/docs/billing).
 
 ## Running Cashier's Tests Locally
 
@@ -45,4 +45,4 @@ Thank you for considering contributing to the Cashier. You can read the contribu
 
 ## License
 
-Laravel Cashier is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
+Laravel Cashier is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
