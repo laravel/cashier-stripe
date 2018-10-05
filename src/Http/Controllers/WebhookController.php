@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
 use Stripe\Event as StripeEvent;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
@@ -50,6 +51,125 @@ class WebhookController extends Controller
             })->each(function ($subscription) {
                 $subscription->markAsCancelled();
             });
+        }
+
+        return new Response('Webhook Handled', 200);
+    }
+
+    /**
+     * Handle deleted customer
+     *
+     * @param  array $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleCustomerDeleted(array $payload)
+    {
+        $user = $this->getUserByStripeId($payload['data']['object']['id']);
+        /* @var $user \App\User */
+
+        if ($user) {
+            $user->subscriptions->each(function ($subscription) {
+                /* @var $subscription \Laravel\Cashier\Subscription */
+                $subscription->skipTrial()
+                    ->markAsCancelled();
+            });
+
+            $user->forceFill([
+                'card_brand'     => null,
+                'card_last_four' => null,
+                'trial_ends_at'  => null,
+                'stripe_id'      => null
+            ])
+                ->save();
+        }
+
+        return new Response('Webhook Handled', 200);
+    }
+
+    /**
+     * Handle customer subscription updated
+     *
+     * @param  array $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleCustomerSubscriptionUpdated(array $payload)
+    {
+        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
+        /* @var $user \App\User */
+        $data = $payload['data']['object'];
+
+        if ($user) {
+            $user->subscriptions->filter(function ($subscription) use ($data) {
+                return $subscription->stripe_id === $data['id'];
+            })->each(function ($subscription) use ($data) {
+                /* @var $subscription \Laravel\Cashier\Subscription */
+
+                // Quantity
+                if (isset($data['quantity'])) {
+                    $subscription->quantity = $data['quantity'];
+                }
+
+                // Plan
+                if (isset($data['plan']['id'])) {
+                    $subscription->stripe_plan = $data['plan']['id'];
+                }
+
+                // Trial ends
+                if (isset($data['trial_end'])) {
+                    $trial_ends = Carbon::createFromTimestamp($data['trial_end']);
+                    if ($subscription->trial_ends_at->ne($trial_ends)) {
+                        $subscription->trial_ends_at = $trial_ends;
+                    }
+                }
+
+                // Cancellation
+                if (isset($data['cancel_at_period_end']) && $data['cancel_at_period_end']) {
+                    if ($subscription->onTrial()) {
+                        $subscription->ends_at = $subscription->trial_ends_at;
+                    } else {
+                        $subscription->ends_at = Carbon::createFromTimestamp($data['current_period_end']);
+                    }
+                }
+
+                $subscription->save();
+            });
+        }
+
+        return new Response('Webhook Handled', 200);
+    }
+
+    /**
+     * Handle customer updated
+     *
+     * @param  array $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleCustomerUpdated(array $payload)
+    {
+        $user = $this->getUserByStripeId($payload['data']['object']['id']);
+        /* @var $user \App\User */
+
+        if ($user) {
+            $data = $payload['data']['object'];
+
+            // Change card details
+            if (isset(
+                $data['default_source'],
+                $payload['data']['previous_attributes']['default_source'],
+                $data['sources']['data']
+            )) {
+                $default_card = $data['default_source'];
+                foreach ($data['sources']['data'] as $card) {
+                    if (isset($card['id']) && $card['id'] == $default_card) {
+                        $user->forceFill([
+                            'card_brand'     => $card['brand'] ?? null,
+                            'card_last_four' => $card['last4'] ?? null
+                        ])
+                            ->save();
+                        break;
+                    }
+                }
+            }
         }
 
         return new Response('Webhook Handled', 200);
