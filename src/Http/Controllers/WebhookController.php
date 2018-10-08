@@ -5,9 +5,9 @@ namespace Laravel\Cashier\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
+use Illuminate\Support\Carbon;
 use Stripe\Event as StripeEvent;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
@@ -57,7 +57,7 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle deleted customer
+     * Handle deleted customer.
      *
      * @param  array $payload
      * @return \Symfony\Component\HttpFoundation\Response
@@ -78,7 +78,7 @@ class WebhookController extends Controller
                 'card_brand'     => null,
                 'card_last_four' => null,
                 'trial_ends_at'  => null,
-                'stripe_id'      => null
+                'stripe_id'      => null,
             ])
                 ->save();
         }
@@ -87,7 +87,7 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle customer subscription updated
+     * Handle customer subscription updated.
      *
      * @param  array $payload
      * @return \Symfony\Component\HttpFoundation\Response
@@ -139,7 +139,7 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle customer updated
+     * Handle customer updated.
      *
      * @param  array $payload
      * @return \Symfony\Component\HttpFoundation\Response
@@ -163,7 +163,7 @@ class WebhookController extends Controller
                     if (isset($card['id']) && $card['id'] == $default_card) {
                         $user->forceFill([
                             'card_brand'     => $card['brand'] ?? null,
-                            'card_last_four' => $card['last4'] ?? null
+                            'card_last_four' => $card['last4'] ?? null,
                         ])
                             ->save();
                         break;
