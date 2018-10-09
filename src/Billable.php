@@ -266,7 +266,7 @@ trait Billable
                 $id, $this->getStripeKey()
             );
 
-            $stripeInvoice->lines = StripeInvoice::retrieve($id)
+            $stripeInvoice->lines = StripeInvoice::retrieve($id, $this->getStripeKey())
                         ->lines
                         ->all(['limit' => 1000]);
 
