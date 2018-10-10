@@ -8,6 +8,13 @@ use Stripe\Error\SignatureVerification;
 
 final class VerifyWebhookSignature
 {
+    /**
+     * Handle the incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return \Illuminate\Http\Response
+     */
     public function handle($request, Closure $next)
     {
         try {
@@ -18,7 +25,7 @@ final class VerifyWebhookSignature
                 config('services.stripe.webhook.tolerance')
             );
         } catch (SignatureVerification $exception) {
-            return abort(403);
+            abort(403);
         }
 
         return $next($request);
