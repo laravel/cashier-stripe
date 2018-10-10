@@ -122,12 +122,7 @@ class CashierTest extends TestCase
         $this->assertEquals(1, $subscription->quantity);
 
         // Swap Plan
-        $subscription->swap('monthly-10-2', 'premium');
-        $this->assertEquals('premium', $subscription->name);
-
-        // Rename Plan
-        $subscription->swap('monthly-10-2', 'main');
-        $this->assertEquals('main', $subscription->name);
+        $subscription->swap('monthly-10-2');
 
         $this->assertEquals('monthly-10-2', $subscription->stripe_plan);
 
