@@ -16,7 +16,7 @@ final class VerifyWebhookSignatureTest extends PHPUnit_Framework_TestCase
         config(['services.stripe.webhook.secret' => $secret, 'services.stripe.webhook.tolerance' => 300]);
 
         $request = new Request([], [], [], [], [], [], 'Signed Body');
-        $request->headers->set('Stripe-Signature', 't='.time().',v1=' . $this->sign($request->getContent(), $secret));
+        $request->headers->set('Stripe-Signature', 't='.time().',v1='.$this->sign($request->getContent(), $secret));
 
         $called = false;
 
@@ -43,7 +43,8 @@ final class VerifyWebhookSignatureTest extends PHPUnit_Framework_TestCase
 
         static::expectException(HttpException::class);
 
-        (new VerifyWebhookSignature)->handle($request, function ($request) {});
+        (new VerifyWebhookSignature)->handle($request, function ($request) {
+        });
     }
 
     public function test_no_secret_aborts()
@@ -53,7 +54,7 @@ final class VerifyWebhookSignatureTest extends PHPUnit_Framework_TestCase
         config(['services.stripe.webhook.secret' => '', 'services.stripe.webhook.tolerance' => 300]);
 
         $request = new Request([], [], [], [], [], [], 'Signed Body');
-        $request->headers->set('Stripe-Signature', 't='.time().',v1=' . $this->sign($request->getContent(), $secret));
+        $request->headers->set('Stripe-Signature', 't='.time().',v1='.$this->sign($request->getContent(), $secret));
 
         static::expectException(HttpException::class);
 
