@@ -15,7 +15,7 @@ final class VerifyWebhookSignature
                 $request->getContent(),
                 $request->header('Stripe-Signature'),
                 config('services.stripe.webhook.secret'),
-                config('services.stripe.webhook.tolerance', 300)
+                config('services.stripe.webhook.tolerance')
             );
         } catch (SignatureVerification $exception) {
             return abort(403);
