@@ -29,7 +29,7 @@ final class VerifyWebhookSignatureTest extends PHPUnit_Framework_TestCase
 
     private function sign($payload, $secret)
     {
-        return hash_hmac('sha256', $payload, $secret);
+        return hash_hmac('sha256', time().'.'.$payload, $secret);
     }
 
     public function test_bad_signature_aborts()
