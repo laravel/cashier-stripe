@@ -3,8 +3,8 @@
 namespace Laravel\Cashier\Http\Middleware;
 
 use Closure;
-use Stripe\Error\SignatureVerification;
 use Stripe\WebhookSignature;
+use Stripe\Error\SignatureVerification;
 
 final class VerifyWebhookSignature
 {

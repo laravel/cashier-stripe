@@ -3,9 +3,9 @@
 namespace Laravel\Cashier\Tests;
 
 use Illuminate\Http\Request;
-use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 
 final class VerifyWebhookSignatureTest extends PHPUnit_Framework_TestCase
 {
@@ -16,7 +16,7 @@ final class VerifyWebhookSignatureTest extends PHPUnit_Framework_TestCase
         config(['services.stripe.webhook.secret' => $secret, 'services.stripe.webhook.tolerance' => 300]);
 
         $request = new Request([], [], [], [], [], [], 'Signed Body');
-        $request->headers->set('Stripe-Signature', 't=' . time() . ',v1=' . $this->sign($request->getContent(), $secret));
+        $request->headers->set('Stripe-Signature', 't='.time().',v1=' . $this->sign($request->getContent(), $secret));
 
         $called = false;
 
@@ -29,7 +29,7 @@ final class VerifyWebhookSignatureTest extends PHPUnit_Framework_TestCase
 
     private function sign($payload, $secret)
     {
-        return hash_hmac("sha256", $payload, $secret);
+        return hash_hmac('sha256', $payload, $secret);
     }
 
     public function test_bad_signature_aborts()
@@ -39,7 +39,7 @@ final class VerifyWebhookSignatureTest extends PHPUnit_Framework_TestCase
         config(['services.stripe.webhook.secret' => $secret, 'services.stripe.webhook.tolerance' => 300]);
 
         $request = new Request([], [], [], [], [], [], 'Signed Body');
-        $request->headers->set('Stripe-Signature', 't=' . time() . ',v1=fail');
+        $request->headers->set('Stripe-Signature', 't='.time().',v1=fail');
 
         static::expectException(HttpException::class);
 
@@ -53,10 +53,11 @@ final class VerifyWebhookSignatureTest extends PHPUnit_Framework_TestCase
         config(['services.stripe.webhook.secret' => '', 'services.stripe.webhook.tolerance' => 300]);
 
         $request = new Request([], [], [], [], [], [], 'Signed Body');
-        $request->headers->set('Stripe-Signature', 't=' . time() . ',v1=' . $this->sign($request->getContent(), $secret));
+        $request->headers->set('Stripe-Signature', 't='.time().',v1=' . $this->sign($request->getContent(), $secret));
 
         static::expectException(HttpException::class);
 
-        (new VerifyWebhookSignature)->handle($request, function ($request) {});
+        (new VerifyWebhookSignature)->handle($request, function ($request) {
+        });
     }
 }
