@@ -59,7 +59,7 @@ trait Billable
      *
      * @param  string  $charge
      * @param  array  $options
-     * @return \Stripe\Charge
+     * @return \Stripe\Refund
      *
      * @throws \InvalidArgumentException
      */
