@@ -2,25 +2,37 @@
 
 namespace Laravel\Cashier\Tests;
 
+use Mockery as m;
 use Illuminate\Http\Request;
 use PHPUnit_Framework_TestCase;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Config\Repository as Config;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 
 final class VerifyWebhookSignatureTest extends PHPUnit_Framework_TestCase
 {
+    public function tearDown()
+    {
+        m::close();
+    }
+
     public function test_signature_checks_out()
     {
         $secret = 'secret';
 
-        config(['services.stripe.webhook.secret' => $secret, 'services.stripe.webhook.tolerance' => 300]);
+        $app = m::mock(Application::class);
+
+        $config = m::mock(Config::class);
+        $config->shouldReceive('get')->with('services.stripe.webhook.secret')->andReturn($secret);
+        $config->shouldReceive('get')->with('services.stripe.webhook.tolerance')->andReturn(300);
 
         $request = new Request([], [], [], [], [], [], 'Signed Body');
         $request->headers->set('Stripe-Signature', 't='.time().',v1='.$this->sign($request->getContent(), $secret));
 
         $called = false;
 
-        (new VerifyWebhookSignature)->handle($request, function ($request) use (&$called) {
+        (new VerifyWebhookSignature($app, $config))->handle($request, function ($request) use (&$called) {
             $called = true;
         });
 
@@ -36,29 +48,39 @@ final class VerifyWebhookSignatureTest extends PHPUnit_Framework_TestCase
     {
         $secret = 'secret';
 
-        config(['services.stripe.webhook.secret' => $secret, 'services.stripe.webhook.tolerance' => 300]);
+        $app = m::mock(Application::class);
+        $app->shouldReceive('abort')->andThrow(HttpException::class, 403);
+
+        $config = m::mock(Config::class);
+        $config->shouldReceive('get')->with('services.stripe.webhook.secret')->andReturn($secret);
+        $config->shouldReceive('get')->with('services.stripe.webhook.tolerance')->andReturn(300);
 
         $request = new Request([], [], [], [], [], [], 'Signed Body');
         $request->headers->set('Stripe-Signature', 't='.time().',v1=fail');
 
         static::expectException(HttpException::class);
 
-        (new VerifyWebhookSignature)->handle($request, function ($request) {
+        (new VerifyWebhookSignature($app, $config))->handle($request, function ($request) {
         });
     }
 
-    public function test_no_secret_aborts()
+    public function test_no_or_mismatching_secret_aborts()
     {
         $secret = 'secret';
 
-        config(['services.stripe.webhook.secret' => '', 'services.stripe.webhook.tolerance' => 300]);
+        $app = m::mock(Application::class);
+        $app->shouldReceive('abort')->andThrow(HttpException::class, 403);
+
+        $config = m::mock(Config::class);
+        $config->shouldReceive('get')->with('services.stripe.webhook.secret')->andReturn($secret);
+        $config->shouldReceive('get')->with('services.stripe.webhook.tolerance')->andReturn(300);
 
         $request = new Request([], [], [], [], [], [], 'Signed Body');
-        $request->headers->set('Stripe-Signature', 't='.time().',v1='.$this->sign($request->getContent(), $secret));
+        $request->headers->set('Stripe-Signature', 't='.time().',v1='.$this->sign($request->getContent(), ''));
 
         static::expectException(HttpException::class);
 
-        (new VerifyWebhookSignature)->handle($request, function ($request) {
+        (new VerifyWebhookSignature($app, $config))->handle($request, function ($request) {
         });
     }
 }
