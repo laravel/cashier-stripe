@@ -3,7 +3,6 @@
 namespace Laravel\Cashier;
 
 use Exception;
-use Carbon\Carbon;
 use InvalidArgumentException;
 use Stripe\Card as StripeCard;
 use Stripe\Token as StripeToken;
@@ -16,6 +15,7 @@ use Stripe\BankAccount as StripeBankAccount;
 use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 trait Billable
 {
@@ -59,7 +59,7 @@ trait Billable
      *
      * @param  string  $charge
      * @param  array  $options
-     * @return \Stripe\Charge
+     * @return \Stripe\Refund
      *
      * @throws \InvalidArgumentException
      */
@@ -165,7 +165,7 @@ trait Billable
      */
     public function onGenericTrial()
     {
-        return $this->trial_ends_at && Carbon::now()->lt($this->trial_ends_at);
+        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
     }
 
     /**
@@ -210,7 +210,7 @@ trait Billable
     /**
      * Get all of the subscriptions for the Stripe model.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function subscriptions()
     {
@@ -262,7 +262,15 @@ trait Billable
     public function findInvoice($id)
     {
         try {
-            return new Invoice($this, StripeInvoice::retrieve($id, $this->getStripeKey()));
+            $stripeInvoice = StripeInvoice::retrieve(
+                $id, $this->getStripeKey()
+            );
+
+            $stripeInvoice->lines = StripeInvoice::retrieve($id, $this->getStripeKey())
+                        ->lines
+                        ->all(['limit' => 1000]);
+
+            return new Invoice($this, $stripeInvoice);
         } catch (Exception $e) {
             //
         }
@@ -280,6 +288,10 @@ trait Billable
 
         if (is_null($invoice)) {
             throw new NotFoundHttpException;
+        }
+
+        if ($invoice->customer !== $this->stripe_id) {
+            throw new AccessDeniedHttpException;
         }
 
         return $invoice;
@@ -363,6 +375,22 @@ trait Billable
     }
 
     /**
+     * Get the default card for the entity.
+     *
+     * @return \Stripe\Card|null
+     */
+    public function defaultCard()
+    {
+        $customer = $this->asStripeCustomer();
+
+        foreach ($customer->sources->data as $card) {
+            if ($card->id === $customer->default_source) {
+                return $card;
+            }
+        }
+    }
+
+    /**
      * Update customer's credit card.
      *
      * @param  string  $token
@@ -406,16 +434,7 @@ trait Billable
      */
     public function updateCardFromStripe()
     {
-        $customer = $this->asStripeCustomer();
-
-        $defaultCard = null;
-
-        foreach ($customer->sources->data as $card) {
-            if ($card->id === $customer->default_source) {
-                $defaultCard = $card;
-                break;
-            }
-        }
+        $defaultCard = $this->defaultCard();
 
         if ($defaultCard) {
             $this->fillCardDetails($defaultCard)->save();
@@ -458,6 +477,8 @@ trait Billable
         $this->cards()->each(function ($card) {
             $card->delete();
         });
+
+        $this->updateCardFromStripe();
     }
 
     /**

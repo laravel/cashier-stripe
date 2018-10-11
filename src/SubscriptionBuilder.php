@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
+use DateTimeInterface;
 
 class SubscriptionBuilder
 {
@@ -47,6 +48,13 @@ class SubscriptionBuilder
      * @var bool
      */
     protected $skipTrial = false;
+
+    /**
+     * The date on which the billing cycle should be anchored.
+     *
+     * @var int|null
+     */
+    protected $billingCycleAnchor = null;
 
     /**
      * The coupon code being applied to the customer.
@@ -124,6 +132,23 @@ class SubscriptionBuilder
     public function skipTrial()
     {
         $this->skipTrial = true;
+
+        return $this;
+    }
+
+    /**
+     * Change the billing cycle anchor on a plan creation.
+     *
+     * @param  \DateTimeInterface|int  $date
+     * @return $this
+     */
+    public function anchorBillingCycleOn($date)
+    {
+        if ($date instanceof DateTimeInterface) {
+            $date = $date->getTimestamp();
+        }
+
+        $this->billingCycleAnchor = $date;
 
         return $this;
     }
@@ -224,12 +249,13 @@ class SubscriptionBuilder
     protected function buildPayload()
     {
         return array_filter([
+            'billing_cycle_anchor' => $this->billingCycleAnchor,
+            'coupon' => $this->coupon,
+            'metadata' => $this->metadata,
             'plan' => $this->plan,
             'quantity' => $this->quantity,
-            'coupon' => $this->coupon,
-            'trial_end' => $this->getTrialEndForPayload(),
             'tax_percent' => $this->getTaxPercentageForPayload(),
-            'metadata' => $this->metadata,
+            'trial_end' => $this->getTrialEndForPayload(),
         ]);
     }
 

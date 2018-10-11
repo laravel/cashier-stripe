@@ -86,6 +86,8 @@ class CashierTest extends TestCase
         $this->assertTrue($user->subscription('main')->active());
         $this->assertFalse($user->subscription('main')->cancelled());
         $this->assertFalse($user->subscription('main')->onGracePeriod());
+        $this->assertTrue($user->subscription('main')->recurring());
+        $this->assertFalse($user->subscription('main')->ended());
 
         // Cancel Subscription
         $subscription = $user->subscription('main');
@@ -94,6 +96,8 @@ class CashierTest extends TestCase
         $this->assertTrue($subscription->active());
         $this->assertTrue($subscription->cancelled());
         $this->assertTrue($subscription->onGracePeriod());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
 
         // Modify Ends Date To Past
         $oldGracePeriod = $subscription->ends_at;
@@ -102,6 +106,8 @@ class CashierTest extends TestCase
         $this->assertFalse($subscription->active());
         $this->assertTrue($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
+        $this->assertFalse($subscription->recurring());
+        $this->assertTrue($subscription->ended());
 
         $subscription->fill(['ends_at' => $oldGracePeriod])->save();
 
@@ -111,6 +117,8 @@ class CashierTest extends TestCase
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
+        $this->assertTrue($subscription->recurring());
+        $this->assertFalse($subscription->ended());
 
         // Increment & Decrement
         $subscription->incrementQuantity();
@@ -155,6 +163,8 @@ class CashierTest extends TestCase
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
+        $this->assertTrue($subscription->recurring());
+        $this->assertFalse($subscription->ended());
 
         // Invoice Tests
         $invoice = $user->invoices()[0];
@@ -163,6 +173,43 @@ class CashierTest extends TestCase
         $this->assertEquals('$5.00', $invoice->total());
         $this->assertEquals('$5.00', $invoice->amountOff());
         $this->assertFalse($invoice->discountIsPercentage());
+    }
+
+    public function test_creating_subscription_with_an_anchored_billing_cycle()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        // Create Subscription
+        $user->newSubscription('main', 'monthly-10-1')
+            ->anchorBillingCycleOn(new \DateTime('first day of next month'))
+            ->create($this->getTestToken());
+
+        $subscription = $user->subscription('main');
+
+        $this->assertTrue($user->subscribed('main'));
+        $this->assertTrue($user->subscribed('main', 'monthly-10-1'));
+        $this->assertFalse($user->subscribed('main', 'monthly-10-2'));
+        $this->assertTrue($subscription->active());
+        $this->assertFalse($subscription->cancelled());
+        $this->assertFalse($subscription->onGracePeriod());
+        $this->assertTrue($subscription->recurring());
+        $this->assertFalse($subscription->ended());
+
+        // Invoice Tests
+        $invoice = $user->invoices()[0];
+        $invoicePeriod = $invoice->invoiceItems()[0]->period;
+
+        $this->assertEquals(
+            (new \DateTime('now'))->format('Y-m-d'),
+            date('Y-m-d', $invoicePeriod->start)
+        );
+        $this->assertEquals(
+            (new \DateTime('first day of next month'))->format('Y-m-d'),
+            date('Y-m-d', $invoicePeriod->end)
+        );
     }
 
     public function test_generic_trials()
@@ -190,6 +237,8 @@ class CashierTest extends TestCase
 
         $this->assertTrue($subscription->active());
         $this->assertTrue($subscription->onTrial());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
         $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
 
         // Cancel Subscription
@@ -197,6 +246,8 @@ class CashierTest extends TestCase
 
         $this->assertTrue($subscription->active());
         $this->assertTrue($subscription->onGracePeriod());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
 
         // Resume Subscription
         $subscription->resume();
@@ -204,6 +255,8 @@ class CashierTest extends TestCase
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->onGracePeriod());
         $this->assertTrue($subscription->onTrial());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
         $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
     }
 
@@ -222,6 +275,8 @@ class CashierTest extends TestCase
 
         $this->assertTrue($subscription->active());
         $this->assertTrue($subscription->onTrial());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
         $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
 
         // Cancel Subscription
@@ -229,6 +284,8 @@ class CashierTest extends TestCase
 
         $this->assertTrue($subscription->active());
         $this->assertTrue($subscription->onGracePeriod());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
 
         // Resume Subscription
         $subscription->resume();
@@ -236,6 +293,8 @@ class CashierTest extends TestCase
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->onGracePeriod());
         $this->assertTrue($subscription->onTrial());
+        $this->assertFalse($subscription->recurring());
+        $this->assertFalse($subscription->ended());
         $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
     }
 
