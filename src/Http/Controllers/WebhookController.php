@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
+use Laravel\Cashier\Cashier;
 use Stripe\Event as StripeEvent;
 use Illuminate\Routing\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,7 +63,7 @@ class WebhookController extends Controller
      */
     protected function getUserByStripeId($stripeId)
     {
-        $model = getenv('STRIPE_MODEL') ?: config('services.stripe.model');
+        $model = Cashier::stripeModel();
 
         return (new $model)->where('stripe_id', $stripeId)->first();
     }

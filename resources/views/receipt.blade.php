@@ -61,7 +61,7 @@
 
             <!-- Organization Name / Image -->
             <td align="right">
-                <strong>{{ $header or $vendor }}</strong>
+                <strong>{{ $header ?? $vendor }}</strong>
             </td>
         </tr>
         <tr valign="top">
@@ -90,6 +90,9 @@
                 @if (isset($phone))
                     <strong>T</strong> {{ $phone }}<br>
                 @endif
+                @if (isset($vendorVat))
+                    {{ $vendorVat }}<br>
+                @endif
                 @if (isset($url))
                     <a href="{{ $url }}">{{ $url }}</a>
                 @endif
@@ -98,7 +101,7 @@
                 <!-- Invoice Info -->
                 <p>
                     <strong>Product:</strong> {{ $product }}<br>
-                    <strong>Invoice Number:</strong> {{ $id or $invoice->id }}<br>
+                    <strong>Invoice Number:</strong> {{ $id ?? $invoice->id }}<br>
                 </p>
 
                 <!-- Extra / VAT Information -->

@@ -42,6 +42,8 @@ class Subscription extends Model
 
     /**
      * Get the user that owns the subscription.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user()
     {
@@ -55,11 +57,9 @@ class Subscription extends Model
      */
     public function owner()
     {
-        $model = getenv('STRIPE_MODEL') ?: config('services.stripe.model', 'App\\User');
+        $class = Cashier::stripeModel();
 
-        $model = new $model;
-
-        return $this->belongsTo(get_class($model), $model->getForeignKey());
+        return $this->belongsTo($class, (new $class)->getForeignKey());
     }
 
     /**
@@ -83,6 +83,16 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription is recurring and not on trial.
+     *
+     * @return bool
+     */
+    public function recurring()
+    {
+        return ! $this->onTrial() && ! $this->cancelled();
+    }
+
+    /**
      * Determine if the subscription is no longer active.
      *
      * @return bool
@@ -93,17 +103,23 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription has ended and the grace period has expired.
+     *
+     * @return bool
+     */
+    public function ended()
+    {
+        return $this->cancelled() && ! $this->onGracePeriod();
+    }
+
+    /**
      * Determine if the subscription is within its trial period.
      *
      * @return bool
      */
     public function onTrial()
     {
-        if (! is_null($this->trial_ends_at)) {
-            return Carbon::today()->lt($this->trial_ends_at);
-        } else {
-            return false;
-        }
+        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
     }
 
     /**
@@ -113,11 +129,7 @@ class Subscription extends Model
      */
     public function onGracePeriod()
     {
-        if (! is_null($endsAt = $this->ends_at)) {
-            return Carbon::now()->lt(Carbon::instance($endsAt));
-        } else {
-            return false;
-        }
+        return $this->ends_at && $this->ends_at->isFuture();
     }
 
     /**
@@ -243,7 +255,7 @@ class Subscription extends Model
         $subscription->prorate = $this->prorate;
 
         if (! is_null($this->billingCycleAnchor)) {
-            $subscription->billingCycleAnchor = $this->billingCycleAnchor;
+            $subscription->billing_cycle_anchor = $this->billingCycleAnchor;
         }
 
         // If no specific trial end date has been set, the default behavior should be
@@ -283,7 +295,9 @@ class Subscription extends Model
     {
         $subscription = $this->asStripeSubscription();
 
-        $subscription->cancel(['at_period_end' => true]);
+        $subscription->cancel_at_period_end = true;
+
+        $subscription->save();
 
         // If the user was on trial, we will set the grace period to end when the trial
         // would have ended. Otherwise, we'll retrieve the end of the billing period
@@ -342,6 +356,8 @@ class Subscription extends Model
 
         $subscription = $this->asStripeSubscription();
 
+        $subscription->cancel_at_period_end = false;
+
         // To resume the subscription we need to set the plan parameter on the Stripe
         // subscription object. This will force Stripe to resume this subscription
         // where we left off. Then, we'll set the proper trial ending timestamp.
@@ -361,6 +377,20 @@ class Subscription extends Model
         $this->fill(['ends_at' => null])->save();
 
         return $this;
+    }
+
+    /**
+     * Sync the tax percentage of the user to the subscription.
+     *
+     * @return void
+     */
+    public function syncTaxPercentage()
+    {
+        $subscription = $this->asStripeSubscription();
+
+        $subscription->tax_percent = $this->user->taxPercentage();
+
+        $subscription->save();
     }
 
     /**
