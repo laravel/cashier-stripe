@@ -380,11 +380,11 @@ class Subscription extends Model
     }
 
     /**
-     * Syncs the tax percentage of user to the subscription.
+     * Sync the tax percentage of the user to the subscription.
      *
      * @return void
      */
-    public function updateTax()
+    public function syncTaxPercentage()
     {
         $subscription = $this->asStripeSubscription();
 
