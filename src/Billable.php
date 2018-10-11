@@ -389,8 +389,6 @@ trait Billable
                 return $card;
             }
         }
-
-        return null;
     }
 
     /**
