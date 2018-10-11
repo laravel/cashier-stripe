@@ -11,15 +11,26 @@ use Illuminate\Contracts\Config\Repository as Config;
 final class VerifyWebhookSignature
 {
     /**
+     * The application instance.
+     *
      * @var \Illuminate\Contracts\Foundation\Application
      */
-    private $app;
+    protected $app;
 
     /**
+     * The configuration repository instance.
+     *
      * @var \Illuminate\Contracts\Config\Repository
      */
-    private $config;
+    protected $config;
 
+    /**
+     * Create a new middleware instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Config\Repository  $config
+     * @return void
+     */
     public function __construct(Application $app, Config $config)
     {
         $this->app = $app;
