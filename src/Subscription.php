@@ -380,6 +380,20 @@ class Subscription extends Model
     }
 
     /**
+     * Syncs the tax percentage of user to the subscription.
+     *
+     * @return void
+     */
+    public function updateTax()
+    {
+        $subscription = $this->asStripeSubscription();
+
+        $subscription->tax_percent = $this->user->taxPercentage();
+
+        $subscription->save();
+    }
+
+    /**
      * Get the subscription as a Stripe subscription object.
      *
      * @return \Stripe\Subscription
