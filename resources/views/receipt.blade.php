@@ -112,72 +112,72 @@
                 @endif
 
                 <br><br>
-
-                <!-- Invoice Table -->
-                <table width="100%" class="table" border="0">
-                    <tr>
-                        <th align="left">Description</th>
-                        <th align="right">Date</th>
-                        <th align="right">Amount</th>
-                    </tr>
-
-                    <!-- Existing Balance -->
-                    <tr>
-                        <td>Starting Balance</td>
-                        <td>&nbsp;</td>
-                        <td>{{ $invoice->startingBalance() }}</td>
-                    </tr>
-
-                    <!-- Display The Invoice Items -->
-                    @foreach ($invoice->invoiceItems() as $item)
-                        <tr>
-                            <td colspan="2">{{ $item->description }}</td>
-                            <td>{{ $item->total() }}</td>
-                        </tr>
-                    @endforeach
-
-                    <!-- Display The Subscriptions -->
-                    @foreach ($invoice->subscriptions() as $subscription)
-                        <tr>
-                            <td>Subscription ({{ $subscription->quantity }})</td>
-                            <td>
-                                {{ $subscription->startDateAsCarbon()->formatLocalized('%B %e, %Y') }} -
-                                {{ $subscription->endDateAsCarbon()->formatLocalized('%B %e, %Y') }}
-                            </td>
-                            <td>{{ $subscription->total() }}</td>
-                        </tr>
-                    @endforeach
-
-                    <!-- Display The Discount -->
-                    @if ($invoice->hasDiscount())
-                        <tr>
-                            @if ($invoice->discountIsPercentage())
-                                <td>{{ $invoice->coupon() }} ({{ $invoice->percentOff() }}% Off)</td>
-                            @else
-                                <td>{{ $invoice->coupon() }} ({{ $invoice->amountOff() }} Off)</td>
-                            @endif
-                            <td>&nbsp;</td>
-                            <td>-{{ $invoice->discount() }}</td>
-                        </tr>
-                    @endif
-
-                    <!-- Display The Tax Amount -->
-                    @if ($invoice->tax_percent)
-                        <tr>
-                            <td>Tax ({{ $invoice->tax_percent }}%)</td>
-                            <td>&nbsp;</td>
-                            <td>{{ Laravel\Cashier\Cashier::formatAmount($invoice->tax) }}</td>
-                        </tr>
-                    @endif
-
-                    <!-- Display The Final Total -->
-                    <tr style="border-top:2px solid #000;">
-                        <td>&nbsp;</td>
-                        <td style="text-align: right;"><strong>Total</strong></td>
-                        <td><strong>{{ $invoice->total() }}</strong></td>
-                    </tr>
-                </table>
             </td>
+        </tr>
+    </table>
+
+    <!-- Invoice Table -->
+    <table width="100%" class="table" border="0">
+        <tr>
+            <th align="left">Description</th>
+            <th align="right">Date</th>
+            <th align="right">Amount</th>
+        </tr>
+
+        <!-- Existing Balance -->
+        <tr>
+            <td>Starting Balance</td>
+            <td>&nbsp;</td>
+            <td>{{ $invoice->startingBalance() }}</td>
+        </tr>
+
+        <!-- Display The Invoice Items -->
+        @foreach ($invoice->invoiceItems() as $item)
+            <tr>
+                <td colspan="2">{{ $item->description }}</td>
+                <td>{{ $item->total() }}</td>
+            </tr>
+        @endforeach
+
+    <!-- Display The Subscriptions -->
+        @foreach ($invoice->subscriptions() as $subscription)
+            <tr>
+                <td>Subscription ({{ $subscription->quantity }})</td>
+                <td>
+                    {{ $subscription->startDateAsCarbon()->formatLocalized('%B %e, %Y') }} -
+                    {{ $subscription->endDateAsCarbon()->formatLocalized('%B %e, %Y') }}
+                </td>
+                <td>{{ $subscription->total() }}</td>
+            </tr>
+        @endforeach
+
+    <!-- Display The Discount -->
+        @if ($invoice->hasDiscount())
+            <tr>
+                @if ($invoice->discountIsPercentage())
+                    <td>{{ $invoice->coupon() }} ({{ $invoice->percentOff() }}% Off)</td>
+                @else
+                    <td>{{ $invoice->coupon() }} ({{ $invoice->amountOff() }} Off)</td>
+                @endif
+                <td>&nbsp;</td>
+                <td>-{{ $invoice->discount() }}</td>
+            </tr>
+        @endif
+
+    <!-- Display The Tax Amount -->
+        @if ($invoice->tax_percent)
+            <tr>
+                <td>Tax ({{ $invoice->tax_percent }}%)</td>
+                <td>&nbsp;</td>
+                <td>{{ Laravel\Cashier\Cashier::formatAmount($invoice->tax) }}</td>
+            </tr>
+    @endif
+
+    <!-- Display The Final Total -->
+        <tr style="border-top:2px solid #000;">
+            <td>&nbsp;</td>
+            <td style="text-align: right;"><strong>Total</strong></td>
+            <td><strong>{{ $invoice->total() }}</strong></td>
         </tr>
     </table>
 </div>
