@@ -159,7 +159,7 @@ class WebhookController extends Controller
             )) {
                 $default_card = $data['default_source'];
                 foreach ($data['sources']['data'] as $card) {
-                    if (!isset($card['id']) || $card['id'] != $default_card) {
+                    if (! isset($card['id']) || $card['id'] != $default_card) {
                         continue;
                     }
                     $user->forceFill([
