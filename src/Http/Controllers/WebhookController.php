@@ -64,8 +64,8 @@ class WebhookController extends Controller
      */
     protected function handleCustomerDeleted(array $payload)
     {
-        $user = $this->getUserByStripeId($payload['data']['object']['id']);
         /* @var $user \App\User */
+        $user = $this->getUserByStripeId($payload['data']['object']['id']);
 
         if ($user) {
             $user->subscriptions->each(function ($subscription) {
@@ -79,8 +79,7 @@ class WebhookController extends Controller
                 'card_last_four' => null,
                 'trial_ends_at'  => null,
                 'stripe_id'      => null,
-            ])
-                ->save();
+            ])->save();
         }
 
         return new Response('Webhook Handled', 200);
@@ -94,8 +93,8 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
     {
-        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
         /* @var $user \App\User */
+        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
         $data = $payload['data']['object'];
 
         if ($user) {
@@ -146,8 +145,8 @@ class WebhookController extends Controller
      */
     protected function handleCustomerUpdated(array $payload)
     {
-        $user = $this->getUserByStripeId($payload['data']['object']['id']);
         /* @var $user \App\User */
+        $user = $this->getUserByStripeId($payload['data']['object']['id']);
 
         if ($user) {
             $data = $payload['data']['object'];
@@ -160,14 +159,13 @@ class WebhookController extends Controller
             )) {
                 $default_card = $data['default_source'];
                 foreach ($data['sources']['data'] as $card) {
-                    if (isset($card['id']) && $card['id'] == $default_card) {
-                        $user->forceFill([
-                            'card_brand'     => $card['brand'] ?? null,
-                            'card_last_four' => $card['last4'] ?? null,
-                        ])
-                            ->save();
-                        break;
+                    if (!isset($card['id']) || $card['id'] != $default_card) {
+                        continue;
                     }
+                    $user->forceFill([
+                        'card_brand'     => $card['brand'] ?? null,
+                        'card_last_four' => $card['last4'] ?? null,
+                    ])->save();
                 }
             }
         }
