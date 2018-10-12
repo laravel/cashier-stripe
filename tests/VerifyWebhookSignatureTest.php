@@ -4,13 +4,13 @@ namespace Laravel\Cashier\Tests;
 
 use Mockery as m;
 use Illuminate\Http\Request;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Config\Repository as Config;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 
-final class VerifyWebhookSignatureTest extends PHPUnit_Framework_TestCase
+final class VerifyWebhookSignatureTest extends TestCase
 {
     public function tearDown()
     {
