@@ -95,9 +95,10 @@ class WebhookController extends Controller
     {
         /* @var $user \App\User */
         $user = $this->getUserByStripeId($payload['data']['object']['customer']);
-        $data = $payload['data']['object'];
 
         if ($user) {
+            $data = $payload['data']['object'];
+
             $user->subscriptions->filter(function ($subscription) use ($data) {
                 return $subscription->stripe_id === $data['id'];
             })->each(function ($subscription) use ($data) {
@@ -167,6 +168,31 @@ class WebhookController extends Controller
                         'card_last_four' => $card['last4'] ?? null,
                     ])->save();
                 }
+            }
+        }
+
+        return new Response('Webhook Handled', 200);
+    }
+
+    /**
+     * Handle customer source deleted
+     *
+     * @param  array $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleCustomerSourceDeleted(array $payload)
+    {
+        /* @var $user \App\User */
+        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
+
+        if ($user) {
+            $data = $payload['data']['object'];
+
+            if ($user->card_brand == $data['brand'] && $user->card_last_four == $data['last4']) {
+                $user->forceFill([
+                    'card_brand'     => null,
+                    'card_last_four' => null,
+                ])->save();
             }
         }
 
