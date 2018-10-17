@@ -175,7 +175,7 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle customer source deleted
+     * Handle customer source deleted.
      *
      * @param  array $payload
      * @return \Symfony\Component\HttpFoundation\Response
