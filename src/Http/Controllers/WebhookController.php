@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
 use Illuminate\Support\Carbon;
+use Laravel\Cashier\Subscription;
 use Stripe\Event as StripeEvent;
 use Illuminate\Routing\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,21 +65,19 @@ class WebhookController extends Controller
      */
     protected function handleCustomerDeleted(array $payload)
     {
-        /* @var $user \App\User */
         $user = $this->getUserByStripeId($payload['data']['object']['id']);
 
         if ($user) {
-            $user->subscriptions->each(function ($subscription) {
-                /* @var $subscription \Laravel\Cashier\Subscription */
+            $user->subscriptions->each(function (Subscription $subscription) {
                 $subscription->skipTrial()
                     ->markAsCancelled();
             });
 
             $user->forceFill([
-                'card_brand'     => null,
+                'card_brand' => null,
                 'card_last_four' => null,
-                'trial_ends_at'  => null,
-                'stripe_id'      => null,
+                'trial_ends_at' => null,
+                'stripe_id' => null,
             ])->save();
         }
 
@@ -93,16 +92,14 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
     {
-        /* @var $user \App\User */
         $user = $this->getUserByStripeId($payload['data']['object']['customer']);
 
         if ($user) {
             $data = $payload['data']['object'];
 
-            $user->subscriptions->filter(function ($subscription) use ($data) {
+            $user->subscriptions->filter(function (Subscription $subscription) use ($data) {
                 return $subscription->stripe_id === $data['id'];
-            })->each(function ($subscription) use ($data) {
-                /* @var $subscription \Laravel\Cashier\Subscription */
+            })->each(function (Subscription $subscription) use ($data) {
 
                 // Quantity
                 if (isset($data['quantity'])) {
@@ -117,6 +114,7 @@ class WebhookController extends Controller
                 // Trial ends
                 if (isset($data['trial_end'])) {
                     $trial_ends = Carbon::createFromTimestamp($data['trial_end']);
+
                     if ($subscription->trial_ends_at->ne($trial_ends)) {
                         $subscription->trial_ends_at = $trial_ends;
                     }
@@ -146,7 +144,6 @@ class WebhookController extends Controller
      */
     protected function handleCustomerUpdated(array $payload)
     {
-        /* @var $user \App\User */
         $user = $this->getUserByStripeId($payload['data']['object']['id']);
 
         if ($user) {
@@ -159,12 +156,14 @@ class WebhookController extends Controller
                 $data['sources']['data']
             )) {
                 $default_card = $data['default_source'];
+
                 foreach ($data['sources']['data'] as $card) {
                     if (! isset($card['id']) || $card['id'] != $default_card) {
                         continue;
                     }
+
                     $user->forceFill([
-                        'card_brand'     => $card['brand'] ?? null,
+                        'card_brand' => $card['brand'] ?? null,
                         'card_last_four' => $card['last4'] ?? null,
                     ])->save();
                 }
@@ -182,7 +181,6 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSourceDeleted(array $payload)
     {
-        /* @var $user \App\User */
         $user = $this->getUserByStripeId($payload['data']['object']['customer']);
 
         if ($user) {
@@ -190,7 +188,7 @@ class WebhookController extends Controller
 
             if ($user->card_brand == $data['brand'] && $user->card_last_four == $data['last4']) {
                 $user->forceFill([
-                    'card_brand'     => null,
+                    'card_brand' => null,
                     'card_last_four' => null,
                 ])->save();
             }
