@@ -115,7 +115,7 @@ class WebhookController extends Controller
                 if (isset($data['trial_end'])) {
                     $trial_ends = Carbon::createFromTimestamp($data['trial_end']);
 
-                    if ($subscription->trial_ends_at->ne($trial_ends)) {
+                    if (! $subscription->trial_ends_at || $subscription->trial_ends_at->ne($trial_ends)) {
                         $subscription->trial_ends_at = $trial_ends;
                     }
                 }
