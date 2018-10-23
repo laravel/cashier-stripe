@@ -6,8 +6,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
 use Illuminate\Support\Carbon;
-use Laravel\Cashier\Subscription;
 use Stripe\Event as StripeEvent;
+use Laravel\Cashier\Subscription;
 use Illuminate\Routing\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
