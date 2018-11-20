@@ -254,6 +254,9 @@ class Subscription extends Model
 
         $subscription->prorate = $this->prorate;
 
+        // Let's make sure the subscription is resumed if the subscription was cancelled
+        $subscription->cancel_at_period_end = false;
+
         if (! is_null($this->billingCycleAnchor)) {
             $subscription->billing_cycle_anchor = $this->billingCycleAnchor;
         }
