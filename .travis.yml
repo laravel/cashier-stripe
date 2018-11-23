@@ -8,6 +8,9 @@ php:
 
 sudo: false
 
+before_install:
+  - phpenv config-rm xdebug.ini || true
+
 install: travis_retry composer install --no-interaction --prefer-source
 
 script: vendor/bin/phpunit --verbose
