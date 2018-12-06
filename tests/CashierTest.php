@@ -1,14 +1,14 @@
 <?php
 
-namespace Laravel\Cashier\Tests;
+namespace Tests;
 
 use Carbon\Carbon;
+use Tests\Fixtures\User;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
-use Laravel\Cashier\Tests\Fixtures\User;
+use Tests\Fixtures\CashierTestControllerStub;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Laravel\Cashier\Tests\Fixtures\CashierTestControllerStub;
 
 class CashierTest extends TestCase
 {
