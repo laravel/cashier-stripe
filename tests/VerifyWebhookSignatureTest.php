@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Laravel\Cashier\Tests;
 
 use Mockery as m;
 use Illuminate\Http\Request;
