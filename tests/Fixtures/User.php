@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Cashier\Tests\Fixtures;
+namespace Tests\Fixtures;
 
 use Laravel\Cashier\Billable;
 use Illuminate\Database\Eloquent\Model as Eloquent;
