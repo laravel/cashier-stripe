@@ -37,7 +37,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Laravel\\Cashier\\Tests\\": "tests/"
         }
     },
     "extra": {

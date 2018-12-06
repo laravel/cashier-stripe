@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fixtures;
+namespace Laravel\Cashier\Tests\Fixtures;
 
 use Laravel\Cashier\Http\Controllers\WebhookController;
 
