@@ -4,22 +4,14 @@ namespace Laravel\Cashier\Tests;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Laravel\Cashier\Billable;
 use PHPUnit\Framework\TestCase;
-use Laravel\Cashier\Tests\Fixtures\User;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Laravel\Cashier\Tests\Fixtures\CashierTestControllerStub;
+use Laravel\Cashier\Http\Controllers\WebhookController;
 
 class CashierTest extends TestCase
 {
-    public static function setUpBeforeClass()
-    {
-        if (file_exists(__DIR__.'/../.env')) {
-            $dotenv = new \Dotenv\Dotenv(__DIR__.'/../');
-            $dotenv->load();
-        }
-    }
-
     public function setUp()
     {
         Eloquent::unguard();
@@ -408,5 +400,18 @@ class CashierTest extends TestCase
     protected function connection()
     {
         return Eloquent::getConnectionResolver()->connection();
+    }
+}
+
+class User extends Eloquent
+{
+    use Billable;
+}
+
+class CashierTestControllerStub extends WebhookController
+{
+    protected function eventExistsOnStripe($id)
+    {
+        return true;
     }
 }

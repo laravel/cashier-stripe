@@ -21,10 +21,10 @@ You will need to set the following details locally and on your Stripe account in
 
 ### Environment
 
-#### .env
+#### Environment Variables
 
     STRIPE_SECRET=
-    STRIPE_MODEL=Laravel\Cashier\Tests\Fixtures\User
+    STRIPE_MODEL=Laravel\Cashier\Tests\User
 
 You can set these variables in the `phpunit.xml` file.
 
