@@ -410,8 +410,8 @@ class User extends Eloquent
 
 class CashierTestControllerStub extends WebhookController
 {
-    protected function eventExistsOnStripe($id)
+    public function __construct()
     {
-        return true;
+        // Prevent setting middleware...
     }
 }

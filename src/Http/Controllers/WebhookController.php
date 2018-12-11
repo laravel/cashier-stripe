@@ -2,17 +2,28 @@
 
 namespace Laravel\Cashier\Http\Controllers;
 
-use Exception;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
 use Illuminate\Support\Carbon;
-use Stripe\Event as StripeEvent;
 use Laravel\Cashier\Subscription;
 use Illuminate\Routing\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 
 class WebhookController extends Controller
 {
+    /**
+     * Create a new webhook controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        if (config('services.stripe.webhook.secret')) {
+            $this->middleware(VerifyWebhookSignature::class);
+        }
+    }
+
     /**
      * Handle a Stripe webhook call.
      *
@@ -22,11 +33,6 @@ class WebhookController extends Controller
     public function handleWebhook(Request $request)
     {
         $payload = json_decode($request->getContent(), true);
-
-        if (! $this->isInTestingEnvironment() && ! $this->eventExistsOnStripe($payload['id'])) {
-            return;
-        }
-
         $method = 'handle'.studly_case(str_replace('.', '_', $payload['type']));
 
         if (method_exists($this, $method)) {
@@ -173,31 +179,6 @@ class WebhookController extends Controller
         $model = Cashier::stripeModel();
 
         return (new $model)->where('stripe_id', $stripeId)->first();
-    }
-
-    /**
-     * Verify with Stripe that the event is genuine.
-     *
-     * @param  string  $id
-     * @return bool
-     */
-    protected function eventExistsOnStripe($id)
-    {
-        try {
-            return ! is_null(StripeEvent::retrieve($id, config('services.stripe.secret')));
-        } catch (Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Verify if cashier is in the testing environment.
-     *
-     * @return bool
-     */
-    protected function isInTestingEnvironment()
-    {
-        return getenv('CASHIER_ENV') === 'testing';
     }
 
     /**
