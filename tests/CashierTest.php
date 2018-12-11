@@ -12,14 +12,6 @@ use Laravel\Cashier\Tests\Fixtures\CashierTestControllerStub;
 
 class CashierTest extends TestCase
 {
-    public static function setUpBeforeClass()
-    {
-        if (file_exists(__DIR__.'/../.env')) {
-            $dotenv = new \Dotenv\Dotenv(__DIR__.'/../');
-            $dotenv->load();
-        }
-    }
-
     public function setUp()
     {
         Eloquent::unguard();
