@@ -4,7 +4,7 @@ namespace Laravel\Cashier\Tests;
 
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
-use Laravel\Cashier\Tests\Fixtures\WebhookControllerTestStub;
+use Laravel\Cashier\Http\Controllers\WebhookController;
 
 class WebhookControllerTest extends TestCase
 {
@@ -24,5 +24,18 @@ class WebhookControllerTest extends TestCase
         $controller = new WebhookControllerTestStub;
         $response = $controller->handleWebhook($request);
         $this->assertEquals(200, $response->getStatusCode());
+    }
+}
+
+class WebhookControllerTestStub extends WebhookController
+{
+    public function handleChargeSucceeded()
+    {
+        $_SERVER['__received'] = true;
+    }
+
+    protected function eventExistsOnStripe($id)
+    {
+        return true;
     }
 }
