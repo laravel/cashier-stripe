@@ -358,7 +358,8 @@ class CashierTest extends TestCase
         ]);
 
         // Create Invoice
-        $user->createAsStripeCustomer($this->getTestToken());
+        $user->createAsStripeCustomer();
+        $user->updateCard($this->getTestToken());
         $user->invoiceFor('Laravel Cashier', 1000);
 
         // Invoice Tests
@@ -375,7 +376,8 @@ class CashierTest extends TestCase
         ]);
 
         // Create Invoice
-        $user->createAsStripeCustomer($this->getTestToken());
+        $user->createAsStripeCustomer();
+        $user->updateCard($this->getTestToken());
         $invoice = $user->invoiceFor('Laravel Cashier', 1000);
 
         // Create the refund
