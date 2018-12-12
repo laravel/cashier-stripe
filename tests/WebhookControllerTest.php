@@ -29,13 +29,13 @@ class WebhookControllerTest extends TestCase
 
 class WebhookControllerTestStub extends WebhookController
 {
+    public function __construct()
+    {
+        // Prevent setting middleware...
+    }
+
     public function handleChargeSucceeded()
     {
         $_SERVER['__received'] = true;
-    }
-
-    protected function eventExistsOnStripe($id)
-    {
-        return true;
     }
 }
