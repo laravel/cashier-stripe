@@ -546,14 +546,14 @@ trait Billable
     /**
      * Create a Stripe customer for the given Stripe model.
      *
-     * @param  string  $token
      * @param  array  $options
      * @return \Stripe\Customer
      */
-    public function createAsStripeCustomer($token, array $options = [])
+    public function createAsStripeCustomer(array $options = [])
     {
         $options = array_key_exists('email', $options)
-                ? $options : array_merge($options, ['email' => $this->email]);
+                ? $options
+                : array_merge($options, ['email' => $this->email]);
 
         // Here we will create the customer instance on Stripe and store the ID of the
         // user from Stripe. This ID will correspond with the Stripe user instances
@@ -565,13 +565,6 @@ trait Billable
         $this->stripe_id = $customer->id;
 
         $this->save();
-
-        // Next we will add the credit card to the user's account on Stripe using this
-        // token that was provided to this method. This will allow us to bill users
-        // when they subscribe to plans or we need to do one-off charges on them.
-        if (! is_null($token)) {
-            $this->updateCard($token);
-        }
 
         return $customer;
     }

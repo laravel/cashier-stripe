@@ -1,5 +1,11 @@
 # Cashier Change Log
 
+## Unreleased
+
+### Changed
+
+- Extract `updateCard` from `createAsStripeCustomer` method ([#588](https://github.com/laravel/cashier/pull/588))
+
 ## Version 2.0.4
 
 - Allow user to pass paramaters when fetching invoices.
