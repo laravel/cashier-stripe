@@ -14,6 +14,8 @@ The `updateCard` call was extracted from the `createAsStripeCustomer` method on 
 
 Manually checking for events through the Stripe API and the `CASHIER_ENV` environment variable were removed in [#591](https://github.com/laravel/cashier/pull/591). Further more, support for the `VerifyWebhookSignature` middleware was added directly inside the `WebhookController`'s constructor. If you are using incoming webhooks you should verify the events with the middleware by setting the `STRIPE_WEBHOOK_SECRET` environment variable. 
 
+If you added the `VerifyWebhookSignature` middleware directly on your webhook route you may remove it there.
+
 If you were using the `CASHIER_ENV` environment variable to test incoming webhooks you may disable the `STRIPE_WEBHOOK_SECRET` environment variable to achieve the same behavior.
 
 More information about verifying webhooks can be found [in the Cashier documentation](https://laravel.com/docs/5.7/billing#verifying-webhook-signatures).
