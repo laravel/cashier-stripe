@@ -1,10 +1,17 @@
-# Cashier Change Log
+# Release Notes
 
-## Unreleased
+## [v9.0.0](https://github.com/laravel/cashier/compare/v8.0.1...v9.0.0)
 
 ### Changed
 
+- Removed support for PHP 7.0 ([#595](https://github.com/laravel/cashier/pull/595))
+- Require Laravel 5.7 as minimum version ([#595](https://github.com/laravel/cashier/pull/595))
 - Extract `updateCard` from `createAsStripeCustomer` method ([#588](https://github.com/laravel/cashier/pull/588))
+- Remove `CASHIER_ENV` and event checks and encourage usage of `VerifyWebhookSignature` middleware ([#591](https://github.com/laravel/cashier/pull/591))
+
+### Fixed
+
+- Fixed some DocBlocks ([#594](https://github.com/laravel/cashier/pull/594))
 
 ## Version 2.0.4
 
