@@ -39,11 +39,6 @@ final class VerifyWebhookSignatureTest extends TestCase
         static::assertTrue($called);
     }
 
-    private function sign($payload, $secret)
-    {
-        return hash_hmac('sha256', time().'.'.$payload, $secret);
-    }
-
     public function test_bad_signature_aborts()
     {
         $secret = 'secret';
@@ -82,5 +77,10 @@ final class VerifyWebhookSignatureTest extends TestCase
 
         (new VerifyWebhookSignature($app, $config))->handle($request, function ($request) {
         });
+    }
+
+    private function sign($payload, $secret)
+    {
+        return hash_hmac('sha256', time().'.'.$payload, $secret);
     }
 }

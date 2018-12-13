@@ -60,7 +60,6 @@ trait Billable
      * @param  string  $charge
      * @param  array  $options
      * @return \Stripe\Refund
-     *
      * @throws \InvalidArgumentException
      */
     public function refund($charge, array $options = [])
@@ -87,7 +86,6 @@ trait Billable
      * @param  int  $amount
      * @param  array  $options
      * @return \Stripe\InvoiceItem
-     *
      * @throws \InvalidArgumentException
      */
     public function tab($description, $amount, array $options = [])
@@ -103,9 +101,7 @@ trait Billable
             'description' => $description,
         ], $options);
 
-        return StripeInvoiceItem::create(
-            $options, ['api_key' => $this->getStripeKey()]
-        );
+        return StripeInvoiceItem::create($options, ['api_key' => $this->getStripeKey()]);
     }
 
     /**
@@ -201,8 +197,7 @@ trait Billable
     {
         return $this->subscriptions->sortByDesc(function ($value) {
             return $value->created_at->getTimestamp();
-        })
-        ->first(function ($value) use ($subscription) {
+        })->first(function ($value) use ($subscription) {
             return $value->name === $subscription;
         });
     }

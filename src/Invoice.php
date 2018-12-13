@@ -109,8 +109,9 @@ class Invoice
      */
     public function hasDiscount()
     {
-        return $this->invoice->subtotal > 0 && $this->invoice->subtotal != $this->invoice->total
-          && ! is_null($this->invoice->discount);
+        return $this->invoice->subtotal > 0 &&
+            $this->invoice->subtotal != $this->invoice->total &&
+            ! is_null($this->invoice->discount);
     }
 
     /**
@@ -168,9 +169,9 @@ class Invoice
     {
         if (isset($this->invoice->discount->coupon->amount_off)) {
             return $this->formatAmount($this->invoice->discount->coupon->amount_off);
-        } else {
-            return $this->formatAmount(0);
         }
+
+        return $this->formatAmount(0);
     }
 
     /**
@@ -229,7 +230,7 @@ class Invoice
      * Get the View instance for the invoice.
      *
      * @param  array  $data
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Contracts\View\View
      */
     public function view(array $data)
     {
@@ -253,9 +254,7 @@ class Invoice
         }
 
         $dompdf = new Dompdf;
-
         $dompdf->loadHtml($this->view($data)->render());
-
         $dompdf->render();
 
         return $dompdf->output();
@@ -287,7 +286,8 @@ class Invoice
     public function rawStartingBalance()
     {
         return isset($this->invoice->starting_balance)
-                   ? $this->invoice->starting_balance : 0;
+            ? $this->invoice->starting_balance
+            : 0;
     }
 
     /**
