@@ -19,14 +19,4 @@ class CashierServiceProvider extends ServiceProvider
             __DIR__.'/../resources/views' => $this->app->basePath('resources/views/vendor/cashier'),
         ]);
     }
-
-    /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
-    }
 }
