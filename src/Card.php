@@ -29,8 +29,8 @@ class Card
      */
     public function __construct($owner, StripeCard $card)
     {
-        $this->card = $card;
         $this->owner = $owner;
+        $this->card = $card;
     }
 
     /**

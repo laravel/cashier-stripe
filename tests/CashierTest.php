@@ -2,10 +2,15 @@
 
 namespace Laravel\Cashier\Tests;
 
+use DateTime;
+use Stripe\Token;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Billable;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Laravel\Cashier\Http\Controllers\WebhookController;
@@ -24,7 +29,7 @@ class CashierTest extends TestCase
         $db->bootEloquent();
         $db->setAsGlobal();
 
-        $this->schema()->create('users', function ($table) {
+        $this->schema()->create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->string('name');
@@ -34,7 +39,7 @@ class CashierTest extends TestCase
             $table->timestamps();
         });
 
-        $this->schema()->create('subscriptions', function ($table) {
+        $this->schema()->create('subscriptions', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('name');
@@ -53,10 +58,7 @@ class CashierTest extends TestCase
         $this->schema()->drop('subscriptions');
     }
 
-    /**
-     * Tests.
-     */
-    public function testSubscriptionsCanBeCreated()
+    public function test_subscriptions_can_be_created()
     {
         $user = User::create([
             'email' => 'taylor@laravel.com',
@@ -145,7 +147,8 @@ class CashierTest extends TestCase
 
         // Create Subscription
         $user->newSubscription('main', 'monthly-10-1')
-                ->withCoupon('coupon-1')->create($this->getTestToken());
+            ->withCoupon('coupon-1')
+            ->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
 
@@ -176,7 +179,7 @@ class CashierTest extends TestCase
 
         // Create Subscription
         $user->newSubscription('main', 'monthly-10-1')
-            ->anchorBillingCycleOn(new \DateTime('first day of next month'))
+            ->anchorBillingCycleOn(new DateTime('first day of next month'))
             ->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
@@ -195,11 +198,11 @@ class CashierTest extends TestCase
         $invoicePeriod = $invoice->invoiceItems()[0]->period;
 
         $this->assertEquals(
-            (new \DateTime('now'))->format('Y-m-d'),
+            (new DateTime('now'))->format('Y-m-d'),
             date('Y-m-d', $invoicePeriod->start)
         );
         $this->assertEquals(
-            (new \DateTime('first day of next month'))->format('Y-m-d'),
+            (new DateTime('first day of next month'))->format('Y-m-d'),
             date('Y-m-d', $invoicePeriod->end)
         );
     }
@@ -207,10 +210,15 @@ class CashierTest extends TestCase
     public function test_generic_trials()
     {
         $user = new User;
+
         $this->assertFalse($user->onGenericTrial());
+
         $user->trial_ends_at = Carbon::tomorrow();
+
         $this->assertTrue($user->onGenericTrial());
+
         $user->trial_ends_at = Carbon::today()->subDays(5);
+
         $this->assertFalse($user->onGenericTrial());
     }
 
@@ -223,7 +231,8 @@ class CashierTest extends TestCase
 
         // Create Subscription
         $user->newSubscription('main', 'monthly-10-1')
-                ->trialDays(7)->create($this->getTestToken());
+            ->trialDays(7)
+            ->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
 
@@ -255,13 +264,14 @@ class CashierTest extends TestCase
     public function test_creating_subscription_with_explicit_trial()
     {
         $user = User::create([
-             'email' => 'taylor@laravel.com',
-             'name' => 'Taylor Otwell',
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
         ]);
 
         // Create Subscription
         $user->newSubscription('main', 'monthly-10-1')
-             ->trialUntil(Carbon::tomorrow()->hour(3)->minute(15))->create($this->getTestToken());
+            ->trialUntil(Carbon::tomorrow()->hour(3)->minute(15))
+            ->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
 
@@ -299,7 +309,7 @@ class CashierTest extends TestCase
 
         // Create Subscription
         $user->newSubscription('main', 'monthly-10-1')
-                ->create($this->getTestToken());
+            ->create($this->getTestToken());
 
         $user->applyCoupon('coupon-1');
 
@@ -308,9 +318,6 @@ class CashierTest extends TestCase
         $this->assertEquals('coupon-1', $customer->discount->coupon->id);
     }
 
-    /**
-     * @group foo
-     */
     public function test_marking_as_cancelled_from_webhook()
     {
         $user = User::create([
@@ -319,11 +326,13 @@ class CashierTest extends TestCase
         ]);
 
         $user->newSubscription('main', 'monthly-10-1')
-                ->create($this->getTestToken());
+            ->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
 
-        $request = Request::create('/', 'POST', [], [], [], [], json_encode(['id' => 'foo', 'type' => 'customer.subscription.deleted',
+        $request = Request::create('/', 'POST', [], [], [], [], json_encode([
+            'id' => 'foo',
+            'type' => 'customer.subscription.deleted',
             'data' => [
                 'object' => [
                     'id' => $subscription->stripe_id,
@@ -342,7 +351,7 @@ class CashierTest extends TestCase
         $this->assertTrue($subscription->cancelled());
     }
 
-    public function testCreatingOneOffInvoices()
+    public function test_creating_one_off_invoices()
     {
         $user = User::create([
             'email' => 'taylor@laravel.com',
@@ -360,7 +369,7 @@ class CashierTest extends TestCase
         $this->assertEquals('Laravel Cashier', $invoice->invoiceItems()[0]->asStripeInvoiceItem()->description);
     }
 
-    public function testRefunds()
+    public function test_refunds()
     {
         $user = User::create([
             'email' => 'taylor@laravel.com',
@@ -381,7 +390,7 @@ class CashierTest extends TestCase
 
     protected function getTestToken()
     {
-        return \Stripe\Token::create([
+        return Token::create([
             'card' => [
                 'number' => '4242424242424242',
                 'exp_month' => 5,
@@ -391,15 +400,12 @@ class CashierTest extends TestCase
         ], ['api_key' => getenv('STRIPE_SECRET')])->id;
     }
 
-    /**
-     * Schema Helpers.
-     */
-    protected function schema()
+    protected function schema(): Builder
     {
         return $this->connection()->getSchemaBuilder();
     }
 
-    protected function connection()
+    protected function connection(): ConnectionInterface
     {
         return Eloquent::getConnectionResolver()->connection();
     }

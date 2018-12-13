@@ -43,6 +43,7 @@ class Cashier
      * @param  string  $currency
      * @param  string|null  $symbol
      * @return void
+     * @throws \Exception
      */
     public static function useCurrency($currency, $symbol = null)
     {
