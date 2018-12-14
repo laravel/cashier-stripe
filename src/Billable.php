@@ -108,14 +108,15 @@ trait Billable
      *
      * @param  string  $description
      * @param  int  $amount
-     * @param  array  $options
+     * @param  array  $tabOptions
+     * @param  array  $invoiceOptions
      * @return \Laravel\Cashier\Invoice|bool
      */
-    public function invoiceFor($description, $amount, array $options = [])
+    public function invoiceFor($description, $amount, array $tabOptions = [], array $invoiceOptions = [])
     {
-        $this->tab($description, $amount, $options);
+        $this->tab($description, $amount, $tabOptions);
 
-        return $this->invoice();
+        return $this->invoice($invoiceOptions);
     }
 
     /**
