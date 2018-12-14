@@ -278,7 +278,7 @@ class SubscriptionBuilder
     /**
      * Get the tax percentage for the Stripe payload.
      *
-     * @return int|null
+     * @return int|float|null
      */
     protected function getTaxPercentageForPayload()
     {
