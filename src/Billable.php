@@ -32,7 +32,6 @@ trait Billable
      * @param  int  $amount
      * @param  array  $options
      * @return \Stripe\Charge
-     *
      * @throws \InvalidArgumentException
      */
     public function charge($amount, array $options = [])
@@ -215,13 +214,16 @@ trait Billable
     /**
      * Invoice the billable entity outside of regular billing cycle.
      *
+     * @param  array  $options
      * @return \Stripe\Invoice|bool
      */
-    public function invoice()
+    public function invoice(array $options = [])
     {
         if ($this->stripe_id) {
+            $parameters = array_merge($options, ['customer' => $this->stripe_id]);
+
             try {
-                return StripeInvoice::create(['customer' => $this->stripe_id], $this->getStripeKey())->pay();
+                return StripeInvoice::create($parameters, $this->getStripeKey())->pay();
             } catch (StripeErrorInvalidRequest $e) {
                 return false;
             }
