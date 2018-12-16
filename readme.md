@@ -19,7 +19,7 @@ Documentation for Cashier can be found on the [Laravel website](https://laravel.
 
 You will need to set the following details locally and on your Stripe account in order to run the Cashier unit tests:
 
-### Environment
+### Local
 
 #### Environment Variables
 
