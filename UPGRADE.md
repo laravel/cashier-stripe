@@ -8,7 +8,9 @@ Like the latest releases of the Laravel framework, Laravel Cashier now requires 
 
 ### The `createAsStripeCustomer` Method
 
-The `updateCard` call was extracted from the `createAsStripeCustomer` method on the `Billable` trait in PR [#588](https://github.com/laravel/cashier/pull/588). In addition, the `$token` parameter was removed. If you were using this method directly you should call the `updateCard` method separately after calling the `createAsStripeCustomer` method. This provides better granularity when handling errors for the two calls separately.
+The `updateCard` call was extracted from the `createAsStripeCustomer` method on the `Billable` trait in PR [#588](https://github.com/laravel/cashier/pull/588). In addition, the `$token` parameter was removed.
+
+If you were using the `createAsStripeCustomer` method directly you now should call the `updateCard` method separately after calling the `createAsStripeCustomer` method. This provides the opportunity for more granularity when handling errors for the two calls.
 
 ### WebhookController Changes
 
