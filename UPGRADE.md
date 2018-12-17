@@ -4,7 +4,7 @@
 
 ### PHP & Laravel Version Requirements
 
-Support for PHP 7.0 and Laravel <= 5.6 was dropped in [#595](https://github.com/laravel/cashier/pull/595). We encourage you to upgrade to the latest versions of PHP and Laravel before upgrading to Cashier 9.0.
+Like the latest releases of the Laravel framework, Laravel Cashier now requires PHP >= 7.1.3. We encourage you to upgrade to the latest versions of PHP and Laravel before upgrading to Cashier 9.0.
 
 ### The `createAsStripeCustomer` Method
 
