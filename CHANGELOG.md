@@ -1,6 +1,6 @@
 # Release Notes
 
-## [v9.0.0](https://github.com/laravel/cashier/compare/v8.0.1...v9.0.0)
+## [v9.0.0 (2018-12-17)](https://github.com/laravel/cashier/compare/v8.0.1...v9.0.0)
 
 ### Changed
 
