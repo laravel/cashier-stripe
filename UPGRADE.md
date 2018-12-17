@@ -20,6 +20,6 @@ The `VerifyWebhookSignature` middleware is now automatically added to the `Webho
 
 If you manually added the `VerifyWebhookSignature` middleware to your Cashier webhook route, you may remove it since it will now be added automatically.
 
-If you were using the `CASHIER_ENV` environment variable to test incoming webhooks, you should may set the `STRIPE_WEBHOOK_SECRET` environment variable to `null` to achieve the same behavior.
+If you were using the `CASHIER_ENV` environment variable to test incoming webhooks, you should set the `STRIPE_WEBHOOK_SECRET` environment variable to `null` to achieve the same behavior.
 
 More information about verifying webhooks can be found [in the Cashier documentation](https://laravel.com/docs/5.7/billing#verifying-webhook-signatures).
