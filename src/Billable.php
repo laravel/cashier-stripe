@@ -110,7 +110,7 @@ trait Billable
      * @param  int  $amount
      * @param  array  $tabOptions
      * @param  array  $invoiceOptions
-     * @return \Laravel\Cashier\Invoice|bool
+     * @return \Stripe\Invoice|bool
      */
     public function invoiceFor($description, $amount, array $tabOptions = [], array $invoiceOptions = [])
     {
