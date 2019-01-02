@@ -37,9 +37,9 @@ class WebhookController extends Controller
 
         if (method_exists($this, $method)) {
             return $this->{$method}($payload);
-        } else {
-            return $this->missingMethod();
         }
+        
+        return $this->missingMethod();
     }
 
     /**
