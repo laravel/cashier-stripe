@@ -7,7 +7,6 @@ use Stripe\Token;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Billable;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\ConnectionInterface;
@@ -19,6 +18,8 @@ class CashierTest extends TestCase
 {
     public function setUp()
     {
+        parent::setUp();
+
         Eloquent::unguard();
 
         $db = new DB;
