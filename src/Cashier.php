@@ -7,13 +7,6 @@ use Exception;
 class Cashier
 {
     /**
-     * The API version used for making Stripe calls.
-     *
-     * @var string
-     */
-    public static $stripeVersion = '2018-11-08';
-
-    /**
      * The current currency.
      *
      * @var string

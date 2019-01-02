@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier;
 
-use Stripe\Stripe;
 use Illuminate\Support\ServiceProvider;
 
 class CashierServiceProvider extends ServiceProvider
@@ -19,7 +18,5 @@ class CashierServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/views' => $this->app->basePath('resources/views/vendor/cashier'),
         ]);
-
-        Stripe::setApiVersion(Cashier::$stripeVersion);
     }
 }
