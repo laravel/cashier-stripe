@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/laravel/cashier/compare/v9.0.0...9.0)
 
+### Changed
+- Set Stripe API version ([#603](https://github.com/laravel/cashier/pull/603))
+
 ### Fixed
 - Correct PHP Doc @return tag ([#601](https://github.com/laravel/cashier/pull/601))
 
