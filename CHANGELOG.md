@@ -1,6 +1,6 @@
 # Release Notes
 
-## [v9.0.1](https://github.com/laravel/cashier/compare/v9.0.0...v9.0.1)
+## [v9.0.1 (2019-02-03)](https://github.com/laravel/cashier/compare/v9.0.0...v9.0.1)
 
 ### Added
 - Allow Carbon 2 installs ([a3b9d36](https://github.com/laravel/cashier/commit/a3b9d3688e21d3d9d3ae72ef58db585c80d96fa3))
