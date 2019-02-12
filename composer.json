@@ -19,7 +19,7 @@
         "dompdf/dompdf": "^0.8.0",
         "illuminate/database": "~5.7",
         "illuminate/support": "~5.7",
-        "nesbot/carbon": "~1.0 || ~2.0",
+        "nesbot/carbon": "^1.26.3 || ^2.0",
         "stripe/stripe-php": "~6.0",
         "symfony/http-kernel": "~4.0"
     },

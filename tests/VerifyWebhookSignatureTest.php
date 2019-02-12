@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Tests;
 
 use Mockery as m;
 use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Config\Repository as Config;
 use Symfony\Component\HttpKernel\Exception\HttpException;
