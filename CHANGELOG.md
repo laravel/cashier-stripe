@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v9.0.0...9.0)
+## [v9.0.1](https://github.com/laravel/cashier/compare/v9.0.0...v9.0.1)
+
+### Added
+- Allow Carbon 2 installs ([a3b9d36](https://github.com/laravel/cashier/commit/a3b9d3688e21d3d9d3ae72ef58db585c80d96fa3))
+
+### Changed
+- Test against latest Stripe API version ([#603](https://github.com/laravel/cashier/pull/603))
 
 ### Fixed
 - Correct PHP Doc @return tag ([#601](https://github.com/laravel/cashier/pull/601))
