@@ -1,5 +1,10 @@
 # Release Notes
 
+## [v9.1.0 (2019-02-12)](https://github.com/laravel/cashier/compare/v9.0.1...v9.1.0)
+
+### Added
+- Laravel 5.8 support ([291f4b2](https://github.com/laravel/cashier/commit/291f4b217ddbbd8a641072d8476fb11805b9801f))
+
 ## [v9.0.1 (2019-02-03)](https://github.com/laravel/cashier/compare/v9.0.0...v9.0.1)
 
 ### Added
