@@ -389,6 +389,72 @@ class CashierTest extends TestCase
         $this->assertEquals(1000, $refund->amount);
     }
 
+    public function test_subscription_state_scopes()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+        $subscription = $user->subscriptions()->create([
+            'name' => 'yearly',
+            'stripe_id' => 'xxxx',
+            'stripe_plan' => 'stripe-yearly',
+            'quantity' => 1,
+            'trial_ends_at' => null,
+            'ends_at' => null,
+        ]);
+
+        // subscription is active
+        $this->assertTrue($user->subscriptions()->active()->exists());
+        $this->assertFalse($user->subscriptions()->onTrial()->exists());
+        $this->assertTrue($user->subscriptions()->notOnTrial()->exists());
+        $this->assertTrue($user->subscriptions()->recurring()->exists());
+        $this->assertFalse($user->subscriptions()->cancelled()->exists());
+        $this->assertTrue($user->subscriptions()->notCancelled()->exists());
+        $this->assertFalse($user->subscriptions()->onGracePeriod()->exists());
+        $this->assertTrue($user->subscriptions()->notOnGracePeriod()->exists());
+        $this->assertFalse($user->subscriptions()->ended()->exists());
+
+        // put on trial
+        $subscription->update(['trial_ends_at' => Carbon::now()->addDay()]);
+
+        $this->assertTrue($user->subscriptions()->active()->exists());
+        $this->assertTrue($user->subscriptions()->onTrial()->exists());
+        $this->assertFalse($user->subscriptions()->notOnTrial()->exists());
+        $this->assertFalse($user->subscriptions()->recurring()->exists());
+        $this->assertFalse($user->subscriptions()->cancelled()->exists());
+        $this->assertTrue($user->subscriptions()->notCancelled()->exists());
+        $this->assertFalse($user->subscriptions()->onGracePeriod()->exists());
+        $this->assertTrue($user->subscriptions()->notOnGracePeriod()->exists());
+        $this->assertFalse($user->subscriptions()->ended()->exists());
+
+        // put on grace period
+        $subscription->update(['ends_at' => Carbon::now()->addDay()]);
+
+        $this->assertTrue($user->subscriptions()->active()->exists());
+        $this->assertTrue($user->subscriptions()->onTrial()->exists());
+        $this->assertFalse($user->subscriptions()->notOnTrial()->exists());
+        $this->assertFalse($user->subscriptions()->recurring()->exists());
+        $this->assertTrue($user->subscriptions()->cancelled()->exists());
+        $this->assertFalse($user->subscriptions()->notCancelled()->exists());
+        $this->assertTrue($user->subscriptions()->onGracePeriod()->exists());
+        $this->assertFalse($user->subscriptions()->notOnGracePeriod()->exists());
+        $this->assertFalse($user->subscriptions()->ended()->exists());
+
+        // end subscription
+        $subscription->update(['ends_at' => Carbon::now()->subDay()]);
+
+        $this->assertFalse($user->subscriptions()->active()->exists());
+        $this->assertTrue($user->subscriptions()->onTrial()->exists());
+        $this->assertFalse($user->subscriptions()->notOnTrial()->exists());
+        $this->assertFalse($user->subscriptions()->recurring()->exists());
+        $this->assertTrue($user->subscriptions()->cancelled()->exists());
+        $this->assertFalse($user->subscriptions()->notCancelled()->exists());
+        $this->assertFalse($user->subscriptions()->onGracePeriod()->exists());
+        $this->assertTrue($user->subscriptions()->notOnGracePeriod()->exists());
+        $this->assertTrue($user->subscriptions()->ended()->exists());
+    }
+
     protected function getTestToken()
     {
         return Token::create([
