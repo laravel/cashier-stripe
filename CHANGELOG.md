@@ -5,6 +5,9 @@
 ### Added
 - Add subscription state scopes ([#609](https://github.com/laravel/cashier/pull/609))
 
+### Changed
+- Test latest Stripe API version ([#611](https://github.com/laravel/cashier/pull/611))
+
 ## [v9.1.0 (2019-02-12)](https://github.com/laravel/cashier/compare/v9.0.1...v9.1.0)
 
 ### Added
