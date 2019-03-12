@@ -1,6 +1,9 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v9.1.0...9.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v9.2.0...9.0)
+
+
+## [v9.1.0 (2019-03-12)](https://github.com/laravel/cashier/compare/v9.1.0...v9.2.0)
 
 ### Added
 - Add subscription state scopes ([#609](https://github.com/laravel/cashier/pull/609))
@@ -8,10 +11,12 @@
 ### Changed
 - Test latest Stripe API version ([#611](https://github.com/laravel/cashier/pull/611))
 
+
 ## [v9.1.0 (2019-02-12)](https://github.com/laravel/cashier/compare/v9.0.1...v9.1.0)
 
 ### Added
 - Laravel 5.8 support ([291f4b2](https://github.com/laravel/cashier/commit/291f4b217ddbbd8a641072d8476fb11805b9801f))
+
 
 ## [v9.0.1 (2019-02-03)](https://github.com/laravel/cashier/compare/v9.0.0...v9.0.1)
 
@@ -23,6 +28,7 @@
 
 ### Fixed
 - Correct PHP Doc @return tag ([#601](https://github.com/laravel/cashier/pull/601))
+
 
 ## [v9.0.0 (2018-12-17)](https://github.com/laravel/cashier/compare/v8.0.1...v9.0.0)
 
@@ -38,20 +44,24 @@
 - Fixed some DocBlocks ([#594](https://github.com/laravel/cashier/pull/594))
 - Fixed a bug where the `swap` and `incrementAndInvoice` methods on the `Subscription` model would sometimes invoice other pending invoice items ([#598](https://github.com/laravel/cashier/pull/598))
 
+
 ## Version 2.0.4
 
 - Allow user to pass paramaters when fetching invoices.
 - Added a method to get the current subscription period's end date.
 - If a webhook endpoint is not defined for a given hook, an empty 200 response will be returned.
 
+
 ## Version 2.0.3
 
 - Added space for extra / VAT information in receipts.
 - Implemented missing method on web hook controller.
 
+
 ## Version 2.0.2
 
 - Fixed how credit cards are updated.
+
 
 ## Version 2.0.1
 
