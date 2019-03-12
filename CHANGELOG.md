@@ -1,6 +1,9 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v9.2.0...9.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v9.2.0...master)
+
+### Added
+- Allow Carbon 2 ([#607](https://github.com/laravel/cashier/pull/607))
 
 
 ## [v9.1.0 (2019-03-12)](https://github.com/laravel/cashier/compare/v9.1.0...v9.2.0)
