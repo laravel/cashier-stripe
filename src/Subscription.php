@@ -345,9 +345,10 @@ class Subscription extends Model
      * Swap the subscription to a new Stripe plan.
      *
      * @param  string  $plan
+     * @param  array  $options
      * @return $this
      */
-    public function swap($plan)
+    public function swap($plan, $options = [])
     {
         $subscription = $this->asStripeSubscription();
 
@@ -359,6 +360,14 @@ class Subscription extends Model
 
         if (! is_null($this->billingCycleAnchor)) {
             $subscription->billing_cycle_anchor = $this->billingCycleAnchor;
+        }
+
+        // Set additional options on the subscription update, such as
+        // [
+        //     'coupon' => 'TEST_COUPON',
+        // ]
+        foreach ($options as $key => $option) {
+            $subscription->$key = $option;
         }
 
         // If no specific trial end date has been set, the default behavior should be

@@ -139,6 +139,24 @@ class CashierTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $invoice->date());
     }
 
+    public function test_swapping_subscription_with_coupon()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+        
+        $user->newSubscription('main', 'monthly-10-1')->create($this->getTestToken());
+        $subscription = $user->subscription('main');
+
+        // Swap Plan with Coupon
+        $subscription->swap('monthly-10-2', [
+            'coupon' => 'coupon-1',
+        ]);
+
+        $this->assertEquals('coupon-1', $subscription->asStripeSubscription()->discount->coupon->id);
+    }
+
     public function test_creating_subscription_with_coupons()
     {
         $user = User::create([
