@@ -145,7 +145,7 @@ class CashierTest extends TestCase
             'email' => 'taylor@laravel.com',
             'name' => 'Taylor Otwell',
         ]);
-        
+
         $user->newSubscription('main', 'monthly-10-1')->create($this->getTestToken());
         $subscription = $user->subscription('main');
 
