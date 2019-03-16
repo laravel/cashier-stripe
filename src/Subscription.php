@@ -362,10 +362,6 @@ class Subscription extends Model
             $subscription->billing_cycle_anchor = $this->billingCycleAnchor;
         }
 
-        // Set additional options on the subscription update, such as
-        // [
-        //     'coupon' => 'TEST_COUPON',
-        // ]
         foreach ($options as $key => $option) {
             $subscription->$key = $option;
         }
