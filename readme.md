@@ -37,7 +37,7 @@ You can set these variables in the `phpunit.xml` file.
 
 #### Coupons
 
-    * coupon-1 ($5)
+    * coupon-1 ($5) (Duration longer than once)
 
 ## Contributing
 
