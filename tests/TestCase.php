@@ -14,7 +14,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUp()
     {
-        Stripe::setApiVersion('2019-02-19');
+        Stripe::setApiVersion('2019-03-14');
         $this->plan_1_id = $this->stripe_prefix.'monthly-10-'.str_random(10);
         $this->plan_2_id = $this->stripe_prefix.'monthly-10-'.str_random(10);
         $this->coupon_1_id = $this->stripe_prefix.'coupon-'.str_random(10);
