@@ -16,11 +16,11 @@ abstract class TestCase extends BaseTestCase
     protected function setUp()
     {
         Stripe::setApiVersion('2019-02-19');
-        $this->plan_1_id = $this->stripe_prefix . 'monthly-10-1';
-        $this->plan_2_id = $this->stripe_prefix . 'monthly-10-2';
-        $this->coupon_1_id = $this->stripe_prefix . 'coupon-1';
-        
-        if (!static::$bootstrapped) {
+        $this->plan_1_id = $this->stripe_prefix.'monthly-10-1';
+        $this->plan_2_id = $this->stripe_prefix.'monthly-10-2';
+        $this->coupon_1_id = $this->stripe_prefix.'coupon-1';
+
+        if (! static::$bootstrapped) {
             $this->bootstrapStripe();
             static::$bootstrapped = true;
         }
@@ -33,7 +33,7 @@ abstract class TestCase extends BaseTestCase
         $items = [
             'products' => [
                 [
-                    'id' => $this->stripe_prefix . 'product-1',
+                    'id' => $this->stripe_prefix.'product-1',
                     'name' => 'Laravel Cashier Test Product',
                     'type' => 'service',
                 ],
@@ -46,7 +46,7 @@ abstract class TestCase extends BaseTestCase
                     'interval' => 'month',
                     'billing_scheme' => 'per_unit',
                     'amount' => 1000,
-                    'product' => $this->stripe_prefix . 'product-1',
+                    'product' => $this->stripe_prefix.'product-1',
                 ],
                 [
                     'id' => $this->plan_2_id,
@@ -55,7 +55,7 @@ abstract class TestCase extends BaseTestCase
                     'interval' => 'month',
                     'billing_scheme' => 'per_unit',
                     'amount' => 1000,
-                    'product' => $this->stripe_prefix . 'product-1',
+                    'product' => $this->stripe_prefix.'product-1',
                 ],
             ],
             'coupons' => [
@@ -70,8 +70,8 @@ abstract class TestCase extends BaseTestCase
         ];
 
         foreach ($items as $item_key => $items) {
-            $stripe_class = '\Stripe\\' . ucfirst(str_singular($item_key));
-            if (!$this->checkStripeItems($items, $stripe_class)) {
+            $stripe_class = '\Stripe\\'.ucfirst(str_singular($item_key));
+            if (! $this->checkStripeItems($items, $stripe_class)) {
                 $this->deleteExistingStripeItems($items, $stripe_class);
                 $this->createStripeItems($items, $stripe_class);
             }
@@ -102,11 +102,12 @@ abstract class TestCase extends BaseTestCase
                 return false;
             }
         }
+
         return true;
     }
 
     /**
-     * Delete any Stripe items matching the ones in the array
+     * Delete any Stripe items matching the ones in the array.
      * @param array $items
      * @param string $stripe_class
      */
@@ -125,7 +126,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Create a Stripe item using the data from the array
+     * Create a Stripe item using the data from the array.
      * @param array $items
      * @param string $stripe_class
      */
