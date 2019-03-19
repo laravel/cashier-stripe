@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/cashier/compare/v9.2.1...9.0)
 
 
-## [v9.2.1](https://github.com/laravel/cashier/compare/v9.2.0...v9.2.1)
+## [v9.2.1 (2019-03-19)](https://github.com/laravel/cashier/compare/v9.2.0...v9.2.1)
 
 ### Fixed
 - Use new created property on invoice ([4714ba4](https://github.com/laravel/cashier/commit/4714ba4ad909092a61bfe2d0704b3fce6070ed5b))
