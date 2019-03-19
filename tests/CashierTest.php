@@ -67,17 +67,17 @@ class CashierTest extends TestCase
         ]);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')->create($this->getTestToken());
+        $user->newSubscription('main', $this->plan_1_id)->create($this->getTestToken());
 
         $this->assertEquals(1, count($user->subscriptions));
         $this->assertNotNull($user->subscription('main')->stripe_id);
 
         $this->assertTrue($user->subscribed('main'));
-        $this->assertTrue($user->subscribedToPlan('monthly-10-1', 'main'));
-        $this->assertFalse($user->subscribedToPlan('monthly-10-1', 'something'));
-        $this->assertFalse($user->subscribedToPlan('monthly-10-2', 'main'));
-        $this->assertTrue($user->subscribed('main', 'monthly-10-1'));
-        $this->assertFalse($user->subscribed('main', 'monthly-10-2'));
+        $this->assertTrue($user->subscribedToPlan($this->plan_1_id, 'main'));
+        $this->assertFalse($user->subscribedToPlan($this->plan_1_id, 'something'));
+        $this->assertFalse($user->subscribedToPlan($this->plan_2_id, 'main'));
+        $this->assertTrue($user->subscribed('main', $this->plan_1_id));
+        $this->assertFalse($user->subscribed('main', $this->plan_2_id));
         $this->assertTrue($user->subscription('main')->active());
         $this->assertFalse($user->subscription('main')->cancelled());
         $this->assertFalse($user->subscription('main')->onGracePeriod());
@@ -125,9 +125,9 @@ class CashierTest extends TestCase
         $this->assertEquals(1, $subscription->quantity);
 
         // Swap Plan
-        $subscription->swap('monthly-10-2');
+        $subscription->swap($this->plan_2_id);
 
-        $this->assertEquals('monthly-10-2', $subscription->stripe_plan);
+        $this->assertEquals($this->plan_2_id, $subscription->stripe_plan);
 
         // Invoice Tests
         $invoice = $user->invoices()[1];
@@ -146,15 +146,15 @@ class CashierTest extends TestCase
             'name' => 'Taylor Otwell',
         ]);
 
-        $user->newSubscription('main', 'monthly-10-1')->create($this->getTestToken());
+        $user->newSubscription('main', $this->plan_1_id)->create($this->getTestToken());
         $subscription = $user->subscription('main');
 
         // Swap Plan with Coupon
-        $subscription->swap('monthly-10-2', [
-            'coupon' => 'coupon-1',
+        $subscription->swap($this->plan_2_id, [
+            'coupon' => $this->coupon_1_id,
         ]);
 
-        $this->assertEquals('coupon-1', $subscription->asStripeSubscription()->discount->coupon->id);
+        $this->assertEquals($this->coupon_1_id, $subscription->asStripeSubscription()->discount->coupon->id);
     }
 
     public function test_creating_subscription_with_coupons()
@@ -165,15 +165,15 @@ class CashierTest extends TestCase
         ]);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
-            ->withCoupon('coupon-1')
+        $user->newSubscription('main', $this->plan_1_id)
+            ->withCoupon($this->coupon_1_id)
             ->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
 
         $this->assertTrue($user->subscribed('main'));
-        $this->assertTrue($user->subscribed('main', 'monthly-10-1'));
-        $this->assertFalse($user->subscribed('main', 'monthly-10-2'));
+        $this->assertTrue($user->subscribed('main', $this->plan_1_id));
+        $this->assertFalse($user->subscribed('main', $this->plan_2_id));
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
@@ -197,15 +197,15 @@ class CashierTest extends TestCase
         ]);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', $this->plan_1_id)
             ->anchorBillingCycleOn(new DateTime('first day of next month'))
             ->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
 
         $this->assertTrue($user->subscribed('main'));
-        $this->assertTrue($user->subscribed('main', 'monthly-10-1'));
-        $this->assertFalse($user->subscribed('main', 'monthly-10-2'));
+        $this->assertTrue($user->subscribed('main', $this->plan_1_id));
+        $this->assertFalse($user->subscribed('main', $this->plan_2_id));
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
@@ -249,7 +249,7 @@ class CashierTest extends TestCase
         ]);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', $this->plan_1_id)
             ->trialDays(7)
             ->create($this->getTestToken());
 
@@ -288,7 +288,7 @@ class CashierTest extends TestCase
         ]);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', $this->plan_1_id)
             ->trialUntil(Carbon::tomorrow()->hour(3)->minute(15))
             ->create($this->getTestToken());
 
@@ -327,14 +327,14 @@ class CashierTest extends TestCase
         ]);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', $this->plan_1_id)
             ->create($this->getTestToken());
 
-        $user->applyCoupon('coupon-1');
+        $user->applyCoupon($this->coupon_1_id);
 
         $customer = $user->asStripeCustomer();
 
-        $this->assertEquals('coupon-1', $customer->discount->coupon->id);
+        $this->assertEquals($this->coupon_1_id, $customer->discount->coupon->id);
     }
 
     public function test_marking_as_cancelled_from_webhook()
@@ -344,7 +344,7 @@ class CashierTest extends TestCase
             'name' => 'Taylor Otwell',
         ]);
 
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', $this->plan_1_id)
             ->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
