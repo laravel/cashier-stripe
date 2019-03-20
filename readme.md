@@ -26,18 +26,7 @@ You will need to set the following details locally and on your Stripe account in
     STRIPE_SECRET=
     STRIPE_MODEL=Laravel\Cashier\Tests\User
 
-You can set these variables in the `phpunit.xml` file.
-
-### Stripe
-
-#### Plans
-
-    * monthly-10-1 ($10)
-    * monthly-10-2 ($10)
-
-#### Coupons
-
-    * coupon-1 ($5)
+You can set these variables isn the `phpunit.xml` file.
 
 ## Contributing
 
