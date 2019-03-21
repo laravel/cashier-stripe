@@ -248,7 +248,7 @@ class CashierTest extends TestCase
 
         // Create Subscription
         $user->newSubscription('main', static::$planId)
-            ->withCoupon($this->couponId)
+            ->withCoupon(static::$couponId)
             ->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
