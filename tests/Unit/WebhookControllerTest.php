@@ -1,8 +1,9 @@
 <?php
 
-namespace Laravel\Cashier\Tests;
+namespace Laravel\Cashier\Tests\Unit;
 
 use Illuminate\Http\Request;
+use PHPUnit\Framework\TestCase;
 use Laravel\Cashier\Http\Controllers\WebhookController;
 
 class WebhookControllerTest extends TestCase
@@ -35,7 +36,7 @@ class WebhookControllerTestStub extends WebhookController
 {
     public function __construct()
     {
-        // Prevent setting middleware...
+        // Don't call parent constructor to prevent setting middleware...
     }
 
     public function handleChargeSucceeded()
