@@ -4,10 +4,10 @@ namespace Laravel\Cashier\Tests\Integration;
 
 use DateTime;
 use Stripe\Plan;
-use Stripe\Stripe;
 use Stripe\Token;
 use Carbon\Carbon;
 use Stripe\Coupon;
+use Stripe\Stripe;
 use Stripe\Product;
 use Stripe\ApiResource;
 use Illuminate\Support\Str;
