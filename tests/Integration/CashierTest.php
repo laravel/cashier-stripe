@@ -412,11 +412,11 @@ class CashierTest extends TestCase
         $user->newSubscription('main', static::$planId)
             ->create($this->getTestToken());
 
-        $user->applyCoupon($this->couponId);
+        $user->applyCoupon(static::$couponId);
 
         $customer = $user->asStripeCustomer();
 
-        $this->assertEquals($this->couponId, $customer->discount->coupon->id);
+        $this->assertEquals(static::$couponId, $customer->discount->coupon->id);
     }
 
     public function test_marking_as_cancelled_from_webhook()
@@ -564,7 +564,7 @@ class CashierTest extends TestCase
                 'exp_year' => 2020,
                 'cvc' => '123',
             ],
-        ], ['api_key' => getenv('STRIPE_SECRET')])->id;
+        ])->id;
     }
 
     protected function schema(): Builder
