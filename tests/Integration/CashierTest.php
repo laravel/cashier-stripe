@@ -144,9 +144,9 @@ class CashierTest extends TestCase
     {
         parent::tearDownAfterClass();
 
-        static::deleteStripeResource(new Product(static::$productId));
         static::deleteStripeResource(new Plan(static::$planId));
         static::deleteStripeResource(new Plan(static::$otherPlanId));
+        static::deleteStripeResource(new Product(static::$productId));
         static::deleteStripeResource(new Coupon(static::$couponId));
     }
 
