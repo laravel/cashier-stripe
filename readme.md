@@ -15,18 +15,13 @@ Laravel Cashier provides an expressive, fluent interface to [Stripe's](https://s
 
 Documentation for Cashier can be found on the [Laravel website](https://laravel.com/docs/billing).
 
-## Running Cashier's Tests Locally
+## Running Cashier's Tests
 
-You will need to set the following details locally and on your Stripe account in order to run the Cashier unit tests:
+You will need to set the Stripe Secret env variable before your `vendor/bin/phpunit` call in order to run the Cashier tests:
 
-### Local
+    STRIPE_SECRET=<your Stripe secret> vendor/bin/phpunit
 
-#### Environment Variables
-
-    STRIPE_SECRET=
-    STRIPE_MODEL=Laravel\Cashier\Tests\User
-
-You can set these variables isn the `phpunit.xml` file.
+Please note that due to the fact that actual API requests against Stripe are being made, these tests take a few minutes to run.
 
 ## Contributing
 
