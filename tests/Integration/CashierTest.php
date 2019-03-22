@@ -1,12 +1,20 @@
 <?php
 
-namespace Laravel\Cashier\Tests;
+namespace Laravel\Cashier\Tests\Integration;
 
 use DateTime;
+use Stripe\Plan;
 use Stripe\Token;
 use Carbon\Carbon;
+use Stripe\Coupon;
+use Stripe\Stripe;
+use Stripe\Product;
+use Stripe\ApiResource;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Billable;
+use PHPUnit\Framework\TestCase;
+use Stripe\Error\InvalidRequest;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\ConnectionInterface;
@@ -16,10 +24,83 @@ use Laravel\Cashier\Http\Controllers\WebhookController;
 
 class CashierTest extends TestCase
 {
+    /**
+     * @var string
+     */
+    protected static $stripePrefix = 'cashier-test-';
+
+    /**
+     * @var string
+     */
+    protected static $productId;
+
+    /**
+     * @var string
+     */
+    protected static $planId;
+
+    /**
+     * @var string
+     */
+    protected static $otherPlanId;
+
+    /**
+     * @var string
+     */
+    protected static $couponId;
+
+    public static function setUpBeforeClass()
+    {
+        Stripe::setApiVersion('2019-03-14');
+        Stripe::setApiKey(getenv('STRIPE_SECRET'));
+
+        static::setUpStripeTestData();
+    }
+
+    protected static function setUpStripeTestData()
+    {
+        static::$productId = static::$stripePrefix.'product-1'.Str::random(10);
+        static::$planId = static::$stripePrefix.'monthly-10-'.Str::random(10);
+        static::$otherPlanId = static::$stripePrefix.'monthly-10-'.Str::random(10);
+        static::$couponId = static::$stripePrefix.'coupon-'.Str::random(10);
+
+        Product::create([
+            'id' => static::$productId,
+            'name' => 'Laravel Cashier Test Product',
+            'type' => 'service',
+        ]);
+
+        Plan::create([
+            'id' => static::$planId,
+            'nickname' => 'Monthly $10 Test 1',
+            'currency' => 'USD',
+            'interval' => 'month',
+            'billing_scheme' => 'per_unit',
+            'amount' => 1000,
+            'product' => static::$productId,
+        ]);
+
+        Plan::create([
+            'id' => static::$otherPlanId,
+            'nickname' => 'Monthly $10 Test 2',
+            'currency' => 'USD',
+            'interval' => 'month',
+            'billing_scheme' => 'per_unit',
+            'amount' => 1000,
+            'product' => static::$productId,
+        ]);
+
+        Coupon::create([
+            'id' => static::$couponId,
+            'duration' => 'repeating',
+            'amount_off' => 500,
+            'duration_in_months' => 3,
+            'currency' => 'USD',
+        ]);
+    }
+
     public function setUp()
     {
-        parent::setUp();
-
         Eloquent::unguard();
 
         $db = new DB;
@@ -59,6 +140,25 @@ class CashierTest extends TestCase
         $this->schema()->drop('subscriptions');
     }
 
+    public static function tearDownAfterClass()
+    {
+        parent::tearDownAfterClass();
+
+        static::deleteStripeResource(new Plan(static::$planId));
+        static::deleteStripeResource(new Plan(static::$otherPlanId));
+        static::deleteStripeResource(new Product(static::$productId));
+        static::deleteStripeResource(new Coupon(static::$couponId));
+    }
+
+    protected static function deleteStripeResource(ApiResource $resource)
+    {
+        try {
+            $resource->delete();
+        } catch (InvalidRequest $e) {
+            //
+        }
+    }
+
     public function test_subscriptions_can_be_created()
     {
         $user = User::create([
@@ -67,17 +167,17 @@ class CashierTest extends TestCase
         ]);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')->create($this->getTestToken());
+        $user->newSubscription('main', static::$planId)->create($this->getTestToken());
 
         $this->assertEquals(1, count($user->subscriptions));
         $this->assertNotNull($user->subscription('main')->stripe_id);
 
         $this->assertTrue($user->subscribed('main'));
-        $this->assertTrue($user->subscribedToPlan('monthly-10-1', 'main'));
-        $this->assertFalse($user->subscribedToPlan('monthly-10-1', 'something'));
-        $this->assertFalse($user->subscribedToPlan('monthly-10-2', 'main'));
-        $this->assertTrue($user->subscribed('main', 'monthly-10-1'));
-        $this->assertFalse($user->subscribed('main', 'monthly-10-2'));
+        $this->assertTrue($user->subscribedToPlan(static::$planId, 'main'));
+        $this->assertFalse($user->subscribedToPlan(static::$planId, 'something'));
+        $this->assertFalse($user->subscribedToPlan(static::$otherPlanId, 'main'));
+        $this->assertTrue($user->subscribed('main', static::$planId));
+        $this->assertFalse($user->subscribed('main', static::$otherPlanId));
         $this->assertTrue($user->subscription('main')->active());
         $this->assertFalse($user->subscription('main')->cancelled());
         $this->assertFalse($user->subscription('main')->onGracePeriod());
@@ -125,9 +225,9 @@ class CashierTest extends TestCase
         $this->assertEquals(1, $subscription->quantity);
 
         // Swap Plan
-        $subscription->swap('monthly-10-2');
+        $subscription->swap(static::$otherPlanId);
 
-        $this->assertEquals('monthly-10-2', $subscription->stripe_plan);
+        $this->assertEquals(static::$otherPlanId, $subscription->stripe_plan);
 
         // Invoice Tests
         $invoice = $user->invoices()[1];
@@ -165,15 +265,15 @@ class CashierTest extends TestCase
         ]);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
-            ->withCoupon('coupon-1')
+        $user->newSubscription('main', static::$planId)
+            ->withCoupon(static::$couponId)
             ->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
 
         $this->assertTrue($user->subscribed('main'));
-        $this->assertTrue($user->subscribed('main', 'monthly-10-1'));
-        $this->assertFalse($user->subscribed('main', 'monthly-10-2'));
+        $this->assertTrue($user->subscribed('main', static::$planId));
+        $this->assertFalse($user->subscribed('main', static::$otherPlanId));
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
@@ -197,15 +297,15 @@ class CashierTest extends TestCase
         ]);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', static::$planId)
             ->anchorBillingCycleOn(new DateTime('first day of next month'))
             ->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
 
         $this->assertTrue($user->subscribed('main'));
-        $this->assertTrue($user->subscribed('main', 'monthly-10-1'));
-        $this->assertFalse($user->subscribed('main', 'monthly-10-2'));
+        $this->assertTrue($user->subscribed('main', static::$planId));
+        $this->assertFalse($user->subscribed('main', static::$otherPlanId));
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
@@ -249,7 +349,7 @@ class CashierTest extends TestCase
         ]);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', static::$planId)
             ->trialDays(7)
             ->create($this->getTestToken());
 
@@ -288,7 +388,7 @@ class CashierTest extends TestCase
         ]);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', static::$planId)
             ->trialUntil(Carbon::tomorrow()->hour(3)->minute(15))
             ->create($this->getTestToken());
 
@@ -327,14 +427,14 @@ class CashierTest extends TestCase
         ]);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', static::$planId)
             ->create($this->getTestToken());
 
-        $user->applyCoupon('coupon-1');
+        $user->applyCoupon(static::$couponId);
 
         $customer = $user->asStripeCustomer();
 
-        $this->assertEquals('coupon-1', $customer->discount->coupon->id);
+        $this->assertEquals(static::$couponId, $customer->discount->coupon->id);
     }
 
     public function test_marking_as_cancelled_from_webhook()
@@ -344,7 +444,7 @@ class CashierTest extends TestCase
             'name' => 'Taylor Otwell',
         ]);
 
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', static::$planId)
             ->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
@@ -482,7 +582,7 @@ class CashierTest extends TestCase
                 'exp_year' => 2020,
                 'cvc' => '123',
             ],
-        ], ['api_key' => getenv('STRIPE_SECRET')])->id;
+        ])->id;
     }
 
     protected function schema(): Builder
