@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Exception;
+use Illuminate\Support\Str;
 
 class Cashier
 {
@@ -131,7 +132,7 @@ class Cashier
 
         $amount = number_format($amount / 100, 2);
 
-        if (starts_with($amount, '-')) {
+        if (Str::startsWith($amount, '-')) {
             return '-'.static::usesCurrencySymbol().ltrim($amount, '-');
         }
 

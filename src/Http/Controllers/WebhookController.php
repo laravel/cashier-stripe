@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Http\Controllers;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
 use Illuminate\Support\Carbon;
@@ -33,7 +34,7 @@ class WebhookController extends Controller
     public function handleWebhook(Request $request)
     {
         $payload = json_decode($request->getContent(), true);
-        $method = 'handle'.studly_case(str_replace('.', '_', $payload['type']));
+        $method = 'handle'.Str::studly(str_replace('.', '_', $payload['type']));
 
         if (method_exists($this, $method)) {
             return $this->{$method}($payload);
