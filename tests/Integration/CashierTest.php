@@ -21,6 +21,7 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Laravel\Cashier\Http\Controllers\WebhookController;
+use Laravel\Cashier\Exceptions\SubscriptionCreationFailed;
 
 class CashierTest extends TestCase
 {
@@ -237,6 +238,26 @@ class CashierTest extends TestCase
         $this->assertFalse($invoice->hasStartingBalance());
         $this->assertNull($invoice->coupon());
         $this->assertInstanceOf(Carbon::class, $invoice->date());
+    }
+
+    public function test_creating_subscription_fails_when_card_is_declined()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        try {
+            $user->newSubscription('main', static::$planId)->create($this->getInvalidCardToken());
+
+            $this->fail('Expected exception '.SubscriptionCreationFailed::class.' was not thrown.');
+        } catch (SubscriptionCreationFailed $e) {
+            // Assert no subscription was added to the billable entity.
+            $this->assertEmpty($user->subscriptions);
+
+            // Assert subscription was cancelled.
+            $this->assertEmpty($user->asStripeCustomer()->subscriptions->data);
+        }
     }
 
     public function test_creating_subscription_with_coupons()
@@ -561,7 +582,19 @@ class CashierTest extends TestCase
             'card' => [
                 'number' => '4242424242424242',
                 'exp_month' => 5,
-                'exp_year' => 2020,
+                'exp_year' => date('Y') + 1,
+                'cvc' => '123',
+            ],
+        ])->id;
+    }
+
+    protected function getInvalidCardToken()
+    {
+        return Token::create([
+            'card' => [
+                'number' => '4000 0000 0000 0341',
+                'exp_month' => 5,
+                'exp_year' => date('Y') + 1,
                 'cvc' => '123',
             ],
         ])->id;
