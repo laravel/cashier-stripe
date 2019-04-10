@@ -17,7 +17,7 @@ Documentation for Cashier can be found on the [Laravel website](https://laravel.
 
 ## Running Cashier's Tests
 
-You will need to set the Stripe **Testing** Secret env variable in a custom `phpunit.xml` file in order to run the Cashier tests.
+You will need to set the Stripe **Testing** secret environment variable in a custom `phpunit.xml` file in order to run the Cashier tests.
 
 Copy the file with `cp phpunit.xml.dist phpunit.xml` and add the following line below the `STRIPE_MODEL` env variable in the `phpunit.xml` file:
 
