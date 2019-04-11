@@ -568,6 +568,21 @@ trait Billable
     }
 
     /**
+     * Update a Stripe customer for the given Stripe model.
+     *
+     * @param  array  $options
+     * @return \Stripe\Customer
+     */
+    public function updateStripeCustomer(array $options = [])
+    {
+        $customer = StripeCustomer::update(
+            $this->stripe_id, $options, $this->getStripeKey()
+        );
+
+        return $customer;
+    }
+
+    /**
      * Get the Stripe customer for the Stripe model.
      *
      * @return \Stripe\Customer
