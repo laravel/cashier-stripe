@@ -542,7 +542,7 @@ trait Billable
     }
 
     /**
-     * Create a Stripe customer for the given Stripe model.
+     * Create a Stripe customer for the given model.
      *
      * @param  array  $options
      * @return \Stripe\Customer
@@ -568,7 +568,22 @@ trait Billable
     }
 
     /**
-     * Get the Stripe customer for the Stripe model.
+     * Update the underlying Stripe customer information for the model.
+     *
+     * @param  array  $options
+     * @return \Stripe\Customer
+     */
+    public function updateStripeCustomer(array $options = [])
+    {
+        $customer = StripeCustomer::update(
+            $this->stripe_id, $options, $this->getStripeKey()
+        );
+
+        return $customer;
+    }
+
+    /**
+     * Get the Stripe customer for the model.
      *
      * @return \Stripe\Customer
      */
