@@ -11,14 +11,9 @@
 >
     <testsuites>
         <testsuite name="Package Test Suite">
-            <directory suffix=".php">./tests</directory>
+            <directory suffix=".php">./tests</directory suffix=".php">
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./src</directory>
-        </whitelist>
-    </filter>
     <php>
         <env name="STRIPE_MODEL" value="Laravel\Cashier\Tests\Integration\User"/>
     </php>
