@@ -202,7 +202,6 @@ class SubscriptionBuilder
     {
         $customer = $this->getStripeCustomer($token, $options);
 
-        /** @var \Stripe\Subscription $subscription */
         $subscription = $customer->subscriptions->create($this->buildPayload());
 
         if (in_array($subscription->status, ['incomplete', 'incomplete_expired'])) {
