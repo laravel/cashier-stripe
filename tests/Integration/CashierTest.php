@@ -576,6 +576,21 @@ class CashierTest extends TestCase
         $this->assertTrue($user->subscriptions()->ended()->exists());
     }
 
+    public function test_update_stripe_customer()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        $user->createAsStripeCustomer();
+
+        // Update the customers email
+        $customer = $user->updateStripeCustomer(['email' => 'test@laravel.com']);
+
+        $this->assertEquals('test@laravel.com', $customer->email);
+    }
+
     protected function getTestToken()
     {
         return Token::create([
