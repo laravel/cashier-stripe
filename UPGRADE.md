@@ -10,6 +10,14 @@ To accommodate for this new behavior from now on Cashier will cancel that subscr
 
 If you were relying on catching the `\Stripe\Error\Card` exception before you should now rely on catching the `Laravel\Cashier\Exceptions\SubscriptionCreationFailed` exception instead. 
 
+### Card failure upon plan swapping
+
+Previously, when a plan swap was attempted and payment failed, the exception was cascaded to the end user and the update to the subscription in the app was not performed. However, the update to the subscription in Stripe itself was performed and the two states would be out of sync unless you implemented webhooks. 
+
+We've decided to catch the card failure exception and allow the plan swap to continue regardless of the failed payment. This leaves the subscription in a "past_due" state. This is because payment failure will be handled by Stripe and Stripe may attempt to retry the payment later on. When payment finally fails on its last attempt Stripe will send out a webhook to update the subscription in the way you specified in its settings: https://stripe.com/docs/billing/lifecycle#settings
+
+The change you should accommodate for is to implement Stripe's webhooks to let Cashier update the subscription automatically. [See our instructions for setting up Stripe webhooks with Cashier.](https://laravel.com/docs/master/billing#handling-stripe-webhooks)
+
 ## Upgrading To 9.0 From 8.0
 
 ### PHP & Laravel Version Requirements

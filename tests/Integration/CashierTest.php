@@ -48,6 +48,11 @@ class CashierTest extends TestCase
     /**
      * @var string
      */
+    protected static $premiumPlanId;
+
+    /**
+     * @var string
+     */
     protected static $couponId;
 
     public static function setUpBeforeClass()
@@ -63,6 +68,7 @@ class CashierTest extends TestCase
         static::$productId = static::$stripePrefix.'product-1'.Str::random(10);
         static::$planId = static::$stripePrefix.'monthly-10-'.Str::random(10);
         static::$otherPlanId = static::$stripePrefix.'monthly-10-'.Str::random(10);
+        static::$premiumPlanId = static::$stripePrefix.'monthly-20-premium-'.Str::random(10);
         static::$couponId = static::$stripePrefix.'coupon-'.Str::random(10);
 
         Product::create([
@@ -73,7 +79,7 @@ class CashierTest extends TestCase
 
         Plan::create([
             'id' => static::$planId,
-            'nickname' => 'Monthly $10 Test 1',
+            'nickname' => 'Monthly $10',
             'currency' => 'USD',
             'interval' => 'month',
             'billing_scheme' => 'per_unit',
@@ -83,11 +89,21 @@ class CashierTest extends TestCase
 
         Plan::create([
             'id' => static::$otherPlanId,
-            'nickname' => 'Monthly $10 Test 2',
+            'nickname' => 'Monthly $10 Other',
             'currency' => 'USD',
             'interval' => 'month',
             'billing_scheme' => 'per_unit',
             'amount' => 1000,
+            'product' => static::$productId,
+        ]);
+
+        Plan::create([
+            'id' => static::$premiumPlanId,
+            'nickname' => 'Monthly $20 Premium',
+            'currency' => 'USD',
+            'interval' => 'month',
+            'billing_scheme' => 'per_unit',
+            'amount' => 2000,
             'product' => static::$productId,
         ]);
 
@@ -147,6 +163,7 @@ class CashierTest extends TestCase
 
         static::deleteStripeResource(new Plan(static::$planId));
         static::deleteStripeResource(new Plan(static::$otherPlanId));
+        static::deleteStripeResource(new Plan(static::$premiumPlanId));
         static::deleteStripeResource(new Product(static::$productId));
         static::deleteStripeResource(new Coupon(static::$couponId));
     }
@@ -258,6 +275,28 @@ class CashierTest extends TestCase
             // Assert subscription was cancelled.
             $this->assertEmpty($user->asStripeCustomer()->subscriptions->data);
         }
+    }
+
+    /**
+     * @group Swapping
+     */
+    public function test_plan_swap_succeeds_even_if_payment_fails()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        $subscription = $user->newSubscription('main', static::$planId)->create($this->getTestToken());
+
+        // Set a faulty card as the customer's default card.
+        $user->updateCard($this->getInvalidCardToken());
+
+        // Attempt to swap and pay with a faulty card.
+        $subscription = $subscription->swap(static::$premiumPlanId);
+
+        // Assert that the plan was swapped.
+        $this->assertEquals(static::$premiumPlanId, $subscription->stripe_plan);
     }
 
     public function test_creating_subscription_with_coupons()
