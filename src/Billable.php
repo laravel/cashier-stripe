@@ -20,13 +20,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 trait Billable
 {
     /**
-     * The Stripe API key.
-     *
-     * @var string
-     */
-    protected static $stripeKey;
-
-    /**
      * Make a "one off" charge on the customer for the given amount.
      *
      * @param  int  $amount
@@ -50,7 +43,7 @@ trait Billable
             throw new InvalidArgumentException('No payment source provided.');
         }
 
-        return StripeCharge::create($options, ['api_key' => $this->getStripeKey()]);
+        return StripeCharge::create($options, Cashier::stripeOptions());
     }
 
     /**
@@ -65,7 +58,7 @@ trait Billable
     {
         $options['charge'] = $charge;
 
-        return StripeRefund::create($options, ['api_key' => $this->getStripeKey()]);
+        return StripeRefund::create($options, Cashier::stripeOptions());
     }
 
     /**
@@ -100,7 +93,7 @@ trait Billable
             'description' => $description,
         ], $options);
 
-        return StripeInvoiceItem::create($options, ['api_key' => $this->getStripeKey()]);
+        return StripeInvoiceItem::create($options, Cashier::stripeOptions());
     }
 
     /**
@@ -224,7 +217,7 @@ trait Billable
             $parameters = array_merge($options, ['customer' => $this->stripe_id]);
 
             try {
-                return StripeInvoice::create($parameters, $this->getStripeKey())->pay();
+                return StripeInvoice::create($parameters, Cashier::stripeOptions())->pay();
             } catch (StripeErrorInvalidRequest $e) {
                 return false;
             }
@@ -241,9 +234,7 @@ trait Billable
     public function upcomingInvoice()
     {
         try {
-            $stripeInvoice = StripeInvoice::upcoming(
-                ['customer' => $this->stripe_id], ['api_key' => $this->getStripeKey()]
-            );
+            $stripeInvoice = StripeInvoice::upcoming(['customer' => $this->stripe_id], Cashier::stripeOptions());
 
             return new Invoice($this, $stripeInvoice);
         } catch (StripeErrorInvalidRequest $e) {
@@ -261,10 +252,10 @@ trait Billable
     {
         try {
             $stripeInvoice = StripeInvoice::retrieve(
-                $id, $this->getStripeKey()
+                $id, Cashier::stripeOptions()
             );
 
-            $stripeInvoice->lines = StripeInvoice::retrieve($id, $this->getStripeKey())
+            $stripeInvoice->lines = StripeInvoice::retrieve($id, Cashier::stripeOptions())
                         ->lines
                         ->all(['limit' => 1000]);
 
@@ -398,7 +389,7 @@ trait Billable
     {
         $customer = $this->asStripeCustomer();
 
-        $token = StripeToken::retrieve($token, ['api_key' => $this->getStripeKey()]);
+        $token = StripeToken::retrieve($token, Cashier::stripeOptions());
 
         // If the given token already has the card as their default source, we can just
         // bail out of the method now. We don't need to keep adding the same card to
@@ -557,7 +548,7 @@ trait Billable
         // user from Stripe. This ID will correspond with the Stripe user instances
         // and allow us to retrieve users from Stripe later when we need to work.
         $customer = StripeCustomer::create(
-            $options, $this->getStripeKey()
+            $options, Cashier::stripeOptions()
         );
 
         $this->stripe_id = $customer->id;
@@ -575,11 +566,9 @@ trait Billable
      */
     public function updateStripeCustomer(array $options = [])
     {
-        $customer = StripeCustomer::update(
-            $this->stripe_id, $options, $this->getStripeKey()
+        return StripeCustomer::update(
+            $this->stripe_id, $options, Cashier::stripeOptions()
         );
-
-        return $customer;
     }
 
     /**
@@ -589,7 +578,7 @@ trait Billable
      */
     public function asStripeCustomer()
     {
-        return StripeCustomer::retrieve($this->stripe_id, $this->getStripeKey());
+        return StripeCustomer::retrieve($this->stripe_id, Cashier::stripeOptions());
     }
 
     /**
@@ -610,34 +599,5 @@ trait Billable
     public function taxPercentage()
     {
         return 0;
-    }
-
-    /**
-     * Get the Stripe API key.
-     *
-     * @return string
-     */
-    public static function getStripeKey()
-    {
-        if (static::$stripeKey) {
-            return static::$stripeKey;
-        }
-
-        if ($key = getenv('STRIPE_SECRET')) {
-            return $key;
-        }
-
-        return config('services.stripe.secret');
-    }
-
-    /**
-     * Set the Stripe API key.
-     *
-     * @param  string  $key
-     * @return void
-     */
-    public static function setStripeKey($key)
-    {
-        static::$stripeKey = $key;
     }
 }
