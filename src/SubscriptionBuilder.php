@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use DateTimeInterface;
+use Laravel\Cashier\Exceptions\SubscriptionCreationFailed;
 
 class SubscriptionBuilder
 {
@@ -202,6 +203,12 @@ class SubscriptionBuilder
         $customer = $this->getStripeCustomer($token, $options);
 
         $subscription = $customer->subscriptions->create($this->buildPayload());
+
+        if (in_array($subscription->status, ['incomplete', 'incomplete_expired'])) {
+            $subscription->cancel();
+
+            throw SubscriptionCreationFailed::incomplete($subscription);
+        }
 
         if ($this->skipTrial) {
             $trialEndsAt = null;

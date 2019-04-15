@@ -1,5 +1,23 @@
 # Upgrade Guide
 
+## Upgrading To 9.3 From 9.2
+
+### Custom Subscription Creation Exception
+
+[In their 2019-03-14 API update](https://stripe.com/docs/upgrades#2019-03-14), Stripe changed the way they handle new subscriptions when card payment fails. Instead of letting the creation of the subscription fail, the subscription is failed with an "incomplete" status. Because of this a Cashier customer will always get a successful subscription. Previously a card exception was thrown.
+
+To accommodate for this new behavior from now on Cashier will cancel that subscription immediately and throw a custom `SubscriptionCreationFailed` exception when a subscription is created with an "incomplete" or "incomplete_expired" status. We've decided to do this because in general you want to let a customer only start using your product when payment was received.
+
+If you were relying on catching the `\Stripe\Error\Card` exception before you should now rely on catching the `Laravel\Cashier\Exceptions\SubscriptionCreationFailed` exception instead. 
+
+### Card Failure When Swapping Plans
+
+Previously, when a user attempted to change subscription plans and their payment failed, the resulting exception bubbled up to the end user and the update to the subscription in the application was not performed. However, the subscription was still updated in Stripe itself resulting in the application and Stripe becoming out of sync.
+
+However, Cashier will now catch the payment failure exception while allowing the plan swap to continue. The payment failure will be handled by Stripe and Stripe may attempt to retry the payment at a later time. If the payment fails during the final retry attempt, Stripe will execute the action you have configured in your billing settings: https://stripe.com/docs/billing/lifecycle#settings
+
+Therefore, you should ensure you have configured Cashier to handle Stripe's webhooks. When configured properly, this will allow Cashier to mark the subscription as cancelled when the final payment retry attempt fails and Stripe notifies your application via a webhook request. Please refer to our [instructions for setting up Stripe webhooks with Cashier.](https://laravel.com/docs/master/billing#handling-stripe-webhooks).
+
 ## Upgrading To 9.0 From 8.0
 
 ### PHP & Laravel Version Requirements
