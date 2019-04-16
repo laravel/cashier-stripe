@@ -57,7 +57,6 @@ class CashierTest extends TestCase
 
     public static function setUpBeforeClass()
     {
-        Stripe::setApiVersion('2019-03-14');
         Stripe::setApiKey(getenv('STRIPE_SECRET'));
 
         static::setUpStripeTestData();

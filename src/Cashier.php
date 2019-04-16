@@ -8,6 +8,20 @@ use Illuminate\Support\Str;
 class Cashier
 {
     /**
+     * The Stripe API version.
+     *
+     * @var string
+     */
+    const STRIPE_VERSION = '2019-03-14';
+
+    /**
+     * The Stripe API key.
+     *
+     * @var string
+     */
+    protected static $stripeKey;
+
+    /**
      * The current currency.
      *
      * @var string
@@ -27,6 +41,49 @@ class Cashier
      * @var callable
      */
     protected static $formatCurrencyUsing;
+
+    /**
+     * Get the Stripe API key.
+     *
+     * @return string
+     */
+    public static function stripeKey()
+    {
+        if (static::$stripeKey) {
+            return static::$stripeKey;
+        }
+
+        if ($key = getenv('STRIPE_SECRET')) {
+            return $key;
+        }
+
+        return config('services.stripe.secret');
+    }
+
+    /**
+     * Set the Stripe API key.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public static function setStripeKey($key)
+    {
+        static::$stripeKey = $key;
+    }
+
+    /**
+     * Get the default Stripe API options.
+     *
+     * @param  array  $options
+     * @return array
+     */
+    public static function stripeOptions(array $options = [])
+    {
+        return array_merge([
+            'api_key' => static::stripeKey(),
+            'stripe_version' => static::STRIPE_VERSION,
+        ], $options);
+    }
 
     /**
      * Get the class name of the billable model.
