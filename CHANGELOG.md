@@ -1,9 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v9.2.1...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v9.3.0...master)
 
 ### Added
 - Allow Carbon 2 ([#607](https://github.com/laravel/cashier/pull/607))
+
+
+## [v9.3.0 (2019-04-16)](https://github.com/laravel/cashier/compare/v9.2.1...v9.3.0)
+
+### Added
+- Able to update a Stripe customer ([#634](https://github.com/laravel/cashier/pull/634))
+
+### Fixed
+- Handle incomplete subscriptions upon creation ([#631](https://github.com/laravel/cashier/pull/631))
+- Handle card failure in plan swap ([#641](https://github.com/laravel/cashier/pull/641))
 
 
 ## [v9.2.1 (2019-03-19)](https://github.com/laravel/cashier/compare/v9.2.0...v9.2.1)
