@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use DateTimeInterface;
+use Stripe\Checkout\Session;
 use Laravel\Cashier\Exceptions\SubscriptionCreationFailed;
 
 class SubscriptionBuilder
@@ -227,6 +228,36 @@ class SubscriptionBuilder
     }
 
     /**
+     * Begin a new Checkout Session.
+     *
+     * @param  array  $options
+     * @return \Laravel\Cashier\Checkout
+     */
+    public function checkout(array $options = [])
+    {
+        $customer = $this->getStripeCustomer(null, $options);
+
+        $session = Session::create([
+            'customer' => $customer->id,
+            'success_url' => route('cashier.checkout.success'),
+            'cancel_url' => route('cashier.checkout.cancelled'),
+            'payment_method_types' => ['card'],
+            'subscription_data' => [
+                'items' => [
+                    [
+                        'plan' => $this->plan,
+                        'quantity' => $this->quantity,
+                    ],
+                ],
+                'metadata' => $this->metadata,
+                'trial_end' => $this->getTrialEndForPayload(),
+            ],
+        ], Cashier::stripeOptions());
+
+        return new Checkout($customer, $session);
+    }
+
+    /**
      * Get the Stripe customer instance for the current user and token.
      *
      * @param  string|null  $token
@@ -235,11 +266,7 @@ class SubscriptionBuilder
      */
     protected function getStripeCustomer($token = null, array $options = [])
     {
-        if ($this->owner->stripe_id) {
-            $customer = $this->owner->asStripeCustomer();
-        } else {
-            $customer = $this->owner->createAsStripeCustomer($options);
-        }
+        $customer = $this->owner->createOrGetAsStripeCustomer($options);
 
         if ($token) {
             $this->owner->updateCard($token);

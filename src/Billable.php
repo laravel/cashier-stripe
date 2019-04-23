@@ -559,6 +559,21 @@ trait Billable
     }
 
     /**
+     * Create or get the Stripe customer for the model.
+     *
+     * @param  array  $options
+     * @return \Stripe\Customer
+     */
+    public function createOrGetAsStripeCustomer(array $options = [])
+    {
+        if ($this->stripe_id) {
+            return $this->asStripeCustomer();
+        }
+
+        return $this->createAsStripeCustomer($options);
+    }
+
+    /**
      * Update the underlying Stripe customer information for the model.
      *
      * @param  array  $options
