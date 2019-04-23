@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use DateTimeInterface;
+use Stripe\Checkout\Session;
 use Laravel\Cashier\Exceptions\SubscriptionCreationFailed;
 
 class SubscriptionBuilder
@@ -224,6 +225,36 @@ class SubscriptionBuilder
             'trial_ends_at' => $trialEndsAt,
             'ends_at' => null,
         ]);
+    }
+
+    /**
+     * Begin a new Checkout Session.
+     *
+     * @param  array  $customerOptions
+     * @return \Laravel\Cashier\Checkout
+     */
+    public function checkout(array $customerOptions = [])
+    {
+        $customer = $this->owner->createOrGetStripeCustomer($customerOptions);
+
+        $session = Session::create([
+            'customer' => $customer->id,
+            'success_url' => route('cashier.checkout.success'),
+            'cancel_url' => route('cashier.checkout.cancelled'),
+            'payment_method_types' => ['card'],
+            'subscription_data' => [
+                'items' => [
+                    [
+                        'plan' => $this->plan,
+                        'quantity' => $this->quantity,
+                    ],
+                ],
+                'metadata' => $this->metadata,
+                'trial_end' => $this->getTrialEndForPayload(),
+            ],
+        ], Cashier::stripeOptions());
+
+        return new Checkout($customer, $session);
     }
 
     /**
