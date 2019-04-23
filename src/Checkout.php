@@ -2,8 +2,8 @@
 
 namespace Laravel\Cashier;
 
-use Illuminate\Support\Facades\View;
 use Stripe\Checkout\Session;
+use Illuminate\Support\Facades\View;
 
 class Checkout
 {
