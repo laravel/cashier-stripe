@@ -235,11 +235,7 @@ class SubscriptionBuilder
      */
     protected function getStripeCustomer($token = null, array $options = [])
     {
-        if ($this->owner->stripe_id) {
-            $customer = $this->owner->asStripeCustomer();
-        } else {
-            $customer = $this->owner->createAsStripeCustomer($options);
-        }
+        $customer = $this->owner->createOrGetStripeCustomer($options);
 
         if ($token) {
             $this->owner->updateCard($token);
