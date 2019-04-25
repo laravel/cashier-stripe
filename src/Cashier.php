@@ -50,7 +50,7 @@ class Cashier
     protected static $formatCurrencyUsing;
 
     /**
-     * Get the Stripe Publishable API key.
+     * Get the pulishable Stripe API key.
      *
      * @return string
      */
@@ -68,7 +68,7 @@ class Cashier
     }
 
     /**
-     * Set the Stripe Publishable API key.
+     * Set the publishable Stripe API key.
      *
      * @param  string  $key
      * @return void
@@ -79,7 +79,7 @@ class Cashier
     }
 
     /**
-     * Get the Stripe Secret API key.
+     * Get the secret Stripe API key.
      *
      * @return string
      */
@@ -97,7 +97,7 @@ class Cashier
     }
 
     /**
-     * Set the Stripe Secret API key.
+     * Set the secret Stripe API key.
      *
      * @param  string  $key
      * @return void
