@@ -15,14 +15,14 @@ class Cashier
     const STRIPE_VERSION = '2019-03-14';
 
     /**
-     * The Stripe Publishable API key.
+     * The publishable Stripe API key.
      *
      * @var string
      */
     protected static $stripeKey;
 
     /**
-     * The Stripe Secret API key.
+     * The secret Stripe API key.
      *
      * @var string
      */
