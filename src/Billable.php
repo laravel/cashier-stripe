@@ -572,6 +572,21 @@ trait Billable
     }
 
     /**
+     * Get the Stripe customer instance for the current user and token.
+     *
+     * @param  array  $options
+     * @return \Stripe\Customer
+     */
+    public function createOrGetStripeCustomer(array $options = [])
+    {
+        if ($this->stripe_id) {
+            return $this->asStripeCustomer();
+        }
+
+        return $this->createAsStripeCustomer($options);
+    }
+
+    /**
      * Get the Stripe customer for the model.
      *
      * @return \Stripe\Customer
