@@ -15,11 +15,18 @@ class Cashier
     const STRIPE_VERSION = '2019-03-14';
 
     /**
-     * The Stripe API key.
+     * The publishable Stripe API key.
      *
      * @var string
      */
     protected static $stripeKey;
+
+    /**
+     * The secret Stripe API key.
+     *
+     * @var string
+     */
+    protected static $stripeSecret;
 
     /**
      * The current currency.
@@ -43,7 +50,7 @@ class Cashier
     protected static $formatCurrencyUsing;
 
     /**
-     * Get the Stripe API key.
+     * Get the pulishable Stripe API key.
      *
      * @return string
      */
@@ -51,6 +58,35 @@ class Cashier
     {
         if (static::$stripeKey) {
             return static::$stripeKey;
+        }
+
+        if ($key = getenv('STRIPE_KEY')) {
+            return $key;
+        }
+
+        return config('services.stripe.key');
+    }
+
+    /**
+     * Set the publishable Stripe API key.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public static function setStripeKey($key)
+    {
+        static::$stripeKey = $key;
+    }
+
+    /**
+     * Get the secret Stripe API key.
+     *
+     * @return string
+     */
+    public static function stripeSecret()
+    {
+        if (static::$stripeSecret) {
+            return static::$stripeSecret;
         }
 
         if ($key = getenv('STRIPE_SECRET')) {
@@ -61,14 +97,14 @@ class Cashier
     }
 
     /**
-     * Set the Stripe API key.
+     * Set the secret Stripe API key.
      *
      * @param  string  $key
      * @return void
      */
-    public static function setStripeKey($key)
+    public static function setStripeSecret($key)
     {
-        static::$stripeKey = $key;
+        static::$stripeSecret = $key;
     }
 
     /**
@@ -80,7 +116,7 @@ class Cashier
     public static function stripeOptions(array $options = [])
     {
         return array_merge([
-            'api_key' => static::stripeKey(),
+            'api_key' => static::stripeSecret(),
             'stripe_version' => static::STRIPE_VERSION,
         ], $options);
     }
