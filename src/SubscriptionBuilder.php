@@ -230,14 +230,15 @@ class SubscriptionBuilder
     /**
      * Begin a new Checkout Session.
      *
+     * @param  array  $sessionOptions
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
-    public function checkout(array $customerOptions = [])
+    public function checkout(array $sessionOptions = [], array $customerOptions = [])
     {
         $customer = $this->owner->createOrGetStripeCustomer($customerOptions);
 
-        $session = Session::create([
+        $session = Session::create(array_merge([
             'customer' => $customer->id,
             'success_url' => route('cashier.checkout.success'),
             'cancel_url' => route('cashier.checkout.cancelled'),
@@ -252,7 +253,7 @@ class SubscriptionBuilder
                 'metadata' => $this->metadata,
                 'trial_end' => $this->getTrialEndForPayload(),
             ],
-        ], Cashier::stripeOptions());
+        ], $sessionOptions), Cashier::stripeOptions());
 
         return new Checkout($customer, $session);
     }
