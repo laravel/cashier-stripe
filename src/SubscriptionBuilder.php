@@ -255,6 +255,9 @@ class SubscriptionBuilder
             ],
         ], $sessionOptions), Cashier::stripeOptions());
 
+        // Todo: We should have the subscription id from here on. Already create subscription in database?
+        // See: https://stripe.com/docs/api/checkout/sessions/create
+
         return new Checkout($customer, $session);
     }
 
