@@ -236,13 +236,7 @@ class SubscriptionBuilder
      */
     public function checkout(array $sessionOptions = [], array $customerOptions = [])
     {
-        $customer = $this->owner->createOrGetStripeCustomer($customerOptions);
-
-        $session = Session::create(array_merge([
-            'customer' => $customer->id,
-            'success_url' => route('cashier.checkout.success'),
-            'cancel_url' => route('cashier.checkout.cancelled'),
-            'payment_method_types' => ['card'],
+        return Checkout::create($this->owner, array_merge([
             'subscription_data' => [
                 'items' => [
                     [
@@ -253,12 +247,7 @@ class SubscriptionBuilder
                 'metadata' => $this->metadata,
                 'trial_end' => $this->getTrialEndForPayload(),
             ],
-        ], $sessionOptions), Cashier::stripeOptions());
-
-        // Todo: We should have the subscription id from here on. Already create subscription in database?
-        // See: https://stripe.com/docs/api/checkout/sessions/create
-
-        return new Checkout($customer, $session);
+        ], $sessionOptions), $customerOptions);
     }
 
     /**

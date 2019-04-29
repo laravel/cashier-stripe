@@ -31,6 +31,28 @@ class Checkout
     }
 
     /**
+     * Begin a new Checkout Session.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @param  array  $sessionOptions
+     * @param  array  $customerOptions
+     * @return \Laravel\Cashier\Checkout
+     */
+    public static function create($owner, array $sessionOptions = [], array $customerOptions = [])
+    {
+        $customer = $owner->createOrGetStripeCustomer($customerOptions);
+
+        $session = Session::create(array_merge([
+            'customer' => $customer->id,
+            'success_url' => route('cashier.checkout.success'),
+            'cancel_url' => route('cashier.checkout.cancelled'),
+            'payment_method_types' => ['card'],
+        ], $sessionOptions), Cashier::stripeOptions());
+
+        return new static($customer, $session);
+    }
+
+    /**
      * Get the View instance for the button.
      *
      * @param  string  $label

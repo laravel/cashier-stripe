@@ -5,6 +5,7 @@ namespace Laravel\Cashier;
 use Exception;
 use InvalidArgumentException;
 use Stripe\Card as StripeCard;
+use Stripe\Checkout\Session;
 use Stripe\Token as StripeToken;
 use Illuminate\Support\Collection;
 use Stripe\Charge as StripeCharge;
@@ -44,6 +45,28 @@ trait Billable
         }
 
         return StripeCharge::create($options, Cashier::stripeOptions());
+    }
+
+    /**
+     * Begin a new Checkout Session.
+     *
+     * @param  int  $amount
+     * @param  string  $name
+     * @param  int  $quantity
+     * @param  array  $sessionOptions
+     * @param  array  $customerOptions
+     * @return \Laravel\Cashier\Checkout
+     */
+    public function checkout($amount, $name, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
+    {
+        return Checkout::create($this, array_merge([
+            'line_items' => [[
+                'name' => $name,
+                'amount' => $amount,
+                'currency' => $this->preferredCurrency(),
+                'quantity' => $quantity,
+            ]],
+        ], $sessionOptions), $customerOptions);
     }
 
     /**
