@@ -3,9 +3,9 @@
 namespace Laravel\Cashier;
 
 use Exception;
+use Stripe\Checkout\Session;
 use InvalidArgumentException;
 use Stripe\Card as StripeCard;
-use Stripe\Checkout\Session;
 use Stripe\Token as StripeToken;
 use Illuminate\Support\Collection;
 use Stripe\Charge as StripeCharge;
