@@ -10,7 +10,7 @@
 <div id="error-message"></div>
 
 <script>
-    var checkoutButton = document.getElementById('checkout-{{ $sessionId }}');
+    const checkoutButton = document.getElementById('checkout-{{ $sessionId }}');
 
     checkoutButton.addEventListener('click', function () {
         // When the customer clicks on the button, redirect them to Checkout.
