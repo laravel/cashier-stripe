@@ -242,9 +242,9 @@ class SubscriptionBuilder
         $minimumTrialPeriod = Carbon::now()->addHours(48);
 
         if ($this->trialExpires && $this->trialExpires->gt($minimumTrialPeriod)) {
-            $trialEnd = $this->trialExpires->getTimestamp();
+            $trialEnd = $this->trialExpires;
         } else {
-            $trialEnd = $minimumTrialPeriod->getTimestamp();
+            $trialEnd = $minimumTrialPeriod;
         }
 
         return Checkout::create($this->owner, array_merge([
@@ -256,7 +256,7 @@ class SubscriptionBuilder
                     ],
                 ],
                 'metadata' => $this->metadata,
-                'trial_end' => $trialEnd,
+                'trial_end' => $trialEnd->getTimestamp(),
             ],
         ], $sessionOptions), $customerOptions);
     }
