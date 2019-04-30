@@ -236,6 +236,17 @@ class SubscriptionBuilder
      */
     public function checkout(array $sessionOptions = [], array $customerOptions = [])
     {
+        // Checkout Sessions are active for 24 hours after their creation and within that time frame the customer
+        // can complete the payment at any time. Stripe requires the trial end at least 48 hours in the future
+        // so that there is still at least a one day trial if your customer pays at the end of the 24 hours.
+        $minimumTrialPeriod = Carbon::now()->addHours(48);
+
+        if ($this->trialExpires && $this->trialExpires->gt($minimumTrialPeriod)) {
+            $trialEnd = $this->trialExpires->getTimestamp();
+        } else {
+            $trialEnd = $minimumTrialPeriod->getTimestamp();
+        }
+
         return Checkout::create($this->owner, array_merge([
             'subscription_data' => [
                 'items' => [
@@ -245,7 +256,7 @@ class SubscriptionBuilder
                     ],
                 ],
                 'metadata' => $this->metadata,
-                'trial_end' => $this->getTrialEndForPayload(),
+                'trial_end' => $trialEnd,
             ],
         ], $sessionOptions), $customerOptions);
     }
@@ -289,7 +300,7 @@ class SubscriptionBuilder
     /**
      * Get the trial ending date for the Stripe payload.
      *
-     * @return int|null
+     * @return int|string|null
      */
     protected function getTrialEndForPayload()
     {
