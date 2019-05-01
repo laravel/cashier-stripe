@@ -379,6 +379,10 @@ trait Billable
      */
     public function defaultCard()
     {
+        if (! $this->hasStripeId()) {
+            return null;
+        }
+
         $customer = $this->asStripeCustomer();
 
         foreach ($customer->sources->data as $card) {
