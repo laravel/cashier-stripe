@@ -380,7 +380,7 @@ trait Billable
     public function defaultCard()
     {
         if (! $this->hasStripeId()) {
-            return null;
+            return;
         }
 
         $customer = $this->asStripeCustomer();
