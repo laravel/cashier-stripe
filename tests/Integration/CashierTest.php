@@ -267,18 +267,6 @@ class CashierTest extends TestCase
 
         // Assert that the defaultCard method returns null for billable models that are not stripe customers, and no exception is thrown
         $this->assertNull($user->defaultCard());
-
-        // Create the user as a stripe customer
-        $user->createAsStripeCustomer();
-
-        // Assert that the defaultCard method returns null if the user is a stripe customer but has no cards
-        $this->assertNull($user->defaultCard());
-
-        // Add a card to the stripe customer
-        $user->updateCard($this->getTestToken());
-
-        // Now that the user has a card on file, make sure it is returned as expected
-        $this->assertInstanceOf(Card::class, $user->defaultCard());
     }
 
     public function test_creating_subscription_fails_when_card_is_declined()
