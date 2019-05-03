@@ -15,8 +15,28 @@ class CashierServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cashier');
 
-        $this->publishes([
-            __DIR__.'/../resources/views' => $this->app->basePath('resources/views/vendor/cashier'),
-        ]);
+        if ($this->app->runningInConsole()) {
+            $this->registerMigrations();
+
+            $this->publishes([
+                __DIR__.'/../database/migrations' => $this->app->databasePath('migrations'),
+            ], 'cashier-migrations');
+
+            $this->publishes([
+                __DIR__.'/../resources/views' => $this->app->resourcePath('views/vendor/cashier'),
+            ], 'cashier-views');
+        }
+    }
+
+    /**
+     * Register Cashier's migration files.
+     *
+     * @return void
+     */
+    protected function registerMigrations()
+    {
+        if (Cashier::$runsMigrations) {
+            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        }
     }
 }

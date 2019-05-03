@@ -5,13 +5,12 @@ namespace Laravel\Cashier\Tests\Integration;
 use Stripe\Token;
 use Stripe\Stripe;
 use Stripe\ApiResource;
-use PHPUnit\Framework\TestCase;
 use Stripe\Error\InvalidRequest;
+use Orchestra\Testbench\TestCase;
 use Illuminate\Database\Schema\Builder;
 use Laravel\Cashier\Tests\Fixtures\User;
-use Illuminate\Database\Schema\Blueprint;
+use Laravel\Cashier\CashierServiceProvider;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 abstract class IntegrationTestCase extends TestCase
@@ -28,47 +27,20 @@ abstract class IntegrationTestCase extends TestCase
         Stripe::setApiKey(getenv('STRIPE_SECRET'));
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         Eloquent::unguard();
 
-        $db = new DB;
-        $db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-        ]);
-        $db->bootEloquent();
-        $db->setAsGlobal();
+        $this->loadLaravelMigrations();
 
-        $this->schema()->create('users', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('email');
-            $table->string('name');
-            $table->string('stripe_id')->nullable();
-            $table->string('card_brand')->nullable();
-            $table->string('card_last_four')->nullable();
-            $table->timestamps();
-        });
-
-        $this->schema()->create('subscriptions', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('user_id');
-            $table->string('name');
-            $table->string('stripe_id');
-            $table->string('stripe_plan');
-            $table->integer('quantity');
-            $table->timestamp('trial_ends_at')->nullable();
-            $table->timestamp('ends_at')->nullable();
-            $table->timestamps();
-        });
+        $this->artisan('migrate')->run();
     }
 
-    public function tearDown()
+    protected function getPackageProviders($app)
     {
-        $this->schema()->drop('users');
-        $this->schema()->drop('subscriptions');
+        return [CashierServiceProvider::class];
     }
 
     protected static function deleteStripeResource(ApiResource $resource)
@@ -112,6 +84,7 @@ abstract class IntegrationTestCase extends TestCase
         return User::create([
             'email' => "{$description}@cashier-test.com",
             'name' => 'Taylor Otwell',
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
         ]);
     }
 }
