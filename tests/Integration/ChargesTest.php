@@ -10,7 +10,7 @@ class ChargesTest extends IntegrationTestCase
     {
         $user = $this->createCustomer('customer_can_be_charged');
         $user->createAsStripeCustomer();
-        $user->updateCard($this->getTestToken());
+        $user->updateCard('tok_visa');
 
         $response = $user->charge(1000);
 
@@ -22,7 +22,7 @@ class ChargesTest extends IntegrationTestCase
     {
         $user = $this->createCustomer('customer_can_be_charged_and_invoiced_immediately');
         $user->createAsStripeCustomer();
-        $user->updateCard($this->getTestToken());
+        $user->updateCard('tok_visa');
 
         $user->invoiceFor('Laravel Cashier', 1000);
 
@@ -35,7 +35,7 @@ class ChargesTest extends IntegrationTestCase
     {
         $user = $this->createCustomer('customer_can_be_refunded');
         $user->createAsStripeCustomer();
-        $user->updateCard($this->getTestToken());
+        $user->updateCard('tok_visa');
 
         $invoice = $user->invoiceFor('Laravel Cashier', 1000);
         $refund = $user->refund($invoice->charge);

@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Tests\Integration;
 
-use Stripe\Token;
 use Stripe\Stripe;
 use Stripe\ApiResource;
 use Stripe\Error\InvalidRequest;
@@ -48,23 +47,6 @@ abstract class IntegrationTestCase extends TestCase
         } catch (InvalidRequest $e) {
             //
         }
-    }
-
-    protected function getTestToken($cardNumber = null)
-    {
-        return Token::create([
-            'card' => [
-                'number' => $cardNumber ?? '4242424242424242',
-                'exp_month' => 5,
-                'exp_year' => date('Y') + 1,
-                'cvc' => '123',
-            ],
-        ])->id;
-    }
-
-    protected function getInvalidCardToken()
-    {
-        return $this->getTestToken('4000 0000 0000 0341');
     }
 
     protected function createCustomer($description = 'taylor'): User

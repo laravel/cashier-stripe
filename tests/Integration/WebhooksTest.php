@@ -55,9 +55,7 @@ class WebhooksTest extends IntegrationTestCase
     public function test_subscription_is_marked_as_cancelled_when_deleted_in_stripe()
     {
         $user = $this->createCustomer('subscription_is_marked_as_cancelled_when_deleted_in_stripe');
-        $user->newSubscription('main', static::$planId)
-            ->create($this->getTestToken());
-        $subscription = $user->subscription('main');
+        $subscription = $user->newSubscription('main', static::$planId)->create('tok_visa');
 
         $response = (new CashierTestControllerStub)->handleWebhook(
             Request::create('/', 'POST', [], [], [], [], json_encode([
