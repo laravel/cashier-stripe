@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests\Integration;
 
 use DateTime;
+use Stripe\Card;
 use Stripe\Plan;
 use Stripe\Token;
 use Carbon\Carbon;
@@ -255,6 +256,17 @@ class CashierTest extends TestCase
         $this->assertFalse($invoice->hasStartingBalance());
         $this->assertNull($invoice->coupon());
         $this->assertInstanceOf(Carbon::class, $invoice->date());
+    }
+
+    public function test_default_card_returns_null_when_not_customer()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        // Assert that the defaultCard method returns null for billable models that are not stripe customers, and no exception is thrown
+        $this->assertNull($user->defaultCard());
     }
 
     public function test_creating_subscription_fails_when_card_is_declined()
