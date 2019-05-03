@@ -108,7 +108,7 @@ class SubscriptionsTest extends IntegrationTestCase
         $user = $this->createCustomer('subscriptions_can_be_created');
 
         // Create Subscription
-        $user->newSubscription('main', static::$planId)->create($this->getTestToken());
+        $user->newSubscription('main', static::$planId)->create('tok_visa');
 
         $this->assertEquals(1, count($user->subscriptions));
         $this->assertNotNull($user->subscription('main')->stripe_id);
@@ -183,7 +183,7 @@ class SubscriptionsTest extends IntegrationTestCase
     public function test_swapping_subscription_with_coupon()
     {
         $user = $this->createCustomer('swapping_subscription_with_coupon');
-        $user->newSubscription('main', static::$planId)->create($this->getTestToken());
+        $user->newSubscription('main', static::$planId)->create('tok_visa');
         $subscription = $user->subscription('main');
 
         $subscription->swap(static::$otherPlanId, [
@@ -198,7 +198,7 @@ class SubscriptionsTest extends IntegrationTestCase
         $user = $this->createCustomer('creating_subscription_fails_when_card_is_declined');
 
         try {
-            $user->newSubscription('main', static::$planId)->create($this->getInvalidCardToken());
+            $user->newSubscription('main', static::$planId)->create('tok_chargeCustomerFail');
 
             $this->fail('Expected exception '.SubscriptionCreationFailed::class.' was not thrown.');
         } catch (SubscriptionCreationFailed $e) {
@@ -214,10 +214,10 @@ class SubscriptionsTest extends IntegrationTestCase
     {
         $user = $this->createCustomer('plan_swap_succeeds_even_if_payment_fails');
 
-        $subscription = $user->newSubscription('main', static::$planId)->create($this->getTestToken());
+        $subscription = $user->newSubscription('main', static::$planId)->create('tok_visa');
 
         // Set a faulty card as the customer's default card.
-        $user->updateCard($this->getInvalidCardToken());
+        $user->updateCard('tok_chargeCustomerFail');
 
         // Attempt to swap and pay with a faulty card.
         $subscription = $subscription->swap(static::$premiumPlanId);
@@ -233,7 +233,7 @@ class SubscriptionsTest extends IntegrationTestCase
         // Create Subscription
         $user->newSubscription('main', static::$planId)
             ->withCoupon(static::$couponId)
-            ->create($this->getTestToken());
+            ->create('tok_visa');
 
         $subscription = $user->subscription('main');
 
@@ -262,7 +262,7 @@ class SubscriptionsTest extends IntegrationTestCase
         // Create Subscription
         $user->newSubscription('main', static::$planId)
             ->anchorBillingCycleOn(new DateTime('first day of next month'))
-            ->create($this->getTestToken());
+            ->create('tok_visa');
 
         $subscription = $user->subscription('main');
 
@@ -296,7 +296,7 @@ class SubscriptionsTest extends IntegrationTestCase
         // Create Subscription
         $user->newSubscription('main', static::$planId)
             ->trialDays(7)
-            ->create($this->getTestToken());
+            ->create('tok_visa');
 
         $subscription = $user->subscription('main');
 
@@ -332,7 +332,7 @@ class SubscriptionsTest extends IntegrationTestCase
         // Create Subscription
         $user->newSubscription('main', static::$planId)
             ->trialUntil(Carbon::tomorrow()->hour(3)->minute(15))
-            ->create($this->getTestToken());
+            ->create('tok_visa');
 
         $subscription = $user->subscription('main');
 
@@ -365,9 +365,7 @@ class SubscriptionsTest extends IntegrationTestCase
     {
         $user = $this->createCustomer('applying_coupons_to_existing_customers');
 
-        // Create Subscription
-        $user->newSubscription('main', static::$planId)
-            ->create($this->getTestToken());
+        $user->newSubscription('main', static::$planId)->create('tok_visa');
 
         $user->applyCoupon(static::$couponId);
 
