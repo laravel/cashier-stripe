@@ -7,10 +7,8 @@ use Stripe\Stripe;
 use Stripe\ApiResource;
 use Stripe\Error\InvalidRequest;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Database\Schema\Builder;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\CashierServiceProvider;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 abstract class IntegrationTestCase extends TestCase
@@ -50,16 +48,6 @@ abstract class IntegrationTestCase extends TestCase
         } catch (InvalidRequest $e) {
             //
         }
-    }
-
-    protected function schema(): Builder
-    {
-        return $this->connection()->getSchemaBuilder();
-    }
-
-    protected function connection(): ConnectionInterface
-    {
-        return Eloquent::getConnectionResolver()->connection();
     }
 
     protected function getTestToken($cardNumber = null)
