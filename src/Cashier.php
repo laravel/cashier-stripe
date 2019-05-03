@@ -50,6 +50,13 @@ class Cashier
     protected static $formatCurrencyUsing;
 
     /**
+     * Indicates if Cashier migrations will be run.
+     *
+     * @var bool
+     */
+    public static $runsMigrations = true;
+
+    /**
      * Get the publishable Stripe API key.
      *
      * @return string
@@ -230,5 +237,17 @@ class Cashier
         }
 
         return static::usesCurrencySymbol().$amount;
+    }
+
+    /**
+     * Configure Cashier to not register its migrations.
+     *
+     * @return static
+     */
+    public static function ignoreMigrations()
+    {
+        static::$runsMigrations = false;
+
+        return new static;
     }
 }
