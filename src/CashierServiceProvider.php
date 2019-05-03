@@ -23,7 +23,7 @@ class CashierServiceProvider extends ServiceProvider
             ], 'cashier-migrations');
 
             $this->publishes([
-                __DIR__ . '/../resources/views' => $this->app->resourcePath('views/vendor/cashier'),
+                __DIR__.'/../resources/views' => $this->app->resourcePath('views/vendor/cashier'),
             ], 'cashier-views');
         }
     }

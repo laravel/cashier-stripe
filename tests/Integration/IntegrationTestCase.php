@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Tests\Integration;
 
-use Laravel\Cashier\CashierServiceProvider;
 use Stripe\Token;
 use Stripe\Stripe;
 use Stripe\ApiResource;
@@ -10,6 +9,7 @@ use Stripe\Error\InvalidRequest;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Database\Schema\Builder;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Laravel\Cashier\CashierServiceProvider;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
