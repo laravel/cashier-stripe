@@ -22,4 +22,11 @@ class CustomerTest extends TestCase
 
         $this->assertFalse($user->onGenericTrial());
     }
+
+    public function test_default_card_returns_null_when_the_user_is_not_a_customer_yet()
+    {
+        $user = new User;
+
+        $this->assertNull($user->defaultCard());
+    }
 }
