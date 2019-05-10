@@ -206,12 +206,6 @@ class SubscriptionBuilder
         /** @var \Stripe\Subscription $subscription */
         $subscription = $customer->subscriptions->create($this->buildPayload());
 
-        if ($this->skipTrial) {
-            $trialEndsAt = null;
-        } else {
-            $trialEndsAt = $this->trialExpires;
-        }
-
         if (in_array($subscription->status, ['incomplete', 'incomplete_expired'])) {
             /** @var \Stripe\Invoice $latestInvoice */
             $latestInvoice = $subscription->latest_invoice;
@@ -225,6 +219,12 @@ class SubscriptionBuilder
             } elseif ($paymentIntent->status === 'requires_action') {
                 throw SubscriptionCreationIncomplete::requiresAction($subscription);
             }
+        }
+
+        if ($this->skipTrial) {
+            $trialEndsAt = null;
+        } else {
+            $trialEndsAt = $this->trialExpires;
         }
 
         return $this->owner->subscriptions()->create([
