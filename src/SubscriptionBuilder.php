@@ -5,6 +5,7 @@ namespace Laravel\Cashier;
 use Carbon\Carbon;
 use DateTimeInterface;
 use Laravel\Cashier\Exceptions\SubscriptionCreationFailed;
+use Laravel\Cashier\Exceptions\SubscriptionCreationIncomplete;
 
 class SubscriptionBuilder
 {
@@ -222,7 +223,7 @@ class SubscriptionBuilder
 
                 throw SubscriptionCreationFailed::cardError($subscription);
             } elseif ($paymentIntent->status === 'requires_action') {
-                // Needs extra payment action: 3D Secure,...
+                throw SubscriptionCreationIncomplete::requiresAction($subscription);
             }
         }
 
