@@ -202,18 +202,28 @@ class SubscriptionBuilder
     {
         $customer = $this->getStripeCustomer($token, $options);
 
+        /** @var \Stripe\Subscription $subscription */
         $subscription = $customer->subscriptions->create($this->buildPayload());
-
-        if (in_array($subscription->status, ['incomplete', 'incomplete_expired'])) {
-            $subscription->cancel();
-
-            throw SubscriptionCreationFailed::incomplete($subscription);
-        }
 
         if ($this->skipTrial) {
             $trialEndsAt = null;
         } else {
             $trialEndsAt = $this->trialExpires;
+        }
+
+        if (in_array($subscription->status, ['incomplete', 'incomplete_expired'])) {
+            /** @var \Stripe\Invoice $latestInvoice */
+            $latestInvoice = $subscription->latest_invoice;
+            /** @var \Stripe\PaymentIntent $paymentIntent */
+            $paymentIntent = $latestInvoice->payment_intent;
+
+            if ($paymentIntent->status === 'requires_payment_method') {
+                $subscription->cancel();
+
+                throw SubscriptionCreationFailed::cardError($subscription);
+            } elseif ($paymentIntent->status === 'requires_action') {
+                // Needs extra payment action: 3D Secure,...
+            }
         }
 
         return $this->owner->subscriptions()->create([
@@ -259,6 +269,7 @@ class SubscriptionBuilder
             'quantity' => $this->quantity,
             'tax_percent' => $this->getTaxPercentageForPayload(),
             'trial_end' => $this->getTrialEndForPayload(),
+            'expand' => ['latest_invoice.payment_intent'],
         ]);
     }
 
