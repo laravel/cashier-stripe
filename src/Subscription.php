@@ -348,11 +348,13 @@ class Subscription extends Model
      * @param  string  $plan
      * @return $this
      */
-    public function swap($plan)
+    public function swap($plan, $metadata = [])
     {
         $subscription = $this->asStripeSubscription();
 
         $subscription->plan = $plan;
+
+        $subscription->metadata = $metadata;
 
         $subscription->prorate = $this->prorate;
 
