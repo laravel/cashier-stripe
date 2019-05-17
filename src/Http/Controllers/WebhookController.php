@@ -20,7 +20,7 @@ class WebhookController extends Controller
      */
     public function __construct()
     {
-        if (config('services.stripe.webhook.secret')) {
+        if (config('services.stripe.webhook.secret')) {dump('middleware');
             $this->middleware(VerifyWebhookSignature::class);
         }
     }
