@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Routing\Registrar;
 
 class CashierServiceProvider extends ServiceProvider
 {
@@ -14,6 +15,8 @@ class CashierServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cashier');
+
+        $this->registerRoutes();
 
         if ($this->app->runningInConsole()) {
             $this->registerMigrations();
@@ -38,5 +41,41 @@ class CashierServiceProvider extends ServiceProvider
         if (Cashier::$runsMigrations) {
             $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         }
+    }
+
+    /**
+     * Register Cashier's routes.
+     *
+     * @return void
+     */
+    protected function registerRoutes()
+    {
+        $this->router()->group($this->routeConfiguration(), function (Registrar $router) {
+            $router->post('webhook', 'WebhookController@handleWebhook')->name('webhook');
+        });
+    }
+
+    /**
+     * The Illuminate route registrar.
+     *
+     * @return \Illuminate\Contracts\Routing\Registrar
+     */
+    protected function router()
+    {
+        return $this->app->make(Registrar::class);
+    }
+
+    /**
+     * Get the Cashier route group configuration array.
+     *
+     * @return array
+     */
+    protected function routeConfiguration()
+    {
+        return [
+            'namespace' => 'Laravel\Cashier\Http\Controllers',
+            'prefix' => 'stripe',
+            'as' => 'cashier.',
+        ];
     }
 }
