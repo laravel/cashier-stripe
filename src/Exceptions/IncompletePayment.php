@@ -15,7 +15,7 @@ class IncompletePayment extends Exception
      */
     public $paymentIntent;
 
-    public function __construct(PaymentIntent $paymentIntent, $message = "", $code = 0, Throwable $previous = null)
+    public function __construct(PaymentIntent $paymentIntent, $message = '', $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
 

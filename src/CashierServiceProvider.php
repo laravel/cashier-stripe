@@ -76,7 +76,7 @@ class CashierServiceProvider extends ServiceProvider
         return [
             'namespace' => 'Laravel\Cashier\Http\Controllers',
             'prefix' => 'stripe',
-            'as' => 'cashier.'
+            'as' => 'cashier.',
         ];
     }
 }

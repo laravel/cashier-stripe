@@ -4,9 +4,8 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use DateTimeInterface;
-use Laravel\Cashier\Exceptions\IncompletePayment;
-use Laravel\Cashier\Exceptions\PaymentFailure;
 use Laravel\Cashier\Exceptions\ActionRequired;
+use Laravel\Cashier\Exceptions\PaymentFailure;
 
 class SubscriptionBuilder
 {
