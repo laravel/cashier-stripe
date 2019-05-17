@@ -4,8 +4,8 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use DateTimeInterface;
-use Laravel\Cashier\Exceptions\SubscriptionCreationFailed;
-use Laravel\Cashier\Exceptions\SubscriptionCreationIncomplete;
+use Laravel\Cashier\Exceptions\ActionRequired;
+use Laravel\Cashier\Exceptions\PaymentFailure;
 
 class SubscriptionBuilder
 {
@@ -203,23 +203,8 @@ class SubscriptionBuilder
     {
         $customer = $this->getStripeCustomer($token, $options);
 
-        /** @var \Stripe\Subscription $subscription */
-        $subscription = $customer->subscriptions->create($this->buildPayload());
-
-        if (in_array($subscription->status, ['incomplete', 'incomplete_expired'])) {
-            /** @var \Stripe\Invoice $latestInvoice */
-            $latestInvoice = $subscription->latest_invoice;
-            /** @var \Stripe\PaymentIntent $paymentIntent */
-            $paymentIntent = $latestInvoice->payment_intent;
-
-            if ($paymentIntent->status === 'requires_payment_method') {
-                $subscription->cancel();
-
-                throw SubscriptionCreationFailed::cardError($subscription);
-            } elseif ($paymentIntent->status === 'requires_action') {
-                throw SubscriptionCreationIncomplete::requiresAction($subscription);
-            }
-        }
+        /** @var \Stripe\Subscription $stripeSubscription */
+        $stripeSubscription = $customer->subscriptions->create($this->buildPayload());
 
         if ($this->skipTrial) {
             $trialEndsAt = null;
@@ -227,14 +212,26 @@ class SubscriptionBuilder
             $trialEndsAt = $this->trialExpires;
         }
 
-        return $this->owner->subscriptions()->create([
+        $subscription = $this->owner->subscriptions()->create([
             'name' => $this->name,
-            'stripe_id' => $subscription->id,
+            'stripe_id' => $stripeSubscription->id,
             'stripe_plan' => $this->plan,
             'quantity' => $this->quantity,
             'trial_ends_at' => $trialEndsAt,
             'ends_at' => null,
         ]);
+
+        if ($stripeSubscription->status === 'incomplete') {
+            $paymentIntent = new PaymentIntent($stripeSubscription->latest_invoice->payment_intent);
+
+            if ($paymentIntent->requiresPaymentMethod()) {
+                throw PaymentFailure::forSubscription($subscription, $paymentIntent);
+            } elseif ($paymentIntent->requiresAction()) {
+                throw ActionRequired::forSubscription($subscription, $paymentIntent);
+            }
+        }
+
+        return $subscription;
     }
 
     /**
