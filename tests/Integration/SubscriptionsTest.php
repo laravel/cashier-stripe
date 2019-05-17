@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Stripe\Coupon;
 use Stripe\Product;
 use Illuminate\Support\Str;
-use Laravel\Cashier\Exceptions\SubscriptionCreationFailed;
+use Laravel\Cashier\Exceptions\PaymentFailure;
 
 class SubscriptionsTest extends IntegrationTestCase
 {
@@ -200,8 +200,8 @@ class SubscriptionsTest extends IntegrationTestCase
         try {
             $user->newSubscription('main', static::$planId)->create('tok_chargeCustomerFail');
 
-            $this->fail('Expected exception '.SubscriptionCreationFailed::class.' was not thrown.');
-        } catch (SubscriptionCreationFailed $e) {
+            $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
+        } catch (PaymentFailure $e) {
             // Assert no subscription was added to the billable entity.
             $this->assertEmpty($user->subscriptions);
 

@@ -14,7 +14,7 @@ use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 class WebhookController extends Controller
 {
     /**
-     * Create a new webhook controller instance.
+     * Create a new WebhookController instance.
      *
      * @return void
      */
@@ -51,9 +51,7 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
     {
-        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
-
-        if ($user) {
+        if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
             $data = $payload['data']['object'];
 
             $user->subscriptions->filter(function (Subscription $subscription) use ($data) {
@@ -100,9 +98,7 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSubscriptionDeleted(array $payload)
     {
-        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
-
-        if ($user) {
+        if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
             $user->subscriptions->filter(function ($subscription) use ($payload) {
                 return $subscription->stripe_id === $payload['data']['object']['id'];
             })->each(function ($subscription) {
@@ -151,9 +147,7 @@ class WebhookController extends Controller
      */
     protected function handleCustomerDeleted(array $payload)
     {
-        $user = $this->getUserByStripeId($payload['data']['object']['id']);
-
-        if ($user) {
+        if ($user = $this->getUserByStripeId($payload['data']['object']['id'])) {
             $user->subscriptions->each(function (Subscription $subscription) {
                 $subscription->skipTrial()->markAsCancelled();
             });
