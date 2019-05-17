@@ -66,7 +66,6 @@ class WebhooksTest extends IntegrationTestCase
             ],
         ])->assertOk();
 
-
         $this->assertTrue($user->fresh()->subscription('main')->cancelled());
     }
 }
