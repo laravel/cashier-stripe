@@ -5,8 +5,6 @@ namespace Laravel\Cashier\Tests\Integration;
 use Stripe\Plan;
 use Stripe\Product;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Laravel\Cashier\Http\Controllers\WebhookController;
 
 class WebhooksTest extends IntegrationTestCase
 {
@@ -57,28 +55,17 @@ class WebhooksTest extends IntegrationTestCase
         $user = $this->createCustomer('subscription_is_marked_as_cancelled_when_deleted_in_stripe');
         $subscription = $user->newSubscription('main', static::$planId)->create('tok_visa');
 
-        $response = (new CashierTestControllerStub)->handleWebhook(
-            Request::create('/', 'POST', [], [], [], [], json_encode([
-                'id' => 'foo',
-                'type' => 'customer.subscription.deleted',
-                'data' => [
-                    'object' => [
-                        'id' => $subscription->stripe_id,
-                        'customer' => $user->stripe_id,
-                    ],
+        $this->postJson('stripe/webhook', [
+            'id' => 'foo',
+            'type' => 'customer.subscription.deleted',
+            'data' => [
+                'object' => [
+                    'id' => $subscription->stripe_id,
+                    'customer' => $user->stripe_id,
                 ],
-            ]))
-        );
+            ],
+        ])->assertOk();
 
-        $this->assertEquals(200, $response->getStatusCode());
         $this->assertTrue($user->fresh()->subscription('main')->cancelled());
-    }
-}
-
-class CashierTestControllerStub extends WebhookController
-{
-    public function __construct()
-    {
-        // Prevent setting middleware...
     }
 }
