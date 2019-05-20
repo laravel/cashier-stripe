@@ -164,6 +164,29 @@ class WebhookController extends Controller
     }
 
     /**
+     * Handle invoice payment succeeded.
+     *
+     * @param  array $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleInvoicePaymentSucceeded(array $payload)
+    {
+        $object = $payload['data']['object'];
+
+        if ($user = $this->getUserByStripeId($object['customer'])) {
+            if ($object['billing_reason'] === 'subscription_create' && $object['status'] === 'paid') {
+                $user->subscriptions->filter(function ($subscription) use ($payload) {
+                    return $subscription->stripe_id === $payload['data']['object']['subscription'];
+                })->each(function ($subscription) {
+                    $subscription->markAsActive();
+                });
+            }
+        }
+
+        return new Response('Webhook Handled', 200);
+    }
+
+    /**
      * Get the billable entity instance by Stripe ID.
      *
      * @param  string  $stripeId

@@ -74,13 +74,44 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription is incomplete.
+     *
+     * @return bool
+     */
+    public function incomplete()
+    {
+        return $this->status === 'incomplete';
+    }
+
+    /**
+     * Filter query by incomplete.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeIncomplete($query)
+    {
+        $query->where('status', 'incomplete');
+    }
+
+    /**
+     * Mark the subscription as incomplete.
+     *
+     * @return void
+     */
+    public function markAsIncomplete()
+    {
+        $this->fill(['status' => 'incomplete'])->save();
+    }
+
+    /**
      * Determine if the subscription is active.
      *
      * @return bool
      */
     public function active()
     {
-        return is_null($this->ends_at) || $this->onGracePeriod();
+        return (is_null($this->ends_at) || $this->onGracePeriod()) && ! $this->incomplete();
     }
 
     /**
@@ -91,9 +122,19 @@ class Subscription extends Model
      */
     public function scopeActive($query)
     {
-        $query->whereNull('ends_at')->orWhere(function ($query) {
+        $query->whereNull('ends_at')->where('status', '!=', 'incomplete')->orWhere(function ($query) {
             $query->onGracePeriod();
         });
+    }
+
+    /**
+     * Mark the subscription as active.
+     *
+     * @return void
+     */
+    public function markAsActive()
+    {
+        $this->fill(['status' => 'active'])->save();
     }
 
     /**

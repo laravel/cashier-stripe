@@ -214,6 +214,7 @@ class SubscriptionBuilder
 
         $subscription = $this->owner->subscriptions()->create([
             'name' => $this->name,
+            'status' => 'active',
             'stripe_id' => $stripeSubscription->id,
             'stripe_plan' => $this->plan,
             'quantity' => $this->quantity,
@@ -222,6 +223,8 @@ class SubscriptionBuilder
         ]);
 
         if ($stripeSubscription->status === 'incomplete') {
+            $subscription->markAsIncomplete();
+
             $paymentIntent = new PaymentIntent($stripeSubscription->latest_invoice->payment_intent);
 
             if ($paymentIntent->requiresPaymentMethod()) {
