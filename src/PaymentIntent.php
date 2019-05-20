@@ -35,7 +35,7 @@ class PaymentIntent
     }
 
     /**
-     * The Stripe PaymentIntent ID.
+     * The Stripe PaymentIntent client secret.
      *
      * @return string
      */
