@@ -2,8 +2,8 @@
 
 namespace Laravel\Cashier\Tests\Unit;
 
-use Laravel\Cashier\Subscription;
 use PHPUnit\Framework\TestCase;
+use Laravel\Cashier\Subscription;
 
 class SubscriptionTest extends TestCase
 {
