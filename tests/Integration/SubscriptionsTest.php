@@ -8,7 +8,9 @@ use Carbon\Carbon;
 use Stripe\Coupon;
 use Stripe\Product;
 use Illuminate\Support\Str;
-use Laravel\Cashier\Exceptions\SubscriptionCreationFailed;
+use Laravel\Cashier\Subscription;
+use Laravel\Cashier\Exceptions\ActionRequired;
+use Laravel\Cashier\Exceptions\PaymentFailure;
 
 class SubscriptionsTest extends IntegrationTestCase
 {
@@ -193,20 +195,37 @@ class SubscriptionsTest extends IntegrationTestCase
         $this->assertEquals(static::$couponId, $subscription->asStripeSubscription()->discount->coupon->id);
     }
 
-    public function test_creating_subscription_fails_when_card_is_declined()
+    public function test_exception_is_thrown_when_card_is_declined()
     {
-        $user = $this->createCustomer('creating_subscription_fails_when_card_is_declined');
+        $user = $this->createCustomer('test_exception_is_thrown_when_card_is_declined');
 
         try {
             $user->newSubscription('main', static::$planId)->create('tok_chargeCustomerFail');
 
-            $this->fail('Expected exception '.SubscriptionCreationFailed::class.' was not thrown.');
-        } catch (SubscriptionCreationFailed $e) {
-            // Assert no subscription was added to the billable entity.
-            $this->assertEmpty($user->subscriptions);
+            $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
+        } catch (PaymentFailure $e) {
+            // Assert subscription was added to the billable entity.
+            $this->assertInstanceOf(Subscription::class, $subscription = $user->subscription('main'));
 
-            // Assert subscription was cancelled.
-            $this->assertEmpty($user->asStripeCustomer()->subscriptions->data);
+            // Assert subscription is incomplete.
+            $this->assertTrue($subscription->incomplete());
+        }
+    }
+
+    public function test_exception_is_thrown_when_card_requires_next_action()
+    {
+        $user = $this->createCustomer('test_exception_is_thrown_when_card_requires_next_action');
+
+        try {
+            $user->newSubscription('main', static::$planId)->create('tok_threeDSecure2Required');
+
+            $this->fail('Expected exception '.ActionRequired::class.' was not thrown.');
+        } catch (ActionRequired $e) {
+            // Assert subscription was added to the billable entity.
+            $this->assertInstanceOf(Subscription::class, $subscription = $user->subscription('main'));
+
+            // Assert subscription is incomplete.
+            $this->assertTrue($subscription->incomplete());
         }
     }
 
@@ -374,12 +393,17 @@ class SubscriptionsTest extends IntegrationTestCase
         $this->assertEquals(static::$couponId, $customer->discount->coupon->id);
     }
 
+    /**
+     * @group Scopes
+     */
     public function test_subscription_state_scopes()
     {
         $user = $this->createCustomer('subscription_state_scopes');
 
+        // Start with an incomplete subscription.
         $subscription = $user->subscriptions()->create([
             'name' => 'yearly',
+            'status' => 'incomplete',
             'stripe_id' => 'xxxx',
             'stripe_plan' => 'stripe-yearly',
             'quantity' => 1,
@@ -387,7 +411,22 @@ class SubscriptionsTest extends IntegrationTestCase
             'ends_at' => null,
         ]);
 
-        // subscription is active
+        // Subscription is incomplete
+        $this->assertTrue($user->subscriptions()->incomplete()->exists());
+        $this->assertFalse($user->subscriptions()->active()->exists());
+        $this->assertFalse($user->subscriptions()->onTrial()->exists());
+        $this->assertTrue($user->subscriptions()->notOnTrial()->exists());
+        $this->assertTrue($user->subscriptions()->recurring()->exists());
+        $this->assertFalse($user->subscriptions()->cancelled()->exists());
+        $this->assertTrue($user->subscriptions()->notCancelled()->exists());
+        $this->assertFalse($user->subscriptions()->onGracePeriod()->exists());
+        $this->assertTrue($user->subscriptions()->notOnGracePeriod()->exists());
+        $this->assertFalse($user->subscriptions()->ended()->exists());
+
+        // Activate.
+        $subscription->update(['status' => 'active']);
+
+        $this->assertFalse($user->subscriptions()->incomplete()->exists());
         $this->assertTrue($user->subscriptions()->active()->exists());
         $this->assertFalse($user->subscriptions()->onTrial()->exists());
         $this->assertTrue($user->subscriptions()->notOnTrial()->exists());
@@ -398,9 +437,10 @@ class SubscriptionsTest extends IntegrationTestCase
         $this->assertTrue($user->subscriptions()->notOnGracePeriod()->exists());
         $this->assertFalse($user->subscriptions()->ended()->exists());
 
-        // put on trial
+        // Put on trial.
         $subscription->update(['trial_ends_at' => Carbon::now()->addDay()]);
 
+        $this->assertFalse($user->subscriptions()->incomplete()->exists());
         $this->assertTrue($user->subscriptions()->active()->exists());
         $this->assertTrue($user->subscriptions()->onTrial()->exists());
         $this->assertFalse($user->subscriptions()->notOnTrial()->exists());
@@ -411,9 +451,10 @@ class SubscriptionsTest extends IntegrationTestCase
         $this->assertTrue($user->subscriptions()->notOnGracePeriod()->exists());
         $this->assertFalse($user->subscriptions()->ended()->exists());
 
-        // put on grace period
+        // Put on grace period.
         $subscription->update(['ends_at' => Carbon::now()->addDay()]);
 
+        $this->assertFalse($user->subscriptions()->incomplete()->exists());
         $this->assertTrue($user->subscriptions()->active()->exists());
         $this->assertTrue($user->subscriptions()->onTrial()->exists());
         $this->assertFalse($user->subscriptions()->notOnTrial()->exists());
@@ -424,9 +465,10 @@ class SubscriptionsTest extends IntegrationTestCase
         $this->assertFalse($user->subscriptions()->notOnGracePeriod()->exists());
         $this->assertFalse($user->subscriptions()->ended()->exists());
 
-        // end subscription
+        // End subscription.
         $subscription->update(['ends_at' => Carbon::now()->subDay()]);
 
+        $this->assertFalse($user->subscriptions()->incomplete()->exists());
         $this->assertFalse($user->subscriptions()->active()->exists());
         $this->assertTrue($user->subscriptions()->onTrial()->exists());
         $this->assertFalse($user->subscriptions()->notOnTrial()->exists());
