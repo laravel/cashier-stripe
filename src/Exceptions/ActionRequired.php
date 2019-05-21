@@ -10,7 +10,7 @@ class ActionRequired extends IncompletePayment
     {
         return new static(
             $paymentIntent,
-            'The payment attempt to pay failed because it needs an extra action before it can be completed.'
+            'The payment attempt failed because it needs an extra action before it can be completed.'
         );
     }
 }

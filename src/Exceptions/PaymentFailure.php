@@ -10,7 +10,7 @@ class PaymentFailure extends IncompletePayment
     {
         return new static(
             $paymentIntent,
-            'The payment attempt to pay failed because there was a card error.'
+            'The payment attempt failed because there was a card error.'
         );
     }
 }
