@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
+use Laravel\Cashier\Exceptions\IncompletePayment;
 use LogicException;
 use DateTimeInterface;
 use Stripe\Error\Card as StripeCard;
@@ -389,6 +390,8 @@ class Subscription extends Model
      * @param  string  $plan
      * @param  array  $options
      * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
     public function swap($plan, $options = [])
     {
@@ -426,18 +429,18 @@ class Subscription extends Model
 
         $subscription->save();
 
-        try {
-            $this->user->invoice(['subscription' => $subscription->id]);
-        } catch (StripeCard $exception) {
-            // When the payment for the plan swap fails, we continue to let the user swap to the
-            // new plan. This is because Stripe may attempt to retry the payment later on. If
-            // all attempts to collect payment fail, webhooks will handle any update to it.
-        }
-
         $this->fill([
             'stripe_plan' => $plan,
             'ends_at' => null,
         ])->save();
+
+        try {
+            $this->user->invoice(['subscription' => $subscription->id]);
+        } catch (IncompletePayment $exception) {
+            $this->markAsIncomplete();
+
+            throw $exception;
+        }
 
         return $this;
     }
