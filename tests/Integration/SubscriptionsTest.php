@@ -195,9 +195,9 @@ class SubscriptionsTest extends IntegrationTestCase
         $this->assertEquals(static::$couponId, $subscription->asStripeSubscription()->discount->coupon->id);
     }
 
-    public function test_exception_is_thrown_when_card_is_declined()
+    public function test_declined_card_during_subscribing_results_in_an_exception()
     {
-        $user = $this->createCustomer('test_exception_is_thrown_when_card_is_declined');
+        $user = $this->createCustomer('declined_card_during_subscribing_results_in_an_exception');
 
         try {
             $user->newSubscription('main', static::$planId)->create('tok_chargeCustomerFail');
@@ -212,9 +212,9 @@ class SubscriptionsTest extends IntegrationTestCase
         }
     }
 
-    public function test_exception_is_thrown_when_card_requires_next_action()
+    public function test_next_action_needed_during_subscribing_results_in_an_exception()
     {
-        $user = $this->createCustomer('test_exception_is_thrown_when_card_requires_next_action');
+        $user = $this->createCustomer('next_action_needed_during_subscribing_results_in_an_exception');
 
         try {
             $user->newSubscription('main', static::$planId)->create('tok_threeDSecure2Required');
@@ -229,20 +229,56 @@ class SubscriptionsTest extends IntegrationTestCase
         }
     }
 
-    public function test_plan_swap_succeeds_even_if_payment_fails()
+    /**
+     * @group Swap
+     */
+    public function test_declined_card_during_plan_swap_results_in_an_exception()
     {
-        $user = $this->createCustomer('plan_swap_succeeds_even_if_payment_fails');
+        $user = $this->createCustomer('declined_card_during_plan_swap_results_in_an_exception');
 
         $subscription = $user->newSubscription('main', static::$planId)->create('tok_visa');
 
         // Set a faulty card as the customer's default card.
         $user->updateCard('tok_chargeCustomerFail');
 
-        // Attempt to swap and pay with a faulty card.
-        $subscription = $subscription->swap(static::$premiumPlanId);
+        try {
+            // Attempt to swap and pay with a faulty card.
+            $subscription = $subscription->swap(static::$premiumPlanId);
 
-        // Assert that the plan was swapped.
-        $this->assertEquals(static::$premiumPlanId, $subscription->stripe_plan);
+            $this->fail('Expected exception '.ActionRequired::class.' was not thrown.');
+        } catch (PaymentFailure $e) {
+            // Assert that the plan was swapped anyway.
+            $this->assertEquals(static::$premiumPlanId, $subscription->refresh()->stripe_plan);
+
+            // Assert subscription is incomplete.
+            $this->assertTrue($subscription->incomplete());
+        }
+    }
+
+    /**
+     * @group Swap
+     */
+    public function test_next_action_needed_during_plan_swap_results_in_an_exception()
+    {
+        $user = $this->createCustomer('next_action_needed_during_plan_swap_results_in_an_exception');
+
+        $subscription = $user->newSubscription('main', static::$planId)->create('tok_visa');
+
+        // Set a card that requires a next action as the customer's default card.
+        $user->updateCard('tok_threeDSecure2Required');
+
+        try {
+            // Attempt to swap and pay with a faulty card.
+            $subscription = $subscription->swap(static::$premiumPlanId);
+
+            $this->fail('Expected exception '.ActionRequired::class.' was not thrown.');
+        } catch (ActionRequired $e) {
+            // Assert that the plan was swapped anyway.
+            $this->assertEquals(static::$premiumPlanId, $subscription->refresh()->stripe_plan);
+
+            // Assert subscription is incomplete.
+            $this->assertTrue($subscription->incomplete());
+        }
     }
 
     public function test_creating_subscription_with_coupons()

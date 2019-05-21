@@ -17,9 +17,9 @@
         @elseif ($paymentIntent->isCancelled())
             <p>{{ __('The payment was cancelled.') }}</p>
         @else
-            <p>{{ __('Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.') }}</p>
-
             <div id="payment-elements">
+                <p>{{ __('Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.') }}</p>
+
                 <input id="cardholder-name" type="text" placeholder="{{ __('Name') }}">
                 <div id="card-element"></div>
 

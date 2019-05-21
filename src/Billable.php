@@ -13,6 +13,10 @@ use Stripe\Invoice as StripeInvoice;
 use Stripe\Customer as StripeCustomer;
 use Stripe\BankAccount as StripeBankAccount;
 use Stripe\InvoiceItem as StripeInvoiceItem;
+use Stripe\Error\Card as StripeCardException;
+use Laravel\Cashier\Exceptions\ActionRequired;
+use Laravel\Cashier\Exceptions\PaymentFailure;
+use Stripe\PaymentIntent as StripePaymentIntent;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -210,6 +214,9 @@ trait Billable
      *
      * @param  array  $options
      * @return \Stripe\Invoice|bool
+     *
+     * @throws \Laravel\Cashier\Exceptions\ActionRequired
+     * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
     public function invoice(array $options = [])
     {
@@ -217,9 +224,24 @@ trait Billable
             $parameters = array_merge($options, ['customer' => $this->stripe_id]);
 
             try {
-                return StripeInvoice::create($parameters, Cashier::stripeOptions())->pay();
+                /** @var \Stripe\Invoice $invoice */
+                $invoice = StripeInvoice::create($parameters, Cashier::stripeOptions());
+
+                return $invoice->pay();
             } catch (StripeErrorInvalidRequest $e) {
                 return false;
+            } catch (StripeCardException $exception) {
+                $stripePaymentIntent = StripePaymentIntent::retrieve(
+                    $invoice->refresh()->payment_intent,
+                    Cashier::stripeOptions()
+                );
+                $paymentIntent = new PaymentIntent($stripePaymentIntent);
+
+                if ($paymentIntent->requiresPaymentMethod()) {
+                    throw PaymentFailure::cardError($paymentIntent);
+                } elseif ($paymentIntent->requiresAction()) {
+                    throw ActionRequired::incomplete($paymentIntent);
+                }
             }
         }
 

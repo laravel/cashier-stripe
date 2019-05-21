@@ -83,6 +83,15 @@ class WebhookController extends Controller
                                 : Carbon::createFromTimestamp($data['current_period_end']);
                 }
 
+                // Status...
+                if (isset($data['status'])) {
+                    if (in_array($data['status'], ['past_due', 'incomplete', 'incomplete_expired'])) {
+                        $subscription->status = 'incomplete';
+                    } else {
+                        $subscription->status = 'active';
+                    }
+                }
+
                 $subscription->save();
             });
         }
@@ -158,29 +167,6 @@ class WebhookController extends Controller
                 'card_brand' => null,
                 'card_last_four' => null,
             ])->save();
-        }
-
-        return new Response('Webhook Handled', 200);
-    }
-
-    /**
-     * Handle invoice payment succeeded.
-     *
-     * @param  array $payload
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function handleInvoicePaymentSucceeded(array $payload)
-    {
-        $object = $payload['data']['object'];
-
-        if ($user = $this->getUserByStripeId($object['customer'])) {
-            if ($object['billing_reason'] === 'subscription_create' && $object['status'] === 'paid') {
-                $user->subscriptions->filter(function ($subscription) use ($payload) {
-                    return $subscription->stripe_id === $payload['data']['object']['subscription'];
-                })->each(function ($subscription) {
-                    $subscription->markAsActive();
-                });
-            }
         }
 
         return new Response('Webhook Handled', 200);
