@@ -118,7 +118,7 @@ class SubscriptionBuilder
      * @param  \Carbon\Carbon  $trialUntil
      * @return $this
      */
-    public function trialUntil(Carbon $trialUntil)
+    public function trialUntil($trialUntil)
     {
         $this->trialExpires = $trialUntil;
 
