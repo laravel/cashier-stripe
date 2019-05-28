@@ -2,6 +2,8 @@
 
 namespace Laravel\Cashier;
 
+use Laravel\Cashier\Exceptions\ActionRequired;
+use Laravel\Cashier\Exceptions\PaymentFailure;
 use Stripe\PaymentIntent as StripePaymentIntent;
 
 class PaymentIntent
@@ -82,6 +84,23 @@ class PaymentIntent
     public function isSucceeded()
     {
         return $this->paymentIntent->status === 'succeeded';
+    }
+
+    /**
+     * Validate if the payment intent was successful and throw an exception if not.
+     *
+     * @return void
+     *
+     * @throws \Laravel\Cashier\Exceptions\ActionRequired
+     * @throws \Laravel\Cashier\Exceptions\PaymentFailure
+     */
+    public function validate()
+    {
+        if ($this->requiresPaymentMethod()) {
+            throw PaymentFailure::cardError($this);
+        } elseif ($this->requiresAction()) {
+            throw ActionRequired::incomplete($this);
+        }
     }
 
     /**

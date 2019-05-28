@@ -4,8 +4,6 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use DateTimeInterface;
-use Laravel\Cashier\Exceptions\ActionRequired;
-use Laravel\Cashier\Exceptions\PaymentFailure;
 
 class SubscriptionBuilder
 {
@@ -198,9 +196,6 @@ class SubscriptionBuilder
      * @param  string|null  $token
      * @param  array  $options
      * @return \Laravel\Cashier\Subscription
-     *
-     * @throws \Laravel\Cashier\Exceptions\ActionRequired
-     * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
     public function create($token = null, array $options = [])
     {
@@ -230,11 +225,7 @@ class SubscriptionBuilder
 
             $paymentIntent = new PaymentIntent($stripeSubscription->latest_invoice->payment_intent);
 
-            if ($paymentIntent->requiresPaymentMethod()) {
-                throw PaymentFailure::cardError($paymentIntent);
-            } elseif ($paymentIntent->requiresAction()) {
-                throw ActionRequired::incomplete($paymentIntent);
-            }
+            $paymentIntent->validate();
         }
 
         return $subscription;
