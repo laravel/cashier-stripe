@@ -8,7 +8,7 @@ use Stripe\Error\SignatureVerification;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Config\Repository as Config;
 
-final class VerifyWebhookSignature
+class VerifyWebhookSignature
 {
     /**
      * The application instance.
