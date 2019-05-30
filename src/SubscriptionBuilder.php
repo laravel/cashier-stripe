@@ -223,9 +223,9 @@ class SubscriptionBuilder
         if ($stripeSubscription->status === 'incomplete') {
             $subscription->markAsIncomplete();
 
-            $paymentIntent = new PaymentIntent($stripeSubscription->latest_invoice->payment_intent);
+            $payment = new Payment($stripeSubscription->latest_invoice->payment_intent);
 
-            $paymentIntent->validate();
+            $payment->validate();
         }
 
         return $subscription;

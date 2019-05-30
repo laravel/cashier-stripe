@@ -2,14 +2,20 @@
 
 namespace Laravel\Cashier\Exceptions;
 
-use Laravel\Cashier\PaymentIntent;
+use Laravel\Cashier\Payment;
 
 class PaymentFailure extends IncompletePayment
 {
-    public static function cardError(PaymentIntent $paymentIntent)
+    /**
+     * Create a new PaymentFailure instance.
+     *
+     * @param  \Laravel\Cashier\Payment  $payment
+     * @return self
+     */
+    public static function cardError(Payment $payment)
     {
         return new self(
-            $paymentIntent,
+            $payment,
             'The payment attempt failed because there was a card error.'
         );
     }

@@ -12,9 +12,9 @@
     <div>
         <h1>{{ __('Payment Confirmation') }}</h1>
 
-        @if ($paymentIntent->isSucceeded())
+        @if ($payment->isSucceeded())
             <p>{{ __('The payment was successful.') }}</p>
-        @elseif ($paymentIntent->isCancelled())
+        @elseif ($payment->isCancelled())
             <p>{{ __('The payment was cancelled.') }}</p>
         @else
             <div id="payment-elements">
@@ -43,7 +43,7 @@
 
                 cardButton.addEventListener('click', function() {
                     stripe.handleCardPayment(
-                        '{{ $paymentIntent->clientSecret() }}', cardElement, {
+                        '{{ $payment->clientSecret() }}', cardElement, {
                             payment_method_data: {
                                 billing_details: { name: cardholderName.value }
                             }

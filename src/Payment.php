@@ -6,7 +6,7 @@ use Laravel\Cashier\Exceptions\ActionRequired;
 use Laravel\Cashier\Exceptions\PaymentFailure;
 use Stripe\PaymentIntent as StripePaymentIntent;
 
-class PaymentIntent
+class Payment
 {
     /**
      * The Stripe PaymentIntent instance.
@@ -16,7 +16,7 @@ class PaymentIntent
     protected $paymentIntent;
 
     /**
-     * Create a new PaymentIntent instance.
+     * Create a new Payment instance.
      *
      * @param  \Stripe\PaymentIntent  $paymentIntent
      * @return void

@@ -4,21 +4,27 @@ namespace Laravel\Cashier\Exceptions;
 
 use Exception;
 use Throwable;
-use Laravel\Cashier\PaymentIntent;
+use Laravel\Cashier\Payment;
 
 class IncompletePayment extends Exception
 {
     /**
-     * The Stripe PaymentIntent object.
+     * The Cashier Payment object.
      *
-     * @var \Laravel\Cashier\PaymentIntent
+     * @var \Laravel\Cashier\Payment
      */
-    public $paymentIntent;
+    public $payment;
 
-    public function __construct(PaymentIntent $paymentIntent, $message = '', $code = 0, Throwable $previous = null)
+    /**
+     * Create a new IncompletePayment instance.
+     *
+     * @param  \Laravel\Cashier\Payment  $payment
+     * @return void
+     */
+    public function __construct(Payment $payment, $message = '', $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
 
-        $this->paymentIntent = $paymentIntent;
+        $this->payment = $payment;
     }
 }

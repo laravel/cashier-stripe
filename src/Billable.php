@@ -24,7 +24,7 @@ trait Billable
      *
      * @param  int  $amount
      * @param  array  $options
-     * @return \Laravel\Cashier\PaymentIntent
+     * @return \Laravel\Cashier\Payment
      * @throws \InvalidArgumentException
      */
     public function charge($amount, array $options = [])
@@ -45,13 +45,13 @@ trait Billable
             throw new InvalidArgumentException('No payment method provided.');
         }
 
-        $paymentIntent = new PaymentIntent(
+        $payment = new Payment(
             StripePaymentIntent::create($options, Cashier::stripeOptions())
         );
 
-        $paymentIntent->validate();
+        $payment->validate();
 
-        return $paymentIntent;
+        return $payment;
     }
 
     /**
@@ -232,11 +232,11 @@ trait Billable
             } catch (StripeErrorInvalidRequest $e) {
                 return false;
             } catch (StripeCardException $exception) {
-                $paymentIntent = new PaymentIntent(
+                $payment = new Payment(
                     StripePaymentIntent::retrieve($invoice->refresh()->payment_intent, Cashier::stripeOptions())
                 );
 
-                $paymentIntent->validate();
+                $payment->validate();
             }
         }
 
