@@ -235,9 +235,6 @@ class SubscriptionsTest extends IntegrationTestCase
         }
     }
 
-    /**
-     * @group Swap
-     */
     public function test_declined_card_during_plan_swap_results_in_an_exception()
     {
         $user = $this->createCustomer('declined_card_during_plan_swap_results_in_an_exception');
@@ -264,9 +261,6 @@ class SubscriptionsTest extends IntegrationTestCase
         }
     }
 
-    /**
-     * @group Swap
-     */
     public function test_next_action_needed_during_plan_swap_results_in_an_exception()
     {
         $user = $this->createCustomer('next_action_needed_during_plan_swap_results_in_an_exception');
@@ -441,9 +435,6 @@ class SubscriptionsTest extends IntegrationTestCase
         $this->assertEquals(static::$couponId, $customer->discount->coupon->id);
     }
 
-    /**
-     * @group Scopes
-     */
     public function test_subscription_state_scopes()
     {
         $user = $this->createCustomer('subscription_state_scopes');
