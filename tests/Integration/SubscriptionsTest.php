@@ -204,6 +204,9 @@ class SubscriptionsTest extends IntegrationTestCase
 
             $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
         } catch (PaymentFailure $e) {
+            // Assert that the payment needs a valid card.
+            $this->assertTrue($e->payment->requiresPaymentMethod());
+
             // Assert subscription was added to the billable entity.
             $this->assertInstanceOf(Subscription::class, $subscription = $user->subscription('main'));
 
@@ -221,6 +224,9 @@ class SubscriptionsTest extends IntegrationTestCase
 
             $this->fail('Expected exception '.ActionRequired::class.' was not thrown.');
         } catch (ActionRequired $e) {
+            // Assert that the payment needs an extra action.
+            $this->assertTrue($e->payment->requiresAction());
+
             // Assert subscription was added to the billable entity.
             $this->assertInstanceOf(Subscription::class, $subscription = $user->subscription('main'));
 
@@ -245,8 +251,11 @@ class SubscriptionsTest extends IntegrationTestCase
             // Attempt to swap and pay with a faulty card.
             $subscription = $subscription->swap(static::$premiumPlanId);
 
-            $this->fail('Expected exception '.ActionRequired::class.' was not thrown.');
+            $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
         } catch (PaymentFailure $e) {
+            // Assert that the payment needs a valid card.
+            $this->assertTrue($e->payment->requiresPaymentMethod());
+
             // Assert that the plan was swapped anyway.
             $this->assertEquals(static::$premiumPlanId, $subscription->refresh()->stripe_plan);
 
@@ -273,6 +282,9 @@ class SubscriptionsTest extends IntegrationTestCase
 
             $this->fail('Expected exception '.ActionRequired::class.' was not thrown.');
         } catch (ActionRequired $e) {
+            // Assert that the payment needs an extra action.
+            $this->assertTrue($e->payment->requiresAction());
+
             // Assert that the plan was swapped anyway.
             $this->assertEquals(static::$premiumPlanId, $subscription->refresh()->stripe_plan);
 

@@ -37,6 +37,16 @@ class Payment
     }
 
     /**
+     * The Stripe PaymentIntent amount.
+     *
+     * @return int
+     */
+    public function amount()
+    {
+        return $this->paymentIntent->amount;
+    }
+
+    /**
      * The Stripe PaymentIntent client secret.
      *
      * @return string
