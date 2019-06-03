@@ -21,9 +21,13 @@
                 </h1>
 
                 @if ($payment->isSucceeded())
-                    <p class="mb-4">{{ __('The payment was successful.') }}</p>
+                    <p class="mb-4">{{ __('This payment was already successfully confirmed.') }}</p>
+
+                    @include('cashier::components.button', ['label' => __('Continue')])
                 @elseif ($payment->isCancelled())
-                    <p class="mb-4">{{ __('The payment was cancelled.') }}</p>
+                    <p class="mb-4">{{ __('This payment was cancelled.') }}</p>
+
+                    @include('cashier::components.button', ['label' => __('Continue')])
                 @else
                     <div id="payment-elements">
                         <p class="mb-4">
@@ -39,12 +43,9 @@
                             {{ __('Confirm Payment') }}
                         </button>
                     </div>
-                @endif
 
-                <a href="{{ $redirect ?? url('/') }}"
-                   class="inline-block w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-center text-gray-800 font-bold rounded">
-                    {{ __('Back') }}
-                </a>
+                    @include('cashier::components.button', ['label' => __('Back')])
+                @endif
 
                 <script>
                     const paymentElements = document.getElementById('payment-elements');
