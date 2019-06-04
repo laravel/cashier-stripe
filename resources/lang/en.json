@@ -1,14 +1,17 @@
 {
     "All rights reserved.": "All rights reserved.",
+    "Confirm Payment": "Confirm Payment",
     "Confirm your :amount payment": "Confirm your :amount payment",
     "Continue": "Continue",
     "Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.": "Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.",
+    "Extra confirmation is needed to process your payment. Please continue to the payment page by clicking on the button below.": "Extra confirmation is needed to process your payment. Please continue to the payment page by clicking on the button below.",
     "Name": "Name",
     "Pay :amount": "Pay :amount",
     "Payment Cancelled": "Payment Cancelled",
     "Payment Confirmation": "Payment Confirmation",
     "Payment Successful": "Payment bla",
     "Please provide your name.": "Please provide your name.",
+    "Thanks": "Thanks",
     "The payment was successful.": "The payment was successful.",
     "This payment was already successfully confirmed.": "This payment was already successfully confirmed.",
     "This payment was cancelled.": "This payment was cancelled."

@@ -6,9 +6,13 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Cashier;
 use Illuminate\Support\Carbon;
+use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpFoundation\Response;
+use Laravel\Cashier\Mail\PaymentActionRequired;
+use Stripe\PaymentIntent as StripePaymentIntent;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 
 class WebhookController extends Controller
@@ -167,6 +171,26 @@ class WebhookController extends Controller
                 'card_brand' => null,
                 'card_last_four' => null,
             ])->save();
+        }
+
+        return new Response('Webhook Handled', 200);
+    }
+
+    /**
+     * Handle payment action required for invoice.
+     *
+     * @param  array $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleInvoicePaymentActionRequired(array $payload)
+    {
+        if (Cashier::$paymentConfirmationEmails &&
+            $user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
+            $payment = new Payment(
+                StripePaymentIntent::retrieve($payload['data']['object']['payment_intent'], Cashier::stripeOptions())
+            );
+
+            Mail::to($user)->send(new PaymentActionRequired($user, $payment));
         }
 
         return new Response('Webhook Handled', 200);

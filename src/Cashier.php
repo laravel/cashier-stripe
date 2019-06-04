@@ -50,6 +50,13 @@ class Cashier
     protected static $formatCurrencyUsing;
 
     /**
+     * Indicates if Cashier will send out emails when extra payment confirmation is needed.
+     *
+     * @var bool
+     */
+    public static $paymentConfirmationEmails = false;
+
+    /**
      * Indicates if Cashier migrations will be run.
      *
      * @var bool
@@ -237,6 +244,18 @@ class Cashier
         }
 
         return static::usesCurrencySymbol().$amount;
+    }
+
+    /**
+     * Configure Cashier to send out payment confirmation emails.
+     *
+     * @return static
+     */
+    public static function enablePaymentConfirmationEmails()
+    {
+        static::$paymentConfirmationEmails = true;
+
+        return new static;
     }
 
     /**
