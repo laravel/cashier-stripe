@@ -11,7 +11,7 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 
-final class VerifyWebhookSignatureTest extends TestCase
+class VerifyWebhookSignatureTest extends TestCase
 {
     public function tearDown()
     {
