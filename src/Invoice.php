@@ -216,7 +216,7 @@ class Invoice
     }
 
     /**
-     * Format the given amount into a string based on the Stripe model's preferences.
+     * Format the given amount into a string based on the Cashier's preferences.
      *
      * @param  int  $amount
      * @return string

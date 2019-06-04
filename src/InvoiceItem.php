@@ -102,7 +102,7 @@ class InvoiceItem
     }
 
     /**
-     * Format the given amount into a string based on the owner model's preferences.
+     * Format the given amount into a string based on Cashier's preferences.
      *
      * @param  int  $amount
      * @return string

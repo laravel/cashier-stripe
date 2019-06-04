@@ -37,11 +37,21 @@ class Payment
     }
 
     /**
-     * The Stripe PaymentIntent amount.
+     * Get the total amount that will be paid.
+     *
+     * @return string
+     */
+    public function amount()
+    {
+        return Cashier::formatAmount($this->rawAmount());
+    }
+
+    /**
+     * Get the raw total amount that will be paid.
      *
      * @return int
      */
-    public function amount()
+    public function rawAmount()
     {
         return $this->paymentIntent->amount;
     }

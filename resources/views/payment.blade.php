@@ -15,20 +15,28 @@
         <div class="w-full max-w-lg">
             <p id="message" class="hidden mb-4 bg-red-400 px-6 py-4 rounded text-white"></p>
 
-            <div class="bg-white rounded-lg shadow-xl p-4 pt-6 mb-5">
-                <h1 class="text-2xl mb-4 font-bold text-center">
-                    {{ __('Payment Confirmation') }}
-                </h1>
-
+            <div class="bg-white rounded-lg shadow-xl p-4 mb-5">
                 @if ($payment->isSucceeded())
+                    <h1 class="text-2xl mt-2 mb-4 font-bold text-center">
+                        {{ __('Payment Successful') }}
+                    </h1>
+
                     <p class="mb-4">{{ __('This payment was already successfully confirmed.') }}</p>
 
                     @include('cashier::components.button', ['label' => __('Continue')])
                 @elseif ($payment->isCancelled())
+                    <h1 class="text-2xl mt-2 mb-4 font-bold text-center">
+                        {{ __('Payment Cancelled') }}
+                    </h1>
+
                     <p class="mb-4">{{ __('This payment was cancelled.') }}</p>
 
                     @include('cashier::components.button', ['label' => __('Continue')])
                 @else
+                    <h1 class="text-2xl mt-2 mb-4 font-bold text-center">
+                        {{ __('Confirm your :amount payment', ['amount' => $payment->amount()]) }}
+                    </h1>
+
                     <div id="payment-elements">
                         <p class="mb-4">
                             {{ __('Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.') }}
@@ -40,7 +48,7 @@
                         <div id="card-element" class="bg-gray-100 rounded px-6 py-4 mb-4"></div>
 
                         <button id="card-button" class="inline-block w-full px-4 py-3 mb-4 bg-blue-600 text-white font-bold rounded hover:bg-blue-500">
-                            {{ __('Confirm Payment') }}
+                            {{ __('Pay :amount', ['amount' => $payment->amount()]) }}
                         </button>
                     </div>
 

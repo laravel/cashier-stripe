@@ -16,7 +16,7 @@ class ChargesTest extends IntegrationTestCase
         $response = $user->charge(1000);
 
         $this->assertInstanceOf(Payment::class, $response);
-        $this->assertEquals(1000, $response->amount());
+        $this->assertEquals(1000, $response->rawAmount());
     }
 
     public function test_customer_can_be_charged_and_invoiced_immediately()
@@ -59,7 +59,7 @@ class ChargesTest extends IntegrationTestCase
             $this->assertTrue($e->payment->requiresAction());
 
             // Assert that the payment was for the correct amount.
-            $this->assertEquals(1000, $e->payment->amount());
+            $this->assertEquals(1000, $e->payment->rawAmount());
         }
     }
 }
