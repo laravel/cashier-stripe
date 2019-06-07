@@ -36,7 +36,7 @@ trait Billable
 
         $options['amount'] = $amount;
 
-        if (! array_key_exists('source', $options) && $this->stripe_id) {
+        if ($this->stripe_id) {
             $options['customer'] = $this->stripe_id;
         }
 
