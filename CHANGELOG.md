@@ -1,9 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v9.3.2...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v9.3.3...master)
 
 ### Added
 - Allow Carbon 2 ([#607](https://github.com/laravel/cashier/pull/607))
+
+
+## [v9.3.3 (2019-06-14)](https://github.com/laravel/cashier/compare/v9.3.2...v9.3.3)
+
+### Fixed
+- Fix hasStartingBalance and subtotal on `Invoice` ([#684](https://github.com/laravel/cashier/pull/684))
 
 
 ## [v9.3.2 (2019-06-04)](https://github.com/laravel/cashier/compare/v9.3.1...v9.3.2)

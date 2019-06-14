@@ -78,7 +78,7 @@ class Invoice
     public function subtotal()
     {
         return $this->formatAmount(
-            max(0, $this->invoice->subtotal - $this->rawStartingBalance())
+            max(0, $this->invoice->subtotal - ($this->rawStartingBalance() * -1))
         );
     }
 
@@ -89,7 +89,7 @@ class Invoice
      */
     public function hasStartingBalance()
     {
-        return $this->rawStartingBalance() > 0;
+        return $this->rawStartingBalance() < 0;
     }
 
     /**
