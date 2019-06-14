@@ -2,8 +2,11 @@
 
 namespace Laravel\Cashier;
 
-use Exception;
-use Illuminate\Support\Str;
+use Money\Money;
+use Money\Currency;
+use NumberFormatter;
+use Money\Currencies\ISOCurrencies;
+use Money\Formatter\IntlMoneyFormatter;
 
 class Cashier
 {
@@ -36,11 +39,14 @@ class Cashier
     protected static $currency = 'usd';
 
     /**
-     * The current currency symbol.
+     * The locale used to format money values.
+     *
+     * To use more locales besides the default "en" locale, make
+     * sure you have the ext-intl installed on your environment.
      *
      * @var string
      */
-    protected static $currencySymbol = '$';
+    protected static $currencyLocale = 'en';
 
     /**
      * The custom currency formatter.
@@ -142,38 +148,11 @@ class Cashier
      * Set the currency to be used when billing Stripe models.
      *
      * @param  string  $currency
-     * @param  string|null  $symbol
      * @return void
-     * @throws \Exception
      */
-    public static function useCurrency($currency, $symbol = null)
+    public static function useCurrency($currency)
     {
         static::$currency = $currency;
-
-        static::useCurrencySymbol($symbol ?: static::guessCurrencySymbol($currency));
-    }
-
-    /**
-     * Guess the currency symbol for the given currency.
-     *
-     * @param  string  $currency
-     * @return string
-     * @throws \Exception
-     */
-    protected static function guessCurrencySymbol($currency)
-    {
-        switch (strtolower($currency)) {
-            case 'usd':
-            case 'aud':
-            case 'cad':
-                return '$';
-            case 'eur':
-                return '€';
-            case 'gbp':
-                return '£';
-            default:
-                throw new Exception('Unable to guess symbol for currency. Please explicitly specify it.');
-        }
     }
 
     /**
@@ -187,24 +166,14 @@ class Cashier
     }
 
     /**
-     * Set the currency symbol to be used when formatting currency.
+     * Set the currency locale to format money.
      *
-     * @param  string  $symbol
+     * @param  string  $currencyLocale
      * @return void
      */
-    public static function useCurrencySymbol($symbol)
+    public static function useCurrencyLocale($currencyLocale)
     {
-        static::$currencySymbol = $symbol;
-    }
-
-    /**
-     * Get the currency symbol currently in use.
-     *
-     * @return string
-     */
-    public static function usesCurrencySymbol()
-    {
-        return static::$currencySymbol;
+        static::$currencyLocale = $currencyLocale;
     }
 
     /**
@@ -222,21 +191,21 @@ class Cashier
      * Format the given amount into a displayable currency.
      *
      * @param  int  $amount
+     * @param  string|null  $currency
      * @return string
      */
-    public static function formatAmount($amount)
+    public static function formatAmount($amount, $currency = null)
     {
         if (static::$formatCurrencyUsing) {
-            return call_user_func(static::$formatCurrencyUsing, $amount);
+            return call_user_func(static::$formatCurrencyUsing, $amount, $currency);
         }
 
-        $amount = number_format($amount / 100, 2);
+        $money = new Money($amount, new Currency(strtoupper($currency ?? static::usesCurrency())));
 
-        if (Str::startsWith($amount, '-')) {
-            return '-'.static::usesCurrencySymbol().ltrim($amount, '-');
-        }
+        $numberFormatter = new NumberFormatter(static::$currencyLocale, NumberFormatter::CURRENCY);
+        $moneyFormatter = new IntlMoneyFormatter($numberFormatter, new ISOCurrencies());
 
-        return static::usesCurrencySymbol().$amount;
+        return $moneyFormatter->format($money);
     }
 
     /**
