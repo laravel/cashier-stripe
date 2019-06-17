@@ -102,14 +102,14 @@ class InvoiceItem
     }
 
     /**
-     * Format the given amount into a string based on the owner model's preferences.
+     * Format the given amount into a displayable currency.
      *
      * @param  int  $amount
      * @return string
      */
     protected function formatAmount($amount)
     {
-        return Cashier::formatAmount($amount);
+        return Cashier::formatAmount($amount, $this->item->currency);
     }
 
     /**

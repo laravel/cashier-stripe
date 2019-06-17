@@ -23,14 +23,19 @@
         "illuminate/routing": "~5.8.0|~5.9.0",
         "illuminate/support": "~5.8.0|~5.9.0",
         "illuminate/view": "~5.8.0|~5.9.0",
+        "moneyphp/money": "^3.2",
         "nesbot/carbon": "^1.26.3|^2.0",
         "stripe/stripe-php": "^6.0",
-        "symfony/http-kernel": "^4.2"
+        "symfony/http-kernel": "^4.2",
+        "symfony/intl": "^4.3"
     },
     "require-dev": {
         "mockery/mockery": "^1.0",
         "orchestra/testbench": "^3.8",
         "phpunit/phpunit": "^7.5"
+    },
+    "suggest": {
+        "ext-intl": "Allows for more locales besides the default \"en\" when formatting money values."
     },
     "autoload": {
         "psr-4": {
