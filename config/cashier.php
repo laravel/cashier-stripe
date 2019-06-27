@@ -8,9 +8,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | The Stripe publishable key and secret key give you access to Stripe's
-    | API. The Publishable key allows you to interact with public requests
-    | like the Stripe.js widgets and the secret key allows you to perform
-    | signed requests to retrieve and write your private dashboard data.
+    | API. The "publishable" key is typically used when interacting with
+    | Stripe.js while the "secret" key accesses private API endpoints.
     |
     */
 
@@ -23,8 +22,9 @@ return [
     | Stripe Webhooks
     |--------------------------------------------------------------------------
     |
-    | These settings control the webhook secret and tolerance level for
-    | incoming Stripe webhook requests.
+    | Your Stripe webhook secret is used to prevent unauthorized requests to
+    | your Stripe webhook handling contorllers. The tolerance setting will
+    | check the drift between the current time and the signed request's.
     |
     */
 
@@ -38,9 +38,9 @@ return [
     | Cashier Model
     |--------------------------------------------------------------------------
     |
-    | This is the model in your all that will implement the Billable trait.
-    | It'll be the primary model to perform Cashier related methods on and
-    | where subscriptions get attached to.
+    | This is the model in your all that will implements the Billable trait
+    | within the application. It will serve as the primary model you use
+    | when interacting with Cashier related methods and subscriptions.
     |
     */
 
@@ -51,7 +51,9 @@ return [
     | Currency
     |--------------------------------------------------------------------------
     |
-    | This is the default currency that'll be used to make charges with.
+    | This is the default currency that will be used when generating charges
+    | from your application. Of course, you are welcome to use any of the
+    | various world currencies that are currently supported via Stripe.
     |
     */
 
@@ -62,9 +64,9 @@ return [
     | Currency Locale
     |--------------------------------------------------------------------------
     |
-    | This is the default locale in which your money values are formatted in.
-    | To use other locales besides the default "en" locale, make sure you have
-    | the ext-intl installed on your environment.
+    | This is the default locale in which your money values are formatted in
+    | for display. To utilize other locales besides the default en locale
+    | verify you have the "intl" PHP extension installed on the system.
     |
     */
 
