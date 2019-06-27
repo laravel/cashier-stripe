@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Http\Controllers;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Laravel\Cashier\Cashier;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Subscription;
 use Illuminate\Routing\Controller;
@@ -20,7 +19,7 @@ class WebhookController extends Controller
      */
     public function __construct()
     {
-        if (config('services.stripe.webhook.secret')) {
+        if (config('cashier.webhook.secret')) {
             $this->middleware(VerifyWebhookSignature::class);
         }
     }
@@ -171,7 +170,7 @@ class WebhookController extends Controller
      */
     protected function getUserByStripeId($stripeId)
     {
-        $model = Cashier::stripeModel();
+        $model = config('cashier.model');
 
         return (new $model)->where('stripe_id', $stripeId)->first();
     }

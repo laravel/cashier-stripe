@@ -50,8 +50,8 @@ class VerifyWebhookSignature
             WebhookSignature::verifyHeader(
                 $request->getContent(),
                 $request->header('Stripe-Signature'),
-                $this->config->get('services.stripe.webhook.secret'),
-                $this->config->get('services.stripe.webhook.tolerance')
+                $this->config->get('cashier.webhook.secret'),
+                $this->config->get('cashier.webhook.tolerance')
             );
         } catch (SignatureVerification $exception) {
             $this->app->abort(403);

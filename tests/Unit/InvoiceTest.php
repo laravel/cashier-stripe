@@ -7,13 +7,13 @@ use Carbon\Carbon;
 use Stripe\Discount;
 use Carbon\CarbonTimeZone;
 use Laravel\Cashier\Invoice;
-use PHPUnit\Framework\TestCase;
+use Laravel\Cashier\Tests\TestCase;
 use Stripe\Invoice as StripeInvoice;
 use Laravel\Cashier\Tests\Fixtures\User;
 
 class InvoiceTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
 

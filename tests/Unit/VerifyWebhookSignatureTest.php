@@ -79,8 +79,8 @@ class VerifierMock
     {
         $this->app = m::mock(Application::class);
         $this->config = m::mock(Config::class);
-        $this->config->shouldReceive('get')->with('services.stripe.webhook.secret')->andReturn($webhookSecret);
-        $this->config->shouldReceive('get')->with('services.stripe.webhook.tolerance')->andReturn(300);
+        $this->config->shouldReceive('get')->with('cashier.webhook.secret')->andReturn($webhookSecret);
+        $this->config->shouldReceive('get')->with('cashier.webhook.tolerance')->andReturn(300);
         $this->request = new Request([], [], [], [], [], [], 'Signed Body');
     }
 
