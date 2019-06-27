@@ -50,10 +50,35 @@ class WebhooksTest extends IntegrationTestCase
         static::deleteStripeResource(new Product(static::$productId));
     }
 
+    public function test_cancelled_subscription_is_properly_reactivated()
+    {
+        $user = $this->createCustomer('cancelled_subscription_is_properly_reactivated');
+        $subscription = $user->newSubscription('main', static::$planId)->create('tok_visa');
+        $subscription->cancel();
+
+        $this->assertTrue($subscription->cancelled());
+
+        $this->postJson('stripe/webhook', [
+            'id' => 'foo',
+            'type' => 'customer.subscription.updated',
+            'data' => [
+                'object' => [
+                    'id' => $subscription->stripe_id,
+                    'customer' => $user->stripe_id,
+                    'cancel_at_period_end' => false,
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertFalse($subscription->fresh()->cancelled(), 'Subscription is still cancelled.');
+    }
+
     public function test_subscription_is_marked_as_cancelled_when_deleted_in_stripe()
     {
         $user = $this->createCustomer('subscription_is_marked_as_cancelled_when_deleted_in_stripe');
         $subscription = $user->newSubscription('main', static::$planId)->create('tok_visa');
+
+        $this->assertFalse($subscription->cancelled());
 
         $this->postJson('stripe/webhook', [
             'id' => 'foo',
@@ -66,6 +91,6 @@ class WebhooksTest extends IntegrationTestCase
             ],
         ])->assertOk();
 
-        $this->assertTrue($user->fresh()->subscription('main')->cancelled());
+        $this->assertTrue($subscription->fresh()->cancelled(), 'Subscription is still active.');
     }
 }
