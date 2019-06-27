@@ -5,9 +5,8 @@ namespace Laravel\Cashier\Tests\Integration;
 use Stripe\Stripe;
 use Stripe\ApiResource;
 use Stripe\Error\InvalidRequest;
-use Orchestra\Testbench\TestCase;
+use Laravel\Cashier\Tests\TestCase;
 use Laravel\Cashier\Tests\Fixtures\User;
-use Laravel\Cashier\CashierServiceProvider;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 abstract class IntegrationTestCase extends TestCase
@@ -33,11 +32,6 @@ abstract class IntegrationTestCase extends TestCase
         $this->loadLaravelMigrations();
 
         $this->artisan('migrate')->run();
-    }
-
-    protected function getPackageProviders($app)
-    {
-        return [CashierServiceProvider::class];
     }
 
     protected static function deleteStripeResource(ApiResource $resource)

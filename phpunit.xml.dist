@@ -16,6 +16,6 @@
     </testsuites>
     <php>
         <env name="DB_CONNECTION" value="testing"/>
-        <env name="STRIPE_MODEL" value="Laravel\Cashier\Tests\Fixtures\User"/>
+        <env name="CASHIER_MODEL" value="Laravel\Cashier\Tests\Fixtures\User"/>
     </php>
 </phpunit>
