@@ -16,7 +16,7 @@ class PaymentFailure extends IncompletePayment
     {
         return new self(
             $payment,
-            'The payment attempt failed because there was a card error.'
+            'The payment attempt failed because of a card error.'
         );
     }
 }

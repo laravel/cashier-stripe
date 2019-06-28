@@ -122,9 +122,11 @@ class Subscription extends Model
      */
     public function scopeActive($query)
     {
-        $query->whereNull('ends_at')->where('status', '!=', 'incomplete')->orWhere(function ($query) {
-            $query->onGracePeriod();
-        });
+        $query->whereNull('ends_at')
+                ->where('status', '!=', 'incomplete')
+                ->orWhere(function ($query) {
+                    $query->onGracePeriod();
+                });
     }
 
     /**

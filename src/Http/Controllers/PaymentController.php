@@ -10,20 +10,18 @@ use Stripe\PaymentIntent as StripePaymentIntent;
 class PaymentController extends Controller
 {
     /**
-     * Handle a Stripe PaymentIntent.
+     * Display the form to gather additional payment verification for the given payment.
      *
      * @param  string  $id
      * @return \Illuminate\View\View
      */
     public function show($id)
     {
-        $payment = new Payment(
-            StripePaymentIntent::retrieve($id, Cashier::stripeOptions())
-        );
-
         return view('cashier::payment', [
             'stripeKey' => config('cashier.key'),
-            'payment' => $payment,
+            'payment' => new Payment(
+                StripePaymentIntent::retrieve($id, Cashier::stripeOptions())
+            ),
             'redirect' => request('redirect'),
         ]);
     }

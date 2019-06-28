@@ -15,12 +15,14 @@ class ConfirmPayment extends Mailable
     public $owner;
 
     /**
+     * The payment instance.
+     *
      * @var \Laravel\Cashier\Payment
      */
     public $payment;
 
     /**
-     * Create a new ConfirmPayment instance.
+     * Create a new payment confirmation mailable.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @param  \Laravel\Cashier\Payment $payment
@@ -40,6 +42,6 @@ class ConfirmPayment extends Mailable
     public function build()
     {
         return $this->subject(__('Confirm Payment'))
-            ->markdown('cashier::emails.confirm_payment');
+                        ->markdown('cashier::emails.confirm_payment');
     }
 }

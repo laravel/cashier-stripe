@@ -223,9 +223,9 @@ class SubscriptionBuilder
         if ($stripeSubscription->status === 'incomplete') {
             $subscription->markAsIncomplete();
 
-            $payment = new Payment($stripeSubscription->latest_invoice->payment_intent);
-
-            $payment->validate();
+            (new Payment(
+                $stripeSubscription->latest_invoice->payment_intent
+            ))->validate();
         }
 
         return $subscription;
@@ -259,12 +259,12 @@ class SubscriptionBuilder
         return array_filter([
             'billing_cycle_anchor' => $this->billingCycleAnchor,
             'coupon' => $this->coupon,
+            'expand' => ['latest_invoice.payment_intent'],
             'metadata' => $this->metadata,
             'plan' => $this->plan,
             'quantity' => $this->quantity,
             'tax_percent' => $this->getTaxPercentageForPayload(),
             'trial_end' => $this->getTrialEndForPayload(),
-            'expand' => ['latest_invoice.payment_intent'],
         ]);
     }
 
