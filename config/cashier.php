@@ -23,7 +23,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Your Stripe webhook secret is used to prevent unauthorized requests to
-    | your Stripe webhook handling contorllers. The tolerance setting will
+    | your Stripe webhook handling controllers. The tolerance setting will
     | check the drift between the current time and the signed request's.
     |
     */
