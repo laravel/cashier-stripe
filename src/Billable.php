@@ -7,12 +7,12 @@ use InvalidArgumentException;
 use Stripe\Card as StripeCard;
 use Stripe\Token as StripeToken;
 use Illuminate\Support\Collection;
-use Stripe\Charge as StripeCharge;
-use Stripe\Refund as StripeRefund;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\Customer as StripeCustomer;
 use Stripe\BankAccount as StripeBankAccount;
 use Stripe\InvoiceItem as StripeInvoiceItem;
+use Stripe\Error\Card as StripeCardException;
+use Stripe\PaymentIntent as StripePaymentIntent;
 use Laravel\Cashier\Exceptions\InvalidStripeCustomer;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -25,12 +25,14 @@ trait Billable
      *
      * @param  int  $amount
      * @param  array  $options
-     * @return \Stripe\Charge
+     * @return \Laravel\Cashier\Payment
      * @throws \InvalidArgumentException
      */
     public function charge($amount, array $options = [])
     {
         $options = array_merge([
+            'confirmation_method' => 'automatic',
+            'confirm' => true,
             'currency' => $this->preferredCurrency(),
         ], $options);
 
@@ -40,26 +42,32 @@ trait Billable
             $options['customer'] = $this->stripe_id;
         }
 
-        if (! array_key_exists('source', $options) && ! array_key_exists('customer', $options)) {
-            throw new InvalidArgumentException('No payment source provided.');
+        if (! array_key_exists('payment_method', $options) && ! array_key_exists('customer', $options)) {
+            throw new InvalidArgumentException('No payment method provided.');
         }
 
-        return StripeCharge::create($options, Cashier::stripeOptions());
+        $payment = new Payment(
+            StripePaymentIntent::create($options, Cashier::stripeOptions())
+        );
+
+        $payment->validate();
+
+        return $payment;
     }
 
     /**
      * Refund a customer for a charge.
      *
-     * @param  string  $charge
+     * @param  string  $paymentIntent
      * @param  array  $options
      * @return \Stripe\Refund
      * @throws \InvalidArgumentException
      */
-    public function refund($charge, array $options = [])
+    public function refund($paymentIntent, array $options = [])
     {
-        $options['charge'] = $charge;
+        $intent = StripePaymentIntent::retrieve($paymentIntent, Cashier::stripeOptions());
 
-        return StripeRefund::create($options, Cashier::stripeOptions());
+        return $intent->charges->data[0]->refund($options);
     }
 
     /**
@@ -217,9 +225,18 @@ trait Billable
         $parameters = array_merge($options, ['customer' => $this->stripe_id]);
 
         try {
-            return StripeInvoice::create($parameters, Cashier::stripeOptions())->pay();
+            /** @var \Stripe\Invoice $invoice */
+            $invoice = StripeInvoice::create($parameters, Cashier::stripeOptions());
+
+            return $invoice->pay();
         } catch (StripeErrorInvalidRequest $e) {
             return false;
+        } catch (StripeCardException $exception) {
+            $payment = new Payment(
+                StripePaymentIntent::retrieve($invoice->refresh()->payment_intent, Cashier::stripeOptions())
+            );
+
+            $payment->validate();
         }
     }
 

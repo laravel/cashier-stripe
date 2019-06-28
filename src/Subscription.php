@@ -5,8 +5,8 @@ namespace Laravel\Cashier;
 use Carbon\Carbon;
 use LogicException;
 use DateTimeInterface;
-use Stripe\Error\Card as StripeCard;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Cashier\Exceptions\IncompletePayment;
 
 class Subscription extends Model
 {
@@ -74,13 +74,44 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription is incomplete.
+     *
+     * @return bool
+     */
+    public function incomplete()
+    {
+        return $this->status === 'incomplete';
+    }
+
+    /**
+     * Filter query by incomplete.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeIncomplete($query)
+    {
+        $query->where('status', 'incomplete');
+    }
+
+    /**
+     * Mark the subscription as incomplete.
+     *
+     * @return void
+     */
+    public function markAsIncomplete()
+    {
+        $this->fill(['status' => 'incomplete'])->save();
+    }
+
+    /**
      * Determine if the subscription is active.
      *
      * @return bool
      */
     public function active()
     {
-        return is_null($this->ends_at) || $this->onGracePeriod();
+        return (is_null($this->ends_at) || $this->onGracePeriod()) && ! $this->incomplete();
     }
 
     /**
@@ -91,9 +122,19 @@ class Subscription extends Model
      */
     public function scopeActive($query)
     {
-        $query->whereNull('ends_at')->orWhere(function ($query) {
+        $query->whereNull('ends_at')->where('status', '!=', 'incomplete')->orWhere(function ($query) {
             $query->onGracePeriod();
         });
+    }
+
+    /**
+     * Mark the subscription as active.
+     *
+     * @return void
+     */
+    public function markAsActive()
+    {
+        $this->fill(['status' => 'active'])->save();
     }
 
     /**
@@ -348,6 +389,8 @@ class Subscription extends Model
      * @param  string  $plan
      * @param  array  $options
      * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
     public function swap($plan, $options = [])
     {
@@ -385,18 +428,18 @@ class Subscription extends Model
 
         $subscription->save();
 
-        try {
-            $this->user->invoice(['subscription' => $subscription->id]);
-        } catch (StripeCard $exception) {
-            // When the payment for the plan swap fails, we continue to let the user swap to the
-            // new plan. This is because Stripe may attempt to retry the payment later on. If
-            // all attempts to collect payment fail, webhooks will handle any update to it.
-        }
-
         $this->fill([
             'stripe_plan' => $plan,
             'ends_at' => null,
         ])->save();
+
+        try {
+            $this->user->invoice(['subscription' => $subscription->id]);
+        } catch (IncompletePayment $exception) {
+            $this->markAsIncomplete();
+
+            throw $exception;
+        }
 
         return $this;
     }
