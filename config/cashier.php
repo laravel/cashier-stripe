@@ -74,6 +74,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Payment Confirmation Emails
+    |--------------------------------------------------------------------------
+    |
+    | With this setting turned on, Cashier will auto notify your customers by email
+    | when their off-session payment fails. Make sure you have your webhooks set
+    | up properly to listen to the sent invoice.payment_action_required event.
+    |
+    */
+
+    'payment_emails' => env('CASHIER_PAYMENT_EMAILS', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Cashier Path
     |--------------------------------------------------------------------------
     |
