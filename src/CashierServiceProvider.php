@@ -50,7 +50,7 @@ class CashierServiceProvider extends ServiceProvider
     protected function registerRoutes()
     {
         Route::group([
-            'prefix' => 'stripe',
+            'prefix' => config('cashier.path'),
             'namespace' => 'Laravel\Cashier\Http\Controllers',
             'as' => 'cashier.',
         ], function () {
@@ -65,6 +65,7 @@ class CashierServiceProvider extends ServiceProvider
      */
     protected function registerResources()
     {
+        $this->loadJsonTranslationsFrom(__DIR__.'/../resources/lang');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cashier');
     }
 

@@ -72,4 +72,17 @@ return [
 
     'currency_locale' => env('CASHIER_CURRENCY_LOCALE', 'en'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cashier Path
+    |--------------------------------------------------------------------------
+    |
+    | This is the URI path where Cashier will be accessible from. Feel free
+    | to change this path to anything you like. Note that the URI will not
+    | affect the paths of its internal API that aren't exposed to users.
+    |
+    */
+
+    'path' => env('CASHIER_PATH', 'stripe'),
+
 ];
