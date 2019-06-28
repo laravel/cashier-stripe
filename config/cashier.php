@@ -77,9 +77,9 @@ return [
     | Payment Confirmation Emails
     |--------------------------------------------------------------------------
     |
-    | With this setting turned on, Cashier will auto notify your customers by email
-    | when their off-session payment fails. Make sure you have your webhooks set
-    | up properly to listen to the sent invoice.payment_action_required event.
+    | When this option is enabled, Cashier will automatically email customers
+    | whose payments require additional verification. You should listen to
+    | Stripe's webhooks in order for this feature to function correctly.
     |
     */
 
@@ -90,9 +90,9 @@ return [
     | Cashier Path
     |--------------------------------------------------------------------------
     |
-    | This is the URI path where Cashier will be accessible from. Feel free
-    | to change this path to anything you like. Note that the URI will not
-    | affect the paths of its internal API that aren't exposed to users.
+    | This is the base URI path where Cashier's views, such as the payment
+    | verification screen, will be available from. You're free to tweak
+    | this path according to your preferences and application design.
     |
     */
 
