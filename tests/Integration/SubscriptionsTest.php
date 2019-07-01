@@ -287,6 +287,44 @@ class SubscriptionsTest extends IntegrationTestCase
         }
     }
 
+    public function test_downgrade_with_faulty_card_does_not_incomplete_subscription()
+    {
+        $user = $this->createCustomer('downgrade_with_faulty_card_does_not_incomplete_subscription');
+
+        $subscription = $user->newSubscription('main', static::$premiumPlanId)->create('tok_visa');
+
+        // Set a card that requires a next action as the customer's default card.
+        $user->updateCard('tok_chargeCustomerFail');
+
+        // Attempt to swap and pay with a faulty card.
+        $subscription = $subscription->swap(static::$planId);
+
+        // Assert that the plan was swapped anyway.
+        $this->assertEquals(static::$planId, $subscription->refresh()->stripe_plan);
+
+        // Assert subscription is still active.
+        $this->assertTrue($subscription->active());
+    }
+
+    public function test_downgrade_with_3d_secure_does_not_incomplete_subscription()
+    {
+        $user = $this->createCustomer('downgrade_with_3d_secure_does_not_incomplete_subscription');
+
+        $subscription = $user->newSubscription('main', static::$premiumPlanId)->create('tok_visa');
+
+        // Set a card that requires a next action as the customer's default card.
+        $user->updateCard('tok_threeDSecure2Required');
+
+        // Attempt to swap and pay with a faulty card.
+        $subscription = $subscription->swap(static::$planId);
+
+        // Assert that the plan was swapped anyway.
+        $this->assertEquals(static::$planId, $subscription->refresh()->stripe_plan);
+
+        // Assert subscription is still active.
+        $this->assertTrue($subscription->active());
+    }
+
     public function test_creating_subscription_with_coupons()
     {
         $user = $this->createCustomer('creating_subscription_with_coupons');
