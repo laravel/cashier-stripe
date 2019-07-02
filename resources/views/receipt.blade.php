@@ -8,34 +8,36 @@
 
     <style>
         body {
-            background: #fff;
-            background-image: none;
+            background: #fff none;
             font-size: 12px;
         }
-        address{
-            margin-top:15px;
-        }
+
         h2 {
-            font-size:28px;
-            color:#cccccc;
+            font-size: 28px;
+            color: #ccc;
         }
+
         .container {
-            padding-top:30px;
+            padding-top: 30px;
         }
+
         .invoice-head td {
             padding: 0 8px;
         }
+
         .table th {
             vertical-align: bottom;
             font-weight: bold;
             padding: 8px;
             line-height: 20px;
             text-align: left;
-            border-bottom: 1px solid #dddddd;
+            border-bottom: 1px solid #ddd;
         }
+
         .table tr.row td {
-            border-bottom: 1px solid #dddddd;
+            border-bottom: 1px solid #ddd;
         }
+
         .table td {
             padding: 8px;
             line-height: 20px;
@@ -46,7 +48,7 @@
 </head>
 <body>
 <div class="container">
-    <table style="margin-left: auto; margin-right: auto" width="550">
+    <table style="margin-left: auto; margin-right: auto;" width="550">
         <tr>
             <td width="160">
                 &nbsp;
@@ -58,8 +60,8 @@
             </td>
         </tr>
         <tr valign="top">
-            <td style="font-size:28px;color:#cccccc;">
-                    Receipt
+            <td style="font-size: 28px; color: #ccc;">
+                Receipt
             </td>
 
             <!-- Organization Name / Date -->
@@ -74,18 +76,23 @@
             <!-- Organization Details -->
             <td style="font-size:9px;">
                 {{ $vendor }}<br>
+
                 @if (isset($street))
                     {{ $street }}<br>
                 @endif
+
                 @if (isset($location))
                     {{ $location }}<br>
                 @endif
+
                 @if (isset($phone))
                     <strong>T</strong> {{ $phone }}<br>
                 @endif
+
                 @if (isset($vendorVat))
                     {{ $vendorVat }}<br>
                 @endif
+
                 @if (isset($url))
                     <a href="{{ $url }}">{{ $url }}</a>
                 @endif
