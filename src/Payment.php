@@ -93,7 +93,7 @@ class Payment
      */
     public function isCancelled()
     {
-        return $this->paymentIntent->status === 'cancelled';
+        return $this->paymentIntent->status === 'canceled';
     }
 
     /**
