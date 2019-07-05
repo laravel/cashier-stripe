@@ -4,7 +4,6 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use DateTimeInterface;
-use Laravel\Cashier\Exceptions\SubscriptionCreationFailed;
 
 class SubscriptionBuilder
 {
@@ -202,13 +201,8 @@ class SubscriptionBuilder
     {
         $customer = $this->getStripeCustomer($token, $options);
 
-        $subscription = $customer->subscriptions->create($this->buildPayload());
-
-        if (in_array($subscription->status, ['incomplete', 'incomplete_expired'])) {
-            $subscription->cancel();
-
-            throw SubscriptionCreationFailed::incomplete($subscription);
-        }
+        /** @var \Stripe\Subscription $stripeSubscription */
+        $stripeSubscription = $customer->subscriptions->create($this->buildPayload());
 
         if ($this->skipTrial) {
             $trialEndsAt = null;
@@ -216,14 +210,25 @@ class SubscriptionBuilder
             $trialEndsAt = $this->trialExpires;
         }
 
-        return $this->owner->subscriptions()->create([
+        $subscription = $this->owner->subscriptions()->create([
             'name' => $this->name,
-            'stripe_id' => $subscription->id,
+            'status' => 'active',
+            'stripe_id' => $stripeSubscription->id,
             'stripe_plan' => $this->plan,
             'quantity' => $this->quantity,
             'trial_ends_at' => $trialEndsAt,
             'ends_at' => null,
         ]);
+
+        if ($stripeSubscription->status === 'incomplete') {
+            $subscription->markAsIncomplete();
+
+            (new Payment(
+                $stripeSubscription->latest_invoice->payment_intent
+            ))->validate();
+        }
+
+        return $subscription;
     }
 
     /**
@@ -254,6 +259,7 @@ class SubscriptionBuilder
         return array_filter([
             'billing_cycle_anchor' => $this->billingCycleAnchor,
             'coupon' => $this->coupon,
+            'expand' => ['latest_invoice.payment_intent'],
             'metadata' => $this->metadata,
             'plan' => $this->plan,
             'quantity' => $this->quantity,

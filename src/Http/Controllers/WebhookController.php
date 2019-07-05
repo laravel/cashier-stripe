@@ -4,10 +4,15 @@ namespace Laravel\Cashier\Http\Controllers;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Payment;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Subscription;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Mail;
+use Laravel\Cashier\Mail\ConfirmPayment;
 use Symfony\Component\HttpFoundation\Response;
+use Stripe\PaymentIntent as StripePaymentIntent;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 
 class WebhookController extends Controller
@@ -86,6 +91,15 @@ class WebhookController extends Controller
                     }
                 }
 
+                // Status...
+                if (isset($data['status'])) {
+                    if (in_array($data['status'], ['incomplete', 'incomplete_expired'])) {
+                        $subscription->status = 'incomplete';
+                    } else {
+                        $subscription->status = 'active';
+                    }
+                }
+
                 $subscription->save();
             });
         }
@@ -161,6 +175,26 @@ class WebhookController extends Controller
                 'card_brand' => null,
                 'card_last_four' => null,
             ])->save();
+        }
+
+        return new Response('Webhook Handled', 200);
+    }
+
+    /**
+     * Handle payment action required for invoice.
+     *
+     * @param  array $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleInvoicePaymentActionRequired(array $payload)
+    {
+        if (config('cashier.payment_emails') &&
+            $user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
+            $payment = new Payment(
+                StripePaymentIntent::retrieve($payload['data']['object']['payment_intent'], Cashier::stripeOptions())
+            );
+
+            Mail::to($user)->send(new ConfirmPayment($user, $payment));
         }
 
         return new Response('Webhook Handled', 200);

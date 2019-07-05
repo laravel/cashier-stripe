@@ -5,6 +5,9 @@ namespace Laravel\Cashier\Tests\Integration;
 use Stripe\Plan;
 use Stripe\Product;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use Laravel\Cashier\Mail\ConfirmPayment;
+use Laravel\Cashier\Exceptions\PaymentActionRequired;
 
 class WebhooksTest extends IntegrationTestCase
 {
@@ -92,5 +95,36 @@ class WebhooksTest extends IntegrationTestCase
         ])->assertOk();
 
         $this->assertTrue($subscription->fresh()->cancelled(), 'Subscription is still active.');
+    }
+
+    public function test_payment_action_required_email_is_sent()
+    {
+        config(['cashier.payment_emails' => true]);
+
+        $user = $this->createCustomer('payment_action_required_email_is_sent');
+
+        try {
+            $user->newSubscription('main', static::$planId)->create('tok_threeDSecure2Required');
+
+            $this->fail('Expected exception '.PaymentActionRequired::class.' was not thrown.');
+        } catch (PaymentActionRequired $exception) {
+            Mail::fake();
+
+            $this->postJson('stripe/webhook', [
+                'id' => 'foo',
+                'type' => 'invoice.payment_action_required',
+                'data' => [
+                    'object' => [
+                        'id' => 'foo',
+                        'customer' => $user->stripe_id,
+                        'payment_intent' => $exception->payment->id(),
+                    ],
+                ],
+            ])->assertOk();
+
+            Mail::assertSent(ConfirmPayment::class, function (ConfirmPayment $mail) use ($user) {
+                return $mail->hasTo($user->email);
+            });
+        }
     }
 }

@@ -19,6 +19,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Cashier Path
+    |--------------------------------------------------------------------------
+    |
+    | This is the base URI path where Cashier's views, such as the payment
+    | verification screen, will be available from. You're free to tweak
+    | this path according to your preferences and application design.
+    |
+    */
+
+    'path' => env('CASHIER_PATH', 'stripe'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Stripe Webhooks
     |--------------------------------------------------------------------------
     |
@@ -71,5 +84,18 @@ return [
     */
 
     'currency_locale' => env('CASHIER_CURRENCY_LOCALE', 'en'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payment Confirmation Emails
+    |--------------------------------------------------------------------------
+    |
+    | When this option is enabled, Cashier will automatically email customers
+    | whose payments require additional verification. You should listen to
+    | Stripe's webhooks in order for this feature to function correctly.
+    |
+    */
+
+    'payment_emails' => env('CASHIER_PAYMENT_EMAILS', false),
 
 ];
