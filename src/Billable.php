@@ -3,7 +3,6 @@
 namespace Laravel\Cashier;
 
 use Exception;
-use InvalidArgumentException;
 use Stripe\Card as StripeCard;
 use Stripe\Token as StripeToken;
 use Illuminate\Support\Collection;
@@ -24,11 +23,11 @@ trait Billable
      * Make a "one off" charge on the customer for the given amount.
      *
      * @param  int  $amount
+     * @param  string  $paymentMethod
      * @param  array  $options
      * @return \Laravel\Cashier\Payment
-     * @throws \InvalidArgumentException
      */
-    public function charge($amount, array $options = [])
+    public function charge($amount, $paymentMethod, array $options = [])
     {
         $options = array_merge([
             'confirmation_method' => 'automatic',
@@ -37,13 +36,10 @@ trait Billable
         ], $options);
 
         $options['amount'] = $amount;
+        $options['payment_method'] = $paymentMethod;
 
         if ($this->stripe_id) {
             $options['customer'] = $this->stripe_id;
-        }
-
-        if (! array_key_exists('payment_method', $options) && ! array_key_exists('customer', $options)) {
-            throw new InvalidArgumentException('No payment method provided.');
         }
 
         $payment = new Payment(

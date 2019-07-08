@@ -3,7 +3,6 @@
 namespace Laravel\Cashier\Tests\Integration;
 
 use Laravel\Cashier\Payment;
-use Stripe\Error\InvalidRequest;
 use Laravel\Cashier\Exceptions\PaymentActionRequired;
 
 class ChargesTest extends IntegrationTestCase
@@ -12,30 +11,19 @@ class ChargesTest extends IntegrationTestCase
     {
         $user = $this->createCustomer('customer_can_be_charged');
         $user->createAsStripeCustomer();
-        $user->updateCard('tok_visa');
 
-        $response = $user->charge(1000);
+        $response = $user->charge(1000, 'pm_card_visa');
 
         $this->assertInstanceOf(Payment::class, $response);
         $this->assertEquals(1000, $response->rawAmount());
         $this->assertEquals($user->stripe_id, $response->customer);
     }
 
-    public function test_customer_cannot_be_charged_without_a_payment_method()
-    {
-        $user = $this->createCustomer('customer_cannot_be_charged_without_a_payment_method');
-        $user->createAsStripeCustomer();
-
-        $this->expectException(InvalidRequest::class);
-
-        $user->charge(1000);
-    }
-
     public function test_non_stripe_customer_can_be_charged()
     {
         $user = $this->createCustomer('non_stripe_customer_can_be_charged');
 
-        $response = $user->charge(1000, ['payment_method' => 'pm_card_visa']);
+        $response = $user->charge(1000, 'pm_card_visa');
 
         $this->assertInstanceOf(Payment::class, $response);
         $this->assertEquals(1000, $response->rawAmount());
@@ -71,10 +59,9 @@ class ChargesTest extends IntegrationTestCase
     {
         $user = $this->createCustomer('charging_may_require_an_extra_action');
         $user->createAsStripeCustomer();
-        $user->updateCard('tok_threeDSecure2Required');
 
         try {
-            $user->charge(1000);
+            $user->charge(1000, 'pm_card_threeDSecure2Required');
 
             $this->fail('Expected exception '.PaymentActionRequired::class.' was not thrown.');
         } catch (PaymentActionRequired $e) {
