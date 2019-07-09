@@ -12,11 +12,11 @@ class PaymentFailure extends IncompletePayment
      * @param  \Laravel\Cashier\Payment  $payment
      * @return self
      */
-    public static function cardError(Payment $payment)
+    public static function invalidPaymentMethod(Payment $payment)
     {
         return new self(
             $payment,
-            'The payment attempt failed because of a card error.'
+            'The payment attempt failed because of an invalid payment method.'
         );
     }
 }

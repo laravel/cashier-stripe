@@ -23,10 +23,22 @@ class CustomerTest extends TestCase
         $this->assertFalse($user->onGenericTrial());
     }
 
-    public function test_default_card_returns_null_when_the_user_is_not_a_customer_yet()
+    public function test_we_can_determine_if_it_has_a_payment_method()
+    {
+        $user = new User;
+        $user->card_brand = 'visa';
+
+        $this->assertTrue($user->hasPaymentMethod());
+
+        $user = new User;
+
+        $this->assertFalse($user->hasPaymentMethod());
+    }
+
+    public function test_default_payment_method_returns_null_when_the_user_is_not_a_customer_yet()
     {
         $user = new User;
 
-        $this->assertNull($user->defaultCard());
+        $this->assertNull($user->defaultPaymentMethod());
     }
 }

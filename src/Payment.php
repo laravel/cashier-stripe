@@ -27,16 +27,6 @@ class Payment
     }
 
     /**
-     * The Stripe PaymentIntent ID.
-     *
-     * @return string
-     */
-    public function id()
-    {
-        return $this->paymentIntent->id;
-    }
-
-    /**
      * Get the total amount that will be paid.
      *
      * @return string
@@ -117,7 +107,7 @@ class Payment
     public function validate()
     {
         if ($this->requiresPaymentMethod()) {
-            throw PaymentFailure::cardError($this);
+            throw PaymentFailure::invalidPaymentMethod($this);
         } elseif ($this->requiresAction()) {
             throw PaymentActionRequired::incomplete($this);
         }

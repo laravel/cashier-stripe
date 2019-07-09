@@ -56,7 +56,7 @@ class WebhooksTest extends IntegrationTestCase
     public function test_cancelled_subscription_is_properly_reactivated()
     {
         $user = $this->createCustomer('cancelled_subscription_is_properly_reactivated');
-        $subscription = $user->newSubscription('main', static::$planId)->create('tok_visa');
+        $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
         $subscription->cancel();
 
         $this->assertTrue($subscription->cancelled());
@@ -79,7 +79,7 @@ class WebhooksTest extends IntegrationTestCase
     public function test_subscription_is_marked_as_cancelled_when_deleted_in_stripe()
     {
         $user = $this->createCustomer('subscription_is_marked_as_cancelled_when_deleted_in_stripe');
-        $subscription = $user->newSubscription('main', static::$planId)->create('tok_visa');
+        $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
 
         $this->assertFalse($subscription->cancelled());
 
@@ -104,7 +104,7 @@ class WebhooksTest extends IntegrationTestCase
         $user = $this->createCustomer('payment_action_required_email_is_sent');
 
         try {
-            $user->newSubscription('main', static::$planId)->create('tok_threeDSecure2Required');
+            $user->newSubscription('main', static::$planId)->create('pm_card_threeDSecure2Required');
 
             $this->fail('Expected exception '.PaymentActionRequired::class.' was not thrown.');
         } catch (PaymentActionRequired $exception) {
@@ -117,7 +117,7 @@ class WebhooksTest extends IntegrationTestCase
                     'object' => [
                         'id' => 'foo',
                         'customer' => $user->stripe_id,
-                        'payment_intent' => $exception->payment->id(),
+                        'payment_intent' => $exception->payment->id,
                     ],
                 ],
             ])->assertOk();

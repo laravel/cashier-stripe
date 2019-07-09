@@ -193,13 +193,13 @@ class SubscriptionBuilder
     /**
      * Create a new Stripe subscription.
      *
-     * @param  string|null  $token
+     * @param  string|null  $paymentMethod
      * @param  array  $options
      * @return \Laravel\Cashier\Subscription
      */
-    public function create($token = null, array $options = [])
+    public function create($paymentMethod = null, array $options = [])
     {
-        $customer = $this->getStripeCustomer($token, $options);
+        $customer = $this->getStripeCustomer($paymentMethod, $options);
 
         /** @var \Stripe\Subscription $stripeSubscription */
         $stripeSubscription = $customer->subscriptions->create($this->buildPayload());
@@ -232,18 +232,18 @@ class SubscriptionBuilder
     }
 
     /**
-     * Get the Stripe customer instance for the current user and token.
+     * Get the Stripe customer instance for the current user and payment method.
      *
-     * @param  string|null  $token
+     * @param  string|null  $paymentMethod
      * @param  array  $options
      * @return \Stripe\Customer
      */
-    protected function getStripeCustomer($token = null, array $options = [])
+    protected function getStripeCustomer($paymentMethod = null, array $options = [])
     {
         $customer = $this->owner->createOrGetStripeCustomer($options);
 
-        if ($token) {
-            $this->owner->updateCard($token);
+        if ($paymentMethod) {
+            $this->owner->updatePaymentMethod($paymentMethod);
         }
 
         return $customer;

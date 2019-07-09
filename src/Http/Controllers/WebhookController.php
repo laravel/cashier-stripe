@@ -135,22 +135,7 @@ class WebhookController extends Controller
     protected function handleCustomerUpdated(array $payload)
     {
         if ($user = $this->getUserByStripeId($payload['data']['object']['id'])) {
-            $user->updateCardFromStripe();
-        }
-
-        return new Response('Webhook Handled', 200);
-    }
-
-    /**
-     * Handle customer source deleted.
-     *
-     * @param  array $payload
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function handleCustomerSourceDeleted(array $payload)
-    {
-        if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
-            $user->updateCardFromStripe();
+            $user->updatePaymentMethodFromStripe();
         }
 
         return new Response('Webhook Handled', 200);

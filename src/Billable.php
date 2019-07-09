@@ -4,7 +4,6 @@ namespace Laravel\Cashier;
 
 use Exception;
 use Stripe\Card as StripeCard;
-use Stripe\Token as StripeToken;
 use Illuminate\Support\Collection;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\Customer as StripeCustomer;
@@ -12,6 +11,7 @@ use Stripe\BankAccount as StripeBankAccount;
 use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\Error\Card as StripeCardException;
 use Stripe\PaymentIntent as StripePaymentIntent;
+use Stripe\PaymentMethod as StripePaymentMethod;
 use Laravel\Cashier\Exceptions\InvalidStripeCustomer;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -64,16 +64,6 @@ trait Billable
         $intent = StripePaymentIntent::retrieve($paymentIntent, Cashier::stripeOptions());
 
         return $intent->charges->data[0]->refund($options);
-    }
-
-    /**
-     * Determines if the customer currently has a card on file.
-     *
-     * @return bool
-     */
-    public function hasCardOnFile()
-    {
-        return (bool) $this->card_brand;
     }
 
     /**
@@ -353,102 +343,116 @@ trait Billable
     }
 
     /**
-     * Get a collection of the entity's cards.
+     * Determines if the customer currently has a payment method.
      *
-     * @param  array  $parameters
-     * @return \Illuminate\Support\Collection
+     * @return bool
      */
-    public function cards($parameters = [])
+    public function hasPaymentMethod()
     {
-        $this->assertCustomerExists();
-
-        $cards = [];
-
-        $parameters = array_merge(['limit' => 24], $parameters);
-
-        $stripeCards = $this->asStripeCustomer()->sources->all(
-            ['object' => 'card'] + $parameters
-        );
-
-        if (! is_null($stripeCards)) {
-            foreach ($stripeCards->data as $card) {
-                $cards[] = new Card($this, $card);
-            }
-        }
-
-        return new Collection($cards);
+        return (bool) $this->card_brand;
     }
 
     /**
-     * Get the default card for the entity.
+     * Get a collection of the entity's payment methods.
      *
-     * @return \Stripe\Card|null
+     * @param  array  $parameters
+     * @return \Illuminate\Support\Collection|\Laravel\Cashier\PaymentMethod[]
      */
-    public function defaultCard()
+    public function paymentMethods($parameters = [])
+    {
+        $this->assertCustomerExists();
+
+        $parameters = array_merge(['limit' => 24], $parameters);
+
+        // Note that "type" is temporarily required here by Stripe until
+        // they've rolled out support for bank account.
+        $paymentMethods = StripePaymentMethod::all(
+            ['customer' => $this->stripe_id, 'type' => 'card'] + $parameters,
+            Cashier::stripeOptions()
+        );
+
+        return collect($paymentMethods->data)->map(function ($paymentMethod) {
+            return new PaymentMethod($this, $paymentMethod);
+        });
+    }
+
+    /**
+     * Get the default payment method for the entity.
+     *
+     * @return \Laravel\Cashier\PaymentMethod|\Stripe\Card|\Stripe\BankAccount|null
+     */
+    public function defaultPaymentMethod()
     {
         if (! $this->hasStripeId()) {
             return;
         }
 
-        $customer = $this->asStripeCustomer();
+        $customer = StripeCustomer::retrieve(
+            ['id' => $this->stripe_id, 'expand' => ['invoice_settings.default_payment_method', 'default_source']],
+            Cashier::stripeOptions()
+        );
 
-        foreach ($customer->sources->data as $card) {
-            if ($card->id === $customer->default_source) {
-                return $card;
-            }
+        if ($customer->invoice_settings->default_payment_method) {
+            return new PaymentMethod($this, $customer->invoice_settings->default_payment_method);
         }
+
+        // If we can't find a default payment method, we'll try to see if a Card or
+        // BankAccount source was still set from the legacy Sources implementation.
+        return $customer->default_source;
     }
 
     /**
-     * Update customer's credit card.
+     * Update customer's default payment method.
      *
-     * @param  string  $token
+     * @param  string  $paymentMethod
      * @return void
      */
-    public function updateCard($token)
+    public function updatePaymentMethod($paymentMethod)
     {
         $this->assertCustomerExists();
 
         $customer = $this->asStripeCustomer();
 
-        $token = StripeToken::retrieve($token, Cashier::stripeOptions());
+        $paymentMethod = StripePaymentMethod::retrieve($paymentMethod, Cashier::stripeOptions());
 
-        // If the given token already has the card as their default source, we can just
-        // bail out of the method now. We don't need to keep adding the same card to
-        // a model's account every time we go through this particular method call.
-        if ($token[$token->type]->id === $customer->default_source) {
+        // If the customer already has the payment method as their default, we can bail out
+        // of the call now. We don't need to keep adding the same payment method to this
+        // model's account every single time we go through this specific process call.
+        if ($paymentMethod->id === $customer->invoice_settings->default_payment_method) {
             return;
         }
 
-        $card = $customer->sources->create(['source' => $token]);
+        $paymentMethod = $paymentMethod->attach(['customer' => $customer->id], Cashier::stripeOptions());
 
-        $customer->default_source = $card->id;
+        $customer->invoice_settings = ['default_payment_method' => $paymentMethod->id];
 
-        $customer->save();
+        $customer->save(Cashier::stripeOptions());
 
-        // Next we will get the default source for this model so we can update the last
-        // four digits and the card brand on the record in the database. This allows
-        // us to display the information on the front-end when updating the cards.
-        $source = $customer->default_source
-                    ? $customer->sources->retrieve($customer->default_source)
-                    : null;
-
-        $this->fillCardDetails($source);
+        // Next we'll get the default payment method for this user so we can update
+        // the payment method details on the record in the database. This allows
+        // us to show that on the front-end when updating the payment methods.
+        $this->fillPaymentMethodDetails($paymentMethod);
 
         $this->save();
     }
 
     /**
-     * Synchronises the customer's card from Stripe back into the database.
+     * Synchronises the customer's payment method from Stripe back into the database.
      *
      * @return $this
      */
-    public function updateCardFromStripe()
+    public function updatePaymentMethodFromStripe()
     {
-        $defaultCard = $this->defaultCard();
+        $defaultPaymentMethod = $this->defaultPaymentMethod();
 
-        if ($defaultCard) {
-            $this->fillCardDetails($defaultCard)->save();
+        if ($defaultPaymentMethod) {
+            if ($defaultPaymentMethod instanceof PaymentMethod) {
+                $this->fillPaymentMethodDetails(
+                    $defaultPaymentMethod->asStripePaymentMethod()
+                )->save();
+            } else {
+                $this->fillSourceDetails($defaultPaymentMethod)->save();
+            }
         } else {
             $this->forceFill([
                 'card_brand' => null,
@@ -460,36 +464,53 @@ trait Billable
     }
 
     /**
-     * Fills the model's properties with the source from Stripe.
+     * Fills the model's properties with the payment method from Stripe.
      *
-     * @param  \Stripe\Card|\Stripe\BankAccount|null  $card
+     * @param  \Stripe\PaymentMethod|null  $paymentMethod
      * @return $this
      */
-    protected function fillCardDetails($card)
+    protected function fillPaymentMethodDetails($paymentMethod)
     {
-        if ($card instanceof StripeCard) {
-            $this->card_brand = $card->brand;
-            $this->card_last_four = $card->last4;
-        } elseif ($card instanceof StripeBankAccount) {
-            $this->card_brand = 'Bank Account';
-            $this->card_last_four = $card->last4;
+        if ($paymentMethod->type === 'card') {
+            $this->card_brand = $paymentMethod->card->brand;
+            $this->card_last_four = $paymentMethod->card->last4;
         }
 
         return $this;
     }
 
     /**
-     * Deletes the entity's cards.
+     * Fills the model's properties with the source from Stripe.
+     *
+     * @param  \Stripe\Card|\Stripe\BankAccount|null  $source
+     * @return $this
+     * @deprecated Will be removed in a future Cashier update. You should use the new payment methods api instead.
+     */
+    protected function fillSourceDetails($source)
+    {
+        if ($source instanceof StripeCard) {
+            $this->card_brand = $source->brand;
+            $this->card_last_four = $source->last4;
+        } elseif ($source instanceof StripeBankAccount) {
+            $this->card_brand = 'Bank Account';
+            $this->card_last_four = $source->last4;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Deletes the entity's payment methods.
      *
      * @return void
      */
-    public function deleteCards()
+    public function deletePaymentMethods()
     {
-        $this->cards()->each(function ($card) {
-            $card->delete();
+        $this->paymentMethods()->each(function (PaymentMethod $paymentMethod) {
+            $paymentMethod->delete();
         });
 
-        $this->updateCardFromStripe();
+        $this->updatePaymentMethodFromStripe();
     }
 
     /**
@@ -610,7 +631,7 @@ trait Billable
     }
 
     /**
-     * Get the Stripe customer instance for the current user and token.
+     * Get the Stripe customer instance for the current user or create one.
      *
      * @param  array  $options
      * @return \Stripe\Customer
