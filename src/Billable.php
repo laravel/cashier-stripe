@@ -57,7 +57,6 @@ trait Billable
      * @param  string  $paymentIntent
      * @param  array  $options
      * @return \Stripe\Refund
-     * @throws \InvalidArgumentException
      */
     public function refund($paymentIntent, array $options = [])
     {
@@ -83,7 +82,6 @@ trait Billable
      * @param  int  $amount
      * @param  array  $options
      * @return \Stripe\InvoiceItem
-     * @throws \InvalidArgumentException
      */
     public function tab($description, $amount, array $options = [])
     {
