@@ -388,8 +388,8 @@ trait Billable
             'id' => $this->stripe_id,
             'expand' => [
                 'invoice_settings.default_payment_method',
-                'default_source'
-            ]
+                'default_source',
+            ],
         ], Cashier::stripeOptions());
 
         if ($customer->invoice_settings->default_payment_method) {
