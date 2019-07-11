@@ -362,8 +362,7 @@ trait Billable
 
         $parameters = array_merge(['limit' => 24], $parameters);
 
-        // Note that "type" is temporarily required here by Stripe until
-        // they've rolled out support for bank account.
+        // "type" is temporarily required by Stripe...
         $paymentMethods = StripePaymentMethod::all(
             ['customer' => $this->stripe_id, 'type' => 'card'] + $parameters,
             Cashier::stripeOptions()
@@ -385,17 +384,19 @@ trait Billable
             return;
         }
 
-        $customer = StripeCustomer::retrieve(
-            ['id' => $this->stripe_id, 'expand' => ['invoice_settings.default_payment_method', 'default_source']],
-            Cashier::stripeOptions()
-        );
+        $customer = StripeCustomer::retrieve([
+            'id' => $this->stripe_id,
+            'expand' => [
+                'invoice_settings.default_payment_method',
+                'default_source'
+            ]
+        ], Cashier::stripeOptions());
 
         if ($customer->invoice_settings->default_payment_method) {
             return new PaymentMethod($this, $customer->invoice_settings->default_payment_method);
         }
 
-        // If we can't find a default payment method, we'll try to see if a Card or
-        // BankAccount source was still set from the legacy Sources implementation.
+        // If we can't find a payment method, try to return a legacy source...
         return $customer->default_source;
     }
 
@@ -411,7 +412,9 @@ trait Billable
 
         $customer = $this->asStripeCustomer();
 
-        $paymentMethod = StripePaymentMethod::retrieve($paymentMethod, Cashier::stripeOptions());
+        $paymentMethod = StripePaymentMethod::retrieve(
+            $paymentMethod, Cashier::stripeOptions()
+        );
 
         // If the customer already has the payment method as their default, we can bail out
         // of the call now. We don't need to keep adding the same payment method to this
@@ -420,15 +423,17 @@ trait Billable
             return;
         }
 
-        $paymentMethod = $paymentMethod->attach(['customer' => $customer->id], Cashier::stripeOptions());
+        $paymentMethod = $paymentMethod->attach(
+            ['customer' => $customer->id], Cashier::stripeOptions()
+        );
 
         $customer->invoice_settings = ['default_payment_method' => $paymentMethod->id];
 
         $customer->save(Cashier::stripeOptions());
 
-        // Next we'll get the default payment method for this user so we can update
-        // the payment method details on the record in the database. This allows
-        // us to show that on the front-end when updating the payment methods.
+        // Next we will get the default payment method for this user so we can update the
+        // payment method details on the record in the database. This will allow us to
+        // show that information on the front-end when updating the payment methods.
         $this->fillPaymentMethodDetails($paymentMethod);
 
         $this->save();
@@ -482,7 +487,8 @@ trait Billable
      *
      * @param  \Stripe\Card|\Stripe\BankAccount|null  $source
      * @return $this
-     * @deprecated Will be removed in a future Cashier update. You should use the new payment methods api instead.
+     *
+     * @deprecated Will be removed in a future Cashier update. You should use the new payment methods API instead.
      */
     protected function fillSourceDetails($source)
     {
