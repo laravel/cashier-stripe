@@ -429,8 +429,7 @@ trait Billable
 
             $customer = $this->asStripeCustomer();
 
-            // If the payment method was the default payment method for
-            // the customer, we'll need to remove it manually.
+            // If payment method was the default payment method, we'll remove it manually...
             if ($stripePaymentMethod->id === $customer->invoice_settings->default_payment_method) {
                 $customer->invoice_settings = ['default_payment_method' => null];
 
