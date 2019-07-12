@@ -1,9 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v9.3.3...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.0.0-beta...master)
 
-### Added
-- Allow Carbon 2 ([#607](https://github.com/laravel/cashier/pull/607))
+
+## [v10.0.0-beta](https://github.com/laravel/cashier/compare/v9.3.3...v10.0.0-beta)
+
+Cashier v10 is a major new release. Please give [the upgrade guide](UPGRADE.md) a thorough read to see what's new.
 
 
 ## [v9.3.3 (2019-06-14)](https://github.com/laravel/cashier/compare/v9.3.2...v9.3.3)
