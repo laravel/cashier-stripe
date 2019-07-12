@@ -27,7 +27,7 @@
         "moneyphp/money": "^3.2",
         "nesbot/carbon": "^2.0",
         "stripe/stripe-php": "^6.40",
-        "symfony/http-kernel": "^4.2",
+        "symfony/http-kernel": "^4.3",
         "symfony/intl": "^4.3"
     },
     "require-dev": {
