@@ -20,7 +20,7 @@ class InvoicesTest extends IntegrationTestCase
     {
         $user = $this->createCustomer('invoicing_fails_with_nothing_to_invoice');
         $user->createAsStripeCustomer();
-        $user->updatePaymentMethod('pm_card_visa');
+        $user->updateDefaultPaymentMethod('pm_card_visa');
 
         $response = $user->invoice();
 
@@ -31,7 +31,7 @@ class InvoicesTest extends IntegrationTestCase
     {
         $user = $this->createCustomer('customer_can_be_invoiced');
         $user->createAsStripeCustomer();
-        $user->updatePaymentMethod('pm_card_visa');
+        $user->updateDefaultPaymentMethod('pm_card_visa');
 
         $response = $user->invoiceFor('Laracon', 49900);
 

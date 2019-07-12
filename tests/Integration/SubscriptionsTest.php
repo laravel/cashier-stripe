@@ -242,7 +242,7 @@ class SubscriptionsTest extends IntegrationTestCase
         $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
 
         // Set a faulty card as the customer's default payment method.
-        $user->updatePaymentMethod('pm_card_chargeCustomerFail');
+        $user->updateDefaultPaymentMethod('pm_card_chargeCustomerFail');
 
         try {
             // Attempt to swap and pay with a faulty card.
@@ -268,7 +268,7 @@ class SubscriptionsTest extends IntegrationTestCase
         $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
 
         // Set a card that requires a next action as the customer's default payment method.
-        $user->updatePaymentMethod('pm_card_threeDSecure2Required');
+        $user->updateDefaultPaymentMethod('pm_card_threeDSecure2Required');
 
         try {
             // Attempt to swap and pay with a faulty card.
@@ -294,7 +294,7 @@ class SubscriptionsTest extends IntegrationTestCase
         $subscription = $user->newSubscription('main', static::$premiumPlanId)->create('pm_card_visa');
 
         // Set a card that requires a next action as the customer's default payment method.
-        $user->updatePaymentMethod('pm_card_chargeCustomerFail');
+        $user->updateDefaultPaymentMethod('pm_card_chargeCustomerFail');
 
         // Attempt to swap and pay with a faulty card.
         $subscription = $subscription->swap(static::$planId);
@@ -313,7 +313,7 @@ class SubscriptionsTest extends IntegrationTestCase
         $subscription = $user->newSubscription('main', static::$premiumPlanId)->create('pm_card_visa');
 
         // Set a card that requires a next action as the customer's default payment method.
-        $user->updatePaymentMethod('pm_card_chargeCustomerFail');
+        $user->updateDefaultPaymentMethod('pm_card_chargeCustomerFail');
 
         // Attempt to swap and pay with a faulty card.
         $subscription = $subscription->swap(static::$planId);

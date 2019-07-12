@@ -26,7 +26,7 @@ class PaymentMethodsTest extends IntegrationTestCase
         $user = $this->createCustomer('we_can_set_a_default_payment_method');
         $user->createAsStripeCustomer();
 
-        $user->updatePaymentMethod('pm_card_visa');
+        $user->updateDefaultPaymentMethod('pm_card_visa');
         $paymentMethod = $user->defaultPaymentMethod();
 
         $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);
@@ -68,7 +68,7 @@ class PaymentMethodsTest extends IntegrationTestCase
         $this->assertEquals('visa', $paymentMethods->last()->card->brand);
     }
 
-    public function test_we_can_sync_the_payment_method_from_stripe()
+    public function test_we_can_sync_the_default_payment_method_from_stripe()
     {
         $user = $this->createCustomer('we_can_sync_the_payment_method_from_stripe');
         $customer = $user->createAsStripeCustomer();
@@ -85,7 +85,7 @@ class PaymentMethodsTest extends IntegrationTestCase
         $this->assertNull($user->card_brand);
         $this->assertNull($user->card_last_four);
 
-        $user = $user->updatePaymentMethodFromStripe();
+        $user = $user->updateDefaultPaymentMethodFromStripe();
 
         $this->assertEquals('visa', $user->card_brand);
         $this->assertEquals('4242', $user->card_last_four);

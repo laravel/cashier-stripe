@@ -424,7 +424,7 @@ trait Billable
      * @param  string  $paymentMethod
      * @return void
      */
-    public function updatePaymentMethod($paymentMethod)
+    public function updateDefaultPaymentMethod($paymentMethod)
     {
         $this->assertCustomerExists();
 
@@ -458,11 +458,11 @@ trait Billable
     }
 
     /**
-     * Synchronises the customer's payment method from Stripe back into the database.
+     * Synchronises the customer's default payment method from Stripe back into the database.
      *
      * @return $this
      */
-    public function updatePaymentMethodFromStripe()
+    public function updateDefaultPaymentMethodFromStripe()
     {
         $defaultPaymentMethod = $this->defaultPaymentMethod();
 
@@ -532,7 +532,7 @@ trait Billable
             $paymentMethod->delete();
         });
 
-        $this->updatePaymentMethodFromStripe();
+        $this->updateDefaultPaymentMethodFromStripe();
     }
 
     /**

@@ -34,7 +34,7 @@ class ChargesTest extends IntegrationTestCase
     {
         $user = $this->createCustomer('customer_can_be_charged_and_invoiced_immediately');
         $user->createAsStripeCustomer();
-        $user->updatePaymentMethod('pm_card_visa');
+        $user->updateDefaultPaymentMethod('pm_card_visa');
 
         $user->invoiceFor('Laravel Cashier', 1000);
 
@@ -47,7 +47,7 @@ class ChargesTest extends IntegrationTestCase
     {
         $user = $this->createCustomer('customer_can_be_refunded');
         $user->createAsStripeCustomer();
-        $user->updatePaymentMethod('pm_card_visa');
+        $user->updateDefaultPaymentMethod('pm_card_visa');
 
         $invoice = $user->invoiceFor('Laravel Cashier', 1000);
         $refund = $user->refund($invoice->payment_intent);

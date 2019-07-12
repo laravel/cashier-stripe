@@ -135,7 +135,7 @@ class WebhookController extends Controller
     protected function handleCustomerUpdated(array $payload)
     {
         if ($user = $this->getUserByStripeId($payload['data']['object']['id'])) {
-            $user->updatePaymentMethodFromStripe();
+            $user->updateDefaultPaymentMethodFromStripe();
         }
 
         return new Response('Webhook Handled', 200);
