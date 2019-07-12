@@ -10,7 +10,7 @@ use Stripe\PaymentMethod as StripePaymentMethod;
 
 class PaymentMethodsTest extends IntegrationTestCase
 {
-    public function test_we_can_start_a_new_setup_intents_session()
+    public function test_we_can_start_a_new_setup_intent_session()
     {
         $user = $this->createCustomer('we_can_start_a_new_setup_intents_session');
         $customer = $user->createAsStripeCustomer();
