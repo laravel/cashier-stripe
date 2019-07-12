@@ -5,10 +5,22 @@ namespace Laravel\Cashier\Tests\Integration;
 use Laravel\Cashier\Cashier;
 use Stripe\Card as StripeCard;
 use Laravel\Cashier\PaymentMethod;
+use Stripe\SetupIntent as StripeSetupIntent;
 use Stripe\PaymentMethod as StripePaymentMethod;
 
 class PaymentMethodsTest extends IntegrationTestCase
 {
+    public function test_we_can_start_a_new_setup_intents_session()
+    {
+        $user = $this->createCustomer('we_can_start_a_new_setup_intents_session');
+        $customer = $user->createAsStripeCustomer();
+
+        $setupIntent = $user->createSetupIntent();
+
+        $this->assertInstanceOf(StripeSetupIntent::class, $setupIntent);
+        $this->assertEquals($customer->id, $setupIntent->customer);
+    }
+
     public function test_we_can_set_a_default_payment_method()
     {
         $user = $this->createCustomer('we_can_set_a_default_payment_method');

@@ -9,6 +9,7 @@ use Stripe\Invoice as StripeInvoice;
 use Stripe\Customer as StripeCustomer;
 use Stripe\BankAccount as StripeBankAccount;
 use Stripe\InvoiceItem as StripeInvoiceItem;
+use Stripe\SetupIntent as StripeSetupIntent;
 use Stripe\Error\Card as StripeCardException;
 use Stripe\PaymentIntent as StripePaymentIntent;
 use Stripe\PaymentMethod as StripePaymentMethod;
@@ -338,6 +339,23 @@ trait Billable
     public function invoicesIncludingPending(array $parameters = [])
     {
         return $this->invoices(true, $parameters);
+    }
+
+    /**
+     * Create a new SetupIntent instance.
+     *
+     * @param  array  $options
+     * @return \Stripe\SetupIntent
+     */
+    public function createSetupIntent(array $options = [])
+    {
+        if ($this->stripe_id) {
+            $options['customer'] = $this->stripe_id;
+        }
+
+        return StripeSetupIntent::create(
+            $options, Cashier::stripeOptions()
+        );
     }
 
     /**
