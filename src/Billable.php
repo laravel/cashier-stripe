@@ -392,6 +392,59 @@ trait Billable
     }
 
     /**
+     * Add a payment method to the customer.
+     *
+     * @param  \Stripe\PaymentMethod|string  $paymentMethod
+     * @return \Laravel\Cashier\PaymentMethod
+     */
+    public function addPaymentMethod($paymentMethod)
+    {
+        $this->assertCustomerExists();
+
+        $stripePaymentMethod = $this->resolveStripePaymentMethod($paymentMethod);
+
+        if ($stripePaymentMethod->customer !== $this->stripe_id) {
+            $stripePaymentMethod = $stripePaymentMethod->attach(
+                ['customer' => $this->stripe_id], Cashier::stripeOptions()
+            );
+        }
+
+        return new PaymentMethod($this, $stripePaymentMethod);
+    }
+
+    /**
+     * Remove a payment method from the customer.
+     *
+     * @param  \Stripe\PaymentMethod|string  $paymentMethod
+     * @return void
+     */
+    public function removePaymentMethod($paymentMethod)
+    {
+        $this->assertCustomerExists();
+
+        $stripePaymentMethod = $this->resolveStripePaymentMethod($paymentMethod);
+
+        if ($stripePaymentMethod->customer === $this->stripe_id) {
+            $stripePaymentMethod->detach(null, Cashier::stripeOptions());
+
+            $customer = $this->asStripeCustomer();
+
+            // If the payment method was the default payment method for
+            // the customer, we'll need to remove it manually.
+            if ($stripePaymentMethod->id === $customer->invoice_settings->default_payment_method) {
+                $customer->invoice_settings = ['default_payment_method' => null];
+
+                $customer->save(Cashier::stripeOptions());
+
+                $this->forceFill([
+                    'card_brand' => null,
+                    'card_last_four' => null,
+                ])->save();
+            }
+        }
+    }
+
+    /**
      * Get the default payment method for the entity.
      *
      * @return \Laravel\Cashier\PaymentMethod|\Stripe\Card|\Stripe\BankAccount|null
@@ -421,8 +474,8 @@ trait Billable
     /**
      * Update customer's default payment method.
      *
-     * @param  string  $paymentMethod
-     * @return void
+     * @param  \Stripe\PaymentMethod|string  $paymentMethod
+     * @return \Laravel\Cashier\PaymentMethod
      */
     public function updateDefaultPaymentMethod($paymentMethod)
     {
@@ -430,20 +483,16 @@ trait Billable
 
         $customer = $this->asStripeCustomer();
 
-        $paymentMethod = StripePaymentMethod::retrieve(
-            $paymentMethod, Cashier::stripeOptions()
-        );
+        $stripePaymentMethod = $this->resolveStripePaymentMethod($paymentMethod);
 
         // If the customer already has the payment method as their default, we can bail out
         // of the call now. We don't need to keep adding the same payment method to this
         // model's account every single time we go through this specific process call.
-        if ($paymentMethod->id === $customer->invoice_settings->default_payment_method) {
+        if ($stripePaymentMethod->id === $customer->invoice_settings->default_payment_method) {
             return;
         }
 
-        $paymentMethod = $paymentMethod->attach(
-            ['customer' => $customer->id], Cashier::stripeOptions()
-        );
+        $paymentMethod = $this->addPaymentMethod($stripePaymentMethod);
 
         $customer->invoice_settings = ['default_payment_method' => $paymentMethod->id];
 
@@ -455,6 +504,8 @@ trait Billable
         $this->fillPaymentMethodDetails($paymentMethod);
 
         $this->save();
+
+        return $paymentMethod;
     }
 
     /**
@@ -487,7 +538,7 @@ trait Billable
     /**
      * Fills the model's properties with the payment method from Stripe.
      *
-     * @param  \Stripe\PaymentMethod|null  $paymentMethod
+     * @param  \Laravel\Cashier\PaymentMethod|\Stripe\PaymentMethod|null  $paymentMethod
      * @return $this
      */
     protected function fillPaymentMethodDetails($paymentMethod)
@@ -533,6 +584,23 @@ trait Billable
         });
 
         $this->updateDefaultPaymentMethodFromStripe();
+    }
+
+    /**
+     * Resolve a PaymentMethod ID to a Stripe PaymentMethod object.
+     *
+     * @param  \Stripe\PaymentMethod|string  $paymentMethod
+     * @return \Stripe\PaymentMethod
+     */
+    protected function resolveStripePaymentMethod($paymentMethod)
+    {
+        if ($paymentMethod instanceof StripePaymentMethod) {
+            return $paymentMethod;
+        }
+
+        return StripePaymentMethod::retrieve(
+            $paymentMethod, Cashier::stripeOptions()
+        );
     }
 
     /**

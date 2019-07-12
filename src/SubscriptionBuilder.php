@@ -193,7 +193,7 @@ class SubscriptionBuilder
     /**
      * Create a new Stripe subscription.
      *
-     * @param  string|null  $paymentMethod
+     * @param  \Stripe\PaymentMethod|string|null  $paymentMethod
      * @param  array  $options
      * @return \Laravel\Cashier\Subscription
      */
@@ -234,7 +234,7 @@ class SubscriptionBuilder
     /**
      * Get the Stripe customer instance for the current user and payment method.
      *
-     * @param  string|null  $paymentMethod
+     * @param  \Stripe\PaymentMethod|string|null  $paymentMethod
      * @param  array  $options
      * @return \Stripe\Customer
      */

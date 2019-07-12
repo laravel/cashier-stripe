@@ -40,7 +40,7 @@ class PaymentMethod
      */
     public function delete()
     {
-        return $this->paymentMethod->detach(null, Cashier::stripeOptions());
+        return $this->owner->removePaymentMethod($this->paymentMethod);
     }
 
     /**

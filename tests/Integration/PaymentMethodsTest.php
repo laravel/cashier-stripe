@@ -12,7 +12,7 @@ class PaymentMethodsTest extends IntegrationTestCase
 {
     public function test_we_can_start_a_new_setup_intent_session()
     {
-        $user = $this->createCustomer('we_can_start_a_new_setup_intents_session');
+        $user = $this->createCustomer('we_can_start_a_new_setup_intent_session');
         $customer = $user->createAsStripeCustomer();
 
         $setupIntent = $user->createSetupIntent();
@@ -21,12 +21,60 @@ class PaymentMethodsTest extends IntegrationTestCase
         $this->assertEquals($customer->id, $setupIntent->customer);
     }
 
+    public function test_we_can_add_payment_methods()
+    {
+        $user = $this->createCustomer('we_can_add_payment_methods');
+        $user->createAsStripeCustomer();
+
+        $paymentMethod = $user->addPaymentMethod('pm_card_visa');
+
+        $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);
+        $this->assertEquals('visa', $paymentMethod->card->brand);
+        $this->assertEquals('4242', $paymentMethod->card->last4);
+    }
+
+    public function test_we_can_remove_payment_methods()
+    {
+        $user = $this->createCustomer('we_can_remove_payment_methods');
+        $user->createAsStripeCustomer();
+
+        $paymentMethod = $user->addPaymentMethod('pm_card_visa');
+
+        $this->assertCount(1, $user->paymentMethods());
+
+        $user->removePaymentMethod($paymentMethod->asStripePaymentMethod());
+
+        $this->assertCount(0, $user->paymentMethods());
+    }
+
+    public function test_we_can_remove_the_default_payment_method()
+    {
+        $user = $this->createCustomer('we_can_remove_the_default_payment_method');
+        $user->createAsStripeCustomer();
+
+        $paymentMethod = $user->updateDefaultPaymentMethod('pm_card_visa');
+
+        $this->assertCount(1, $user->paymentMethods());
+
+        $user->removePaymentMethod($paymentMethod->asStripePaymentMethod());
+
+        $this->assertCount(0, $user->paymentMethods());
+        $this->assertNull($user->defaultPaymentMethod());
+        $this->assertNull($user->card_brand);
+        $this->assertNull($user->card_last_four);
+    }
+
     public function test_we_can_set_a_default_payment_method()
     {
         $user = $this->createCustomer('we_can_set_a_default_payment_method');
         $user->createAsStripeCustomer();
 
-        $user->updateDefaultPaymentMethod('pm_card_visa');
+        $paymentMethod = $user->updateDefaultPaymentMethod('pm_card_visa');
+
+        $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);
+        $this->assertEquals('visa', $paymentMethod->card->brand);
+        $this->assertEquals('4242', $paymentMethod->card->last4);
+
         $paymentMethod = $user->defaultPaymentMethod();
 
         $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);
