@@ -13,12 +13,10 @@ class PaymentMethodsTest extends IntegrationTestCase
     public function test_we_can_start_a_new_setup_intent_session()
     {
         $user = $this->createCustomer('we_can_start_a_new_setup_intent_session');
-        $customer = $user->createAsStripeCustomer();
 
         $setupIntent = $user->createSetupIntent();
 
         $this->assertInstanceOf(StripeSetupIntent::class, $setupIntent);
-        $this->assertEquals($customer->id, $setupIntent->customer);
     }
 
     public function test_we_can_add_payment_methods()

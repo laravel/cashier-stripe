@@ -349,10 +349,6 @@ trait Billable
      */
     public function createSetupIntent(array $options = [])
     {
-        if ($this->stripe_id) {
-            $options['customer'] = $this->stripe_id;
-        }
-
         return StripeSetupIntent::create(
             $options, Cashier::stripeOptions()
         );
