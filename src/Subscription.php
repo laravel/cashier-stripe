@@ -124,7 +124,8 @@ class Subscription extends Model
      */
     public function active()
     {
-        return (is_null($this->ends_at) || $this->onGracePeriod()) && ! $this->incomplete();
+        return (is_null($this->ends_at) || $this->onGracePeriod()) &&
+            ($this->stripe_status === 'trialing' || $this->stripe_status === 'active');
     }
 
     /**
@@ -135,11 +136,15 @@ class Subscription extends Model
      */
     public function scopeActive($query)
     {
-        $query->whereNull('ends_at')
-                ->where('stripe_status', '!=', 'incomplete')
+        $query->where(function ($query) {
+            $query->whereNull('ends_at')
                 ->orWhere(function ($query) {
                     $query->onGracePeriod();
                 });
+        })->where(function ($query) {
+            $query->where('stripe_status', 'trialing')
+                ->orWhere('stripe_status', 'active');
+        });
     }
 
     /**
