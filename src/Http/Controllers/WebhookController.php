@@ -61,6 +61,12 @@ class WebhookController extends Controller
             $user->subscriptions->filter(function (Subscription $subscription) use ($data) {
                 return $subscription->stripe_id === $data['id'];
             })->each(function (Subscription $subscription) use ($data) {
+                if (isset($data['status']) && $data['status'] === 'incomplete_expired') {
+                    $subscription->delete();
+
+                    return;
+                }
+
                 // Quantity...
                 if (isset($data['quantity'])) {
                     $subscription->quantity = $data['quantity'];
