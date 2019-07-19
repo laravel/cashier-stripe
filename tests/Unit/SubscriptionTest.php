@@ -2,9 +2,9 @@
 
 namespace Laravel\Cashier\Tests\Unit;
 
-use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use PHPUnit\Framework\TestCase;
 use Laravel\Cashier\Subscription;
+use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 
 class SubscriptionTest extends TestCase
 {
@@ -16,6 +16,7 @@ class SubscriptionTest extends TestCase
         $this->assertFalse($subscription->pastDue());
         $this->assertFalse($subscription->active());
     }
+
     public function test_we_can_check_if_a_subscription_is_past_due()
     {
         $subscription = new Subscription(['stripe_status' => 'past_due']);

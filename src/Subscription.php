@@ -3,12 +3,12 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
-use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Stripe\Subscription as StripeSubscription;
 use Laravel\Cashier\Exceptions\IncompletePayment;
+use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 
 class Subscription extends Model
 {

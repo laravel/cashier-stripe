@@ -117,7 +117,6 @@ class WebhooksTest extends IntegrationTestCase
         ])->assertOk();
 
         $this->assertEmpty($user->refresh()->subscriptions, 'Subscription was not deleted.');
-
     }
 
     public function test_payment_action_required_email_is_sent()
