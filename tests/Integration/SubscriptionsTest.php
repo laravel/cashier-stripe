@@ -168,8 +168,8 @@ class SubscriptionsTest extends IntegrationTestCase
 
         $this->assertEquals(1, $subscription->quantity);
 
-        // Swap Plan
-        $subscription->swap(static::$otherPlanId);
+        // Swap Plan and invoice immediately.
+        $subscription->swapAndInvoice(static::$otherPlanId);
 
         $this->assertEquals(static::$otherPlanId, $subscription->stripe_plan);
 
@@ -247,7 +247,7 @@ class SubscriptionsTest extends IntegrationTestCase
 
         try {
             // Attempt to swap and pay with a faulty card.
-            $subscription = $subscription->swap(static::$premiumPlanId);
+            $subscription = $subscription->swapAndInvoice(static::$premiumPlanId);
 
             $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
         } catch (PaymentFailure $e) {
@@ -273,7 +273,7 @@ class SubscriptionsTest extends IntegrationTestCase
 
         try {
             // Attempt to swap and pay with a faulty card.
-            $subscription = $subscription->swap(static::$premiumPlanId);
+            $subscription = $subscription->swapAndInvoice(static::$premiumPlanId);
 
             $this->fail('Expected exception '.PaymentActionRequired::class.' was not thrown.');
         } catch (PaymentActionRequired $e) {

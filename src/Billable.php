@@ -212,7 +212,7 @@ trait Billable
     }
 
     /**
-     * Invoice the billable entity outside of regular billing cycle.
+     * Invoice the billable entity outside of the regular billing cycle.
      *
      * @param  array  $options
      * @return \Stripe\Invoice|bool
