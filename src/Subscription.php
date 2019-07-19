@@ -124,7 +124,11 @@ class Subscription extends Model
      */
     public function active()
     {
-        return (is_null($this->ends_at) || $this->onGracePeriod()) && ! $this->incomplete();
+        return (is_null($this->ends_at) || $this->onGracePeriod()) &&
+            $this->stripe_status !== 'incomplete' &&
+            $this->stripe_status !== 'incomplete_expired' &&
+            $this->stripe_status !== 'past_due' &&
+            $this->stripe_status !== 'unpaid';
     }
 
     /**
@@ -135,11 +139,29 @@ class Subscription extends Model
      */
     public function scopeActive($query)
     {
-        $query->whereNull('ends_at')
-                ->where('stripe_status', '!=', 'incomplete')
+        $query->where(function ($query) {
+            $query->whereNull('ends_at')
                 ->orWhere(function ($query) {
                     $query->onGracePeriod();
                 });
+        })->where('stripe_status', '!=', 'incomplete')
+            ->where('stripe_status', '!=', 'incomplete_expired')
+            ->where('stripe_status', '!=', 'past_due')
+            ->where('stripe_status', '!=', 'unpaid');
+    }
+
+    /**
+     * Sync the Stripe status of the subscription.
+     *
+     * @return void
+     */
+    public function syncStripeStatus()
+    {
+        $subscription = $this->asStripeSubscription();
+
+        $this->status = $subscription->status;
+
+        $this->save();
     }
 
     /**
