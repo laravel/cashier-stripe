@@ -603,11 +603,11 @@ class Subscription extends Model
      * Invoice the subscription outside of the regular billing cycle.
      *
      * @param  array  $options
-     * @return \Stripe\Invoice|bool
+     * @return \Laravel\Cashier\Invoice|bool
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
-    protected function invoice(array $options = [])
+    public function invoice(array $options = [])
     {
         try {
             return $this->user->invoice(array_merge($options, ['subscription' => $this->stripe_id]));

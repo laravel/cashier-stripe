@@ -95,7 +95,7 @@ trait Billable
      * @param  int  $amount
      * @param  array  $tabOptions
      * @param  array  $invoiceOptions
-     * @return \Stripe\Invoice|bool
+     * @return \Laravel\Cashier\Invoice|bool
      */
     public function invoiceFor($description, $amount, array $tabOptions = [], array $invoiceOptions = [])
     {
@@ -215,7 +215,7 @@ trait Billable
      * Invoice the billable entity outside of the regular billing cycle.
      *
      * @param  array  $options
-     * @return \Stripe\Invoice|bool
+     * @return \Laravel\Cashier\Invoice|bool
      */
     public function invoice(array $options = [])
     {
@@ -225,15 +225,17 @@ trait Billable
 
         try {
             /** @var \Stripe\Invoice $invoice */
-            $invoice = StripeInvoice::create($parameters, Cashier::stripeOptions());
+            $stripeInvoice = StripeInvoice::create($parameters, Cashier::stripeOptions());
 
-            return $invoice->pay();
+            $stripeInvoice = $stripeInvoice->pay();
+
+            return new Invoice($this, $stripeInvoice);
         } catch (StripeErrorInvalidRequest $e) {
             return false;
         } catch (StripeCardException $exception) {
             $payment = new Payment(
                 StripePaymentIntent::retrieve(
-                    ['id' => $invoice->refresh()->payment_intent, 'expand' => ['invoice.subscription']],
+                    ['id' => $stripeInvoice->refresh()->payment_intent, 'expand' => ['invoice.subscription']],
                     Cashier::stripeOptions()
                 )
             );

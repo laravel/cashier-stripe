@@ -2,7 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Integration;
 
-use Stripe\Invoice;
+use Laravel\Cashier\Invoice;
 use Laravel\Cashier\Exceptions\InvalidStripeCustomer;
 
 class InvoicesTest extends IntegrationTestCase
