@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Unit;
 
+use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use PHPUnit\Framework\TestCase;
 use Laravel\Cashier\Subscription;
 
@@ -73,5 +74,23 @@ class SubscriptionTest extends TestCase
         $subscription = new Subscription(['stripe_status' => 'active']);
 
         $this->assertFalse($subscription->hasIncompletePayment());
+    }
+
+    public function test_incomplete_subscriptions_cannot_be_swapped()
+    {
+        $subscription = new Subscription(['stripe_status' => 'incomplete']);
+
+        $this->expectException(SubscriptionUpdateFailure::class);
+
+        $subscription->swap('premium_plan');
+    }
+
+    public function test_incomplete_subscriptions_cannot_update_their_quantity()
+    {
+        $subscription = new Subscription(['stripe_status' => 'incomplete']);
+
+        $this->expectException(SubscriptionUpdateFailure::class);
+
+        $subscription->updateQuantity(5);
     }
 }

@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
+use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -326,9 +327,15 @@ class Subscription extends Model
      * @param  int  $quantity
      * @param  \Stripe\Customer|null  $customer
      * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
     public function updateQuantity($quantity, $customer = null)
     {
+        if ($this->incomplete()) {
+            throw SubscriptionUpdateFailure::incompleteSubscription($this);
+        }
+
         $subscription = $this->asStripeSubscription();
 
         $subscription->quantity = $quantity;
@@ -395,9 +402,14 @@ class Subscription extends Model
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
     public function swap($plan, $options = [])
     {
+        if ($this->incomplete()) {
+            throw SubscriptionUpdateFailure::incompleteSubscription($this);
+        }
+
         $subscription = $this->asStripeSubscription();
 
         $subscription->plan = $plan;
