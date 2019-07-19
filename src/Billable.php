@@ -198,6 +198,20 @@ trait Billable
     }
 
     /**
+     * Determine if the customer's subscription has an incomplete payment.
+     *
+     * @return bool
+     */
+    public function hasIncompletePayment()
+    {
+        if ($subscription = $this->subscription()) {
+            return $subscription->hasIncompletePayment();
+        }
+
+        return false;
+    }
+
+    /**
      * Invoice the billable entity outside of regular billing cycle.
      *
      * @param  array  $options
@@ -218,7 +232,10 @@ trait Billable
             return false;
         } catch (StripeCardException $exception) {
             $payment = new Payment(
-                StripePaymentIntent::retrieve($invoice->refresh()->payment_intent, Cashier::stripeOptions())
+                StripePaymentIntent::retrieve(
+                    ['id' => $invoice->refresh()->payment_intent, 'expand' => ['invoice.subscription']],
+                    Cashier::stripeOptions()
+                )
             );
 
             $payment->validate();
