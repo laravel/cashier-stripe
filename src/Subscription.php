@@ -81,7 +81,7 @@ class Subscription extends Model
      */
     public function incomplete()
     {
-        return $this->status === 'incomplete';
+        return $this->stripe_status === 'incomplete';
     }
 
     /**
@@ -92,17 +92,28 @@ class Subscription extends Model
      */
     public function scopeIncomplete($query)
     {
-        $query->where('status', 'incomplete');
+        $query->where('stripe_status', 'incomplete');
     }
 
     /**
-     * Mark the subscription as incomplete.
+     * Determine if the subscription is past due.
      *
+     * @return bool
+     */
+    public function pastDue()
+    {
+        return $this->stripe_status === 'past_due';
+    }
+
+    /**
+     * Filter query by past due.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function markAsIncomplete()
+    public function scopePastDue($query)
     {
-        $this->fill(['status' => 'incomplete'])->save();
+        $query->where('stripe_status', 'past_due');
     }
 
     /**
@@ -124,20 +135,10 @@ class Subscription extends Model
     public function scopeActive($query)
     {
         $query->whereNull('ends_at')
-                ->where('status', '!=', 'incomplete')
+                ->where('stripe_status', '!=', 'incomplete')
                 ->orWhere(function ($query) {
                     $query->onGracePeriod();
                 });
-    }
-
-    /**
-     * Mark the subscription as active.
-     *
-     * @return void
-     */
-    public function markAsActive()
-    {
-        $this->fill(['status' => 'active'])->save();
     }
 
     /**
@@ -429,7 +430,7 @@ class Subscription extends Model
             $subscription->quantity = $this->quantity;
         }
 
-        $subscription->save();
+        $subscription = $subscription->save();
 
         $this->fill([
             'stripe_plan' => $plan,
@@ -439,7 +440,9 @@ class Subscription extends Model
         try {
             $this->user->invoice(['subscription' => $subscription->id]);
         } catch (IncompletePayment $exception) {
-            $this->markAsIncomplete();
+            $this->fill([
+                'stripe_status' => $exception->payment->invoice->subscription->status,
+            ])->save();
 
             throw $exception;
         }
@@ -458,7 +461,9 @@ class Subscription extends Model
 
         $subscription->cancel_at_period_end = true;
 
-        $subscription->save();
+        $subscription = $subscription->save();
+
+        $this->stripe_status = $subscription->status;
 
         // If the user was on trial, we will set the grace period to end when the trial
         // would have ended. Otherwise, we'll retrieve the end of the billing period
@@ -499,7 +504,10 @@ class Subscription extends Model
      */
     public function markAsCancelled()
     {
-        $this->fill(['ends_at' => Carbon::now()])->save();
+        $this->fill([
+            'stripe_status' => 'canceled',
+            'ends_at' => Carbon::now(),
+        ])->save();
     }
 
     /**
@@ -529,12 +537,15 @@ class Subscription extends Model
             $subscription->trial_end = 'now';
         }
 
-        $subscription->save();
+        $subscription = $subscription->save();
 
         // Finally, we will remove the ending timestamp from the user's record in the
         // local database to indicate that the subscription is active again and is
         // no longer "cancelled". Then we will save this record in the database.
-        $this->fill(['ends_at' => null])->save();
+        $this->fill([
+            'stripe_status' => $subscription->status,
+            'ends_at' => null,
+        ])->save();
 
         return $this;
     }
@@ -551,6 +562,16 @@ class Subscription extends Model
         $subscription->tax_percent = $this->user->taxPercentage();
 
         $subscription->save();
+    }
+
+    /**
+     * Determine if the subscription has an incomplete payment.
+     *
+     * @return bool
+     */
+    public function hasIncompletePayment()
+    {
+        return $this->pastDue() || $this->incomplete();
     }
 
     /**

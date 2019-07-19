@@ -93,11 +93,7 @@ class WebhookController extends Controller
 
                 // Status...
                 if (isset($data['status'])) {
-                    if (in_array($data['status'], ['incomplete', 'incomplete_expired'])) {
-                        $subscription->status = 'incomplete';
-                    } else {
-                        $subscription->status = 'active';
-                    }
+                    $subscription->stripe_status = $data['status'];
                 }
 
                 $subscription->save();

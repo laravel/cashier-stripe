@@ -257,8 +257,8 @@ class SubscriptionsTest extends IntegrationTestCase
             // Assert that the plan was swapped anyway.
             $this->assertEquals(static::$premiumPlanId, $subscription->refresh()->stripe_plan);
 
-            // Assert subscription is incomplete.
-            $this->assertTrue($subscription->incomplete());
+            // Assert subscription is past due.
+            $this->assertTrue($subscription->pastDue());
         }
     }
 
@@ -283,8 +283,8 @@ class SubscriptionsTest extends IntegrationTestCase
             // Assert that the plan was swapped anyway.
             $this->assertEquals(static::$premiumPlanId, $subscription->refresh()->stripe_plan);
 
-            // Assert subscription is incomplete.
-            $this->assertTrue($subscription->incomplete());
+            // Assert subscription is past due.
+            $this->assertTrue($subscription->pastDue());
         }
     }
 
@@ -481,8 +481,8 @@ class SubscriptionsTest extends IntegrationTestCase
         // Start with an incomplete subscription.
         $subscription = $user->subscriptions()->create([
             'name' => 'yearly',
-            'status' => 'incomplete',
             'stripe_id' => 'xxxx',
+            'stripe_status' => 'incomplete',
             'stripe_plan' => 'stripe-yearly',
             'quantity' => 1,
             'trial_ends_at' => null,
@@ -502,7 +502,7 @@ class SubscriptionsTest extends IntegrationTestCase
         $this->assertFalse($user->subscriptions()->ended()->exists());
 
         // Activate.
-        $subscription->update(['status' => 'active']);
+        $subscription->update(['stripe_status' => 'active']);
 
         $this->assertFalse($user->subscriptions()->incomplete()->exists());
         $this->assertTrue($user->subscriptions()->active()->exists());

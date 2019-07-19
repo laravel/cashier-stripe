@@ -97,6 +97,29 @@ class WebhooksTest extends IntegrationTestCase
         $this->assertTrue($subscription->fresh()->cancelled(), 'Subscription is still active.');
     }
 
+    public function test_subscription_is_deleted_when_status_is_incomplete_expired()
+    {
+        $user = $this->createCustomer('subscription_is_deleted_when_status_is_incomplete_expired');
+        $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
+
+        $this->assertCount(1, $user->subscriptions);
+
+        $this->postJson('stripe/webhook', [
+            'id' => 'foo',
+            'type' => 'customer.subscription.updated',
+            'data' => [
+                'object' => [
+                    'id' => $subscription->stripe_id,
+                    'customer' => $user->stripe_id,
+                    'status' => 'incomplete_expired',
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertEmpty($user->refresh()->subscriptions, 'Subscription was not deleted.');
+
+    }
+
     public function test_payment_action_required_email_is_sent()
     {
         config(['cashier.payment_emails' => true]);
