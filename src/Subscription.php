@@ -137,11 +137,11 @@ class Subscription extends Model
     public function scopeActive($query)
     {
         $query->where(function ($query) {
-                    $query->whereNull('ends_at')
+            $query->whereNull('ends_at')
                         ->orWhere(function ($query) {
                             $query->onGracePeriod();
                         });
-                })
+        })
                 ->where(function ($query) {
                     $query->where('stripe_status', 'trialing')
                         ->orWhere('stripe_status', 'active');
