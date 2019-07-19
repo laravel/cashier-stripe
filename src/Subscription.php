@@ -285,6 +285,8 @@ class Subscription extends Model
      *
      * @param  int  $count
      * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
     public function incrementQuantity($count = 1)
     {
@@ -298,12 +300,15 @@ class Subscription extends Model
      *
      * @param  int  $count
      * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
     public function incrementAndInvoice($count = 1)
     {
         $this->incrementQuantity($count);
 
-        $this->user->invoice(['subscription' => $this->stripe_id]);
+        $this->invoice();
 
         return $this;
     }
@@ -313,6 +318,8 @@ class Subscription extends Model
      *
      * @param  int  $count
      * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
     public function decrementQuantity($count = 1)
     {
@@ -401,7 +408,6 @@ class Subscription extends Model
      * @param  array  $options
      * @return $this
      *
-     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
     public function swap($plan, $options = [])
@@ -442,24 +448,33 @@ class Subscription extends Model
             $subscription->quantity = $this->quantity;
         }
 
-        $subscription = $subscription->save();
+        $subscription->save();
 
         $this->fill([
             'stripe_plan' => $plan,
             'ends_at' => null,
         ])->save();
 
-        try {
-            $this->user->invoice(['subscription' => $subscription->id]);
-        } catch (IncompletePayment $exception) {
-            $this->fill([
-                'stripe_status' => $exception->payment->invoice->subscription->status,
-            ])->save();
-
-            throw $exception;
-        }
-
         return $this;
+    }
+
+    /**
+     * Swap the subscription to a new Stripe plan, and invoice immediately.
+     *
+     * @param  string  $plan
+     * @param  array  $options
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function swapAndInvoice($plan, $options = [])
+    {
+        $subscription = $this->swap($plan, $options);
+
+        $this->invoice();
+
+        return $subscription;
     }
 
     /**
@@ -560,6 +575,28 @@ class Subscription extends Model
         ])->save();
 
         return $this;
+    }
+
+    /**
+     * Invoice the subscription outside of the regular billing cycle.
+     *
+     * @param  array  $options
+     * @return \Stripe\Invoice|bool
+     *
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
+     */
+    protected function invoice(array $options = [])
+    {
+        try {
+            return $this->user->invoice(array_merge($options, ['subscription' => $this->stripe_id]));
+        } catch (IncompletePayment $exception) {
+            // Set the new Stripe subscription status immediately when payment fails...
+            $this->fill([
+                'stripe_status' => $exception->payment->invoice->subscription->status,
+            ])->save();
+
+            throw $exception;
+        }
     }
 
     /**
