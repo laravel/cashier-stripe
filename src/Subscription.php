@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
+use Stripe\Subscription as StripeSubscription;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 
 class Subscription extends Model
@@ -553,19 +554,30 @@ class Subscription extends Model
     }
 
     /**
+     * Get the latest payment for a Subscription.
+     *
+     * @return \Laravel\Cashier\Payment
+     */
+    public function latestPayment()
+    {
+        return new Payment(
+            $this->asStripeSubscription(['latest_invoice.payment_intent'])
+                ->latest_invoice
+                ->payment_intent
+        );
+    }
+
+    /**
      * Get the subscription as a Stripe subscription object.
      *
+     * @param  array  $expand
      * @return \Stripe\Subscription
-     * @throws \LogicException
      */
-    public function asStripeSubscription()
+    public function asStripeSubscription(array $expand = [])
     {
-        $subscriptions = $this->user->asStripeCustomer()->subscriptions;
-
-        if (! $subscriptions) {
-            throw new LogicException('The Stripe customer does not have any subscriptions.');
-        }
-
-        return $subscriptions->retrieve($this->stripe_id);
+        return StripeSubscription::retrieve(
+            ['id' => $this->stripe_id, 'expand' => $expand],
+            Cashier::stripeOptions()
+        );
     }
 }
