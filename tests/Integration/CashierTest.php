@@ -66,11 +66,11 @@ class CashierTest extends TestCase
 
     protected static function setUpStripeTestData()
     {
-        static::$productId = static::$stripePrefix.'product-1'.Str::random(10);
-        static::$planId = static::$stripePrefix.'monthly-10-'.Str::random(10);
-        static::$otherPlanId = static::$stripePrefix.'monthly-10-'.Str::random(10);
-        static::$premiumPlanId = static::$stripePrefix.'monthly-20-premium-'.Str::random(10);
-        static::$couponId = static::$stripePrefix.'coupon-'.Str::random(10);
+        static::$productId = static::$stripePrefix . 'product-1' . Str::random(10);
+        static::$planId = static::$stripePrefix . 'monthly-10-' . Str::random(10);
+        static::$otherPlanId = static::$stripePrefix . 'monthly-10-' . Str::random(10);
+        static::$premiumPlanId = static::$stripePrefix . 'monthly-20-premium-' . Str::random(10);
+        static::$couponId = static::$stripePrefix . 'coupon-' . Str::random(10);
 
         Product::create([
             'id' => static::$productId,
@@ -279,7 +279,7 @@ class CashierTest extends TestCase
         try {
             $user->newSubscription('main', static::$planId)->create($this->getInvalidCardToken());
 
-            $this->fail('Expected exception '.SubscriptionCreationFailed::class.' was not thrown.');
+            $this->fail('Expected exception ' . SubscriptionCreationFailed::class . ' was not thrown.');
         } catch (SubscriptionCreationFailed $e) {
             // Assert no subscription was added to the billable entity.
             $this->assertEmpty($user->subscriptions);
@@ -625,6 +625,44 @@ class CashierTest extends TestCase
         $this->assertFalse($user->subscriptions()->onGracePeriod()->exists());
         $this->assertTrue($user->subscriptions()->notOnGracePeriod()->exists());
         $this->assertTrue($user->subscriptions()->ended()->exists());
+    }
+
+    public function test_subscription_proration()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        $subscription = $user->newSubscription('main', static::$premiumPlanId)
+            ->create($this->getTestToken());
+
+        $invoice = $user->invoices()[0];
+
+        $this->assertEquals('$20.00', $invoice->total(), 'Invoice for premium plan should bill $20.00');
+
+        // swapping from premium ($20/month) to normal ($10/month)
+        // without proration should invoice $20
+        $subscription
+            ->noProrate()
+            ->swap(static::$planId);
+
+        $invoice = $user->invoices()[0];
+
+        $this->assertEquals('$20.00', $invoice->total(), 'Swapping from premium to cheaper plan without proration should not change the invoice amount.');
+
+        // swapping from premium ($20/month) to normal ($10/month)
+        // with proration should invoice $0
+        $subscription
+            ->swap(static::$premiumPlanId);
+
+        $subscription
+            ->prorate()
+            ->swap(static::$planId);
+
+        $invoice = $user->invoices()[0];
+
+        $this->assertEquals('$0.00', $invoice->total(), 'Swapping from premium to cheaper plan with proration should change the invoice amount.');
     }
 
     public function test_update_stripe_customer()
