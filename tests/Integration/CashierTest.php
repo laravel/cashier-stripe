@@ -70,7 +70,7 @@ class CashierTest extends TestCase
         static::$planId = static::$stripePrefix.'monthly-10-'.Str::random(10);
         static::$otherPlanId = static::$stripePrefix.'monthly-10-'.Str::random(10);
         static::$premiumPlanId = static::$stripePrefix.'monthly-20-premium-'.Str::random(10);
-        static::$couponId = static::$stripePrefix.'coupon-' . Str::random(10);
+        static::$couponId = static::$stripePrefix.'coupon-'.Str::random(10);
 
         Product::create([
             'id' => static::$productId,
