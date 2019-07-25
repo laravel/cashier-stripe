@@ -66,11 +66,11 @@ class CashierTest extends TestCase
 
     protected static function setUpStripeTestData()
     {
-        static::$productId = static::$stripePrefix . 'product-1' . Str::random(10);
-        static::$planId = static::$stripePrefix . 'monthly-10-' . Str::random(10);
-        static::$otherPlanId = static::$stripePrefix . 'monthly-10-' . Str::random(10);
-        static::$premiumPlanId = static::$stripePrefix . 'monthly-20-premium-' . Str::random(10);
-        static::$couponId = static::$stripePrefix . 'coupon-' . Str::random(10);
+        static::$productId = static::$stripePrefix.'product-1'.Str::random(10);
+        static::$planId = static::$stripePrefix.'monthly-10-'.Str::random(10);
+        static::$otherPlanId = static::$stripePrefix.'monthly-10-'.Str::random(10);
+        static::$premiumPlanId = static::$stripePrefix.'monthly-20-premium-'.Str::random(10);
+        static::$couponId = static::$stripePrefix.'coupon-' . Str::random(10);
 
         Product::create([
             'id' => static::$productId,
@@ -279,7 +279,7 @@ class CashierTest extends TestCase
         try {
             $user->newSubscription('main', static::$planId)->create($this->getInvalidCardToken());
 
-            $this->fail('Expected exception ' . SubscriptionCreationFailed::class . ' was not thrown.');
+            $this->fail('Expected exception '.SubscriptionCreationFailed::class.' was not thrown.');
         } catch (SubscriptionCreationFailed $e) {
             // Assert no subscription was added to the billable entity.
             $this->assertEmpty($user->subscriptions);
