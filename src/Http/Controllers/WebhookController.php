@@ -191,10 +191,14 @@ class WebhookController extends Controller
      * Get the billable entity instance by Stripe ID.
      *
      * @param  string  $stripeId
-     * @return \Laravel\Cashier\Billable
+     * @return \Laravel\Cashier\Billable|null
      */
     protected function getUserByStripeId($stripeId)
     {
+        if ($stripeId === null) {
+            return;
+        }
+
         $model = config('cashier.model');
 
         return (new $model)->where('stripe_id', $stripeId)->first();
