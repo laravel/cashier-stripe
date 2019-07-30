@@ -1,6 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v9.3.3...9.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v9.3.4...9.0)
+
+
+## [v9.3.4 (2019-07-30)](https://github.com/laravel/cashier/compare/v9.3.3...v9.3.4)
+
+### Changed
+- Updated version constraints for Laravel 6.0 ([4a4c5c2](https://github.com/laravel/cashier/commit/4a4c5c226bb98aa0726f57bb5970115d3eaab377), [c7664fc](https://github.com/laravel/cashier/commit/c7664fc90d0310d6fa3a52bec45e94868bff995d))
+
+### Fixed
+- Don't try and find a user when stripeId is null ([#721](https://github.com/laravel/cashier/pull/721))
 
 
 ## [v9.3.3 (2019-06-14)](https://github.com/laravel/cashier/compare/v9.3.2...v9.3.3)
