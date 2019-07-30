@@ -177,7 +177,7 @@ class WebhookController extends Controller
      */
     protected function getUserByStripeId($stripeId)
     {
-        if ($stripeId == null) {
+        if ($stripeId === null) {
             return;
         }
 
