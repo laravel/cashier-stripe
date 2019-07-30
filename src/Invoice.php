@@ -286,11 +286,23 @@ class Invoice
      */
     public function download(array $data)
     {
-        $filename = $data['product'].'_'.$this->date()->month.'_'.$this->date()->year.'.pdf';
+        $filename = $data['product'].'_'.$this->date()->month.'_'.$this->date()->year;
 
+        return $this->downloadAs($filename, $data);
+    }
+
+    /**
+     * Create an invoice download response with a specific filename.
+     *
+     * @param  string  $filename
+     * @param  array  $data
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function downloadAs($filename, array $data)
+    {
         return new Response($this->pdf($data), 200, [
             'Content-Description' => 'File Transfer',
-            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'.pdf"',
             'Content-Transfer-Encoding' => 'binary',
             'Content-Type' => 'application/pdf',
         ]);
