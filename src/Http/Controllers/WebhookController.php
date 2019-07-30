@@ -106,7 +106,7 @@ class WebhookController extends Controller
             });
         }
 
-        return new Response('Webhook Handled', 200);
+        return $this->successMethod();
     }
 
     /**
@@ -125,7 +125,7 @@ class WebhookController extends Controller
             });
         }
 
-        return new Response('Webhook Handled', 200);
+        return $this->successMethod();
     }
 
     /**
@@ -140,7 +140,7 @@ class WebhookController extends Controller
             $user->updateDefaultPaymentMethodFromStripe();
         }
 
-        return new Response('Webhook Handled', 200);
+        return $this->successMethod();
     }
 
     /**
@@ -164,7 +164,7 @@ class WebhookController extends Controller
             ])->save();
         }
 
-        return new Response('Webhook Handled', 200);
+        return $this->successMethod();
     }
 
     /**
@@ -175,8 +175,11 @@ class WebhookController extends Controller
      */
     protected function handleInvoicePaymentActionRequired(array $payload)
     {
-        if (config('cashier.payment_emails') &&
-            $user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
+        if (! config('cashier.payment_emails')) {
+            return $this->successMethod();
+        }
+
+        if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
             $payment = new Payment(
                 StripePaymentIntent::retrieve($payload['data']['object']['payment_intent'], Cashier::stripeOptions())
             );
@@ -184,7 +187,7 @@ class WebhookController extends Controller
             Mail::to($user)->send(new ConfirmPayment($user, $payment));
         }
 
-        return new Response('Webhook Handled', 200);
+        return $this->successMethod();
     }
 
     /**
@@ -205,12 +208,23 @@ class WebhookController extends Controller
     }
 
     /**
+     * Handle successful calls on the controller.
+     *
+     * @param  array  $parameters
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function successMethod($parameters = [])
+    {
+        return new Response('Webhook Handled', 200);
+    }
+
+    /**
      * Handle calls to missing methods on the controller.
      *
      * @param  array  $parameters
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function missingMethod($parameters = [])
+    protected function missingMethod($parameters = [])
     {
         return new Response;
     }
