@@ -177,6 +177,10 @@ class WebhookController extends Controller
      */
     protected function getUserByStripeId($stripeId)
     {
+        if ($stripeId === null) {
+            return;
+        }
+
         $model = Cashier::stripeModel();
 
         return (new $model)->where('stripe_id', $stripeId)->first();
