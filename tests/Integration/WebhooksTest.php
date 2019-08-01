@@ -5,8 +5,8 @@ namespace Laravel\Cashier\Tests\Integration;
 use Stripe\Plan;
 use Stripe\Product;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
-use Laravel\Cashier\Mail\ConfirmPayment;
+use Illuminate\Support\Facades\Notification;
+use Laravel\Cashier\Notifications\ConfirmPayment;
 use Laravel\Cashier\Exceptions\PaymentActionRequired;
 
 class WebhooksTest extends IntegrationTestCase
@@ -121,8 +121,6 @@ class WebhooksTest extends IntegrationTestCase
 
     public function test_payment_action_required_email_is_sent()
     {
-        config(['cashier.payment_emails' => true]);
-
         $user = $this->createCustomer('payment_action_required_email_is_sent');
 
         try {
@@ -130,7 +128,7 @@ class WebhooksTest extends IntegrationTestCase
 
             $this->fail('Expected exception '.PaymentActionRequired::class.' was not thrown.');
         } catch (PaymentActionRequired $exception) {
-            Mail::fake();
+            Notification::fake();
 
             $this->postJson('stripe/webhook', [
                 'id' => 'foo',
@@ -144,8 +142,9 @@ class WebhooksTest extends IntegrationTestCase
                 ],
             ])->assertOk();
 
-            Mail::assertSent(ConfirmPayment::class, function (ConfirmPayment $mail) use ($user) {
-                return $mail->hasTo($user->email);
+            Notification::assertSentTo($user, ConfirmPayment::class, function (ConfirmPayment $notification) use ($exception) {
+                return $notification->paymentId === $exception->payment->id &&
+                    $notification->amount === $exception->payment->amount();
             });
         }
     }

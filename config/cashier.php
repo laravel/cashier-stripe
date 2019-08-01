@@ -87,15 +87,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Payment Confirmation Emails
+    | Payment Confirmation Notification
     |--------------------------------------------------------------------------
     |
-    | When this option is enabled, Cashier will automatically email customers
+    | When this setting is enabled, Cashier'll automatically notify customers
     | whose payments require additional verification. You should listen to
     | Stripe's webhooks in order for this feature to function correctly.
     |
     */
 
-    'payment_emails' => env('CASHIER_PAYMENT_EMAILS', false),
+    'payment_notification' => env('CASHIER_PAYMENT_NOTIFICATION'),
 
 ];

@@ -9,8 +9,7 @@ use Laravel\Cashier\Payment;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Subscription;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Mail;
-use Laravel\Cashier\Mail\ConfirmPayment;
+use Illuminate\Notifications\Notifiable;
 use Symfony\Component\HttpFoundation\Response;
 use Stripe\PaymentIntent as StripePaymentIntent;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
@@ -50,7 +49,7 @@ class WebhookController extends Controller
     /**
      * Handle customer subscription updated.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
@@ -131,7 +130,7 @@ class WebhookController extends Controller
     /**
      * Handle customer updated.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleCustomerUpdated(array $payload)
@@ -146,7 +145,7 @@ class WebhookController extends Controller
     /**
      * Handle deleted customer.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleCustomerDeleted(array $payload)
@@ -170,21 +169,24 @@ class WebhookController extends Controller
     /**
      * Handle payment action required for invoice.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleInvoicePaymentActionRequired(array $payload)
     {
-        if (! config('cashier.payment_emails')) {
+        if (is_null($notification = config('cashier.payment_notification'))) {
             return $this->successMethod();
         }
 
         if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
-            $payment = new Payment(
-                StripePaymentIntent::retrieve($payload['data']['object']['payment_intent'], Cashier::stripeOptions())
-            );
+            if (in_array(Notifiable::class, class_uses_recursive($user))) {
+                $payment = new Payment(StripePaymentIntent::retrieve(
+                    $payload['data']['object']['payment_intent'],
+                    Cashier::stripeOptions()
+                ));
 
-            Mail::to($user)->send(new ConfirmPayment($user, $payment));
+                $user->notify(new $notification($payment));
+            }
         }
 
         return $this->successMethod();
@@ -193,7 +195,7 @@ class WebhookController extends Controller
     /**
      * Get the billable entity instance by Stripe ID.
      *
-     * @param  string  $stripeId
+     * @param  string|null  $stripeId
      * @return \Laravel\Cashier\Billable|null
      */
     protected function getUserByStripeId($stripeId)
