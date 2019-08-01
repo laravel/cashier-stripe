@@ -12,7 +12,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Notifications\Notifiable;
 use Symfony\Component\HttpFoundation\Response;
 use Stripe\PaymentIntent as StripePaymentIntent;
-use Laravel\Cashier\Notifications\ConfirmPayment;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 
 class WebhookController extends Controller
