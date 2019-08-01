@@ -17,5 +17,6 @@
     <php>
         <env name="DB_CONNECTION" value="testing"/>
         <env name="CASHIER_MODEL" value="Laravel\Cashier\Tests\Fixtures\User"/>
+        <env name="CASHIER_PAYMENT_NOTIFICATION" value="Laravel\Cashier\Notifications\ConfirmPayment"/>
     </php>
 </phpunit>
