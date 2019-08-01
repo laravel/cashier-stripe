@@ -5,7 +5,6 @@ namespace Laravel\Cashier\Tests\Integration;
 use Stripe\Plan;
 use Stripe\Product;
 use Illuminate\Support\Str;
-use Laravel\Cashier\Tests\Fixtures\User;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Cashier\Notifications\ConfirmPayment;
 use Laravel\Cashier\Exceptions\PaymentActionRequired;
