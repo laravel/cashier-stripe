@@ -648,15 +648,17 @@ class Subscription extends Model
     /**
      * Get the latest payment for a Subscription.
      *
-     * @return \Laravel\Cashier\Payment
+     * @return \Laravel\Cashier\Payment|null
      */
     public function latestPayment()
     {
-        return new Payment(
-            $this->asStripeSubscription(['latest_invoice.payment_intent'])
-                ->latest_invoice
-                ->payment_intent
-        );
+        $paymentIntent = $this->asStripeSubscription(['latest_invoice.payment_intent'])
+            ->latest_invoice
+            ->payment_intent;
+
+        return $paymentIntent
+            ? new Payment($paymentIntent)
+            : null;
     }
 
     /**
