@@ -51,9 +51,9 @@ return [
     | Cashier Model
     |--------------------------------------------------------------------------
     |
-    | This is the model in your app that will implements the Billable trait
-    | within the application. It will serve as the primary model you use
-    | when interacting with Cashier related methods and subscriptions.
+    | This is the model in your application that implements the Billable trait
+    | provided by Cashier. It will serve as the primary model you use while
+    | interacting with Cashier related methods, subscriptions, and so on.
     |
     */
 
@@ -90,7 +90,7 @@ return [
     | Payment Confirmation Notification
     |--------------------------------------------------------------------------
     |
-    | When this setting is enabled, Cashier'll automatically notify customers
+    | If this setting is enabled, Cashier will automatically notify customers
     | whose payments require additional verification. You should listen to
     | Stripe's webhooks in order for this feature to function correctly.
     |
