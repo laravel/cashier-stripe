@@ -20,7 +20,7 @@
         "illuminate/contracts": "~5.8.0|^6.0",
         "illuminate/database": "~5.8.0|^6.0",
         "illuminate/http": "~5.8.0|^6.0",
-        "illuminate/mail": "~5.8.0|^6.0",
+        "illuminate/notifications": "~5.8.0|^6.0",
         "illuminate/routing": "~5.8.0|^6.0",
         "illuminate/support": "~5.8.0|^6.0",
         "illuminate/view": "~5.8.0|^6.0",
