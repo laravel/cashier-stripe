@@ -354,12 +354,11 @@ class Subscription extends Model
      * Update the quantity of the subscription.
      *
      * @param  int  $quantity
-     * @param  \Stripe\Customer|null  $customer
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function updateQuantity($quantity, $customer = null)
+    public function updateQuantity($quantity)
     {
         if ($this->incomplete()) {
             throw SubscriptionUpdateFailure::incompleteSubscription($this);
