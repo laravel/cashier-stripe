@@ -51,7 +51,7 @@ return [
     | Cashier Model
     |--------------------------------------------------------------------------
     |
-    | This is the model in your all that will implements the Billable trait
+    | This is the model in your app that will implements the Billable trait
     | within the application. It will serve as the primary model you use
     | when interacting with Cashier related methods and subscriptions.
     |
