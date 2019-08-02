@@ -1,6 +1,28 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.0.0-beta...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.0.0-beta.2...master)
+
+
+## [v10.0.0-beta.2](https://github.com/laravel/cashier/compare/v10.0.0-beta...v10.0.0-beta.2)
+
+### Added
+- Add latestPayment method on Subscription ([#705](https://github.com/laravel/cashier/pull/705))
+- Allow custom filename for invoice download ([#723](https://github.com/laravel/cashier/pull/723))
+
+### Changed
+- Improve stripe statuses ([#707](https://github.com/laravel/cashier/pull/707))
+- Refactor active subscription state ([#712](https://github.com/laravel/cashier/pull/712))
+- Return invoice object when applicable ([#711](https://github.com/laravel/cashier/pull/711))
+- Refactor webhook responses ([#722](https://github.com/laravel/cashier/pull/722))
+- Refactor confirm payment mail to notification ([#727](https://github.com/laravel/cashier/pull/727))
+
+### Fixed
+- Fix createSetupIntent ([#704](https://github.com/laravel/cashier/pull/704))
+- Fix subscription invoicing ([#710](https://github.com/laravel/cashier/pull/710))
+- Fix `null` return for `latestPayment` method ([#730](https://github.com/laravel/cashier/pull/730))
+
+### Removed
+- Remove unused `$customer` parameter on `updateQuantity` method ([#729](https://github.com/laravel/cashier/pull/729))
 
 
 ## [v10.0.0-beta](https://github.com/laravel/cashier/compare/v9.3.5...v10.0.0-beta)
