@@ -65,7 +65,7 @@
                                v-model="name">
 
                         <!-- Card -->
-                        <label for="cardholder-name" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Card') }}</label>
+                        <label for="card-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Card') }}</label>
 
                         <div id="card-element" class="bg-gray-200 border border-gray-400 rounded-lg p-4 mb-6"></div>
 
