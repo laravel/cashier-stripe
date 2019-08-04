@@ -200,11 +200,12 @@ trait Billable
     /**
      * Determine if the customer's subscription has an incomplete payment.
      *
+     * @param  string  $subscription
      * @return bool
      */
-    public function hasIncompletePayment()
+    public function hasIncompletePayment($subscription = 'default')
     {
-        if ($subscription = $this->subscription()) {
+        if ($subscription = $this->subscription($subscription)) {
             return $subscription->hasIncompletePayment();
         }
 
