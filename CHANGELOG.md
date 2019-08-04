@@ -27,7 +27,7 @@
 
 ## [v10.0.0-beta](https://github.com/laravel/cashier/compare/v9.3.5...v10.0.0-beta)
 
-Cashier v10 is a major new release. Please give [the upgrade guide](https://github.com/laravel/cashier/blob/upgrade-guide/UPGRADE.md) a thorough read to see what's new.
+Cashier v10 is a major new release. Please give [the upgrade guide](UPGRADE.md) a thorough read to see what's new.
 
 
 ## [v9.3.5 (2019-07-30)](https://github.com/laravel/cashier/compare/v9.3.4...v9.3.5)
