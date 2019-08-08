@@ -111,6 +111,8 @@ Since SCA regulations require customers to occasionally verify their payment det
 
 To ensure that off-session payment confirmation notifications are delivered, verify that [Stripe webhooks are configured](https://laravel.com/docs/billing#handling-stripe-webhooks) for your application and the `invoice.payment_action_required` webhook is enabled in your Stripe dashboard.
 
+> If you enabled Stripe to send secondary payment notifications instead then you don't need to configure this.
+
 ### Cards And Payment Methods
 
 PR: https://github.com/laravel/cashier/pull/696  
