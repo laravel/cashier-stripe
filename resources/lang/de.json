@@ -1,0 +1,19 @@
+{
+    "All rights reserved.": "All Rechte vorbehalten.",
+    "Card": "Kreditkarte",
+    "Confirm Payment": "Zahlung bestätigen",
+    "Confirm your :amount payment": "Bestätigen Sie Ihre Zahlung über :amount",
+    "Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.": "Um Ihre Zahlung zu verarbeiten, wird eine separate Bestätigung benötigt. Bitte bestätigen Sie Ihre Zahlung, indem Sie die Zahlungsdetails unten ausfüllen.",
+    "Extra confirmation is needed to process your payment. Please continue to the payment page by clicking on the button below.": "Um Ihre Zahlung zu verarbeiten, wird eine separate Bestätigung benötigt. Bitte schließen Sie die Zahlung durch einen Klick auf den Button unten ab.",
+    "Full name": "Vollständiger Name",
+    "Go back": "Zurück",
+    "Pay :amount": ":amount bezahlen",
+    "Payment Cancelled": "Zahlung abgebrochen",
+    "Payment Confirmation": "Zahlungsbestätigung",
+    "Payment Successful": "Zahlung erfolgreich",
+    "Please provide your name.": "Bitte geben Sie Ihren Namen an.",
+    "Thanks": "Danke",
+    "The payment was successful.": "Die Zahlung war erfolgreich.",
+    "This payment was already successfully confirmed.": "Diese Zahlung wurde bereits erfolgreich bestätigt.",
+    "This payment was cancelled.": "Diese Zahlung wurde abgebrochen."
+}
