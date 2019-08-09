@@ -105,13 +105,13 @@ You can determine if a user needs to confirm a payment using the new `hasIncompl
 
 #### Payment Notifications
 
+> If you have enabled Stripe's built-in payment confirmation notifications then you do not need to configure the Cashier payment confirmation notifications.
+
 Since SCA regulations require customers to occasionally verify their payment details even while their subscription is active, Cashier can send a payment notification to the customer when off-session payment confirmation is required. For example, this may occur when a subscription is renewing. Cashier's payment notification can be enabled by setting the `CASHIER_PAYMENT_NOTIFICATION` environment variable to a notification class. By default, this notification is disabled. Of course, Cashier includes a notification class you may use for this purpose, but you are free to provide your own notification class if desired:
 
     CASHIER_PAYMENT_NOTIFICATION=Laravel\Cashier\Notifications\ConfirmPayment
 
 To ensure that off-session payment confirmation notifications are delivered, verify that [Stripe webhooks are configured](https://laravel.com/docs/billing#handling-stripe-webhooks) for your application and the `invoice.payment_action_required` webhook is enabled in your Stripe dashboard.
-
-> If you enabled Stripe to send secondary payment notifications instead then you don't need to configure this.
 
 ### Cards And Payment Methods
 
