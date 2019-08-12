@@ -35,6 +35,7 @@ PR: https://github.com/laravel/cashier/pull/663
 
 Just like in other Laravel packages, Cashier's migrations now ship with the package. These migrations are automatically registered and will be executed when you run `php artisan migrate`. If you have already run these migrations and want to disable additional migration being executed by Cashier, call `Cashier::ignoreMigrations();` from the `register` method in your `AppServiceProvider`.
 
+<a name="configuration-file"></a>
 ### Configuration File
 
 PR: https://github.com/laravel/cashier/pull/690
@@ -177,8 +178,11 @@ The Cashier webhook handler route is now automatically registered for you and do
 
 PR: https://github.com/laravel/cashier/pull/685
 PR: https://github.com/laravel/cashier/pull/711
+PR: https://github.com/laravel/cashier/pull/690
 
-Cashier now makes use of the `moneyphp/money` library to format current values for display on invoices. Because of this, the `useCurrencySymbol`, `usesCurrencySymbol`, `guessCurrencySymbol` methods, and the `$symbol` parameter on the `useCurrency` have been removed.
+Cashier now makes use of the `moneyphp/money` library to format current values for display on invoices. Because of this, the `useCurrencySymbol`, `usesCurrencySymbol` and `guessCurrencySymbol` methods have been removed.
+
+The `useCurrency` method has been replaced by a config option in the new [configuration file](#configuration-file) and the `usesCurrency` method was removed as well.
 
 In addition, all `raw` methods on the `Invoice` object now return integers instead of floats. These integers represent money values in cents.
 
