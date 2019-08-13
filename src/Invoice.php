@@ -305,6 +305,7 @@ class Invoice
             'Content-Disposition' => 'attachment; filename="'.$filename.'.pdf"',
             'Content-Transfer-Encoding' => 'binary',
             'Content-Type' => 'application/pdf',
+            'X-Vapor-Base64-Encode' => 'True',
         ]);
     }
 
