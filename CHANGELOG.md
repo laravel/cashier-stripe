@@ -1,6 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.0.0...10.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.0.0...master)
 
 
 ## [v10.0.0 (2019-08-13)](https://github.com/laravel/cashier/compare/v10.0.0-beta.2...v10.0.0)
