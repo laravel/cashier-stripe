@@ -6,7 +6,7 @@
 ## [v10.0.0 (2019-08-13)](https://github.com/laravel/cashier/compare/v10.0.0-beta.2...v10.0.0)
 
 ### Added
-- Allow hasCompletePayment() to check other subscriptions than “default” ([#733](https://github.com/laravel/cashier/pull/733))
+- Allow hasIncompletePayment() to check other subscriptions than “default” ([#733](https://github.com/laravel/cashier/pull/733))
 - Add indexes to those columns used to lookup data in the database ([#739](https://github.com/laravel/cashier/pull/739))
 
 ### Fixed
