@@ -1,9 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.0.0-beta.2...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.0.0...10.0)
 
 
-## [v10.0.0-beta.2](https://github.com/laravel/cashier/compare/v10.0.0-beta...v10.0.0-beta.2)
+## [v10.0.0 (2019-08-13)](https://github.com/laravel/cashier/compare/v10.0.0-beta.2...v10.0.0)
+
+### Added
+- Allow hasIncompletePayment() to check other subscriptions than “default” ([#733](https://github.com/laravel/cashier/pull/733))
+- Add indexes to those columns used to lookup data in the database ([#739](https://github.com/laravel/cashier/pull/739))
+
+### Fixed
+- Fixed a label with an incorrect for attribute ([#732](https://github.com/laravel/cashier/pull/732))
+
+
+## [v10.0.0-beta.2 (2019-08-02)](https://github.com/laravel/cashier/compare/v10.0.0-beta...v10.0.0-beta.2)
 
 ### Added
 - Add latestPayment method on Subscription ([#705](https://github.com/laravel/cashier/pull/705))
@@ -25,7 +35,7 @@
 - Remove unused `$customer` parameter on `updateQuantity` method ([#729](https://github.com/laravel/cashier/pull/729))
 
 
-## [v10.0.0-beta](https://github.com/laravel/cashier/compare/v9.3.5...v10.0.0-beta)
+## [v10.0.0-beta (2019-07-17)](https://github.com/laravel/cashier/compare/v9.3.5...v10.0.0-beta)
 
 Cashier 10.0 is a major release. Please review [the upgrade guide](UPGRADE.md) thoroughly.
 
