@@ -180,9 +180,9 @@ PR: https://github.com/laravel/cashier/pull/685
 PR: https://github.com/laravel/cashier/pull/711
 PR: https://github.com/laravel/cashier/pull/690
 
-Cashier now makes use of the `moneyphp/money` library to format current values for display on invoices. Because of this, the `useCurrencySymbol`, `usesCurrencySymbol` and `guessCurrencySymbol` methods have been removed.
+Cashier now uses the `moneyphp/money` library to format currency values for display on invoices. Because of this, the `useCurrencySymbol`, `usesCurrencySymbol` and `guessCurrencySymbol` methods have been removed.
 
-The `useCurrency` method has been replaced by a config option in the new [configuration file](#configuration-file) and the `usesCurrency` method was removed as well.
+The `useCurrency` method has been replaced by a configuration option in the new [Cashier configuration file](#configuration-file) and the `usesCurrency` method has been removed.
 
 In addition, all `raw` methods on the `Invoice` object now return integers instead of floats. These integers represent money values in cents.
 
