@@ -159,7 +159,7 @@ class Subscription extends Model
     {
         $subscription = $this->asStripeSubscription();
 
-        $this->status = $subscription->status;
+        $this->stripe_status = $subscription->status;
 
         $this->save();
     }
