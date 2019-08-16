@@ -16,14 +16,14 @@ abstract class IntegrationTestCase extends TestCase
      */
     protected static $stripePrefix = 'cashier-test-';
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
 
         Stripe::setApiKey(getenv('STRIPE_SECRET'));
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
