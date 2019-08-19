@@ -272,6 +272,7 @@ class Invoice
         }
 
         $dompdf = new Dompdf;
+        $dompdf->setPaper(config('cashier.invoice_format', 'letter'));
         $dompdf->loadHtml($this->view($data)->render());
         $dompdf->render();
 
