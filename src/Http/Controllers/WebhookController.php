@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Http\Controllers;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Payment;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Subscription;
