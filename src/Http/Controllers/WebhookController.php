@@ -182,7 +182,7 @@ class WebhookController extends Controller
             if (in_array(Notifiable::class, class_uses_recursive($user))) {
                 $payment = new Payment(StripePaymentIntent::retrieve(
                     $payload['data']['object']['payment_intent'],
-                    Cashier::stripeOptions()
+                    $user->stripeOptions()
                 ));
 
                 $user->notify(new $notification($payment));

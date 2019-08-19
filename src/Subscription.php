@@ -670,7 +670,7 @@ class Subscription extends Model
     {
         return StripeSubscription::retrieve(
             ['id' => $this->stripe_id, 'expand' => $expand],
-            Cashier::stripeOptions()
+            $this->owner->stripeOptions()
         );
     }
 }
