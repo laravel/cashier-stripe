@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier;
 
+use Stripe\Stripe;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -18,6 +19,12 @@ class CashierServiceProvider extends ServiceProvider
         $this->registerResources();
         $this->registerMigrations();
         $this->registerPublishing();
+
+        Stripe::setAppInfo(
+            'Laravel Cashier',
+            Cashier::VERSION,
+            'https://laravel.com'
+        );
     }
 
     /**
