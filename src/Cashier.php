@@ -11,6 +11,13 @@ use Money\Formatter\IntlMoneyFormatter;
 class Cashier
 {
     /**
+     * The Cashier library version.
+     *
+     * @var string
+     */
+    const VERSION = '10.0.0';
+
+    /**
      * The Stripe API version.
      *
      * @var string
