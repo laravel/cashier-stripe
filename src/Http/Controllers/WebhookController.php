@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Http\Controllers;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Payment;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Subscription;
@@ -182,7 +181,7 @@ class WebhookController extends Controller
             if (in_array(Notifiable::class, class_uses_recursive($user))) {
                 $payment = new Payment(StripePaymentIntent::retrieve(
                     $payload['data']['object']['payment_intent'],
-                    Cashier::stripeOptions()
+                    $user->stripeOptions()
                 ));
 
                 $user->notify(new $notification($payment));

@@ -13,7 +13,7 @@ use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 
 class VerifyWebhookSignatureTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }

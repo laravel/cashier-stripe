@@ -13,7 +13,7 @@ use Laravel\Cashier\Tests\Fixtures\User;
 
 class InvoiceTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
 

@@ -272,6 +272,7 @@ class Invoice
         }
 
         $dompdf = new Dompdf;
+        $dompdf->setPaper(config('cashier.paper', 'letter'));
         $dompdf->loadHtml($this->view($data)->render());
         $dompdf->render();
 
@@ -305,6 +306,7 @@ class Invoice
             'Content-Disposition' => 'attachment; filename="'.$filename.'.pdf"',
             'Content-Transfer-Encoding' => 'binary',
             'Content-Type' => 'application/pdf',
+            'X-Vapor-Base64-Encode' => 'True',
         ]);
     }
 

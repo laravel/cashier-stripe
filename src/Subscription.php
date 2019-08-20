@@ -159,7 +159,7 @@ class Subscription extends Model
     {
         $subscription = $this->asStripeSubscription();
 
-        $this->status = $subscription->status;
+        $this->stripe_status = $subscription->status;
 
         $this->save();
     }
@@ -670,7 +670,7 @@ class Subscription extends Model
     {
         return StripeSubscription::retrieve(
             ['id' => $this->stripe_id, 'expand' => $expand],
-            Cashier::stripeOptions()
+            $this->owner->stripeOptions()
         );
     }
 }
