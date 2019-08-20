@@ -1,6 +1,20 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.0.0...10.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.1.0...10.0)
+
+
+## [v10.1.0 (2019-08-20)](https://github.com/laravel/cashier/compare/v10.0.0...v10.1.0)
+
+### Added
+- Multiple stripe accounts ([#754](https://github.com/laravel/cashier/pull/754))
+- Set Stripe library info ([#756](https://github.com/laravel/cashier/pull/756))
+- Paper size can be set in config file ([#752](https://github.com/laravel/cashier/pull/752), [cb837d1](https://github.com/laravel/cashier/commit/cb837d13f570353b85b27bd381e8669d1fee3491))
+
+### Changed
+- Update Stripe API version to `2019-08-14` ([#749](https://github.com/laravel/cashier/pull/749))
+
+### Fixed
+- `syncStripeStatus` trying to update incorrect status column ([#748](https://github.com/laravel/cashier/pull/748))
 
 
 ## [v10.0.0 (2019-08-13)](https://github.com/laravel/cashier/compare/v10.0.0-beta.2...v10.0.0)
