@@ -137,7 +137,7 @@ if ($defaultPaymentMethod instanceof StripeCard ||
 }
 ```
 
-Due to these changes, the `Laravel\Cashier\Card` class has been replaced with `Laravel\Cashier\PaymentMethod` class.
+Due to these changes, the `Laravel\Cashier\Card` class has been replaced with `Laravel\Cashier\PaymentMethod` class and the old card methods on the Billable trait were removed.
 
 For more information regarding storing payment methods, review the [Setup Intents](#setup-intents) documentation below.
 
@@ -208,7 +208,7 @@ The `swap` method will no longer automatically invoice the customer. Instead, a 
 
 PR: https://github.com/laravel/cashier/pull/682
 
-The following methods now require that the `Billable` user has an associated Stripe customer account created by your application: `tab`, `invoice`, `upcomingInvoice`, `invoices`, `cards`, `updateCard`, `applyCoupon`. An exception will be thrown if you attempt to call these methods without first creating a Stripe customer account for the user.
+The following methods now require that the `Billable` user has an associated Stripe customer account created by your application: `tab`, `invoice`, `upcomingInvoice`, `invoices`, `applyCoupon`. An exception will be thrown if you attempt to call these methods without first creating a Stripe customer account for the user.
 
 ## Upgrading To 9.3 From 9.2
 
