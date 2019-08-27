@@ -1,9 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.1.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.1.1...master)
 
 ### Changed
 - Dropped Laravel 5.8 support ([b6256a2](https://github.com/laravel/cashier/commit/b6256a2a2e486478a26043cb2926dc744dc0a42a))
+
+
+## [v10.1.1 (2019-08-27)](https://github.com/laravel/cashier/compare/v10.1.0...v10.1.1)
+
+### Fixed
+- Remove collation from migrations ([#761](https://github.com/laravel/cashier/pull/761))
 
 
 ## [v10.1.0 (2019-08-20)](https://github.com/laravel/cashier/compare/v10.0.0...v10.1.0)
