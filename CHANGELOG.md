@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.1.0...10.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.1.1...10.0)
+
+
+## [v10.1.1 (2019-08-27)](https://github.com/laravel/cashier/compare/v10.1.0...v10.1.1)
+
+### Fixed
+- Remove collation from migrations ([#761](https://github.com/laravel/cashier/pull/761))
 
 
 ## [v10.1.0 (2019-08-20)](https://github.com/laravel/cashier/compare/v10.0.0...v10.1.0)
