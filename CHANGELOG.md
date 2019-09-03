@@ -1,6 +1,16 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.1.1...10.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.2.0...10.0)
+
+
+## [v10.2.0 (2019-09-03)](https://github.com/laravel/cashier/compare/v10.1.1...v10.2.0)
+
+### Added
+- Add ability to ignore cashier routes ([#763](https://github.com/laravel/cashier/pull/763))
+
+### Fixed
+- Only mount card element if payment has not succeeded or been cancelled ([#765](https://github.com/laravel/cashier/pull/765))
+- Set off_session parameter to true when creating a new subscription ([#764](https://github.com/laravel/cashier/pull/764))
 
 
 ## [v10.1.1 (2019-08-27)](https://github.com/laravel/cashier/compare/v10.1.0...v10.1.1)
