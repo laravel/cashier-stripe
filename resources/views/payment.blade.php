@@ -107,12 +107,14 @@
                 errorMessage: ''
             },
 
-            mounted: function () {
-                const elements = stripe.elements();
+            @if (! $payment->isSucceeded() && ! $payment->isCancelled())
+                mounted: function () {
+                    const elements = stripe.elements();
 
-                this.cardElement = elements.create('card');
-                this.cardElement.mount('#card-element');
-            },
+                    this.cardElement = elements.create('card');
+                    this.cardElement.mount('#card-element');
+                },
+            @endif
 
             methods: {
                 confirmPayment: function () {
