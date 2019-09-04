@@ -21,7 +21,7 @@
                     <path class="fill-current text-red-500" d="M12 18a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm1-5.9c-.13 1.2-1.88 1.2-2 0l-.5-5a1 1 0 0 1 1-1.1h1a1 1 0 0 1 1 1.1l-.5 5z"/>
                 </svg>
 
-                <span class="ml-3">@{{ errorMessage }}</span>
+                <span class="max-w-sm ml-3">@{{ errorMessage }}</span>
             </p>
 
             <p class="flex items-center mb-4 bg-green-100 border border-green-200 px-5 py-4 rounded-lg text-green-700" v-if="paymentProcessed && successMessage">
@@ -30,7 +30,7 @@
                     <path class="fill-current text-green-500" d="M10 14.59l6.3-6.3a1 1 0 0 1 1.4 1.42l-7 7a1 1 0 0 1-1.4 0l-3-3a1 1 0 0 1 1.4-1.42l2.3 2.3z"/>
                 </svg>
 
-                <span class="ml-3">@{{ successMessage }}</span>
+                <span class="max-w-sm ml-3">@{{ successMessage }}</span>
             </p>
 
             <div class="bg-white rounded-lg shadow-xl p-4 sm:py-6 sm:px-10 mb-5">
