@@ -2,14 +2,14 @@
 
 namespace Laravel\Cashier\Tests\Unit;
 
-use Mockery as m;
+use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Config\Repository as Config;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class VerifyWebhookSignatureTest extends TestCase
 {

@@ -2,16 +2,16 @@
 
 namespace Laravel\Cashier\Tests\Integration;
 
-use DateTime;
-use Stripe\Plan;
 use Carbon\Carbon;
-use Stripe\Coupon;
-use Stripe\Product;
+use DateTime;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Exceptions\PaymentActionRequired;
+use Laravel\Cashier\Exceptions\PaymentFailure;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
-use Laravel\Cashier\Exceptions\PaymentFailure;
-use Laravel\Cashier\Exceptions\PaymentActionRequired;
+use Stripe\Coupon;
+use Stripe\Plan;
+use Stripe\Product;
 
 class SubscriptionsTest extends IntegrationTestCase
 {

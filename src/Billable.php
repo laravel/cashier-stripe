@@ -3,20 +3,20 @@
 namespace Laravel\Cashier;
 
 use Exception;
-use Stripe\Card as StripeCard;
 use Illuminate\Support\Collection;
-use Stripe\Invoice as StripeInvoice;
-use Stripe\Customer as StripeCustomer;
+use Laravel\Cashier\Exceptions\InvalidStripeCustomer;
 use Stripe\BankAccount as StripeBankAccount;
-use Stripe\InvoiceItem as StripeInvoiceItem;
-use Stripe\SetupIntent as StripeSetupIntent;
+use Stripe\Card as StripeCard;
+use Stripe\Customer as StripeCustomer;
 use Stripe\Error\Card as StripeCardException;
+use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
+use Stripe\Invoice as StripeInvoice;
+use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\PaymentIntent as StripePaymentIntent;
 use Stripe\PaymentMethod as StripePaymentMethod;
-use Laravel\Cashier\Exceptions\InvalidStripeCustomer;
-use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Stripe\SetupIntent as StripeSetupIntent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait Billable
 {

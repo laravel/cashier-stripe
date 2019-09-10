@@ -2,9 +2,9 @@
 
 namespace Laravel\Cashier;
 
-use Stripe\Stripe;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Stripe\Stripe;
 
 class CashierServiceProvider extends ServiceProvider
 {
