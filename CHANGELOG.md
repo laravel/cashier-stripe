@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.2.0...10.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.2.1...10.0)
+
+
+## [v10.2.1 (2019-09-10)](https://github.com/laravel/cashier/compare/v10.2.0...v10.2.1)
+
+### Fixed
+- Ensure SVG icons are visible even with a long success or error message ([#772](https://github.com/laravel/cashier/pull/772))
 
 
 ## [v10.2.0 (2019-09-03)](https://github.com/laravel/cashier/compare/v10.1.1...v10.2.0)
