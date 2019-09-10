@@ -2,16 +2,16 @@
 
 namespace Laravel\Cashier\Http\Controllers;
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Laravel\Cashier\Payment;
-use Illuminate\Support\Carbon;
-use Laravel\Cashier\Subscription;
-use Illuminate\Routing\Controller;
 use Illuminate\Notifications\Notifiable;
-use Symfony\Component\HttpFoundation\Response;
-use Stripe\PaymentIntent as StripePaymentIntent;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
+use Laravel\Cashier\Payment;
+use Laravel\Cashier\Subscription;
+use Stripe\PaymentIntent as StripePaymentIntent;
+use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
 {

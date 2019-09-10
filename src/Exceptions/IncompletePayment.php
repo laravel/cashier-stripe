@@ -3,8 +3,8 @@
 namespace Laravel\Cashier\Exceptions;
 
 use Exception;
-use Throwable;
 use Laravel\Cashier\Payment;
+use Throwable;
 
 class IncompletePayment extends Exception
 {

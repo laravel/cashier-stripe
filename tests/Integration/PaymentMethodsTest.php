@@ -2,10 +2,10 @@
 
 namespace Laravel\Cashier\Tests\Integration;
 
-use Stripe\Card as StripeCard;
 use Laravel\Cashier\PaymentMethod;
-use Stripe\SetupIntent as StripeSetupIntent;
+use Stripe\Card as StripeCard;
 use Stripe\PaymentMethod as StripePaymentMethod;
+use Stripe\SetupIntent as StripeSetupIntent;
 
 class PaymentMethodsTest extends IntegrationTestCase
 {

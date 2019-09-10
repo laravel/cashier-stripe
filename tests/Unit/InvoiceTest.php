@@ -2,14 +2,14 @@
 
 namespace Laravel\Cashier\Tests\Unit;
 
-use Mockery as m;
 use Carbon\Carbon;
-use Stripe\Discount;
 use Carbon\CarbonTimeZone;
 use Laravel\Cashier\Invoice;
-use Laravel\Cashier\Tests\TestCase;
-use Stripe\Invoice as StripeInvoice;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Laravel\Cashier\Tests\TestCase;
+use Mockery as m;
+use Stripe\Discount;
+use Stripe\Invoice as StripeInvoice;
 
 class InvoiceTest extends TestCase
 {

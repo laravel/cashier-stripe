@@ -2,9 +2,9 @@
 
 namespace Laravel\Cashier\Tests\Unit;
 
-use Stripe\PaymentIntent;
 use Laravel\Cashier\Payment;
 use PHPUnit\Framework\TestCase;
+use Stripe\PaymentIntent;
 
 class PaymentTest extends TestCase
 {

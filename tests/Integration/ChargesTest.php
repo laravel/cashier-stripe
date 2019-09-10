@@ -2,8 +2,8 @@
 
 namespace Laravel\Cashier\Tests\Integration;
 
-use Laravel\Cashier\Payment;
 use Laravel\Cashier\Exceptions\PaymentActionRequired;
+use Laravel\Cashier\Payment;
 
 class ChargesTest extends IntegrationTestCase
 {
