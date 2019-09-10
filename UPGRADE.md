@@ -80,7 +80,7 @@ A new `stripe_status` database column has been introduced for the `subscriptions
 
 ```php
 Schema::table('subscriptions', function (Blueprint $table) {
-    $table->string('stripe_status')->nullable();
+    $table->string('stripe_status');
 });
 ```
 
