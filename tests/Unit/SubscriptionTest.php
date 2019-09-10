@@ -2,9 +2,9 @@
 
 namespace Laravel\Cashier\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
-use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
+use Laravel\Cashier\Subscription;
+use PHPUnit\Framework\TestCase;
 
 class SubscriptionTest extends TestCase
 {

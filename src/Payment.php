@@ -2,9 +2,9 @@
 
 namespace Laravel\Cashier;
 
+use Laravel\Cashier\Exceptions\PaymentActionRequired;
 use Laravel\Cashier\Exceptions\PaymentFailure;
 use Stripe\PaymentIntent as StripePaymentIntent;
-use Laravel\Cashier\Exceptions\PaymentActionRequired;
 
 class Payment
 {

@@ -2,12 +2,12 @@
 
 namespace Laravel\Cashier\Tests\Integration;
 
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
+use Laravel\Cashier\Exceptions\PaymentActionRequired;
+use Laravel\Cashier\Notifications\ConfirmPayment;
 use Stripe\Plan;
 use Stripe\Product;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Notification;
-use Laravel\Cashier\Notifications\ConfirmPayment;
-use Laravel\Cashier\Exceptions\PaymentActionRequired;
 
 class WebhooksTest extends IntegrationTestCase
 {

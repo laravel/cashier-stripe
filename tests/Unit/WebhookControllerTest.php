@@ -3,9 +3,9 @@
 namespace Laravel\Cashier\Tests\Unit;
 
 use Illuminate\Http\Request;
+use Laravel\Cashier\Http\Controllers\WebhookController;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
-use Laravel\Cashier\Http\Controllers\WebhookController;
 
 class WebhookControllerTest extends TestCase
 {
