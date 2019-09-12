@@ -62,8 +62,6 @@ class ConfirmPayment extends Notification implements ShouldQueue
         return (new MailMessage)
             ->greeting(__('Confirm your :amount payment', ['amount' => $this->amount]))
             ->line(__('Extra confirmation is needed to process your payment. Please continue to the payment page by clicking on the button below.'))
-            ->action(__('Confirm Payment'), $url)
-            ->line(__('Thanks').',')
-            ->line(config('app.name'));
+            ->action(__('Confirm Payment'), $url);
     }
 }
