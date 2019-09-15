@@ -60,7 +60,7 @@
                         <!-- Name -->
                         <label for="cardholder-name" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Full name') }}</label>
 
-                        <input id="cardholder-name" type="text" placeholder="Jane Doe" required
+                        <input id="cardholder-name" type="text" placeholder="{{ __('Jane Doe') }}" required
                                class="inline-block bg-gray-200 border border-gray-400 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
                                v-model="name">
 
