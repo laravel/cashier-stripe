@@ -447,22 +447,31 @@ trait Billable
 
         $stripePaymentMethod = $this->resolveStripePaymentMethod($paymentMethod);
 
-        if ($stripePaymentMethod->customer === $this->stripe_id) {
-            $stripePaymentMethod->detach(null, $this->stripeOptions());
+        if ($stripePaymentMethod->customer !== $this->stripe_id) {
+            return;
+        }
 
-            $customer = $this->asStripeCustomer();
+        $stripePaymentMethod->detach(null, $this->stripeOptions());
 
-            // If payment method was the default payment method, we'll remove it manually...
-            if ($stripePaymentMethod->id === $customer->invoice_settings->default_payment_method) {
-                $customer->invoice_settings = ['default_payment_method' => null];
+        $customer = $this->asStripeCustomer();
 
-                $customer->save($this->stripeOptions());
+        $defaultPaymentMethod = $customer->invoice_settings->default_payment_method;
 
-                $this->forceFill([
-                    'card_brand' => null,
-                    'card_last_four' => null,
-                ])->save();
-            }
+        // If payment method was the default payment method, we'll remove it manually...
+        if ($stripePaymentMethod->id === $defaultPaymentMethod) {
+            $customer->invoice_settings = ['default_payment_method' => null];
+
+            $customer->save($this->stripeOptions());
+
+            $defaultPaymentMethod = null;
+        }
+
+        // If the default payment was already removed, we'll just update the database...
+        if (is_null($defaultPaymentMethod)) {
+            $this->forceFill([
+                'card_brand' => null,
+                'card_last_four' => null,
+            ])->save();
         }
     }
 
