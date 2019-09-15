@@ -82,7 +82,7 @@ class Subscription extends Model
      */
     public function incomplete()
     {
-        return $this->stripe_status === 'incomplete';
+        return $this->stripe_status === StripeSubscription::STATUS_INCOMPLETE;
     }
 
     /**
@@ -93,7 +93,7 @@ class Subscription extends Model
      */
     public function scopeIncomplete($query)
     {
-        $query->where('stripe_status', 'incomplete');
+        $query->where('stripe_status', StripeSubscription::STATUS_INCOMPLETE);
     }
 
     /**
@@ -103,7 +103,7 @@ class Subscription extends Model
      */
     public function pastDue()
     {
-        return $this->stripe_status === 'past_due';
+        return $this->stripe_status === StripeSubscription::STATUS_PAST_DUE;
     }
 
     /**
@@ -114,7 +114,7 @@ class Subscription extends Model
      */
     public function scopePastDue($query)
     {
-        $query->where('stripe_status', 'past_due');
+        $query->where('stripe_status', StripeSubscription::STATUS_PAST_DUE);
     }
 
     /**
@@ -125,10 +125,10 @@ class Subscription extends Model
     public function active()
     {
         return (is_null($this->ends_at) || $this->onGracePeriod()) &&
-            $this->stripe_status !== 'incomplete' &&
-            $this->stripe_status !== 'incomplete_expired' &&
-            $this->stripe_status !== 'past_due' &&
-            $this->stripe_status !== 'unpaid';
+            $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE &&
+            $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE_EXPIRED &&
+            $this->stripe_status !== StripeSubscription::STATUS_PAST_DUE &&
+            $this->stripe_status !== StripeSubscription::STATUS_UNPAID;
     }
 
     /**
@@ -144,10 +144,10 @@ class Subscription extends Model
                 ->orWhere(function ($query) {
                     $query->onGracePeriod();
                 });
-        })->where('stripe_status', '!=', 'incomplete')
-            ->where('stripe_status', '!=', 'incomplete_expired')
-            ->where('stripe_status', '!=', 'past_due')
-            ->where('stripe_status', '!=', 'unpaid');
+        })->where('stripe_status', '!=', StripeSubscription::STATUS_INCOMPLETE)
+            ->where('stripe_status', '!=', StripeSubscription::STATUS_INCOMPLETE_EXPIRED)
+            ->where('stripe_status', '!=', StripeSubscription::STATUS_PAST_DUE)
+            ->where('stripe_status', '!=', StripeSubscription::STATUS_UNPAID);
     }
 
     /**
@@ -553,7 +553,7 @@ class Subscription extends Model
     public function markAsCancelled()
     {
         $this->fill([
-            'stripe_status' => 'canceled',
+            'stripe_status' => StripeSubscription::STATUS_CANCELED,
             'ends_at' => Carbon::now(),
         ])->save();
     }
