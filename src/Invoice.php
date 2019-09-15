@@ -4,8 +4,10 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use Dompdf\Dompdf;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
 use Stripe\Invoice as StripeInvoice;
+use Stripe\InvoiceLineItem as StripeInvoiceLineItem;
 use Symfony\Component\HttpFoundation\Response;
 
 class Invoice
@@ -23,6 +25,13 @@ class Invoice
      * @var \Stripe\Invoice
      */
     protected $invoice;
+
+    /**
+     * The Stripe invoice items.
+     *
+     * @var \Stripe\Collection|\Stripe\InvoiceLineItem[]
+     */
+    protected $items;
 
     /**
      * Create a new invoice instance.
@@ -220,17 +229,15 @@ class Invoice
      */
     public function invoiceItemsByType($type)
     {
-        $lineItems = [];
-
-        if (isset($this->lines->data)) {
-            foreach ($this->lines->data as $line) {
-                if ($line->type == $type) {
-                    $lineItems[] = new InvoiceItem($this->owner, $line);
-                }
-            }
+        if (is_null($this->items)) {
+            $this->items = new Collection($this->lines->autoPagingIterator());
         }
 
-        return $lineItems;
+        return $this->items->filter(function (StripeInvoiceLineItem $item) use ($type) {
+            return $item->type == $type;
+        })->map(function (StripeInvoiceLineItem $item) {
+            return new InvoiceItem($this->owner, $item);
+        })->all();
     }
 
     /**

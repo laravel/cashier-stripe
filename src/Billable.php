@@ -279,11 +279,6 @@ trait Billable
             $stripeInvoice = StripeInvoice::retrieve(
                 $id, $this->stripeOptions()
             );
-
-            $stripeInvoice->lines = StripeInvoice::retrieve($id, $this->stripeOptions())
-                        ->lines
-                        ->all(['limit' => 1000]);
-
             return new Invoice($this, $stripeInvoice);
         } catch (Exception $exception) {
             //
