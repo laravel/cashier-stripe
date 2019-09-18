@@ -23,6 +23,7 @@ class PaymentController extends Controller
                 StripePaymentIntent::retrieve($id, Cashier::stripeOptions())
             ),
             'redirect' => request('redirect'),
+            'next' => request('next'),
         ]);
     }
 }
