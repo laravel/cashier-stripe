@@ -85,7 +85,6 @@
                                 {{ __('Your payment was correctly processed. Please click on the button below to continue with your order.') }}
                             </p>
                             <form action="{{ $next }}" method="post">
-                                @csrf
                                 <button
                                     type="submit"
                                     class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500 bg-blue-600"
