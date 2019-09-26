@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Cashier\Tests\Unit;
+namespace Laravel\Cashier\Tests\Integration;
 
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Logger;
