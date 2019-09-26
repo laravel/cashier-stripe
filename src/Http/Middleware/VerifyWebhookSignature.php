@@ -4,19 +4,12 @@ namespace Laravel\Cashier\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Config\Repository as Config;
-use Illuminate\Contracts\Foundation\Application;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\WebhookSignature;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class VerifyWebhookSignature
 {
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
     /**
      * The configuration repository instance.
      *
@@ -27,13 +20,11 @@ class VerifyWebhookSignature
     /**
      * Create a new middleware instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Config\Repository  $config
      * @return void
      */
-    public function __construct(Application $app, Config $config)
+    public function __construct(Config $config)
     {
-        $this->app = $app;
         $this->config = $config;
     }
 
@@ -43,6 +34,8 @@ class VerifyWebhookSignature
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @return \Illuminate\Http\Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
     public function handle($request, Closure $next)
     {
@@ -54,7 +47,7 @@ class VerifyWebhookSignature
                 $this->config->get('cashier.webhook.tolerance')
             );
         } catch (SignatureVerificationException $exception) {
-            $this->app->abort(403);
+            throw new AccessDeniedHttpException($exception->getMessage(), $exception);
         }
 
         return $next($request);
