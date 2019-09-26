@@ -234,7 +234,7 @@ class Invoice
         }
 
         return $this->items->filter(function (StripeInvoiceLineItem $item) use ($type) {
-            return $item->type == $type;
+            return $item->type === $type;
         })->map(function (StripeInvoiceLineItem $item) {
             return new InvoiceItem($this->owner, $item);
         })->all();

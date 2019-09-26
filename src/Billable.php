@@ -279,6 +279,7 @@ trait Billable
             $stripeInvoice = StripeInvoice::retrieve(
                 $id, $this->stripeOptions()
             );
+
             return new Invoice($this, $stripeInvoice);
         } catch (Exception $exception) {
             //
@@ -446,23 +447,14 @@ trait Billable
             return;
         }
 
-        $stripePaymentMethod->detach(null, $this->stripeOptions());
-
         $customer = $this->asStripeCustomer();
 
         $defaultPaymentMethod = $customer->invoice_settings->default_payment_method;
 
-        // If payment method was the default payment method, we'll remove it manually...
+        $stripePaymentMethod->detach(null, $this->stripeOptions());
+
+        // If the payment method was the default payment method, we'll remove it manually...
         if ($stripePaymentMethod->id === $defaultPaymentMethod) {
-            $customer->invoice_settings = ['default_payment_method' => null];
-
-            $customer->save($this->stripeOptions());
-
-            $defaultPaymentMethod = null;
-        }
-
-        // If the default payment was already removed, we'll just update the database...
-        if (is_null($defaultPaymentMethod)) {
             $this->forceFill([
                 'card_brand' => null,
                 'card_last_four' => null,
