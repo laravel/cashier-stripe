@@ -30,4 +30,4 @@ class Logger implements StripeLogger
     {
         $this->logger->error($message, $context);
     }
-};
+}
