@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Tests\Integration;
 
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Logger;
 use Laravel\Cashier\Tests\TestCase;
 use Mockery as m;
@@ -15,6 +14,13 @@ class LoggerTest extends TestCase
 {
     /** @var string|null */
     protected $channel;
+
+    public function tearDown(): void
+    {
+        config(['cashier.logger' => null]);
+
+        parent::tearDown();
+    }
 
     public function test_the_logger_is_correctly_bound()
     {
@@ -42,13 +48,11 @@ class LoggerTest extends TestCase
             $logger->shouldReceive('channel')->with('default')->once()->andReturn($channel);
         });
 
-        Cashier::useLogger('default');
+        config(['cashier.logger' => 'default']);
 
         $logger = $this->app->make(LoggerInterface::class);
 
         $logger->error('foo', ['bar']);
-
-        Cashier::useLogger(null);
     }
 
     public function test_it_uses_the_default_stripe_logger()
@@ -65,21 +69,6 @@ class LoggerTest extends TestCase
     public function test_it_uses_a_configured_logger()
     {
         $this->channel = 'default';
-
-        $this->refreshApplication();
-
-        $logger = Stripe::getLogger();
-
-        $this->assertInstanceOf(
-            Logger::class,
-            $logger,
-            'Failed asserting that Stripe uses the Cashier logger.'
-        );
-    }
-
-    public function test_it_uses_a_registered_logger()
-    {
-        Cashier::useLogger('default');
 
         $this->refreshApplication();
 

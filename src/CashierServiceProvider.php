@@ -60,7 +60,9 @@ class CashierServiceProvider extends ServiceProvider
     protected function bindLogger()
     {
         $this->app->bind(LoggerInterface::class, function ($app) {
-            return new Logger($app->make('log')->channel(Cashier::$logger));
+            return new Logger(
+                $app->make('log')->channel(config('cashier.logger'))
+            );
         });
     }
 
@@ -71,11 +73,7 @@ class CashierServiceProvider extends ServiceProvider
      */
     protected function registerLogger()
     {
-        if ($logger = config('cashier.logger')) {
-            Cashier::useLogger($logger);
-        }
-
-        if (Cashier::$logger) {
+        if (config('cashier.logger')) {
             Stripe::setLogger($this->app->make(LoggerInterface::class));
         }
     }

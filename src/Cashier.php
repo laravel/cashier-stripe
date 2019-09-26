@@ -46,13 +46,6 @@ class Cashier
     public static $registersRoutes = true;
 
     /**
-     * Indicates the logging channel used by the Stripe library.
-     *
-     * @var string|null
-     */
-    public static $logger = null;
-
-    /**
      * Get the default Stripe API options.
      *
      * @param  array  $options
@@ -118,19 +111,6 @@ class Cashier
     public static function ignoreRoutes()
     {
         static::$registersRoutes = false;
-
-        return new static;
-    }
-
-    /**
-     * Configure Stripe to use a logging channel.
-     *
-     * @param  string|null  $logger
-     * @return static
-     */
-    public static function useLogger($logger)
-    {
-        static::$logger = $logger;
 
         return new static;
     }
