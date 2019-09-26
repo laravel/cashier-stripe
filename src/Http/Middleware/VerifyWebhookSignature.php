@@ -5,7 +5,7 @@ namespace Laravel\Cashier\Http\Middleware;
 use Closure;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Foundation\Application;
-use Stripe\Error\SignatureVerification;
+use Stripe\Exception\SignatureVerificationException;
 use Stripe\WebhookSignature;
 
 class VerifyWebhookSignature
@@ -53,7 +53,7 @@ class VerifyWebhookSignature
                 $this->config->get('cashier.webhook.secret'),
                 $this->config->get('cashier.webhook.tolerance')
             );
-        } catch (SignatureVerification $exception) {
+        } catch (SignatureVerificationException $exception) {
             $this->app->abort(403);
         }
 
