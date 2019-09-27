@@ -3,13 +3,12 @@
 namespace Laravel\Cashier\Tests\Unit;
 
 use Illuminate\Contracts\Config\Repository as Config;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class VerifyWebhookSignatureTest extends TestCase
 {
@@ -23,7 +22,7 @@ class VerifyWebhookSignatureTest extends TestCase
         $mock = VerifierMock::withWebhookSecret('secret')
             ->setSignedSignature('secret');
 
-        $response = (new VerifyWebhookSignature($mock->app, $mock->config))
+        $response = (new VerifyWebhookSignature($mock->config))
             ->handle($mock->request, function ($request) {
                 return new Response('OK');
             });
@@ -34,12 +33,12 @@ class VerifyWebhookSignatureTest extends TestCase
     public function test_app_aborts_when_secret_does_not_match()
     {
         $mock = VerifierMock::withWebhookSecret('secret')
-            ->setSignature('fail')
-            ->expectAbort();
+            ->setSignature('fail');
 
-        $this->expectException(HttpException::class);
+        $this->expectException(AccessDeniedHttpException::class);
+        $this->expectExceptionMessage('No signatures found matching the expected signature for payload');
 
-        (new VerifyWebhookSignature($mock->app, $mock->config))
+        (new VerifyWebhookSignature($mock->config))
             ->handle($mock->request, function ($request) {
             });
     }
@@ -47,12 +46,12 @@ class VerifyWebhookSignatureTest extends TestCase
     public function test_app_aborts_when_no_secret_was_provided()
     {
         $mock = VerifierMock::withWebhookSecret('secret')
-            ->setSignedSignature('')
-            ->expectAbort();
+            ->setSignedSignature('');
 
-        $this->expectException(HttpException::class);
+        $this->expectException(AccessDeniedHttpException::class);
+        $this->expectExceptionMessage('No signatures found matching the expected signature for payload');
 
-        (new VerifyWebhookSignature($mock->app, $mock->config))
+        (new VerifyWebhookSignature($mock->config))
             ->handle($mock->request, function ($request) {
             });
     }
@@ -60,11 +59,6 @@ class VerifyWebhookSignatureTest extends TestCase
 
 class VerifierMock
 {
-    /**
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    public $app;
-
     /**
      * @var \Illuminate\Contracts\Config\Repository
      */
@@ -77,7 +71,6 @@ class VerifierMock
 
     public function __construct($webhookSecret)
     {
-        $this->app = m::mock(Application::class);
         $this->config = m::mock(Config::class);
         $this->config->shouldReceive('get')->with('cashier.webhook.secret')->andReturn($webhookSecret);
         $this->config->shouldReceive('get')->with('cashier.webhook.tolerance')->andReturn(300);
@@ -87,13 +80,6 @@ class VerifierMock
     public static function withWebhookSecret($webhookSecret)
     {
         return new self($webhookSecret);
-    }
-
-    public function expectAbort()
-    {
-        $this->app->shouldReceive('abort')->andThrow(HttpException::class, 403);
-
-        return $this;
     }
 
     public function setSignedSignature($secret)
