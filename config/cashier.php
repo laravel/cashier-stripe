@@ -119,8 +119,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | This setting defines which logging channel will be used by the Stripe
-    | library to write log messages. For example, "default" will use the
-    | application's default log. Otherwise, "error_log" will be used.
+    | library to write log messages. You are free to specify any of your
+    | logging channels listed inside the "logging" configuration file.
     |
     */
 
