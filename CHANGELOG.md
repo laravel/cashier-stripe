@@ -1,6 +1,18 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.2.1...10.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.3.0...10.0)
+
+
+## [v10.3.0 (2019-10-01)](https://github.com/laravel/cashier/compare/v10.2.1...v10.3.0)
+
+### Changed
+- Add language line for full name placeholder ([#782](https://github.com/laravel/cashier/pull/782))
+- Update Stripe SDK to v7 ([#784](https://github.com/laravel/cashier/pull/784))
+- Refactor handling of invalid webhook signatures ([#791](https://github.com/laravel/cashier/pull/791))
+- Remove config repository dependency from webhook middleware ([#793](https://github.com/laravel/cashier/pull/793))
+
+### Fixed
+- Remove extra sign off from `ConfirmPayment` notification ([#779](https://github.com/laravel/cashier/pull/779))
 
 
 ## [v10.2.1 (2019-09-10)](https://github.com/laravel/cashier/compare/v10.2.0...v10.2.1)
