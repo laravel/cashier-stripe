@@ -113,4 +113,17 @@ return [
 
     'paper' => env('CASHIER_PAPER', 'letter'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Stripe Logger
+    |--------------------------------------------------------------------------
+    |
+    | This setting defines which logging channel will be used by the Stripe
+    | library to write log messages. You are free to specify any of your
+    | logging channels listed inside the "logging" configuration file.
+    |
+    */
+
+    'logger' => env('CASHIER_LOGGER'),
+
 ];

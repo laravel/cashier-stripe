@@ -8,12 +8,13 @@ use Laravel\Cashier\Exceptions\InvalidStripeCustomer;
 use Stripe\BankAccount as StripeBankAccount;
 use Stripe\Card as StripeCard;
 use Stripe\Customer as StripeCustomer;
-use Stripe\Error\Card as StripeCardException;
-use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
+use Stripe\Exception\CardException as StripeCardException;
+use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\PaymentIntent as StripePaymentIntent;
 use Stripe\PaymentMethod as StripePaymentMethod;
+use Stripe\Refund as StripeRefund;
 use Stripe\SetupIntent as StripeSetupIntent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -63,7 +64,10 @@ trait Billable
     {
         $intent = StripePaymentIntent::retrieve($paymentIntent, $this->stripeOptions());
 
-        return $intent->charges->data[0]->refund($options);
+        return StripeRefund::create(
+            ['charge' => $intent->charges->data[0]->id] + $options,
+            $this->stripeOptions()
+        );
     }
 
     /**
@@ -231,7 +235,7 @@ trait Billable
             $stripeInvoice = $stripeInvoice->pay();
 
             return new Invoice($this, $stripeInvoice);
-        } catch (StripeErrorInvalidRequest $e) {
+        } catch (StripeInvalidRequestException $exception) {
             return false;
         } catch (StripeCardException $exception) {
             $payment = new Payment(
@@ -258,7 +262,7 @@ trait Billable
             $stripeInvoice = StripeInvoice::upcoming(['customer' => $this->stripe_id], $this->stripeOptions());
 
             return new Invoice($this, $stripeInvoice);
-        } catch (StripeErrorInvalidRequest $e) {
+        } catch (StripeInvalidRequestException $exception) {
             //
         }
     }
@@ -276,12 +280,8 @@ trait Billable
                 $id, $this->stripeOptions()
             );
 
-            $stripeInvoice->lines = StripeInvoice::retrieve($id, $this->stripeOptions())
-                        ->lines
-                        ->all(['limit' => 1000]);
-
             return new Invoice($this, $stripeInvoice);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             //
         }
     }
@@ -334,7 +334,10 @@ trait Billable
 
         $parameters = array_merge(['limit' => 24], $parameters);
 
-        $stripeInvoices = $this->asStripeCustomer()->invoices($parameters);
+        $stripeInvoices = StripeInvoice::all(
+            ['customer' => $this->stripe_id] + $parameters,
+            $this->stripeOptions()
+        );
 
         // Here we will loop through the Stripe invoices and create our own custom Invoice
         // instances that have more helper methods and are generally more convenient to
@@ -440,22 +443,22 @@ trait Billable
 
         $stripePaymentMethod = $this->resolveStripePaymentMethod($paymentMethod);
 
-        if ($stripePaymentMethod->customer === $this->stripe_id) {
-            $stripePaymentMethod->detach(null, $this->stripeOptions());
+        if ($stripePaymentMethod->customer !== $this->stripe_id) {
+            return;
+        }
 
-            $customer = $this->asStripeCustomer();
+        $customer = $this->asStripeCustomer();
 
-            // If payment method was the default payment method, we'll remove it manually...
-            if ($stripePaymentMethod->id === $customer->invoice_settings->default_payment_method) {
-                $customer->invoice_settings = ['default_payment_method' => null];
+        $defaultPaymentMethod = $customer->invoice_settings->default_payment_method;
 
-                $customer->save($this->stripeOptions());
+        $stripePaymentMethod->detach(null, $this->stripeOptions());
 
-                $this->forceFill([
-                    'card_brand' => null,
-                    'card_last_four' => null,
-                ])->save();
-            }
+        // If the payment method was the default payment method, we'll remove it manually...
+        if ($stripePaymentMethod->id === $defaultPaymentMethod) {
+            $this->forceFill([
+                'card_brand' => null,
+                'card_last_four' => null,
+            ])->save();
         }
     }
 

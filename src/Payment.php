@@ -63,7 +63,7 @@ class Payment
      */
     public function requiresPaymentMethod()
     {
-        return $this->paymentIntent->status === 'requires_payment_method';
+        return $this->paymentIntent->status === StripePaymentIntent::STATUS_REQUIRES_PAYMENT_METHOD;
     }
 
     /**
@@ -73,7 +73,7 @@ class Payment
      */
     public function requiresAction()
     {
-        return $this->paymentIntent->status === 'requires_action';
+        return $this->paymentIntent->status === StripePaymentIntent::STATUS_REQUIRES_ACTION;
     }
 
     /**
@@ -83,7 +83,7 @@ class Payment
      */
     public function isCancelled()
     {
-        return $this->paymentIntent->status === 'canceled';
+        return $this->paymentIntent->status === StripePaymentIntent::STATUS_CANCELED;
     }
 
     /**
@@ -93,7 +93,7 @@ class Payment
      */
     public function isSucceeded()
     {
-        return $this->paymentIntent->status === 'succeeded';
+        return $this->paymentIntent->status === StripePaymentIntent::STATUS_SUCCEEDED;
     }
 
     /**
