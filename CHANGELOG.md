@@ -5,6 +5,9 @@
 
 ## [v10.3.0 (2019-10-01)](https://github.com/laravel/cashier/compare/v10.2.1...v10.3.0)
 
+### Added
+- Configure Stripe logger ([#790](https://github.com/laravel/cashier/pull/790), [4a53b46](https://github.com/laravel/cashier/commit/4a53b4620ea5a082f3d6e69d881a971889e8c3eb))
+
 ### Changed
 - Add language line for full name placeholder ([#782](https://github.com/laravel/cashier/pull/782))
 - Update Stripe SDK to v7 ([#784](https://github.com/laravel/cashier/pull/784))
