@@ -46,6 +46,7 @@ class PaymentMethod
     /**
      * Get the Stripe PaymentMethod instance.
      *
+     * @internal
      * @return \Stripe\PaymentMethod
      */
     public function asStripePaymentMethod()

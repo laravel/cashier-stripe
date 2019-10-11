@@ -663,6 +663,7 @@ class Subscription extends Model
     /**
      * Get the subscription as a Stripe subscription object.
      *
+     * @internal
      * @param  array  $expand
      * @return \Stripe\Subscription
      */

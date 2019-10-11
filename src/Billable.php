@@ -756,6 +756,7 @@ trait Billable
     /**
      * Get the Stripe customer for the model.
      *
+     * @internal
      * @return \Stripe\Customer
      */
     public function asStripeCustomer()

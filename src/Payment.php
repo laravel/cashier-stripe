@@ -116,6 +116,7 @@ class Payment
     /**
      * The Stripe PaymentIntent instance.
      *
+     * @internal
      * @return \Stripe\PaymentIntent
      */
     public function asStripePaymentIntent()

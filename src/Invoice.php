@@ -320,6 +320,7 @@ class Invoice
     /**
      * Get the Stripe invoice instance.
      *
+     * @internal
      * @return \Stripe\Invoice
      */
     public function asStripeInvoice()

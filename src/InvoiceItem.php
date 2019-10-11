@@ -115,6 +115,7 @@ class InvoiceItem
     /**
      * Get the underlying Stripe invoice item.
      *
+     * @internal
      * @return \Stripe\StripeObject
      */
     public function asStripeInvoiceItem()
