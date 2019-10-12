@@ -20,6 +20,13 @@ class ConfirmPayment extends Notification implements ShouldQueue
     public static $toMailCallback;
 
     /**
+     * The URL that should be used as redirect target after confirmation.
+     *
+     * @var string|\Closure|null
+     */
+    public static $redirectsTo;
+
+    /**
      * The PaymentIntent identifier.
      *
      * @var string
@@ -66,7 +73,7 @@ class ConfirmPayment extends Notification implements ShouldQueue
     {
         $url = $this->paymentUrl($notifiable);
 
-        if(static::$toMailCallback){
+        if (static::$toMailCallback) {
             return (static::$toMailCallback)($this->amount, $url);
         }
 
@@ -84,6 +91,13 @@ class ConfirmPayment extends Notification implements ShouldQueue
      */
     protected function paymentUrl($notifiable)
     {
+        if ($redirect = static::$redirectsTo) {
+            return route('cashier.payment', [
+                'id' => $this->paymentId,
+                'route' => is_callable($redirect) ? $redirect($notifiable) : $redirect,
+            ]);
+        }
+
         return route('cashier.payment', ['id' => $this->paymentId]);
     }
 
@@ -96,5 +110,16 @@ class ConfirmPayment extends Notification implements ShouldQueue
     public static function toMailUsing($callback)
     {
         static::$toMailCallback = $callback;
+    }
+
+    /**
+     * Set an URL that should be used for redirection after successful payment verification.
+     *
+     * @param  string|\Closure  $callback
+     * @return void
+     */
+    public static function redirectsTo($url)
+    {
+        static::$redirectsTo = $url;
     }
 }
