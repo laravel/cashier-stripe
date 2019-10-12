@@ -74,7 +74,7 @@ class ConfirmPayment extends Notification implements ShouldQueue
         $url = $this->paymentUrl($notifiable);
 
         if (static::$toMailCallback) {
-            return (static::$toMailCallback)($this->amount, $url);
+            return (static::$toMailCallback)($notifiable, $this->amount, $url);
         }
 
         return (new MailMessage)
