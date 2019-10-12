@@ -13,6 +13,13 @@ class ConfirmPayment extends Notification implements ShouldQueue
     use Queueable;
 
     /**
+     * The callback that should be used to build the mail message.
+     *
+     * @var \Closure|null
+     */
+    public static $toMailCallback;
+
+    /**
      * The PaymentIntent identifier.
      *
      * @var string
@@ -59,6 +66,10 @@ class ConfirmPayment extends Notification implements ShouldQueue
     {
         $url = $this->paymentUrl($notifiable);
 
+        if(static::$toMailCallback){
+            return (static::$toMailCallback)($this->amount, $url);
+        }
+
         return (new MailMessage)
             ->greeting(__('Confirm your :amount payment', ['amount' => $this->amount]))
             ->line(__('Extra confirmation is needed to process your payment. Please continue to the payment page by clicking on the button below.'))
@@ -74,5 +85,16 @@ class ConfirmPayment extends Notification implements ShouldQueue
     protected function paymentUrl($notifiable)
     {
         return route('cashier.payment', ['id' => $this->paymentId]);
+    }
+
+    /**
+     * Set a callback that should be used when building the notification mail message.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function toMailUsing($callback)
+    {
+        static::$toMailCallback = $callback;
     }
 }
