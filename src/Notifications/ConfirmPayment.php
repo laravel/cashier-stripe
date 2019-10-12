@@ -57,11 +57,22 @@ class ConfirmPayment extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $url = route('cashier.payment', ['id' => $this->paymentId]);
+        $url = $this->paymentUrl($notifiable);
 
         return (new MailMessage)
             ->greeting(__('Confirm your :amount payment', ['amount' => $this->amount]))
             ->line(__('Extra confirmation is needed to process your payment. Please continue to the payment page by clicking on the button below.'))
             ->action(__('Confirm Payment'), $url);
+    }
+
+    /**
+     * Get the payment verification URL for the given notifiable.
+     *
+     * @param  mixed  $notifiable
+     * @return string
+     */
+    protected function paymentUrl($notifiable)
+    {
+        return route('cashier.payment', ['id' => $this->paymentId]);
     }
 }
