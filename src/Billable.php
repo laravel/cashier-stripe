@@ -430,7 +430,7 @@ trait Billable
 
         return new PaymentMethod($this, $stripePaymentMethod);
     }
-    
+
     /**
      * Retrieve a payment method from Stripe.
      *
