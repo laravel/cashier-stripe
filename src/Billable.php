@@ -279,11 +279,11 @@ trait Billable
             $stripeInvoice = StripeInvoice::retrieve(
                 $id, $this->stripeOptions()
             );
-
-            return new Invoice($this, $stripeInvoice);
         } catch (Exception $exception) {
             //
         }
+
+        return new Invoice($this, $stripeInvoice);
     }
 
     /**
@@ -602,6 +602,23 @@ trait Billable
         });
 
         $this->updateDefaultPaymentMethodFromStripe();
+    }
+
+    /**
+     * Find a PaymentMethod by ID.
+     *
+     * @param  string  $paymentMethod
+     * @return \Laravel\Cashier\PaymentMethod
+     */
+    public function findPaymentMethod($paymentMethod)
+    {
+        try {
+            $stripePaymentMethod = $this->resolveStripePaymentMethod($paymentMethod);
+        } catch (Exception $exception) {
+            //
+        }
+
+        return new PaymentMethod($this, $stripePaymentMethod);
     }
 
     /**
