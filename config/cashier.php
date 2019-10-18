@@ -126,4 +126,17 @@ return [
 
     'logger' => env('CASHIER_LOGGER'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Deactivate Past Due Subscriptions
+    |--------------------------------------------------------------------------
+    |
+    | By default, subscriptions with a "past due" state will be treated
+    | as inactive. You can choose to change this behavior by setting
+    | the configuration below to false so that they remain active.
+    |
+    */
+
+    'deactivate_past_due' => true,
+
 ];

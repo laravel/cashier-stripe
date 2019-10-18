@@ -124,10 +124,12 @@ class Subscription extends Model
      */
     public function active()
     {
+        $ignorePastDue = ! config('cashier.deactivate_past_due');
+
         return (is_null($this->ends_at) || $this->onGracePeriod()) &&
             $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE &&
             $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE_EXPIRED &&
-            $this->stripe_status !== StripeSubscription::STATUS_PAST_DUE &&
+            ($ignorePastDue || $this->stripe_status !== StripeSubscription::STATUS_PAST_DUE) &&
             $this->stripe_status !== StripeSubscription::STATUS_UNPAID;
     }
 
@@ -146,8 +148,11 @@ class Subscription extends Model
                 });
         })->where('stripe_status', '!=', StripeSubscription::STATUS_INCOMPLETE)
             ->where('stripe_status', '!=', StripeSubscription::STATUS_INCOMPLETE_EXPIRED)
-            ->where('stripe_status', '!=', StripeSubscription::STATUS_PAST_DUE)
             ->where('stripe_status', '!=', StripeSubscription::STATUS_UNPAID);
+
+        if (config('cashier.deactivate_past_due')) {
+            $query->where('stripe_status', '!=', StripeSubscription::STATUS_PAST_DUE);
+        }
     }
 
     /**

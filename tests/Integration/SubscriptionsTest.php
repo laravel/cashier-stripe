@@ -12,6 +12,7 @@ use Laravel\Cashier\Subscription;
 use Stripe\Coupon;
 use Stripe\Plan;
 use Stripe\Product;
+use Stripe\Subscription as StripeSubscription;
 
 class SubscriptionsTest extends IntegrationTestCase
 {
@@ -556,6 +557,19 @@ class SubscriptionsTest extends IntegrationTestCase
         $this->assertFalse($user->subscriptions()->onGracePeriod()->exists());
         $this->assertTrue($user->subscriptions()->notOnGracePeriod()->exists());
         $this->assertTrue($user->subscriptions()->ended()->exists());
+
+        // Enable past_due as active state.
+        $this->assertFalse($subscription->active());
+        $this->assertFalse($user->subscriptions()->active()->exists());
+
+        config(['cashier.deactivate_past_due' => false]);
+
+        $subscription->update(['ends_at' => null, 'stripe_status' => StripeSubscription::STATUS_PAST_DUE]);
+
+        $this->assertTrue($subscription->active());
+        $this->assertTrue($user->subscriptions()->active()->exists());
+
+        config(['cashier.deactivate_past_due' => true]);
     }
 
     public function test_retrieve_the_latest_payment_for_a_subscription()
