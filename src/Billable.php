@@ -432,7 +432,7 @@ trait Billable
     }
     
     /**
-     * Retrieve a payment method from Stripe
+     * Retrieve a payment method from Stripe.
      *
      * @param  \Stripe\PaymentMethod|string  $paymentMethod
      * @return \Laravel\Cashier\PaymentMethod
