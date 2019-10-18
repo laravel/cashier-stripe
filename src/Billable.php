@@ -430,6 +430,17 @@ trait Billable
 
         return new PaymentMethod($this, $stripePaymentMethod);
     }
+    
+    /**
+     * Retrieve a payment method from Stripe
+     *
+     * @param  \Stripe\PaymentMethod|string  $paymentMethod
+     * @return \Laravel\Cashier\PaymentMethod
+     */
+    public function findPaymentMethod($paymentMethod)
+    {
+        return $this->resolveStripePaymentMethod($paymentMethod);
+    }
 
     /**
      * Remove a payment method from the customer.
