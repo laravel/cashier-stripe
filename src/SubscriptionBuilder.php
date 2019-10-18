@@ -270,7 +270,7 @@ class SubscriptionBuilder
     /**
      * Get the trial ending date for the Stripe payload.
      *
-     * @return int|null
+     * @return int|string|null
      */
     protected function getTrialEndForPayload()
     {
