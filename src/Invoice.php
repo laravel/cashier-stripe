@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use Dompdf\Dompdf;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
 use Stripe\Invoice as StripeInvoice;
@@ -42,6 +43,10 @@ class Invoice
      */
     public function __construct($owner, StripeInvoice $invoice)
     {
+        if ($owner->stripe_id !== $invoice->customer) {
+            throw new Exception("The invoice `{$invoice->id}` does not belong to this customer `$owner->stripe_id`.");
+        }
+
         $this->owner = $owner;
         $this->invoice = $invoice;
     }
