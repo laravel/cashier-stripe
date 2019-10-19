@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Tests\Integration;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Exceptions\PaymentActionRequired;
 use Laravel\Cashier\Exceptions\PaymentFailure;
 use Laravel\Cashier\Payment;
@@ -562,14 +563,15 @@ class SubscriptionsTest extends IntegrationTestCase
         $this->assertFalse($subscription->active());
         $this->assertFalse($user->subscriptions()->active()->exists());
 
-        config(['cashier.deactivate_past_due' => false]);
+        Cashier::activatePastDue();
 
         $subscription->update(['ends_at' => null, 'stripe_status' => StripeSubscription::STATUS_PAST_DUE]);
 
         $this->assertTrue($subscription->active());
         $this->assertTrue($user->subscriptions()->active()->exists());
 
-        config(['cashier.deactivate_past_due' => true]);
+        // Reset deactivate past due state to default to not conflict with other tests.
+        Cashier::$deactivatePastDue = true;
     }
 
     public function test_retrieve_the_latest_payment_for_a_subscription()
