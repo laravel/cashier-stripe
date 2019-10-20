@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Events\WebhookHandled;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
@@ -39,7 +40,9 @@ class WebhookController extends Controller
         $method = 'handle'.Str::studly(str_replace('.', '_', $payload['type']));
 
         if (method_exists($this, $method)) {
-            return $this->{$method}($payload);
+            $response = $this->{$method}($payload);
+            WebhookHandled::dispatch($payload);
+            return $response;
         }
 
         return $this->missingMethod();

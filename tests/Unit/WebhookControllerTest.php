@@ -3,8 +3,10 @@
 namespace Laravel\Cashier\Tests\Unit;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Events\WebhookHandled;
 use Laravel\Cashier\Http\Controllers\WebhookController;
-use PHPUnit\Framework\TestCase;
+use Laravel\Cashier\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookControllerTest extends TestCase
@@ -13,7 +15,15 @@ class WebhookControllerTest extends TestCase
     {
         $request = $this->request('charge.succeeded');
 
+        Event::fake([
+            WebhookHandled::class
+        ]);
+
         $response = (new WebhookControllerTestStub)->handleWebhook($request);
+
+        Event::assertDispatched(WebhookHandled::class, function (WebhookHandled $event) use ($request) {
+            return $request->getContent() == json_encode($event->payload);
+        });
 
         $this->assertEquals('Webhook Handled', $response->getContent());
     }
