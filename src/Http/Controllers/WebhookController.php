@@ -42,6 +42,7 @@ class WebhookController extends Controller
         if (method_exists($this, $method)) {
             $response = $this->{$method}($payload);
             WebhookHandled::dispatch($payload);
+
             return $response;
         }
 

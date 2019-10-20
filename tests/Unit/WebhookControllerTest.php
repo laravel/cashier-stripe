@@ -16,7 +16,7 @@ class WebhookControllerTest extends TestCase
         $request = $this->request('charge.succeeded');
 
         Event::fake([
-            WebhookHandled::class
+            WebhookHandled::class,
         ]);
 
         $response = (new WebhookControllerTestStub)->handleWebhook($request);
