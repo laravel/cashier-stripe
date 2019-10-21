@@ -123,11 +123,11 @@ class Cashier
     }
 
     /**
-     * Configure Cashier to mark past due subscriptions as active.
+     * Configure Cashier to maintain past due subscriptions as active.
      *
      * @return static
      */
-    public static function activatePastDue()
+    public static function keepPastDueSubscriptionsActive()
     {
         static::$deactivatePastDue = false;
 
