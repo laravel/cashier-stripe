@@ -563,7 +563,7 @@ class SubscriptionsTest extends IntegrationTestCase
         $this->assertFalse($subscription->active());
         $this->assertFalse($user->subscriptions()->active()->exists());
 
-        Cashier::activatePastDue();
+        Cashier::keepPastDueSubscriptionsActive();
 
         $subscription->update(['ends_at' => null, 'stripe_status' => StripeSubscription::STATUS_PAST_DUE]);
 
