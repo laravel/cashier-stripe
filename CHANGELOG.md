@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.3.0...10.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.4.0...10.0)
+
+
+## [v10.4.0 (2019-10-29)](https://github.com/laravel/cashier/compare/v10.3.0...v10.4.0)
+
+### Added
+- Add findPaymentMethod method ([#801](https://github.com/laravel/cashier/pull/801))
+- Allow to set past due as active ([#802](https://github.com/laravel/cashier/pull/802))
 
 
 ## [v10.3.0 (2019-10-01)](https://github.com/laravel/cashier/compare/v10.2.1...v10.3.0)
