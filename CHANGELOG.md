@@ -1,12 +1,22 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.3.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.4.0...master)
 
 ### Changed
 - Dropped Laravel 5.8 support ([b6256a2](https://github.com/laravel/cashier/commit/b6256a2a2e486478a26043cb2926dc744dc0a42a))
 
 
+## [v10.4.0 (2019-10-29)](https://github.com/laravel/cashier/compare/v10.3.0...v10.4.0)
+
+### Added
+- Add findPaymentMethod method ([#801](https://github.com/laravel/cashier/pull/801))
+- Allow to set past due as active ([#802](https://github.com/laravel/cashier/pull/802))
+
+
 ## [v10.3.0 (2019-10-01)](https://github.com/laravel/cashier/compare/v10.2.1...v10.3.0)
+
+### Added
+- Configure Stripe logger ([#790](https://github.com/laravel/cashier/pull/790), [4a53b46](https://github.com/laravel/cashier/commit/4a53b4620ea5a082f3d6e69d881a971889e8c3eb))
 
 ### Changed
 - Add language line for full name placeholder ([#782](https://github.com/laravel/cashier/pull/782))
