@@ -15,19 +15,17 @@ Laravel Cashier provides an expressive, fluent interface to [Stripe's](https://s
 
 Documentation for Cashier can be found on the [Laravel website](https://laravel.com/docs/billing).
 
-## Running Cashier's Tests
-
-You will need to set the Stripe **testing** secret environment variable in a custom `phpunit.xml` file in order to run the Cashier tests.
-
-Copy the default file using `cp phpunit.xml.dist phpunit.xml` and add the following line below the `CASHIER_MODEL` environment variable in your new `phpunit.xml` file:
-
-    <env name="STRIPE_SECRET" value="Your Stripe Secret Key"/>
-
-Please note that due to the fact that actual API requests against Stripe are being made, these tests take a few minutes to run.
-
 ## Contributing
 
-Thank you for considering contributing to the Cashier. You can read the contribution guide lines [here](contributing.md).
+Thank you for considering contributing to the Cashier. You can read the contribution guide lines [here](.github/CONTRIBUTING.md).
+
+## Code of Conduct
+
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](.github/CODE_OF_CONDUCT.md).
+
+## Security Vulnerabilities
+
+Please review [our security policy](https://github.com/laravel/cashier/security/policy) on how to report security vulnerabilities.
 
 ## License
 
