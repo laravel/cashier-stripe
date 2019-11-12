@@ -797,13 +797,13 @@ trait Billable
     }
 
     /**
-     * Get the tax percentage to apply to the subscription.
+     * Get the tax rates to apply to the subscription.
      *
-     * @return int|float
+     * @return array
      */
-    public function taxPercentage()
+    public function taxRates()
     {
-        return 0;
+        return [];
     }
 
     /**
