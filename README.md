@@ -27,7 +27,7 @@ Please note that due to the fact that actual API requests against Stripe are bei
 
 ## Contributing
 
-Thank you for considering contributing to the Cashier. You can read the contribution guide lines [here](contributing.md).
+Thank you for considering contributing to the Cashier. You can read the contribution guide lines [here](.github/CONTRIBUTING.md).
 
 ## License
 
