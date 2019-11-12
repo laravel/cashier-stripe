@@ -184,6 +184,7 @@ class SubscriptionBuilder
      *
      * @param  array  $options
      * @return \Laravel\Cashier\Subscription
+     *
      * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
      * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
@@ -198,6 +199,7 @@ class SubscriptionBuilder
      * @param  \Stripe\PaymentMethod|string|null  $paymentMethod
      * @param  array  $options
      * @return \Laravel\Cashier\Subscription
+     *
      * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
      * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
