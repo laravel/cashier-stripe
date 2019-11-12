@@ -17,7 +17,7 @@ Documentation for Cashier can be found on the [Laravel website](https://laravel.
 
 ## Contributing
 
-Thank you for considering contributing to the Cashier. You can read the contribution guide lines [here](.github/CONTRIBUTING.md).
+Thank you for considering contributing to the Cashier. You can read the contribution guide [here](.github/CONTRIBUTING.md).
 
 ## Code of Conduct
 
