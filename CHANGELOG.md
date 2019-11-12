@@ -1,6 +1,16 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.4.0...10.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.0...10.0)
+
+
+## [v10.5.0 (2019-11-12)](https://github.com/laravel/cashier/compare/v10.4.0...v10.5.0)
+
+### Added
+- Webhook events ([#810](https://github.com/laravel/cashier/pull/810))
+
+### Fixed
+- Add missing `@throws` tags ([#813](https://github.com/laravel/cashier/pull/813))
+- Properly return `null` for find methods ([#817](https://github.com/laravel/cashier/pull/817))
 
 
 ## [v10.4.0 (2019-10-29)](https://github.com/laravel/cashier/compare/v10.3.0...v10.4.0)
