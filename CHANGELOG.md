@@ -1,9 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.4.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.0...master)
 
 ### Changed
 - Dropped Laravel 5.8 support ([b6256a2](https://github.com/laravel/cashier/commit/b6256a2a2e486478a26043cb2926dc744dc0a42a))
+
+
+## [v10.5.0 (2019-11-12)](https://github.com/laravel/cashier/compare/v10.4.0...v10.5.0)
+
+### Added
+- Webhook events ([#810](https://github.com/laravel/cashier/pull/810))
+
+### Fixed
+- Add missing `@throws` tags ([#813](https://github.com/laravel/cashier/pull/813))
+- Properly return `null` for find methods ([#817](https://github.com/laravel/cashier/pull/817))
 
 
 ## [v10.4.0 (2019-10-29)](https://github.com/laravel/cashier/compare/v10.3.0...v10.4.0)
