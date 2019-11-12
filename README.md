@@ -17,7 +17,7 @@ Documentation for Cashier can be found on the [Laravel website](https://laravel.
 
 ## Contributing
 
-Thank you for considering contributing to the Cashier. You can read the contribution guide [here](.github/CONTRIBUTING.md).
+Thank you for considering contributing to Cashier! You can read the contribution guide [here](.github/CONTRIBUTING.md).
 
 ## Code of Conduct
 
@@ -29,4 +29,4 @@ Please review [our security policy](https://github.com/laravel/cashier/security/
 
 ## License
 
-Laravel Cashier is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Laravel Cashier is open-sourced software licensed under the [MIT license](LICENSE.md).
