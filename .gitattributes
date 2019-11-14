@@ -8,5 +8,5 @@
 .styleci.yml export-ignore
 .travis.yml export-ignore
 CHANGELOG.md export-ignore
-UPGRADE.md export-ignore
 phpunit.xml.dist export-ignore
+UPGRADE.md export-ignore
