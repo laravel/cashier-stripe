@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.0...10.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.1...10.0)
+
+
+## [v10.5.1 (2019-11-26)](https://github.com/laravel/cashier/compare/v10.45.0...v10.5.1)
+
+### Added
+- Symfony 5 support ([#822](https://github.com/laravel/cashier/pull/822))
 
 
 ## [v10.5.0 (2019-11-12)](https://github.com/laravel/cashier/compare/v10.4.0...v10.5.0)
