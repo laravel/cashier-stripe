@@ -28,8 +28,8 @@
         "moneyphp/money": "^3.2",
         "nesbot/carbon": "^2.0",
         "stripe/stripe-php": "^7.0",
-        "symfony/http-kernel": "^4.3",
-        "symfony/intl": "^4.3"
+        "symfony/http-kernel": "^4.3|^5.0",
+        "symfony/intl": "^4.3|^5.0"
     },
     "require-dev": {
         "mockery/mockery": "^1.0",

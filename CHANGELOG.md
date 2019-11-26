@@ -1,9 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.1...master)
 
 ### Changed
 - Dropped Laravel 5.8 support ([b6256a2](https://github.com/laravel/cashier/commit/b6256a2a2e486478a26043cb2926dc744dc0a42a))
+
+
+## [v10.5.1 (2019-11-26)](https://github.com/laravel/cashier/compare/v10.45.0...v10.5.1)
+
+### Added
+- Symfony 5 support ([#822](https://github.com/laravel/cashier/pull/822))
 
 
 ## [v10.5.0 (2019-11-12)](https://github.com/laravel/cashier/compare/v10.4.0...v10.5.0)
