@@ -8,6 +8,8 @@ use Stripe\Util\LoggerInterface as StripeLogger;
 class Logger implements StripeLogger
 {
     /**
+     * The Logger instance.
+     *
      * @var \Psr\Log\LoggerInterface
      */
     protected $logger;
