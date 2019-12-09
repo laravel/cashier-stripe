@@ -565,6 +565,7 @@ class Subscription extends Model
      * Resume the cancelled subscription.
      *
      * @return $this
+     *
      * @throws \LogicException
      */
     public function resume()
