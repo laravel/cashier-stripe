@@ -40,7 +40,7 @@ class ChargesTest extends IntegrationTestCase
 
         $invoice = $user->invoices()[0];
         $this->assertEquals('$10.00', $invoice->total());
-        $this->assertEquals('Laravel Cashier', $invoice->invoiceItems()[0]->asStripeInvoiceItem()->description);
+        $this->assertEquals('Laravel Cashier', $invoice->invoiceItems()[0]->asStripeInvoiceLineItem()->description);
     }
 
     public function test_customer_can_be_refunded()

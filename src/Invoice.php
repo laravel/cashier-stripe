@@ -7,6 +7,7 @@ use Dompdf\Dompdf;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
+use Stripe\Customer as StripeCustomer;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\InvoiceLineItem as StripeInvoiceLineItem;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,11 +29,18 @@ class Invoice
     protected $invoice;
 
     /**
-     * The Stripe invoice items.
+     * The Stripe invoice line items.
      *
      * @var \Stripe\Collection|\Stripe\InvoiceLineItem[]
      */
     protected $items;
+
+    /**
+     * The taxes applied to the invoice.
+     *
+     * @var \Laravel\Cashier\Tax[]
+     */
+    protected $taxes;
 
     /**
      * Create a new invoice instance.
@@ -131,9 +139,7 @@ class Invoice
      */
     public function hasDiscount()
     {
-        return $this->invoice->subtotal > 0 &&
-            $this->invoice->subtotal != $this->invoice->total &&
-            ! is_null($this->invoice->discount);
+        return $this->rawDiscount() > 0;
     }
 
     /**
@@ -143,7 +149,25 @@ class Invoice
      */
     public function discount()
     {
-        return $this->formatAmount($this->invoice->subtotal + $this->invoice->tax - $this->invoice->total);
+        return $this->formatAmount($this->rawDiscount());
+    }
+
+    /**
+     * Get the raw discount amount.
+     *
+     * @return int
+     */
+    public function rawDiscount()
+    {
+        if (! isset($this->invoice->discount)) {
+            return 0;
+        }
+
+        if ($this->discountIsPercentage()) {
+            return (int) round($this->invoice->subtotal * ($this->percentOff() / 100));
+        }
+
+        return $this->rawAmountOff();
     }
 
     /**
@@ -165,7 +189,7 @@ class Invoice
      */
     public function discountIsPercentage()
     {
-        return $this->coupon() && isset($this->invoice->discount->coupon->percent_off);
+        return isset($this->invoice->discount) && isset($this->invoice->discount->coupon->percent_off);
     }
 
     /**
@@ -189,15 +213,25 @@ class Invoice
      */
     public function amountOff()
     {
-        if (isset($this->invoice->discount->coupon->amount_off)) {
-            return $this->formatAmount($this->invoice->discount->coupon->amount_off);
-        }
-
-        return $this->formatAmount(0);
+        return $this->formatAmount($this->rawAmountOff());
     }
 
     /**
-     * Get the tax total amount.
+     * Get the raw discount amount for the invoice.
+     *
+     * @return int
+     */
+    public function rawAmountOff()
+    {
+        if (isset($this->invoice->discount->coupon->amount_off)) {
+            return $this->invoice->discount->coupon->amount_off;
+        }
+
+        return 0;
+    }
+
+    /**
+     * Get the total tax amount.
      *
      * @return string
      */
@@ -207,13 +241,78 @@ class Invoice
     }
 
     /**
+     * Determine if the invoice has tax applied.
+     *
+     * @return bool
+     */
+    public function hasTax()
+    {
+        $lineItems = $this->invoiceItems() + $this->subscriptions();
+
+        return collect($lineItems)->contains(function (InvoiceLineItem $item) {
+            return $item->hasTaxRates();
+        });
+    }
+
+    /**
+     * Get the taxes applied to the invoice.
+     *
+     * @return \Laravel\Cashier\Tax[]
+     */
+    public function taxes()
+    {
+        if (! is_null($this->taxes)) {
+            return $this->taxes;
+        }
+
+        $this->refreshWithExpandedTaxRates();
+
+        return $this->taxes = collect($this->invoice->total_tax_amounts)
+            ->sortByDesc('inclusive')
+            ->map(function (object $taxAmount) {
+                return new Tax($taxAmount->amount, $this->invoice->currency, $taxAmount->tax_rate);
+            })
+            ->all();
+    }
+
+    /**
+     * Determine if the customer is not exempted from taxes.
+     *
+     * @return bool
+     */
+    public function isNotTaxExempt()
+    {
+        return $this->invoice->customer_tax_exempt === StripeCustomer::TAX_EXEMPT_NONE;
+    }
+
+    /**
+     * Determine if the customer is exempted from taxes.
+     *
+     * @return bool
+     */
+    public function isTaxExempt()
+    {
+        return $this->invoice->customer_tax_exempt === StripeCustomer::TAX_EXEMPT_EXEMPT;
+    }
+
+    /**
+     * Determine if reverse charge applies to the customer.
+     *
+     * @return bool
+     */
+    public function reverseChargeApplies()
+    {
+        return $this->invoice->customer_tax_exempt === StripeCustomer::TAX_EXEMPT_REVERSE;
+    }
+
+    /**
      * Get all of the "invoice item" line items.
      *
      * @return array
      */
     public function invoiceItems()
     {
-        return $this->invoiceItemsByType('invoiceitem');
+        return $this->invoiceLineItemsByType('invoiceitem');
     }
 
     /**
@@ -223,7 +322,7 @@ class Invoice
      */
     public function subscriptions()
     {
-        return $this->invoiceItemsByType('subscription');
+        return $this->invoiceLineItemsByType('subscription');
     }
 
     /**
@@ -232,17 +331,47 @@ class Invoice
      * @param  string  $type
      * @return array
      */
-    public function invoiceItemsByType($type)
+    public function invoiceLineItemsByType($type)
     {
         if (is_null($this->items)) {
-            $this->items = new Collection($this->lines->autoPagingIterator());
+            $this->refreshWithExpandedTaxRates();
+
+            $this->items = new Collection($this->invoice->lines->autoPagingIterator());
         }
 
         return $this->items->filter(function (StripeInvoiceLineItem $item) use ($type) {
             return $item->type === $type;
         })->map(function (StripeInvoiceLineItem $item) {
-            return new InvoiceItem($this->owner, $item);
+            return new InvoiceLineItem($this, $item);
         })->all();
+    }
+
+    /**
+     * Refresh the invoice with expanded TaxRate objects.
+     *
+     * @return void
+     */
+    protected function refreshWithExpandedTaxRates()
+    {
+        if ($this->invoice->id) {
+            $this->invoice = StripeInvoice::retrieve([
+                'id' => $this->invoice->id,
+                'expand' => [
+                    'lines.data.tax_amounts.tax_rate',
+                    'total_tax_amounts.tax_rate',
+                ],
+            ], $this->owner->stripeOptions());
+        } else {
+            // If no invoice id is set then we can assume the
+            // invoice is the customer's upcoming invoice.
+            $this->invoice = StripeInvoice::upcoming([
+                'customer' => $this->owner->stripe_id,
+                'expand' => [
+                    'lines.data.tax_amounts.tax_rate',
+                    'total_tax_amounts.tax_rate',
+                ],
+            ], $this->owner->stripeOptions());
+        }
     }
 
     /**

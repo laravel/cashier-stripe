@@ -209,7 +209,8 @@ class SubscriptionBuilder
         $customer = $this->getStripeCustomer($paymentMethod, $options);
 
         $stripeSubscription = StripeSubscription::create(
-            ['customer' => $customer->id] + $this->buildPayload()
+            ['customer' => $customer->id] + $this->buildPayload(),
+            $this->owner->stripeOptions()
         );
 
         if ($this->skipTrial) {

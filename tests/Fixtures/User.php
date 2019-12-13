@@ -9,4 +9,16 @@ use Laravel\Cashier\Billable;
 class User extends Model
 {
     use Billable, Notifiable;
+
+    public $taxRates = [];
+
+    /**
+     * Get the tax rates to apply to the subscription.
+     *
+     * @return array
+     */
+    public function taxRates()
+    {
+        return $this->taxRates;
+    }
 }
