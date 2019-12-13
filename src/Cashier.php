@@ -22,7 +22,7 @@ class Cashier
      *
      * @var string
      */
-    const STRIPE_VERSION = '2019-08-14';
+    const STRIPE_VERSION = '2019-12-03';
 
     /**
      * The custom currency formatter.
