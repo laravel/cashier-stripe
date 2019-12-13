@@ -142,7 +142,7 @@
                     @endforeach
 
                     <!-- Display The Subtotal -->
-                    @if ($invoice->hasDiscount() || $invoice->tax_percent || $invoice->hasStartingBalance())
+                    @if ($invoice->hasDiscount() || $invoice->hasTax() || $invoice->hasStartingBalance())
                         <tr>
                             <td colspan="2" style="text-align: right;">Subtotal</td>
                             <td>{{ $invoice->subtotal() }}</td>
@@ -165,10 +165,21 @@
                     @endif
 
                     <!-- Display The Tax Amount -->
-                    @if ($invoice->tax_percent)
+                    @if ($invoice->hasTax())
                         <tr>
-                            <td colspan="2" style="text-align: right;">Tax ({{ $invoice->tax_percent }}%)</td>
+                            <td colspan="2" style="text-align: right;">Tax</td>
                             <td>{{ $invoice->tax() }}</td>
+                        </tr>
+                    @elseif ($invoice->receivesReverseCharge() || $invoice->isTaxExempt())
+                        <tr>
+                            <td colspan="2" style="text-align: right;"></td>
+                            <td>
+                                @if ($invoice->receivesReverseCharge())
+                                    Tax to be paid on reverse charge basis.
+                                @elseif ($invoice->isTaxExempt())
+                                    Customer is exempt from taxes.
+                                @endif
+                            </td>
                         </tr>
                     @endif
 

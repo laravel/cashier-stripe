@@ -805,6 +805,26 @@ trait Billable
     }
 
     /**
+     * Determine if the customer is exempted from taxes.
+     *
+     * @return bool
+     */
+    public function isTaxExempt()
+    {
+        return $this->asStripeCustomer()->tax_exempt === StripeCustomer::TAX_EXEMPT_EXEMPT;
+    }
+
+    /**
+     * Determine if the customer receives a reverse charge.
+     *
+     * @return bool
+     */
+    public function receivesReverseCharge()
+    {
+        return $this->asStripeCustomer()->tax_exempt === StripeCustomer::TAX_EXEMPT_REVERSE;
+    }
+
+    /**
      * Get the default Stripe API options for the current Billable model.
      *
      * @param  array  $options

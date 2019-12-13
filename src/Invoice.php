@@ -7,6 +7,7 @@ use Dompdf\Dompdf;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
+use Stripe\Customer as StripeCustomer;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\InvoiceLineItem as StripeInvoiceLineItem;
 use Symfony\Component\HttpFoundation\Response;
@@ -204,6 +205,36 @@ class Invoice
     public function tax()
     {
         return $this->formatAmount($this->invoice->tax);
+    }
+
+    /**
+     * Determine if the invoice has tax applied.
+     *
+     * @return string
+     */
+    public function hasTax()
+    {
+        return $this->invoice->tax > 0;
+    }
+
+    /**
+     * Determine if the customer is exempted from taxes.
+     *
+     * @return bool
+     */
+    public function isTaxExempt()
+    {
+        return $this->invoice->customer_tax_exempt === StripeCustomer::TAX_EXEMPT_EXEMPT;
+    }
+
+    /**
+     * Determine if the customer receives a reverse charge.
+     *
+     * @return bool
+     */
+    public function receivesReverseCharge()
+    {
+        return $this->invoice->customer_tax_exempt === StripeCustomer::TAX_EXEMPT_REVERSE;
     }
 
     /**
