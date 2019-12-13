@@ -8,8 +8,8 @@ use Laravel\Cashier\Invoice;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Tests\TestCase;
 use Mockery as m;
-use Stripe\Discount;
 use Stripe\Customer as StripeCustomer;
+use Stripe\Discount;
 use Stripe\Invoice as StripeInvoice;
 
 class InvoiceTest extends TestCase
