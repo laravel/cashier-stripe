@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests\Unit;
 
 use Carbon\Carbon;
+use Laravel\Cashier\Exceptions\InvalidStripeCustomer;
 use Laravel\Cashier\Tests\Fixtures\User;
 use PHPUnit\Framework\TestCase;
 
@@ -40,5 +41,14 @@ class CustomerTest extends TestCase
         $user = new User;
 
         $this->assertNull($user->defaultPaymentMethod());
+    }
+
+    public function test_stripe_customer_method_throws_exception_when_stripe_id_is_not_set()
+    {
+        $user = new User;
+
+        $this->expectException(InvalidStripeCustomer::class);
+
+        $user->asStripeCustomer();
     }
 }

@@ -781,6 +781,8 @@ trait Billable
      */
     public function asStripeCustomer()
     {
+        $this->assertCustomerExists();
+
         return StripeCustomer::retrieve($this->stripe_id, $this->stripeOptions());
     }
 
