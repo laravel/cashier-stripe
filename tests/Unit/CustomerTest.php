@@ -29,11 +29,11 @@ class CustomerTest extends TestCase
         $user = new User;
         $user->card_brand = 'visa';
 
-        $this->assertTrue($user->hasPaymentMethod());
+        $this->assertTrue($user->hasDefaultPaymentMethod());
 
         $user = new User;
 
-        $this->assertFalse($user->hasPaymentMethod());
+        $this->assertFalse($user->hasDefaultPaymentMethod());
     }
 
     public function test_default_payment_method_returns_null_when_the_user_is_not_a_customer_yet()
