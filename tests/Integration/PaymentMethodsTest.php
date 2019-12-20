@@ -28,6 +28,8 @@ class PaymentMethodsTest extends IntegrationTestCase
         $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);
         $this->assertEquals('visa', $paymentMethod->card->brand);
         $this->assertEquals('4242', $paymentMethod->card->last4);
+        $this->assertTrue($user->hasPaymentMethod());
+        $this->assertFalse($user->hasDefaultPaymentMethod());
     }
 
     public function test_we_can_remove_payment_methods()
@@ -38,10 +40,12 @@ class PaymentMethodsTest extends IntegrationTestCase
         $paymentMethod = $user->addPaymentMethod('pm_card_visa');
 
         $this->assertCount(1, $user->paymentMethods());
+        $this->assertTrue($user->hasPaymentMethod());
 
         $user->removePaymentMethod($paymentMethod->asStripePaymentMethod());
 
         $this->assertCount(0, $user->paymentMethods());
+        $this->assertFalse($user->hasPaymentMethod());
     }
 
     public function test_we_can_remove_the_default_payment_method()
@@ -52,6 +56,8 @@ class PaymentMethodsTest extends IntegrationTestCase
         $paymentMethod = $user->updateDefaultPaymentMethod('pm_card_visa');
 
         $this->assertCount(1, $user->paymentMethods());
+        $this->assertTrue($user->hasPaymentMethod());
+        $this->assertTrue($user->hasDefaultPaymentMethod());
 
         $user->removePaymentMethod($paymentMethod->asStripePaymentMethod());
 
@@ -59,6 +65,8 @@ class PaymentMethodsTest extends IntegrationTestCase
         $this->assertNull($user->defaultPaymentMethod());
         $this->assertNull($user->card_brand);
         $this->assertNull($user->card_last_four);
+        $this->assertFalse($user->hasPaymentMethod());
+        $this->assertFalse($user->hasDefaultPaymentMethod());
     }
 
     public function test_we_can_set_a_default_payment_method()
@@ -71,6 +79,7 @@ class PaymentMethodsTest extends IntegrationTestCase
         $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);
         $this->assertEquals('visa', $paymentMethod->card->brand);
         $this->assertEquals('4242', $paymentMethod->card->last4);
+        $this->assertTrue($user->hasDefaultPaymentMethod());
 
         $paymentMethod = $user->defaultPaymentMethod();
 

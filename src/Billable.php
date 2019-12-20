@@ -380,13 +380,23 @@ trait Billable
     }
 
     /**
-     * Determines if the customer currently has a payment method.
+     * Determines if the customer currently has a default payment method.
+     *
+     * @return bool
+     */
+    public function hasDefaultPaymentMethod()
+    {
+        return (bool) $this->card_brand;
+    }
+
+    /**
+     * Determines if the customer currently has at least one payment method.
      *
      * @return bool
      */
     public function hasPaymentMethod()
     {
-        return (bool) $this->card_brand;
+        return $this->paymentMethods()->isNotEmpty();
     }
 
     /**
