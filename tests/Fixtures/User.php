@@ -5,8 +5,9 @@ namespace Laravel\Cashier\Tests\Fixtures;
 use Illuminate\Foundation\Auth\User as Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Cashier\Billable;
+use Laravel\Cashier\HasSubscriptions;
 
-class User extends Model
+class User extends Model implements Billable
 {
-    use Billable, Notifiable;
+    use HasSubscriptions, Notifiable;
 }
