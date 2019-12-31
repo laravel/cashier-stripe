@@ -2,14 +2,14 @@
 
 namespace Laravel\Cashier\Http\Controllers;
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Laravel\Cashier\Cashier;
-use Illuminate\Support\Carbon;
-use Laravel\Cashier\Subscription;
 use Illuminate\Routing\Controller;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
+use Laravel\Cashier\Subscription;
+use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
 {
