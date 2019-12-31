@@ -2,27 +2,27 @@
 
 namespace Laravel\Cashier\Tests\Integration;
 
-use DateTime;
-use Stripe\Card;
-use Stripe\Plan;
-use Stripe\Token;
 use Carbon\Carbon;
-use Stripe\Coupon;
-use Stripe\Stripe;
-use Stripe\Product;
-use Stripe\ApiResource;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Laravel\Cashier\Billable;
-use PHPUnit\Framework\TestCase;
-use Stripe\Error\InvalidRequest;
-use Illuminate\Database\Schema\Builder;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\ConnectionInterface;
+use DateTime;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Laravel\Cashier\Http\Controllers\WebhookController;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Laravel\Cashier\Billable;
 use Laravel\Cashier\Exceptions\SubscriptionCreationFailed;
+use Laravel\Cashier\Http\Controllers\WebhookController;
+use PHPUnit\Framework\TestCase;
+use Stripe\ApiResource;
+use Stripe\Card;
+use Stripe\Coupon;
+use Stripe\Error\InvalidRequest;
+use Stripe\Plan;
+use Stripe\Product;
+use Stripe\Stripe;
+use Stripe\Token;
 
 class CashierTest extends TestCase
 {

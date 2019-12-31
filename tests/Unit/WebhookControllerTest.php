@@ -3,8 +3,8 @@
 namespace Laravel\Cashier\Tests\Unit;
 
 use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
 use Laravel\Cashier\Http\Controllers\WebhookController;
+use PHPUnit\Framework\TestCase;
 
 class WebhookControllerTest extends TestCase
 {
