@@ -362,8 +362,7 @@ class Invoice
                 ],
             ], $this->owner->stripeOptions());
         } else {
-            // If no invoice id is set then we can assume the
-            // invoice is the customer's upcoming invoice.
+            // If no invoice ID is present then assume this is the customer's upcoming invoice...
             $this->invoice = StripeInvoice::upcoming([
                 'customer' => $this->owner->stripe_id,
                 'expand' => [
