@@ -807,13 +807,43 @@ trait Billable
     }
 
     /**
-     * Get the tax percentage to apply to the subscription.
+     * Get the tax rates to apply to the subscription.
      *
-     * @return int|float
+     * @return array
      */
-    public function taxPercentage()
+    public function taxRates()
     {
-        return 0;
+        return [];
+    }
+
+    /**
+     * Determine if the customer is not exempted from taxes.
+     *
+     * @return bool
+     */
+    public function isNotTaxExempt()
+    {
+        return $this->asStripeCustomer()->tax_exempt === StripeCustomer::TAX_EXEMPT_NONE;
+    }
+
+    /**
+     * Determine if the customer is exempted from taxes.
+     *
+     * @return bool
+     */
+    public function isTaxExempt()
+    {
+        return $this->asStripeCustomer()->tax_exempt === StripeCustomer::TAX_EXEMPT_EXEMPT;
+    }
+
+    /**
+     * Determine if reverse charge applies to the customer.
+     *
+     * @return bool
+     */
+    public function reverseChargeApplies()
+    {
+        return $this->asStripeCustomer()->tax_exempt === StripeCustomer::TAX_EXEMPT_REVERSE;
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use DateTimeInterface;
+use Stripe\Subscription as StripeSubscription;
 
 class SubscriptionBuilder
 {
@@ -207,8 +208,10 @@ class SubscriptionBuilder
     {
         $customer = $this->getStripeCustomer($paymentMethod, $options);
 
-        /** @var \Stripe\Subscription $stripeSubscription */
-        $stripeSubscription = $customer->subscriptions->create($this->buildPayload());
+        $stripeSubscription = StripeSubscription::create(
+            ['customer' => $customer->id] + $this->buildPayload(),
+            $this->owner->stripeOptions()
+        );
 
         if ($this->skipTrial) {
             $trialEndsAt = null;
@@ -268,7 +271,7 @@ class SubscriptionBuilder
             'metadata' => $this->metadata,
             'plan' => $this->plan,
             'quantity' => $this->quantity,
-            'tax_percent' => $this->getTaxPercentageForPayload(),
+            'default_tax_rates' => $this->getTaxRatesForPayload(),
             'trial_end' => $this->getTrialEndForPayload(),
             'off_session' => true,
         ]);
@@ -291,14 +294,14 @@ class SubscriptionBuilder
     }
 
     /**
-     * Get the tax percentage for the Stripe payload.
+     * Get the tax rates for the Stripe payload.
      *
-     * @return int|float|null
+     * @return array|null
      */
-    protected function getTaxPercentageForPayload()
+    protected function getTaxRatesForPayload()
     {
-        if ($taxPercentage = $this->owner->taxPercentage()) {
-            return $taxPercentage;
+        if ($taxRates = $this->owner->taxRates()) {
+            return $taxRates;
         }
     }
 }

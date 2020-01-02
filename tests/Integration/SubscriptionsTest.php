@@ -14,6 +14,7 @@ use Stripe\Coupon;
 use Stripe\Plan;
 use Stripe\Product;
 use Stripe\Subscription as StripeSubscription;
+use Stripe\TaxRate;
 
 class SubscriptionsTest extends IntegrationTestCase
 {
@@ -41,6 +42,11 @@ class SubscriptionsTest extends IntegrationTestCase
      * @var string
      */
     protected static $couponId;
+
+    /**
+     * @var string
+     */
+    protected static $taxRateId;
 
     public static function setUpBeforeClass(): void
     {
@@ -95,6 +101,14 @@ class SubscriptionsTest extends IntegrationTestCase
             'duration_in_months' => 3,
             'currency' => 'USD',
         ]);
+
+        static::$taxRateId = TaxRate::create([
+            'display_name' => 'VAT',
+            'description' => 'VAT Belgium',
+            'jurisdiction' => 'BE',
+            'percentage' => 21,
+            'inclusive' => false,
+        ])->id;
     }
 
     public static function tearDownAfterClass(): void
@@ -106,6 +120,7 @@ class SubscriptionsTest extends IntegrationTestCase
         static::deleteStripeResource(new Plan(static::$premiumPlanId));
         static::deleteStripeResource(new Product(static::$productId));
         static::deleteStripeResource(new Coupon(static::$couponId));
+        static::deleteStripeResource(new Coupon(static::$taxRateId));
     }
 
     public function test_subscriptions_can_be_created()
@@ -588,5 +603,16 @@ class SubscriptionsTest extends IntegrationTestCase
             $this->assertInstanceOf(Payment::class, $payment = $subscription->latestPayment());
             $this->assertTrue($payment->requiresAction());
         }
+    }
+
+    public function test_subscriptions_with_tax_rates_can_be_created()
+    {
+        $user = $this->createCustomer('subscriptions_with_tax_rates_can_be_created');
+        $user->taxRates = [self::$taxRateId];
+
+        $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
+        $stripeSubscription = $subscription->asStripeSubscription();
+
+        $this->assertEquals([self::$taxRateId], [$stripeSubscription->default_tax_rates[0]->id]);
     }
 }

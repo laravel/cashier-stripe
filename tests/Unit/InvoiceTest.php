@@ -8,6 +8,8 @@ use Laravel\Cashier\Invoice;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Tests\TestCase;
 use Mockery as m;
+use Stripe\Coupon;
+use Stripe\Customer as StripeCustomer;
 use Stripe\Discount;
 use Stripe\Invoice as StripeInvoice;
 
@@ -186,11 +188,17 @@ class InvoiceTest extends TestCase
 
     public function test_it_can_determine_if_it_has_a_discount_applied()
     {
+        $coupon = new Coupon();
+        $coupon->amount_off = 50;
+
+        $discount = new Discount();
+        $discount->coupon = $coupon;
+
         $stripeInvoice = new StripeInvoice();
         $stripeInvoice->customer = 'foo';
         $stripeInvoice->subtotal = 450;
         $stripeInvoice->total = 500;
-        $stripeInvoice->discount = new Discount();
+        $stripeInvoice->discount = $discount;
 
         $user = new User();
         $user->stripe_id = 'foo';
@@ -215,5 +223,33 @@ class InvoiceTest extends TestCase
         $tax = $invoice->tax();
 
         $this->assertEquals('$0.50', $tax);
+    }
+
+    public function test_it_can_determine_if_the_customer_was_exempt_from_taxes()
+    {
+        $stripeInvoice = new StripeInvoice();
+        $stripeInvoice->customer = 'foo';
+        $stripeInvoice->customer_tax_exempt = StripeCustomer::TAX_EXEMPT_EXEMPT;
+
+        $user = new User();
+        $user->stripe_id = 'foo';
+
+        $invoice = new Invoice($user, $stripeInvoice);
+
+        $this->assertTrue($invoice->isTaxExempt());
+    }
+
+    public function test_it_can_determine_if_reverse_charge_applies()
+    {
+        $stripeInvoice = new StripeInvoice();
+        $stripeInvoice->customer = 'foo';
+        $stripeInvoice->customer_tax_exempt = StripeCustomer::TAX_EXEMPT_REVERSE;
+
+        $user = new User();
+        $user->stripe_id = 'foo';
+
+        $invoice = new Invoice($user, $stripeInvoice);
+
+        $this->assertTrue($invoice->reverseChargeApplies());
     }
 }

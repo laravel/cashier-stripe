@@ -118,6 +118,11 @@
                     <tr>
                         <th align="left">Description</th>
                         <th align="right">Date</th>
+
+                        @if ($invoice->hasTax())
+                            <th align="right">Tax</th>
+                        @endif
+
                         <th align="right">Amount</th>
                     </tr>
 
@@ -125,6 +130,23 @@
                     @foreach ($invoice->invoiceItems() as $item)
                         <tr class="row">
                             <td colspan="2">{{ $item->description }}</td>
+
+                            @if ($invoice->hasTax())
+                                <td>
+                                    @if ($inclusiveTaxPercentage = $item->inclusiveTaxPercentage())
+                                        {{ $inclusiveTaxPercentage }}% incl.
+                                    @endif
+
+                                    @if ($item->hasBothInclusiveAndExclusiveTax())
+                                        +
+                                    @endif
+
+                                    @if ($exclusiveTaxPercentage = $item->exclusiveTaxPercentage())
+                                        {{ $exclusiveTaxPercentage }}%
+                                    @endif
+                                </td>
+                            @endif
+
                             <td>{{ $item->total() }}</td>
                         </tr>
                     @endforeach
@@ -137,14 +159,31 @@
                                 {{ $subscription->startDateAsCarbon()->formatLocalized('%B %e, %Y') }} -
                                 {{ $subscription->endDateAsCarbon()->formatLocalized('%B %e, %Y') }}
                             </td>
+
+                            @if ($invoice->hasTax())
+                                <td>
+                                    @if ($inclusiveTaxPercentage = $subscription->inclusiveTaxPercentage())
+                                        {{ $inclusiveTaxPercentage }}% incl.
+                                    @endif
+
+                                    @if ($subscription->hasBothInclusiveAndExclusiveTax())
+                                        +
+                                    @endif
+
+                                    @if ($exclusiveTaxPercentage = $subscription->exclusiveTaxPercentage())
+                                        {{ $exclusiveTaxPercentage }}%
+                                    @endif
+                                </td>
+                            @endif
+
                             <td>{{ $subscription->total() }}</td>
                         </tr>
                     @endforeach
 
                     <!-- Display The Subtotal -->
-                    @if ($invoice->hasDiscount() || $invoice->tax_percent || $invoice->hasStartingBalance())
+                    @if ($invoice->hasDiscount() || $invoice->hasTax() || $invoice->hasStartingBalance())
                         <tr>
-                            <td colspan="2" style="text-align: right;">Subtotal</td>
+                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">Subtotal</td>
                             <td>{{ $invoice->subtotal() }}</td>
                         </tr>
                     @endif
@@ -152,7 +191,7 @@
                     <!-- Display The Discount -->
                     @if ($invoice->hasDiscount())
                         <tr>
-                            <td colspan="2" style="text-align: right;">
+                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
                                 @if ($invoice->discountIsPercentage())
                                     {{ $invoice->coupon() }} ({{ $invoice->percentOff() }}% Off)
                                 @else
@@ -164,26 +203,50 @@
                         </tr>
                     @endif
 
-                    <!-- Display The Tax Amount -->
-                    @if ($invoice->tax_percent)
-                        <tr>
-                            <td colspan="2" style="text-align: right;">Tax ({{ $invoice->tax_percent }}%)</td>
-                            <td>{{ $invoice->tax() }}</td>
-                        </tr>
+                    <!-- Display The Taxes -->
+                    @if ($invoice->hasTax())
+                        @unless ($invoice->isNotTaxExempt())
+                            <tr>
+                                <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
+                                    @if ($invoice->isTaxExempt())
+                                        Tax is exempted
+                                    @else
+                                        Tax to be paid on reverse charge basis
+                                    @endif
+                                </td>
+                                <td></td>
+                            </tr>
+                        @else
+                            @foreach ($invoice->taxes() as $tax)
+                                <tr>
+                                    <td colspan="3" style="text-align: right;">
+                                        {{ $tax->display_name }} {{ $tax->jurisdiction ? ' - '.$tax->jurisdiction : '' }}
+                                        ({{ $tax->percentage }}%{{ $tax->isInclusive() ? ' incl.' : '' }})
+                                    </td>
+                                    <td>{{ $tax->amount() }}</td>
+                                </tr>
+                            @endforeach
+                        @endunless
                     @endif
 
                     <!-- Starting Balance -->
                     @if ($invoice->hasStartingBalance())
                         <tr>
-                            <td colspan="2" style="text-align: right;">Customer Balance</td>
+                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
+                                Customer Balance
+                            </td>
                             <td>{{ $invoice->startingBalance() }}</td>
                         </tr>
                     @endif
 
                     <!-- Display The Final Total -->
                     <tr>
-                        <td colspan="2" style="text-align: right;"><strong>Total</strong></td>
-                        <td><strong>{{ $invoice->total() }}</strong></td>
+                        <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
+                            <strong>Total</strong>
+                        </td>
+                        <td>
+                            <strong>{{ $invoice->total() }}</strong>
+                        </td>
                     </tr>
                 </table>
             </td>
