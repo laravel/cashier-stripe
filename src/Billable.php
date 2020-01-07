@@ -62,10 +62,8 @@ trait Billable
      */
     public function refund($paymentIntent, array $options = [])
     {
-        $intent = StripePaymentIntent::retrieve($paymentIntent, $this->stripeOptions());
-
         return StripeRefund::create(
-            ['charge' => $intent->charges->data[0]->id] + $options,
+            ['payment_intent' => $paymentIntent] + $options,
             $this->stripeOptions()
         );
     }

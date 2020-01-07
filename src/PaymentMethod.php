@@ -31,7 +31,7 @@ class PaymentMethod
     public function __construct($owner, StripePaymentMethod $paymentMethod)
     {
         if ($owner->stripe_id !== $paymentMethod->customer) {
-            throw new Exception("The invoice `{$paymentMethod->id}` does not belong to this customer `$owner->stripe_id`.");
+            throw new Exception("The payment method `{$paymentMethod->id}` does not belong to this customer `$owner->stripe_id`.");
         }
 
         $this->owner = $owner;

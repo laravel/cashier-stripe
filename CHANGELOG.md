@@ -1,12 +1,23 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.1...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.2...master)
 
 ### Changed
 - Dropped Laravel 5.8 support ([b6256a2](https://github.com/laravel/cashier/commit/b6256a2a2e486478a26043cb2926dc744dc0a42a))
 
 
-## [v10.5.1 (2019-11-26)](https://github.com/laravel/cashier/compare/v10.45.0...v10.5.1)
+## [v10.5.2 (2020-01-07)](https://github.com/laravel/cashier/compare/v10.5.1...v10.5.2)
+
+### Changed
+- Assert customer exists before retrieving ([#834](https://github.com/laravel/cashier/pull/834))
+- Simplify refund method ([#837](https://github.com/laravel/cashier/pull/837))
+
+### Fixed
+- Fix typo in exception message ([#846](https://github.com/laravel/cashier/pull/846))
+- Fix overriding notification subject translation ([59faaf3](https://github.com/laravel/cashier/commit/59faaf3d6163de95fd977511121bcee695fb6bbe))
+
+
+## [v10.5.1 (2019-11-26)](https://github.com/laravel/cashier/compare/v10.5.0...v10.5.1)
 
 ### Added
 - Symfony 5 support ([#822](https://github.com/laravel/cashier/pull/822))
