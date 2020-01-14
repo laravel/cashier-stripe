@@ -1,9 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.2...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.3...master)
 
 ### Changed
 - Dropped Laravel 5.8 support ([b6256a2](https://github.com/laravel/cashier/commit/b6256a2a2e486478a26043cb2926dc744dc0a42a))
+
+
+## [v10.5.3 (2020-01-14)](https://github.com/laravel/cashier/compare/v10.5.2...v10.5.3)
+
+### Fixed
+- Fix `findInvoiceOrFail` behavior ([#853](https://github.com/laravel/cashier/pull/853))
 
 
 ## [v10.5.2 (2020-01-07)](https://github.com/laravel/cashier/compare/v10.5.1...v10.5.2)

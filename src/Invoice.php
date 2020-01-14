@@ -4,9 +4,9 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use Dompdf\Dompdf;
-use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
+use Laravel\Cashier\Exceptions\InvalidInvoice;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\InvoiceLineItem as StripeInvoiceLineItem;
@@ -48,11 +48,13 @@ class Invoice
      * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @param  \Stripe\Invoice  $invoice
      * @return void
+     *
+     * @throws \Laravel\Cashier\Exceptions\InvalidInvoice
      */
     public function __construct($owner, StripeInvoice $invoice)
     {
         if ($owner->stripe_id !== $invoice->customer) {
-            throw new Exception("The invoice `{$invoice->id}` does not belong to this customer `$owner->stripe_id`.");
+            throw InvalidInvoice::invalidOwner($invoice, $owner);
         }
 
         $this->owner = $owner;
