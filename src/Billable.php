@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Exception;
 use Illuminate\Support\Collection;
+use Laravel\Cashier\Exceptions\InvalidInvoice;
 use Laravel\Cashier\Exceptions\InvalidStripeCustomer;
 use Stripe\BankAccount as StripeBankAccount;
 use Stripe\Card as StripeCard;
@@ -294,14 +295,14 @@ trait Billable
      */
     public function findInvoiceOrFail($id)
     {
-        $invoice = $this->findInvoice($id);
+        try {
+            $invoice = $this->findInvoice($id);
+        } catch (InvalidInvoice $exception) {
+            throw new AccessDeniedHttpException;
+        }
 
         if (is_null($invoice)) {
             throw new NotFoundHttpException;
-        }
-
-        if ($invoice->customer !== $this->stripe_id) {
-            throw new AccessDeniedHttpException;
         }
 
         return $invoice;
