@@ -2,7 +2,7 @@
 
 namespace Laravel\Cashier;
 
-use Exception;
+use Laravel\Cashier\Exceptions\InvalidPaymentMethod;
 use Stripe\PaymentMethod as StripePaymentMethod;
 
 class PaymentMethod
@@ -27,11 +27,13 @@ class PaymentMethod
      * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @param  \Stripe\PaymentMethod  $paymentMethod
      * @return void
+     *
+     * @throws \Laravel\Cashier\Exceptions\InvalidPaymentMethod
      */
     public function __construct($owner, StripePaymentMethod $paymentMethod)
     {
         if ($owner->stripe_id !== $paymentMethod->customer) {
-            throw new Exception("The payment method `{$paymentMethod->id}` does not belong to this customer `$owner->stripe_id`.");
+            throw InvalidPaymentMethod::invalidOwner($paymentMethod, $owner);
         }
 
         $this->owner = $owner;
