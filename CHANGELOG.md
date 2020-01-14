@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.2...10.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.3...10.0)
+
+
+## [v10.5.3 (2020-01-14)](https://github.com/laravel/cashier/compare/v10.5.2...v10.5.3)
+
+### Fixed
+- Fix `findInvoiceOrFail` behavior ([#853](https://github.com/laravel/cashier/pull/853))
 
 
 ## [v10.5.2 (2020-01-07)](https://github.com/laravel/cashier/compare/v10.5.1...v10.5.2)
