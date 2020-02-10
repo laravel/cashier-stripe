@@ -615,4 +615,15 @@ class SubscriptionsTest extends IntegrationTestCase
 
         $this->assertEquals([self::$taxRateId], [$stripeSubscription->default_tax_rates[0]->id]);
     }
+
+    public function test_it_can_get_subscription_from_stripe_id()
+    {
+        $user = $this->createCustomer('test_subscription');
+
+        $subscription1 = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
+
+        $subscription2 = Cashier::findSubscriptionByStripeId($subscription1->stripe_id);
+
+        $this->assertEquals($subscription1->stripe_id, $subscription2->stripe_id);
+    }
 }

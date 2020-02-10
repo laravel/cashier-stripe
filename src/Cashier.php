@@ -2,11 +2,11 @@
 
 namespace Laravel\Cashier;
 
-use Money\Currencies\ISOCurrencies;
-use Money\Currency;
-use Money\Formatter\IntlMoneyFormatter;
 use Money\Money;
+use Money\Currency;
 use NumberFormatter;
+use Money\Currencies\ISOCurrencies;
+use Money\Formatter\IntlMoneyFormatter;
 
 class Cashier
 {
@@ -132,5 +132,10 @@ class Cashier
         static::$deactivatePastDue = false;
 
         return new static;
+    }
+
+    public static function findSubscriptionByStripeId($stripe_id)
+    {
+        return Subscription::where('stripe_id', $stripe_id)->first();
     }
 }
