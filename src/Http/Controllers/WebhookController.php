@@ -208,7 +208,7 @@ class WebhookController extends Controller
      */
     protected function getUserByStripeId($stripeId)
     {
-        return Cashier::findBillable($stripeId)
+        return Cashier::findBillable($stripeId);
     }
 
     /**
