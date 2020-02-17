@@ -620,12 +620,12 @@ class SubscriptionsTest extends IntegrationTestCase
     {
         $user = $this->createCustomer('subscriptions_with_options_can_be_created');
 
-        $backdate_timestamp = now()->subMonth()->getTimestamp();
+        $backdateStartDate = now()->subMonth()->getTimestamp();
         $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa', [], [
-            'backdate_start_date' => $backdate_timestamp,
+            'backdate_start_date' => $backdateStartDate,
         ]);
         $stripeSubscription = $subscription->asStripeSubscription();
 
-        $this->assertEquals($backdate_timestamp, $stripeSubscription->start_date);
+        $this->assertEquals($backdateStartDate, $stripeSubscription->start_date);
     }
 }
