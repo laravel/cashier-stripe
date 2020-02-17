@@ -204,12 +204,18 @@ class SubscriptionBuilder
      * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
      * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
-    public function create($paymentMethod = null, array $options = [])
+    public function create($paymentMethod = null, array $options = [], $subscriptionOptions = [])
     {
         $customer = $this->getStripeCustomer($paymentMethod, $options);
 
+        $payload = array_merge(
+            ['customer' => $customer->id],
+            $this->buildPayload(),
+            $subscriptionOptions,
+        );
+
         $stripeSubscription = StripeSubscription::create(
-            ['customer' => $customer->id] + $this->buildPayload(),
+            $payload,
             $this->owner->stripeOptions()
         );
 
