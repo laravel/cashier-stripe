@@ -133,4 +133,21 @@ class Cashier
 
         return new static;
     }
+
+    /**
+     * Get the user based on their Stripe id
+     *
+     * @param string $stripeId
+     * @return Billable
+     */
+    public static function getUserByStripeId($stripeId)
+    {
+        if ($stripeId === null) {
+            return;
+        }
+
+        $model = config('cashier.model');
+
+        return (new $model())->where('stripe_id', $stripeId)->first();
+    }
 }

@@ -14,6 +14,7 @@ use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
 use Stripe\PaymentIntent as StripePaymentIntent;
 use Symfony\Component\HttpFoundation\Response;
+use Laravel\Cashier\Cashier;
 
 class WebhookController extends Controller
 {
@@ -61,7 +62,7 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
     {
-        if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
+        if ($user = Cashier::getUserByStripeId($payload['data']['object']['customer'])) {
             $data = $payload['data']['object'];
 
             $user->subscriptions->filter(function (Subscription $subscription) use ($data) {
@@ -123,7 +124,7 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSubscriptionDeleted(array $payload)
     {
-        if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
+        if ($user = Cashier::getUserByStripeId($payload['data']['object']['customer'])) {
             $user->subscriptions->filter(function ($subscription) use ($payload) {
                 return $subscription->stripe_id === $payload['data']['object']['id'];
             })->each(function ($subscription) {
@@ -142,7 +143,7 @@ class WebhookController extends Controller
      */
     protected function handleCustomerUpdated(array $payload)
     {
-        if ($user = $this->getUserByStripeId($payload['data']['object']['id'])) {
+        if ($user = Cashier::getUserByStripeId($payload['data']['object']['id'])) {
             $user->updateDefaultPaymentMethodFromStripe();
         }
 
@@ -157,7 +158,7 @@ class WebhookController extends Controller
      */
     protected function handleCustomerDeleted(array $payload)
     {
-        if ($user = $this->getUserByStripeId($payload['data']['object']['id'])) {
+        if ($user = Cashier::getUserByStripeId($payload['data']['object']['id'])) {
             $user->subscriptions->each(function (Subscription $subscription) {
                 $subscription->skipTrial()->markAsCancelled();
             });
@@ -185,7 +186,7 @@ class WebhookController extends Controller
             return $this->successMethod();
         }
 
-        if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
+        if ($user = Cashier::getUserByStripeId($payload['data']['object']['customer'])) {
             if (in_array(Notifiable::class, class_uses_recursive($user))) {
                 $payment = new Payment(StripePaymentIntent::retrieve(
                     $payload['data']['object']['payment_intent'],
@@ -197,23 +198,6 @@ class WebhookController extends Controller
         }
 
         return $this->successMethod();
-    }
-
-    /**
-     * Get the billable entity instance by Stripe ID.
-     *
-     * @param  string|null  $stripeId
-     * @return \Laravel\Cashier\Billable|null
-     */
-    protected function getUserByStripeId($stripeId)
-    {
-        if ($stripeId === null) {
-            return;
-        }
-
-        $model = config('cashier.model');
-
-        return (new $model)->where('stripe_id', $stripeId)->first();
     }
 
     /**
