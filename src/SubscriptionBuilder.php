@@ -211,7 +211,7 @@ class SubscriptionBuilder
         $payload = array_merge(
             ['customer' => $customer->id],
             $this->buildPayload(),
-            $subscriptionOptions,
+            $subscriptionOptions
         );
 
         $stripeSubscription = StripeSubscription::create(
