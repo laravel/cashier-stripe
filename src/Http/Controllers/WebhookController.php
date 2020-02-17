@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\WebhookHandled;
 use Laravel\Cashier\Events\WebhookReceived;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
@@ -14,7 +15,6 @@ use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
 use Stripe\PaymentIntent as StripePaymentIntent;
 use Symfony\Component\HttpFoundation\Response;
-use Laravel\Cashier\Cashier;
 
 class WebhookController extends Controller
 {

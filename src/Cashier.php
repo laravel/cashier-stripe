@@ -135,7 +135,7 @@ class Cashier
     }
 
     /**
-     * Get the user based on their Stripe id
+     * Get the user based on their Stripe id.
      *
      * @param string $stripeId
      * @return Billable
