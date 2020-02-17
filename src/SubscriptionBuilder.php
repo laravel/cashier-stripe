@@ -199,6 +199,7 @@ class SubscriptionBuilder
      *
      * @param  \Stripe\PaymentMethod|string|null  $paymentMethod
      * @param  array  $customerOptions
+     * @param  array  $subscriptionOptions
      * @return \Laravel\Cashier\Subscription
      *
      * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
