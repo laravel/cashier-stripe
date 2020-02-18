@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\WebhookHandled;
 use Laravel\Cashier\Events\WebhookReceived;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
@@ -207,13 +208,7 @@ class WebhookController extends Controller
      */
     protected function getUserByStripeId($stripeId)
     {
-        if ($stripeId === null) {
-            return;
-        }
-
-        $model = config('cashier.model');
-
-        return (new $model)->where('stripe_id', $stripeId)->first();
+        return Cashier::findBillable($stripeId);
     }
 
     /**

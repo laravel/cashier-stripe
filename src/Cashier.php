@@ -133,4 +133,21 @@ class Cashier
 
         return new static;
     }
+
+    /**
+     * Get the billable entity instance by Stripe ID.
+     *
+     * @param string $stripeId
+     * @return \Laravel\Cashier\Billable
+     */
+    public static function findBillable($stripeId)
+    {
+        if ($stripeId === null) {
+            return;
+        }
+
+        $model = config('cashier.model');
+
+        return (new $model)->where('stripe_id', $stripeId)->first();
+    }
 }
