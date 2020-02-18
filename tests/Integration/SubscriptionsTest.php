@@ -615,4 +615,17 @@ class SubscriptionsTest extends IntegrationTestCase
 
         $this->assertEquals([self::$taxRateId], [$stripeSubscription->default_tax_rates[0]->id]);
     }
+
+    public function test_subscriptions_with_options_can_be_created()
+    {
+        $user = $this->createCustomer('subscriptions_with_options_can_be_created');
+
+        $backdateStartDate = now()->subMonth()->getTimestamp();
+        $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa', [], [
+            'backdate_start_date' => $backdateStartDate,
+        ]);
+        $stripeSubscription = $subscription->asStripeSubscription();
+
+        $this->assertEquals($backdateStartDate, $stripeSubscription->start_date);
+    }
 }

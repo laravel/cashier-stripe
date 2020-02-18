@@ -198,18 +198,25 @@ class SubscriptionBuilder
      * Create a new Stripe subscription.
      *
      * @param  \Stripe\PaymentMethod|string|null  $paymentMethod
-     * @param  array  $options
+     * @param  array  $customerOptions
+     * @param  array  $subscriptionOptions
      * @return \Laravel\Cashier\Subscription
      *
      * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
      * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
-    public function create($paymentMethod = null, array $options = [])
+    public function create($paymentMethod = null, array $customerOptions = [], array $subscriptionOptions = [])
     {
-        $customer = $this->getStripeCustomer($paymentMethod, $options);
+        $customer = $this->getStripeCustomer($paymentMethod, $customerOptions);
+
+        $payload = array_merge(
+            ['customer' => $customer->id],
+            $this->buildPayload(),
+            $subscriptionOptions
+        );
 
         $stripeSubscription = StripeSubscription::create(
-            ['customer' => $customer->id] + $this->buildPayload(),
+            $payload,
             $this->owner->stripeOptions()
         );
 
