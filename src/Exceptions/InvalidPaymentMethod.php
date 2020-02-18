@@ -16,6 +16,8 @@ class InvalidPaymentMethod extends Exception
      */
     public static function invalidOwner(StripePaymentMethod $paymentMethod, $owner)
     {
-        return new static("The payment method `{$paymentMethod->id}` does not belong to this customer `$owner->stripe_id`.");
+        return new static(
+            "The payment method `{$paymentMethod->id}` does not belong to this customer `$owner->stripe_id`."
+        );
     }
 }
