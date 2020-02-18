@@ -1,6 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.5.3...10.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.6.0...10.0)
+
+
+## [v10.6.0 (2020-02-18)](https://github.com/laravel/cashier/compare/v10.5.3...v10.6.0)
+
+### Added
+- Add `findBillable` method ([#869](https://github.com/laravel/cashier/pull/869))
+
+### Fixed
+- Prevent `createAsStripeCustomer` when `stripe_id` is set ([#871](https://github.com/laravel/cashier/pull/871))
 
 
 ## [v10.5.3 (2020-01-14)](https://github.com/laravel/cashier/compare/v10.5.2...v10.5.3)
