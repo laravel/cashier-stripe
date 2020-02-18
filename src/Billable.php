@@ -737,6 +737,10 @@ trait Billable
      */
     public function createAsStripeCustomer(array $options = [])
     {
+        if ($this->stripe_id) {
+            throw InvalidStripeCustomer::exists($this);
+        }
+
         $options = array_key_exists('email', $options)
                 ? $options
                 : array_merge($options, ['email' => $this->email]);

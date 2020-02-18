@@ -12,10 +12,12 @@ class SubscriptionUpdateFailure extends Exception
      *
      * @param  \Laravel\Cashier\Subscription  $subscription
      * @param  string  $plan
-     * @return self
+     * @return static
      */
     public static function incompleteSubscription(Subscription $subscription)
     {
-        return new static("The subscription \"{$subscription->stripe_id}\" cannot be updated because its payment is incomplete.");
+        return new static(
+            "The subscription \"{$subscription->stripe_id}\" cannot be updated because its payment is incomplete."
+        );
     }
 }
