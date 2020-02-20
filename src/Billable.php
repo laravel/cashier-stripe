@@ -29,6 +29,9 @@ trait Billable
      * @param  string  $paymentMethod
      * @param  array  $options
      * @return \Laravel\Cashier\Payment
+     *
+     * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
+     * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
     public function charge($amount, $paymentMethod, array $options = [])
     {
@@ -99,6 +102,9 @@ trait Billable
      * @param  array  $tabOptions
      * @param  array  $invoiceOptions
      * @return \Laravel\Cashier\Invoice|bool
+     *
+     * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
+     * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
     public function invoiceFor($description, $amount, array $tabOptions = [], array $invoiceOptions = [])
     {
@@ -220,6 +226,9 @@ trait Billable
      *
      * @param  array  $options
      * @return \Laravel\Cashier\Invoice|bool
+     *
+     * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
+     * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
     public function invoice(array $options = [])
     {
