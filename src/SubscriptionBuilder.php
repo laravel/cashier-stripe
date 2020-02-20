@@ -198,17 +198,18 @@ class SubscriptionBuilder
      *
      * @param  \Stripe\PaymentMethod|string|null  $paymentMethod
      * @param  array  $options
+     * @param  array $subscriptionOptions
      * @return \Laravel\Cashier\Subscription
      *
      * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
      * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
-    public function create($paymentMethod = null, array $options = [])
+    public function create($paymentMethod = null, array $options = [], array $subscriptionOptions = [])
     {
         $customer = $this->getStripeCustomer($paymentMethod, $options);
 
         /** @var \Stripe\Subscription $stripeSubscription */
-        $stripeSubscription = $customer->subscriptions->create($this->buildPayload());
+        $stripeSubscription = $customer->subscriptions->create($this->buildPayload($subscriptionOptions));
 
         if ($this->skipTrial) {
             $trialEndsAt = null;
@@ -256,22 +257,25 @@ class SubscriptionBuilder
 
     /**
      * Build the payload for subscription creation.
-     *
+     * 
+     * @param  array $options
      * @return array
      */
-    protected function buildPayload()
+    protected function buildPayload(array $options = [])
     {
-        return array_filter([
-            'billing_cycle_anchor' => $this->billingCycleAnchor,
-            'coupon' => $this->coupon,
-            'expand' => ['latest_invoice.payment_intent'],
-            'metadata' => $this->metadata,
-            'plan' => $this->plan,
-            'quantity' => $this->quantity,
-            'tax_percent' => $this->getTaxPercentageForPayload(),
-            'trial_end' => $this->getTrialEndForPayload(),
-            'off_session' => true,
-        ]);
+        return array_filter(
+            array_merge([
+                'billing_cycle_anchor' => $this->billingCycleAnchor,
+                'coupon' => $this->coupon,
+                'expand' => ['latest_invoice.payment_intent'],
+                'metadata' => $this->metadata,
+                'plan' => $this->plan,
+                'quantity' => $this->quantity,
+                'tax_percent' => $this->getTaxPercentageForPayload(),
+                'trial_end' => $this->getTrialEndForPayload(),
+                'off_session' => true,
+            ], $options)
+        );
     }
 
     /**
