@@ -25,6 +25,9 @@ abstract class IntegrationTestCase extends TestCase
 
     protected function setUp(): void
     {
+        // Delay consecutive tests to prevent Stripe rate limiting issues.
+        sleep(2);
+
         parent::setUp();
 
         Eloquent::unguard();
