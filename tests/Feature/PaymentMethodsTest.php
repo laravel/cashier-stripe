@@ -1,13 +1,13 @@
 <?php
 
-namespace Laravel\Cashier\Tests\Integration;
+namespace Laravel\Cashier\Tests\Feature;
 
 use Laravel\Cashier\PaymentMethod;
 use Stripe\Card as StripeCard;
 use Stripe\PaymentMethod as StripePaymentMethod;
 use Stripe\SetupIntent as StripeSetupIntent;
 
-class PaymentMethodsTest extends IntegrationTestCase
+class PaymentMethodsTest extends FeatureTestCase
 {
     public function test_we_can_start_a_new_setup_intent_session()
     {

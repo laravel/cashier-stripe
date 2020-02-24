@@ -1,8 +1,8 @@
 <?php
 
-namespace Laravel\Cashier\Tests\Integration;
+namespace Laravel\Cashier\Tests\Feature;
 
-class CustomerTest extends IntegrationTestCase
+class CustomerTest extends FeatureTestCase
 {
     public function test_customers_in_stripe_can_be_updated()
     {

@@ -1,13 +1,13 @@
 <?php
 
-namespace Laravel\Cashier\Tests\Integration;
+namespace Laravel\Cashier\Tests\Feature;
 
 use Laravel\Cashier\Exceptions\InvalidInvoice;
 use Laravel\Cashier\Exceptions\InvalidStripeCustomer;
 use Laravel\Cashier\Invoice;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class InvoicesTest extends IntegrationTestCase
+class InvoicesTest extends FeatureTestCase
 {
     public function test_require_stripe_customer_for_invoicing()
     {

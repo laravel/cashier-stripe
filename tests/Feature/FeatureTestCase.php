@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Cashier\Tests\Integration;
+namespace Laravel\Cashier\Tests\Feature;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Laravel\Cashier\Tests\Fixtures\User;
@@ -9,7 +9,7 @@ use Stripe\ApiResource;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\Stripe;
 
-abstract class IntegrationTestCase extends TestCase
+abstract class FeatureTestCase extends TestCase
 {
     /**
      * @var string

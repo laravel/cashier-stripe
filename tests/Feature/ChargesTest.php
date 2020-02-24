@@ -1,11 +1,11 @@
 <?php
 
-namespace Laravel\Cashier\Tests\Integration;
+namespace Laravel\Cashier\Tests\Feature;
 
 use Laravel\Cashier\Exceptions\PaymentActionRequired;
 use Laravel\Cashier\Payment;
 
-class ChargesTest extends IntegrationTestCase
+class ChargesTest extends FeatureTestCase
 {
     public function test_customer_can_be_charged()
     {

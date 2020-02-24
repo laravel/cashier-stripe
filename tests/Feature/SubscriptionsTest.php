@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Cashier\Tests\Integration;
+namespace Laravel\Cashier\Tests\Feature;
 
 use Carbon\Carbon;
 use DateTime;
@@ -16,7 +16,7 @@ use Stripe\Product;
 use Stripe\Subscription as StripeSubscription;
 use Stripe\TaxRate;
 
-class SubscriptionsTest extends IntegrationTestCase
+class SubscriptionsTest extends FeatureTestCase
 {
     /**
      * @var string

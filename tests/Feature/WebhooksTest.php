@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Cashier\Tests\Integration;
+namespace Laravel\Cashier\Tests\Feature;
 
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
@@ -9,7 +9,7 @@ use Laravel\Cashier\Notifications\ConfirmPayment;
 use Stripe\Plan;
 use Stripe\Product;
 
-class WebhooksTest extends IntegrationTestCase
+class WebhooksTest extends FeatureTestCase
 {
     /**
      * @var string
