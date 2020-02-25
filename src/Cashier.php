@@ -56,7 +56,7 @@ class Cashier
      * Get the billable entity instance by Stripe ID.
      *
      * @param  string  $stripeId
-     * @return \Laravel\Cashier\Billable
+     * @return \Laravel\Cashier\Billable|null
      */
     public static function findBillable($stripeId)
     {
