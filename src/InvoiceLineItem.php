@@ -132,6 +132,10 @@ class InvoiceLineItem
      */
     public function hasTaxRates()
     {
+        if ($this->invoice->isNotTaxExempt()) {
+            return ! empty($this->item->tax_amounts);
+        }
+
         return ! empty($this->item->tax_rates);
     }
 
