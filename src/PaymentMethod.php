@@ -51,6 +51,16 @@ class PaymentMethod
     }
 
     /**
+     * Get the Stripe model instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function owner()
+    {
+        return $this->owner;
+    }
+
+    /**
      * Get the Stripe PaymentMethod instance.
      *
      * @return \Stripe\PaymentMethod

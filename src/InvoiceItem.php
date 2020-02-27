@@ -113,6 +113,16 @@ class InvoiceItem
     }
 
     /**
+     * Get the Stripe model instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function owner()
+    {
+        return $this->owner;
+    }
+
+    /**
      * Get the underlying Stripe invoice item.
      *
      * @return \Stripe\StripeObject
