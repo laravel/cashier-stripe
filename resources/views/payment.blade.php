@@ -125,9 +125,10 @@
                     this.successMessage = '';
                     this.errorMessage = '';
 
-                    stripe.handleCardPayment(
-                        '{{ $payment->clientSecret() }}', this.cardElement, {
-                            payment_method_data: {
+                    stripe.confirmCardPayment(
+                        '{{ $payment->clientSecret() }}', {
+                            payment_method: {
+                                card: this.cardElement,
                                 billing_details: { name: this.name }
                             }
                         }
