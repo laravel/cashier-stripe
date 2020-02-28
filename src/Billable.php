@@ -44,7 +44,7 @@ trait Billable
         $options['amount'] = $amount;
         $options['payment_method'] = $paymentMethod;
 
-        if ($this->stripe_id) {
+        if ($this->hasStripeId()) {
             $options['customer'] = $this->stripe_id;
         }
 
@@ -264,7 +264,9 @@ trait Billable
      */
     public function upcomingInvoice()
     {
-        $this->assertCustomerExists();
+        if (! $this->hasStripeId()) {
+            return;
+        }
 
         try {
             $stripeInvoice = StripeInvoice::upcoming(['customer' => $this->stripe_id], $this->stripeOptions());
@@ -341,7 +343,9 @@ trait Billable
      */
     public function invoices($includePending = false, $parameters = [])
     {
-        $this->assertCustomerExists();
+        if (! $this->hasStripeId()) {
+            return collect();
+        }
 
         $invoices = [];
 
@@ -418,7 +422,9 @@ trait Billable
      */
     public function paymentMethods($parameters = [])
     {
-        $this->assertCustomerExists();
+        if (! $this->hasStripeId()) {
+            return collect();
+        }
 
         $parameters = array_merge(['limit' => 24], $parameters);
 
@@ -736,7 +742,7 @@ trait Billable
      */
     protected function assertCustomerExists()
     {
-        if (! $this->stripe_id) {
+        if (! $this->hasStripeId()) {
             throw InvalidStripeCustomer::nonCustomer($this);
         }
     }
@@ -749,7 +755,7 @@ trait Billable
      */
     public function createAsStripeCustomer(array $options = [])
     {
-        if ($this->stripe_id) {
+        if ($this->hasStripeId()) {
             throw InvalidStripeCustomer::exists($this);
         }
 
@@ -792,7 +798,7 @@ trait Billable
      */
     public function createOrGetStripeCustomer(array $options = [])
     {
-        if ($this->stripe_id) {
+        if ($this->hasStripeId()) {
             return $this->asStripeCustomer();
         }
 
