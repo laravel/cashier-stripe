@@ -301,6 +301,9 @@ trait Billable
      *
      * @param  string  $id
      * @return \Laravel\Cashier\Invoice
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function findInvoiceOrFail($id)
     {
@@ -334,7 +337,7 @@ trait Billable
      *
      * @param  bool  $includePending
      * @param  array  $parameters
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection|\Laravel\Cashier\Invoice[]
      */
     public function invoices($includePending = false, $parameters = [])
     {
@@ -367,7 +370,7 @@ trait Billable
      * Get an array of the entity's invoices.
      *
      * @param  array  $parameters
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection|\Laravel\Cashier\Invoice[]
      */
     public function invoicesIncludingPending(array $parameters = [])
     {
