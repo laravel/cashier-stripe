@@ -4,8 +4,9 @@ namespace Laravel\Cashier;
 
 use Exception;
 use Illuminate\Support\Collection;
+use Laravel\Cashier\Exceptions\CustomerAlreadyCreated;
+use Laravel\Cashier\Exceptions\InvalidCustomer;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
-use Laravel\Cashier\Exceptions\InvalidStripeCustomer;
 use Stripe\BankAccount as StripeBankAccount;
 use Stripe\Card as StripeCard;
 use Stripe\Customer as StripeCustomer;
@@ -738,12 +739,12 @@ trait Billable
      *
      * @return void
      *
-     * @throws \Laravel\Cashier\Exceptions\InvalidStripeCustomer
+     * @throws \Laravel\Cashier\Exceptions\InvalidCustomer
      */
     protected function assertCustomerExists()
     {
         if (! $this->hasStripeId()) {
-            throw InvalidStripeCustomer::nonCustomer($this);
+            throw InvalidCustomer::notYetCreated($this);
         }
     }
 
@@ -752,11 +753,13 @@ trait Billable
      *
      * @param  array  $options
      * @return \Stripe\Customer
+     *
+     * @throws \Laravel\Cashier\Exceptions\CustomerAlreadyCreated
      */
     public function createAsStripeCustomer(array $options = [])
     {
-        if ($this->hasStripeId()) {
-            throw InvalidStripeCustomer::exists($this);
+        if (! $this->hasStripeId()) {
+            throw CustomerAlreadyCreated::exists($this);
         }
 
         $options = array_key_exists('email', $options)
