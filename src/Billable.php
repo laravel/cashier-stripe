@@ -758,7 +758,7 @@ trait Billable
      */
     public function createAsStripeCustomer(array $options = [])
     {
-        if (! $this->hasStripeId()) {
+        if ($this->hasStripeId()) {
             throw CustomerAlreadyCreated::exists($this);
         }
 
