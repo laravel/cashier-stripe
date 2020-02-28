@@ -441,8 +441,6 @@ class Subscription extends Model
 
         $subscription = $this->asStripeSubscription();
 
-        $subscription->prorate = $this->prorate;
-
         $subscription->trial_end = $date->getTimestamp();
 
         $subscription->save();
