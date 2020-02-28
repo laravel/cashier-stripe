@@ -109,6 +109,7 @@ class Cashier
         }
 
         $money = new Money($amount, new Currency(strtoupper($currency ?? config('cashier.currency'))));
+
         $locale = $locale ?? config('cashier.currency_locale');
 
         $numberFormatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
