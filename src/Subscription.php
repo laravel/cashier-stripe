@@ -397,6 +397,18 @@ class Subscription extends Model
     }
 
     /**
+     * Indicate that the plan change should be prorated.
+     *
+     * @return $this
+     */
+    public function prorate()
+    {
+        $this->prorate = true;
+
+        return $this;
+    }
+
+    /**
      * Change the billing cycle anchor on a plan change.
      *
      * @param  \DateTimeInterface|int|string  $date
