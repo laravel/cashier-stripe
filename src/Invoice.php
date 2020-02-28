@@ -310,7 +310,7 @@ class Invoice
     /**
      * Get all of the "invoice item" line items.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection|\Laravel\Cashier\InvoiceLineItem[]
      */
     public function invoiceItems()
     {
@@ -320,7 +320,7 @@ class Invoice
     /**
      * Get all of the "subscription" line items.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection|\Laravel\Cashier\InvoiceLineItem[]
      */
     public function subscriptions()
     {
@@ -331,7 +331,7 @@ class Invoice
      * Get all of the invoice items by a given type.
      *
      * @param  string  $type
-     * @return array
+     * @return \Illuminate\Support\Collection|\Laravel\Cashier\InvoiceLineItem[]
      */
     public function invoiceLineItemsByType($type)
     {
