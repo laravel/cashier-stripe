@@ -463,6 +463,20 @@ class SubscriptionsTest extends IntegrationTestCase
         $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
     }
 
+    public function test_trials_can_be_extended()
+    {
+        $user = $this->createCustomer('trials_can_be_extended');
+
+        $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
+
+        $this->assertNull($subscription->trial_ends_at);
+
+        $subscription->extendTrial($trialEndsAt = now()->addDays()->floor());
+
+        $this->assertTrue($trialEndsAt->equalTo($subscription->trial_ends_at));
+        $this->assertEquals($subscription->asStripeSubscription()->trial_end, $trialEndsAt->getTimestamp());
+    }
+
     public function test_applying_coupons_to_existing_customers()
     {
         $user = $this->createCustomer('applying_coupons_to_existing_customers');
