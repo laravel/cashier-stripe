@@ -2,8 +2,8 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
+use Laravel\Cashier\Exceptions\InvalidCustomer;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
-use Laravel\Cashier\Exceptions\InvalidStripeCustomer;
 use Laravel\Cashier\Invoice;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -13,7 +13,7 @@ class InvoicesTest extends FeatureTestCase
     {
         $user = $this->createCustomer('require_stripe_customer_for_invoicing');
 
-        $this->expectException(InvalidStripeCustomer::class);
+        $this->expectException(InvalidCustomer::class);
 
         $user->invoice();
     }
