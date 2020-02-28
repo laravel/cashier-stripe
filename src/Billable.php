@@ -4,9 +4,9 @@ namespace Laravel\Cashier;
 
 use Exception;
 use Illuminate\Support\Collection;
+use Laravel\Cashier\Exceptions\CustomerAlreadyCreated;
 use Laravel\Cashier\Exceptions\InvalidCustomer;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
-use Laravel\Cashier\Exceptions\CustomerAlreadyCreated;
 use Stripe\BankAccount as StripeBankAccount;
 use Stripe\Card as StripeCard;
 use Stripe\Customer as StripeCustomer;
