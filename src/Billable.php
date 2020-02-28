@@ -328,11 +328,14 @@ trait Billable
      *
      * @param  string  $id
      * @param  array  $data
+     * @param  string  $filename
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function downloadInvoice($id, array $data)
+    public function downloadInvoice($id, array $data, $filename = null)
     {
-        return $this->findInvoiceOrFail($id)->download($data);
+        $invoice = $this->findInvoiceOrFail($id);
+
+        return $filename ? $invoice->downloadAs($filename, $data) : $invoice->download($data);
     }
 
     /**
