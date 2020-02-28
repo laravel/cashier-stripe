@@ -729,16 +729,6 @@ trait Billable
     }
 
     /**
-     * Get the email address used to create the customer in Stripe.
-     *
-     * @return string|null
-     */
-    public function stripeEmail()
-    {
-        return $this->email;
-    }
-
-    /**
      * Create a Stripe customer for the given model.
      *
      * @param  array  $options
@@ -806,6 +796,16 @@ trait Billable
         $this->assertCustomerExists();
 
         return StripeCustomer::retrieve($this->stripe_id, $this->stripeOptions());
+    }
+
+    /**
+     * Get the email address used to create the customer in Stripe.
+     *
+     * @return string|null
+     */
+    public function stripeEmail()
+    {
+        return $this->email;
     }
 
     /**
