@@ -209,6 +209,16 @@ class InvoiceLineItem
     }
 
     /**
+     * Get the Stripe model instance.
+     *
+     * @return \Laravel\Cashier\Invoice
+     */
+    public function invoice()
+    {
+        return $this->invoice;
+    }
+
+    /**
      * Get the underlying Stripe invoice line item.
      *
      * @return \Stripe\InvoiceLineItem
