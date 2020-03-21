@@ -57,17 +57,44 @@
                             {{ __('Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.') }}
                         </p>
 
-                        <!-- Name -->
-                        <label for="cardholder-name" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Full name') }}</label>
+                        <label for="payment-method" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Card') }}</label>
 
-                        <input id="cardholder-name" type="text" placeholder="{{ __('Jane Doe') }}" required
+                        <select id="payment-method"
+                            class="inline-block bg-gray-200 border border-gray-400 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
+                            v-model="paymentMethod">
+                            <option value="card">{{ __('Card') }}</option>
+                            <option value="iban">{{ __('IBAN via SEPA Debit') }}</option>
+                        </select>
+
+                        <!-- Name -->
+                        <label for="customer-name" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Full name') }}</label>
+
+                        <input id="customer-name" type="text" placeholder="{{ __('Jane Doe') }}" required
                                class="inline-block bg-gray-200 border border-gray-400 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
                                v-model="name">
 
-                        <!-- Card -->
-                        <label for="card-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Card') }}</label>
+                        <div v-if="paymentMethod === 'iban'">
 
-                        <div id="card-element" class="bg-gray-200 border border-gray-400 rounded-lg p-4 mb-6"></div>
+                            <!-- IBAN -->
+                            <label for="customer-name" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Email') }}</label>
+
+                            <input id="customer-email" type="text" placeholder="{{ __('foo@bar.com') }}" required
+                                   class="inline-block bg-gray-200 border border-gray-400 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
+                                   v-model="email">
+
+                            <label for="iban-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('IBAN') }}</label>
+
+                            <div id="iban-element" class="bg-gray-200 border border-gray-400 rounded-lg p-4 mb-6"></div>
+
+                        </div>
+                        <div v-else>
+
+                            <!-- Card -->
+                            <label for="card-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Card') }}</label>
+
+                            <div id="card-element" class="bg-gray-200 border border-gray-400 rounded-lg p-4 mb-6"></div>
+
+                        </div>
 
                         <!-- Pay Button -->
                         <button id="card-button"
@@ -101,6 +128,8 @@
             data: {
                 name: '',
                 cardElement: null,
+                ibanElement: null,
+                paymentMethod: 'card',
                 paymentProcessing: false,
                 paymentProcessed: false,
                 successMessage: '',
@@ -113,6 +142,9 @@
 
                     this.cardElement = elements.create('card');
                     this.cardElement.mount('#card-element');
+
+                    this.ibanElement = elements.create('iban');
+                    this.ibanElement.mount('#iban-element');
                 },
             @endif
 
@@ -125,14 +157,30 @@
                     this.successMessage = '';
                     this.errorMessage = '';
 
-                    stripe.confirmCardPayment(
-                        '{{ $payment->clientSecret() }}', {
+                    if (this.paymentMethod === 'iban') {
+                        var methodName = 'confirmSepaDebitSetup';
+                        var payload = {
+                            payment_method: {
+                                sepa_debit: this.ibanElement,
+                                billing_details: {
+                                    name: this.name,
+                                    email: this.email,
+                                }
+                            }
+                        };
+                    } else {
+                        var methodName = 'confirmCardSetup';
+                        var payload = {
                             payment_method: {
                                 card: this.cardElement,
                                 billing_details: { name: this.name }
                             }
                         }
-                    ).then(function (result) {
+                    }
+
+                    stripe[methodName](
+                        '{{ $payment->clientSecret() }}', payload)
+                    .then(function (result) {
                         self.paymentProcessing = false;
 
                         if (result.error) {

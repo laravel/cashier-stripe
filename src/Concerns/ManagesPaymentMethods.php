@@ -56,17 +56,28 @@ trait ManagesPaymentMethods
             return collect();
         }
 
-        $parameters = array_merge(['limit' => 24], $parameters);
+        $parameters = array_merge(['limit' => 24, 'customer' => $this->stripe_id], $parameters);
 
         // "type" is temporarily required by Stripe...
         $paymentMethods = StripePaymentMethod::all(
-            ['customer' => $this->stripe_id, 'type' => 'card'] + $parameters,
+            ['type' => 'card'] + $parameters,
             $this->stripeOptions()
         );
 
-        return collect($paymentMethods->data)->map(function ($paymentMethod) {
+        $cards = collect($paymentMethods->data)->map(function ($paymentMethod) {
             return new PaymentMethod($this, $paymentMethod);
         });
+
+        $paymentMethods = StripePaymentMethod::all(
+            ['type' => 'sepa_debit'] + $parameters,
+            $this->stripeOptions()
+        );
+
+        $sepa = collect($paymentMethods->data)->map(function ($paymentMethod) {
+            return new PaymentMethod($this, $paymentMethod);
+        });
+
+        return $cards->merge($sepa);
     }
 
     /**
@@ -220,9 +231,15 @@ trait ManagesPaymentMethods
      */
     protected function fillPaymentMethodDetails($paymentMethod)
     {
-        if ($paymentMethod->type === 'card') {
-            $this->card_brand = $paymentMethod->card->brand;
-            $this->card_last_four = $paymentMethod->card->last4;
+        switch ($paymentMethod->type) {
+            case 'card':
+                $this->card_brand = $paymentMethod->card->brand;
+                $this->card_last_four = $paymentMethod->card->last4;
+                break;
+            case 'sepa_debit':
+                $this->card_brand = 'SEPA Debit';
+                $this->card_last_four = $paymentMethod->sepa_debit->last4;
+                break;
         }
 
         return $this;
