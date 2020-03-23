@@ -80,10 +80,10 @@
                     </div>
                 @endif
 
-                <a href="{{ $redirect ?? url('/') }}"
+                <button @click="goBack" ref="goBackButton" data-redirect="{{ $redirect ?? url('/') }}"
                    class="inline-block w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-center text-gray-700 rounded-lg">
                     {{ __('Go back') }}
-                </a>
+                </button>
             </div>
 
             <p class="text-center text-gray-500 text-sm">
@@ -148,6 +148,18 @@
                             self.successMessage = '{{ __('The payment was successful.') }}';
                         }
                     });
+                },
+                goBack: function () {
+                    var self = this;
+                    var button = this.$refs.goBackButton;
+                    var redirect = new URL(button.dataset.redirect);
+
+                    if (self.successMessage || self.errorMessage) {
+                        redirect.searchParams.append('message', self.successMessage ? self.successMessage : self.errorMessage);
+                        redirect.searchParams.append('success', !! self.successMessage);
+                    }
+
+                    window.location.href = redirect;
                 },
             },
         })
