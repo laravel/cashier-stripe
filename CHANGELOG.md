@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.7.0...10.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.7.1...10.0)
+
+
+## [v10.7.1 (2020-03-24)](https://github.com/laravel/cashier/compare/v10.7.0...v10.7.1)
+
+### Fixed
+- Send along status for payment page ([#896](https://github.com/laravel/cashier/pull/896))
 
 
 ## [v10.7.0 (2020-03-03)](https://github.com/laravel/cashier/compare/v10.6.0...v10.7.0)
