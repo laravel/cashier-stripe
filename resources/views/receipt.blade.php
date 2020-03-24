@@ -67,7 +67,7 @@
             <!-- Organization Name / Date -->
             <td>
                 <br><br>
-                <strong>To:</strong> {{ $owner->email ?: $owner->name }}
+                <strong>To:</strong> {{ $owner->stripeEmail() ?: $owner->name }}
                 <br>
                 <strong>Date:</strong> {{ $invoice->date()->toFormattedDateString() }}
             </td>

@@ -478,6 +478,30 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
     }
 
+    public function test_subscription_changes_can_be_prorated()
+    {
+        $user = $this->createCustomer('subscription_changes_can_be_prorated');
+
+        $subscription = $user->newSubscription('main', static::$premiumPlanId)->create('pm_card_visa');
+
+        $this->assertEquals(2000, ($invoice = $user->invoices()->first())->rawTotal());
+
+        $subscription->noProrate()->swapAndInvoice(static::$planId);
+
+        // Assert that no new invoice was created because of no prorating.
+        $this->assertEquals($invoice->id, $user->invoices()->first()->id);
+
+        $subscription->swapAndInvoice(static::$premiumPlanId);
+
+        // Assert that no new invoice was created because of no prorating.
+        $this->assertEquals($invoice->id, $user->invoices()->first()->id);
+
+        $subscription->prorate()->swapAndInvoice(static::$planId);
+
+        // Get back from unused time on premium plan.
+        $this->assertEquals(-1000, $user->invoices()->first()->rawTotal());
+    }
+
     public function test_trials_can_be_extended()
     {
         $user = $this->createCustomer('trials_can_be_extended');

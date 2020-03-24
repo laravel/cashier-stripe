@@ -765,9 +765,9 @@ trait Billable
             throw CustomerAlreadyCreated::exists($this);
         }
 
-        $options = array_key_exists('email', $options)
-                ? $options
-                : array_merge($options, ['email' => $this->email]);
+        if (! array_key_exists('email', $options) && $email = $this->stripeEmail()) {
+            $options['email'] = $email;
+        }
 
         // Here we will create the customer instance on Stripe and store the ID of the
         // user from Stripe. This ID will correspond with the Stripe user instances
@@ -821,6 +821,16 @@ trait Billable
         $this->assertCustomerExists();
 
         return StripeCustomer::retrieve($this->stripe_id, $this->stripeOptions());
+    }
+
+    /**
+     * Get the email address used to create the customer in Stripe.
+     *
+     * @return string|null
+     */
+    public function stripeEmail()
+    {
+        return $this->email;
     }
 
     /**

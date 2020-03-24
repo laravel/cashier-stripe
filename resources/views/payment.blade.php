@@ -7,8 +7,8 @@
     <title>{{ __('Payment Confirmation') }} - {{ config('app.name', 'Laravel') }}</title>
 
     <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
     <script src="https://js.stripe.com/v3"></script>
 </head>
 <body class="font-sans text-gray-600 bg-gray-200 leading-normal p-4 h-full">
@@ -80,10 +80,10 @@
                     </div>
                 @endif
 
-                <a href="{{ $redirect ?? url('/') }}"
+                <button @click="goBack" ref="goBackButton" data-redirect="{{ $redirect ?? url('/') }}"
                    class="inline-block w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-center text-gray-700 rounded-lg">
                     {{ __('Go back') }}
-                </a>
+                </button>
             </div>
 
             <p class="text-center text-gray-500 text-sm">
@@ -148,6 +148,19 @@
                             self.successMessage = '{{ __('The payment was successful.') }}';
                         }
                     });
+                },
+
+                goBack: function () {
+                    var self = this;
+                    var button = this.$refs.goBackButton;
+                    var redirect = new URL(button.dataset.redirect);
+
+                    if (self.successMessage || self.errorMessage) {
+                        redirect.searchParams.append('message', self.successMessage ? self.successMessage : self.errorMessage);
+                        redirect.searchParams.append('success', !! self.successMessage);
+                    }
+
+                    window.location.href = redirect;
                 },
             },
         })

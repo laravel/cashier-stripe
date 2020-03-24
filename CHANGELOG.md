@@ -1,9 +1,28 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.6.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v10.7.1...master)
 
 ### Changed
 - Dropped Laravel 5.8 support ([b6256a2](https://github.com/laravel/cashier/commit/b6256a2a2e486478a26043cb2926dc744dc0a42a))
+
+
+## [v10.7.1 (2020-03-24)](https://github.com/laravel/cashier/compare/v10.7.0...v10.7.1)
+
+### Fixed
+- Send along status for payment page ([#896](https://github.com/laravel/cashier/pull/896))
+
+
+## [v10.7.0 (2020-03-03)](https://github.com/laravel/cashier/compare/v10.6.0...v10.7.0)
+
+### Added
+- Add getters for owner instances to objects ([#877](https://github.com/laravel/cashier/pull/877))
+- Implement extending trials ([#884](https://github.com/laravel/cashier/pull/884))
+- Allow for custom email address attribute ([#887](https://github.com/laravel/cashier/pull/887))
+- Re-enable proration ([#886](https://github.com/laravel/cashier/pull/886))
+
+### Changed
+- Add @throws declaration to methods on Billable which can throw Payment exceptions ([#872](https://github.com/laravel/cashier/pull/872))
+- Update payment page with new JS method ([#879](https://github.com/laravel/cashier/pull/879))
 
 
 ## [v10.6.0 (2020-02-18)](https://github.com/laravel/cashier/compare/v10.5.3...v10.6.0)
