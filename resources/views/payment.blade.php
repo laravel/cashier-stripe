@@ -149,6 +149,7 @@
                         }
                     });
                 },
+
                 goBack: function () {
                     var self = this;
                     var button = this.$refs.goBackButton;
