@@ -7,8 +7,8 @@
     <title>{{ __('Payment Confirmation') }} - {{ config('app.name', 'Laravel') }}</title>
 
     <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
     <script src="https://js.stripe.com/v3"></script>
 </head>
 <body class="font-sans text-gray-600 bg-gray-200 leading-normal p-4 h-full">
