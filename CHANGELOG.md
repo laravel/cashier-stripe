@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v9.3.5...9.0)
+## [Unreleased](https://github.com/laravel/cashier/compare/v9.3.6...9.0)
+
+
+## [v9.3.6 (2020-03-24)](https://github.com/laravel/cashier/compare/v9.3.5...v9.3.6)
+
+### Fixed
+- Add X-Vapor-Base64-Encode header ([#897](https://github.com/laravel/cashier/pull/897))
 
 
 ## [v9.3.5 (2019-07-30)](https://github.com/laravel/cashier/compare/v9.3.4...v9.3.5)
