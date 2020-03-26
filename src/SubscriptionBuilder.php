@@ -4,6 +4,8 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use DateTimeInterface;
+use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use Stripe\Subscription as StripeSubscription;
 
 class SubscriptionBuilder
@@ -25,16 +27,9 @@ class SubscriptionBuilder
     /**
      * The name of the plan being subscribed to.
      *
-     * @var string
+     * @var array
      */
-    protected $plan;
-
-    /**
-     * The quantity of the subscription.
-     *
-     * @var int
-     */
-    protected $quantity = 1;
+    protected $items;
 
     /**
      * The date and time the trial will expire.
@@ -76,27 +71,67 @@ class SubscriptionBuilder
      *
      * @param  mixed  $owner
      * @param  string  $name
-     * @param  string  $plan
+     * @param  string|array  $plans
      * @return void
      */
-    public function __construct($owner, $name, $plan)
+    public function __construct($owner, $name, $plans = null)
     {
         $this->name = $name;
-        $this->plan = $plan;
         $this->owner = $owner;
+        $this->items = $this->formatPlans((array) $plans);
     }
 
     /**
-     * Specify the quantity of the subscription.
+     * Formats the given Stripe Plan IDs into an associative array.
      *
+     * @param string[] $plans
+     * @return array
+     */
+    protected function formatPlans(array $plans)
+    {
+        return collect($plans)->mapWithKeys(function ($plan) {
+            return [$plan => [
+                'plan' => $plan,
+                'quantity' => 1,
+            ]];
+        })->all();
+    }
+
+    /**
+     * Set a plan on the subscription builder.
+     *
+     * @param  string  $plan
      * @param  int  $quantity
      * @return $this
      */
-    public function quantity($quantity)
+    public function plan($plan, $quantity = 1)
     {
-        $this->quantity = $quantity;
+        $this->items[$plan] = [
+            'plan' => $plan,
+            'quantity' => $quantity,
+        ];
 
         return $this;
+    }
+
+    /**
+     * Specify the quantity of a subscription item.
+     *
+     * @param  int  $quantity
+     * @param  string|null  $plan
+     * @return $this
+     */
+    public function quantity($quantity, $plan = null)
+    {
+        if (is_null($plan)) {
+            if (count($this->items) > 1) {
+                throw new InvalidArgumentException('Plan is required when creating multi plan subscriptions.');
+            }
+
+            $plan = Arr::first($this->items)['plan'];
+        }
+
+        return $this->plan($plan, $quantity);
     }
 
     /**
@@ -232,8 +267,8 @@ class SubscriptionBuilder
             'name' => $this->name,
             'stripe_id' => $stripeSubscription->id,
             'stripe_status' => $stripeSubscription->status,
-            'stripe_plan' => $this->plan,
-            'quantity' => $this->quantity,
+            'stripe_plan' => count($this->items) === 1 ? Arr::first($this->items)['plan'] : null,
+            'quantity' => count($this->items) === 1 ? Arr::first($this->items)['quantity'] : null,
             'trial_ends_at' => $trialEndsAt,
             'ends_at' => null,
         ]);
@@ -277,8 +312,7 @@ class SubscriptionBuilder
             'coupon' => $this->coupon,
             'expand' => ['latest_invoice.payment_intent'],
             'metadata' => $this->metadata,
-            'plan' => $this->plan,
-            'quantity' => $this->quantity,
+            'items' => collect($this->items)->values()->all(),
             'default_tax_rates' => $this->getTaxRatesForPayload(),
             'trial_end' => $this->getTrialEndForPayload(),
             'off_session' => true,
