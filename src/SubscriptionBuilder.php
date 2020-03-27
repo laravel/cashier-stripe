@@ -183,15 +183,16 @@ class SubscriptionBuilder
     /**
      * Add a new Stripe subscription to the Stripe model.
      *
-     * @param  array  $options
+     * @param  array  $customerOptions
+     * @param  array  $subscriptionOptions
      * @return \Laravel\Cashier\Subscription
      *
      * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
      * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
-    public function add(array $options = [])
+    public function add(array $customerOptions = [], array $subscriptionOptions = [])
     {
-        return $this->create(null, $options);
+        return $this->create(null, $customerOptions, $subscriptionOptions);
     }
 
     /**
