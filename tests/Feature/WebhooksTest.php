@@ -69,6 +69,7 @@ class WebhooksTest extends FeatureTestCase
                     'id' => $subscription->stripe_id,
                     'customer' => $user->stripe_id,
                     'cancel_at_period_end' => false,
+                    'quantity' => 1,
                 ],
             ],
         ])->assertOk();
@@ -90,6 +91,7 @@ class WebhooksTest extends FeatureTestCase
                 'object' => [
                     'id' => $subscription->stripe_id,
                     'customer' => $user->stripe_id,
+                    'quantity' => 1,
                 ],
             ],
         ])->assertOk();
@@ -112,6 +114,7 @@ class WebhooksTest extends FeatureTestCase
                     'id' => $subscription->stripe_id,
                     'customer' => $user->stripe_id,
                     'status' => 'incomplete_expired',
+                    'quantity' => 1,
                 ],
             ],
         ])->assertOk();

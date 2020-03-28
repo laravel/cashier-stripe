@@ -26,7 +26,7 @@ class Subscription extends Model
      *
      * @var array
      */
-    protected $with = ['owner', 'items'];
+    protected $with = ['items'];
 
     /**
      * The attributes that should be mutated to dates.

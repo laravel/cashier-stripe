@@ -15,13 +15,6 @@ class SubscriptionItem extends Model
     protected $guarded = [];
 
     /**
-     * The relations to eager load on every query.
-     *
-     * @var array
-     */
-    protected $with = ['subscription'];
-
-    /**
      * Get the subscription where the item belongs to.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

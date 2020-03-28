@@ -110,22 +110,24 @@ class WebhookController extends Controller
                 $subscription->save();
 
                 // Update subscription items...
-                $stripeIds = [];
+                if (isset($data['items'])) {
+                    $stripeIds = [];
 
-                foreach ($data['items']['data'] as $item) {
-                    $stripeIds[] = $item['id'];
+                    foreach ($data['items']['data'] as $item) {
+                        $stripeIds[] = $item['id'];
 
-                    SubscriptionItem::updateOrCreate([
-                        'stripe_id' => $item['id'],
-                    ], [
-                        'subscription_id' => $subscription->id,
-                        'stripe_plan' => $item['plan']['id'],
-                        'quantity' => $item['quantity'],
-                    ]);
+                        SubscriptionItem::updateOrCreate([
+                            'stripe_id' => $item['id'],
+                        ], [
+                            'subscription_id' => $subscription->id,
+                            'stripe_plan' => $item['plan']['id'],
+                            'quantity' => $item['quantity'],
+                        ]);
+                    }
+
+                    // Delete items that aren't attached to the subscription anymore...
+                    $subscription->items()->whereNotIn('stripe_id', $stripeIds)->delete();
                 }
-
-                // Delete items that aren't attached to the subscription anymore...
-                $subscription->items()->whereNotIn('stripe_id', $stripeIds)->delete();
             });
         }
 
