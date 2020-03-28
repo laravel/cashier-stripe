@@ -21,7 +21,7 @@ class CreateSubscriptionItemsTable extends Migration
             $table->integer('quantity');
             $table->timestamps();
 
-            $table->index(['user_id', 'stripe_status']);
+            $table->index(['subscription_id', 'stripe_id']);
         });
     }
 
