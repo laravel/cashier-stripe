@@ -72,7 +72,7 @@ Exceptions may be thrown for the following methods: `charge`, `invoiceFor`, and 
 
 > If you would like to let Stripe host your payment verification pages, [you may configure this in your Stripe settings](https://dashboard.stripe.com/account/billing/automatic). However, you should still handle payment exceptions in your application and inform the user they will receive an email with further payment confirmation instructions.
 
-In addition, the subscription `create` method on the subscription builder previously immediately canceled any subscription with an `incomplete` or `incomplete_expired` status and threw a `SubscriptionCreationFailed` exception when a subscription could not be created. This has been replaced with the behavior described above and the `SubscriptionCreationFailed` exception has been removed.
+In addition, the subscription `create` method on the subscription builder previously immediately cancelled any subscription with an `incomplete` or `incomplete_expired` status and threw a `SubscriptionCreationFailed` exception when a subscription could not be created. This has been replaced with the behavior described above and the `SubscriptionCreationFailed` exception has been removed.
 
 #### The Subscription `stripe_status` Column
 
