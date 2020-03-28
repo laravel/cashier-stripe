@@ -267,11 +267,20 @@ class SubscriptionBuilder
             'name' => $this->name,
             'stripe_id' => $stripeSubscription->id,
             'stripe_status' => $stripeSubscription->status,
-            'stripe_plan' => count($this->items) === 1 ? Arr::first($this->items)['plan'] : null,
-            'quantity' => count($this->items) === 1 ? Arr::first($this->items)['quantity'] : null,
+            'stripe_plan' => $stripeSubscription->plan ? $stripeSubscription->plan->id : null,
+            'quantity' => $stripeSubscription->quantity,
             'trial_ends_at' => $trialEndsAt,
             'ends_at' => null,
         ]);
+
+        /** @var \Stripe\SubscriptionItem $item */
+        foreach ($stripeSubscription->items as $item) {
+            $subscription->items()->create([
+                'stripe_id' => $item->id,
+                'stripe_plan' => $item->plan->id,
+                'quantity' => $item->quantity,
+            ]);
+        }
 
         if ($subscription->incomplete()) {
             (new Payment(

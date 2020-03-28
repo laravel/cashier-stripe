@@ -68,6 +68,16 @@ class Subscription extends Model
     }
 
     /**
+     * Get the subscription items related to the subscription.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function items()
+    {
+        return $this->hasMany(SubscriptionItem::class);
+    }
+
+    /**
      * Determine if the subscription is active, on trial, or within its grace period.
      *
      * @return bool
