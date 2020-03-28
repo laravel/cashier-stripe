@@ -22,6 +22,13 @@ class Subscription extends Model
     protected $guarded = [];
 
     /**
+     * The relations to eager load on every query.
+     *
+     * @var array
+     */
+    protected $with = ['owner', 'items'];
+
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
@@ -75,6 +82,37 @@ class Subscription extends Model
     public function items()
     {
         return $this->hasMany(SubscriptionItem::class);
+    }
+
+    /**
+     * Determine if the subscription has multiple plans.
+     *
+     * @return bool
+     */
+    public function hasMultiplePlans()
+    {
+        return is_null($this->stripe_plan);
+    }
+
+    /**
+     * Determine if the subscription has a single plan.
+     *
+     * @return bool
+     */
+    public function hasSinglePlan()
+    {
+        return ! $this->hasMultiplePlans();
+    }
+
+    /**
+     * Get the subscription item for the given plan.
+     *
+     * @param  string  $plan
+     * @return \Laravel\Cashier\SubscriptionItem|null
+     */
+    public function findItem($plan)
+    {
+        return $this->items()->where('stripe_plan', $plan)->first();
     }
 
     /**
@@ -321,13 +359,14 @@ class Subscription extends Model
      * Increment the quantity of the subscription.
      *
      * @param  int  $count
+     * @param  string|null  $plan
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function incrementQuantity($count = 1)
+    public function incrementQuantity($count = 1, $plan = null)
     {
-        $this->updateQuantity($this->quantity + $count);
+        $this->updateQuantity($this->quantity + $count, $plan = null);
 
         return $this;
     }
@@ -336,14 +375,15 @@ class Subscription extends Model
      *  Increment the quantity of the subscription, and invoice immediately.
      *
      * @param  int  $count
+     * @param  string|null  $plan
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function incrementAndInvoice($count = 1)
+    public function incrementAndInvoice($count = 1, $plan = null)
     {
-        $this->incrementQuantity($count);
+        $this->incrementQuantity($count, $plan);
 
         $this->invoice();
 
@@ -354,13 +394,14 @@ class Subscription extends Model
      * Decrement the quantity of the subscription.
      *
      * @param  int  $count
+     * @param  string|null  $plan
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function decrementQuantity($count = 1)
+    public function decrementQuantity($count = 1, $plan = null)
     {
-        $this->updateQuantity(max(1, $this->quantity - $count));
+        $this->updateQuantity(max(1, $this->quantity - $count), $plan);
 
         return $this;
     }
@@ -369,27 +410,46 @@ class Subscription extends Model
      * Update the quantity of the subscription.
      *
      * @param  int  $quantity
+     * @param  string|null  $plan
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function updateQuantity($quantity)
+    public function updateQuantity($quantity, $plan = null)
     {
         if ($this->incomplete()) {
             throw SubscriptionUpdateFailure::incompleteSubscription($this);
         }
 
-        $subscription = $this->asStripeSubscription();
+        $this->guardAgainstMultiplePlans($plan);
 
-        $subscription->quantity = $quantity;
+        $stripeSubscription = $this->asStripeSubscription();
 
-        $subscription->prorate = $this->prorate;
+        if ($this->hasSinglePlan()) {
+            $stripeSubscription->quantity = $quantity;
+        }
 
-        $subscription->save();
+        $stripeSubscription->prorate = $this->prorate;
 
-        $this->quantity = $quantity;
+        $stripeSubscription->save();
 
-        $this->save();
+        if ($this->hasSinglePlan()) {
+            $this->quantity = $quantity;
+
+            $this->save();
+        }
+
+        if ($plan && $item = $this->findItem($plan)) {
+            $stripeSubscriptionItem = $item->asStripeSubscriptionItem();
+
+            $stripeSubscriptionItem->quantity = $quantity;
+
+            $stripeSubscriptionItem->save();
+
+            $item->quantity = $quantity;
+
+            $item->save();
+        }
 
         return $this;
     }
@@ -712,6 +772,23 @@ class Subscription extends Model
         return $paymentIntent
             ? new Payment($paymentIntent)
             : null;
+    }
+
+    /**
+     * Make sure a plan argument is provided when the subscription is a multi plan subscription.
+     *
+     * @param  string|null  $plan
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function guardAgainstMultiplePlans($plan)
+    {
+        if (is_null($plan) && $this->hasMultiplePlans()) {
+            throw new InvalidArgumentException(
+                'This method needs a plan argument because the subscription has multiple plans.'
+            );
+        }
     }
 
     /**

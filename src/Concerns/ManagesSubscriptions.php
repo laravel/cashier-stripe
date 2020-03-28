@@ -11,12 +11,12 @@ trait ManagesSubscriptions
      * Begin creating a new subscription.
      *
      * @param  string  $subscription
-     * @param  string  $plan
+     * @param  string|array  $plans
      * @return \Laravel\Cashier\SubscriptionBuilder
      */
-    public function newSubscription($subscription, $plan)
+    public function newSubscription($subscription, $plans)
     {
-        return new SubscriptionBuilder($this, $subscription, $plan);
+        return new SubscriptionBuilder($this, $subscription, $plans);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Illuminate\Database\Eloquent\Model;
+use Stripe\SubscriptionItem as StripeSubscriptionItem;
 
 class SubscriptionItem extends Model
 {
@@ -14,6 +15,13 @@ class SubscriptionItem extends Model
     protected $guarded = [];
 
     /**
+     * The relations to eager load on every query.
+     *
+     * @var array
+     */
+    protected $with = ['subscription'];
+
+    /**
      * Get the subscription where the item belongs to.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -21,5 +29,18 @@ class SubscriptionItem extends Model
     public function subscription()
     {
         return $this->belongsTo(Subscription::class);
+    }
+
+    /**
+     * Get the subscription as a Stripe subscription item object.
+     *
+     * @return \Stripe\SubscriptionItem
+     */
+    public function asStripeSubscriptionItem()
+    {
+        return StripeSubscriptionItem::retrieve(
+            $this->stripe_id,
+            $this->subscription->owner->stripeOptions()
+        );
     }
 }
