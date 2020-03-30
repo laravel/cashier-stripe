@@ -125,11 +125,13 @@ class Subscription extends Model
      * Get the subscription item for the given plan.
      *
      * @param  string  $plan
-     * @return \Laravel\Cashier\SubscriptionItem|null
+     * @return \Laravel\Cashier\SubscriptionItem
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findItem($plan)
+    public function findItemOrFail($plan)
     {
-        return $this->items()->where('stripe_plan', $plan)->first();
+        return $this->items()->where('stripe_plan', $plan)->firstOrFail();
     }
 
     /**
@@ -440,26 +442,32 @@ class Subscription extends Model
 
         $this->guardAgainstMultiplePlans($plan);
 
-        $stripeSubscription = $this->asStripeSubscription();
+        $item = null;
 
         if ($this->hasSinglePlan()) {
+            $stripeSubscription = $this->asStripeSubscription();
+
             $stripeSubscription->quantity = $quantity;
-        }
 
-        $stripeSubscription->prorate = $this->prorate;
+            $stripeSubscription->prorate = $this->prorate;
 
-        $stripeSubscription->save();
+            $stripeSubscription->save();
 
-        if ($this->hasSinglePlan()) {
             $this->quantity = $quantity;
 
             $this->save();
+
+            $item = $this->items()->first();
+        } elseif ($plan) {
+            $item = $this->findItemOrFail($plan);
         }
 
-        if ($plan && $item = $this->findItem($plan)) {
+        if ($item) {
             $stripeSubscriptionItem = $item->asStripeSubscriptionItem();
 
             $stripeSubscriptionItem->quantity = $quantity;
+
+            $stripeSubscriptionItem->prorate = $this->prorate;
 
             $stripeSubscriptionItem->save();
 
