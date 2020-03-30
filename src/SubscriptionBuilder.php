@@ -355,7 +355,5 @@ class SubscriptionBuilder
         if ($taxRates = $this->owner->itemTaxRates()) {
             return $taxRates[$plan] ?? null;
         }
-
-        return null;
     }
 }

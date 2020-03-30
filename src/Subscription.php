@@ -741,11 +741,19 @@ class Subscription extends Model
      */
     public function syncTaxRates()
     {
-        $subscription = $this->asStripeSubscription();
+        $stripeSubscription = $this->asStripeSubscription();
 
-        $subscription->default_tax_rates = $this->user->taxRates();
+        $stripeSubscription->default_tax_rates = $this->user->taxRates();
 
-        $subscription->save();
+        $stripeSubscription->save();
+
+        foreach ($this->items as $item) {
+            $stripeSubscriptionItem = $item->asStripeSubscriptionItem();
+
+            $stripeSubscriptionItem->tax_rates = $this->user->itemRates($item->stripe_plan);
+
+            $stripeSubscriptionItem->save();
+        }
     }
 
     /**
