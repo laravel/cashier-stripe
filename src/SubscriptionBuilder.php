@@ -96,7 +96,7 @@ class SubscriptionBuilder
         $this->items[$plan] = [
             'plan' => $plan,
             'quantity' => $quantity,
-            'tax_rates' => $this->getTaxRatesForPlan($plan),
+            'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
         ];
 
         return $this;
@@ -345,14 +345,14 @@ class SubscriptionBuilder
     }
 
     /**
-     * Get the tax rates for an individual subscription item.
+     * Get the plan tax rates for the Stripe payload.
      *
      * @param  string  $plan
      * @return array|null
      */
-    protected function getTaxRatesForPlan($plan)
+    protected function getPlanTaxRatesForPayload($plan)
     {
-        if ($taxRates = $this->owner->itemTaxRates()) {
+        if ($taxRates = $this->owner->planTaxRates()) {
             return $taxRates[$plan] ?? null;
         }
     }

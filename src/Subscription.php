@@ -640,6 +640,97 @@ class Subscription extends Model
     }
 
     /**
+     * Add a new Stripe plan to the subscription.
+     *
+     * @param  string  $plan
+     * @param  int  $quantity
+     * @param  array  $options
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function addPlan($plan, $quantity = 1, $options = [])
+    {
+        if ($this->incomplete()) {
+            throw SubscriptionUpdateFailure::incompleteSubscription($this);
+        }
+
+        if ($this->items->contains('stripe_plan', $plan)) {
+            throw SubscriptionUpdateFailure::duplicatePlan($this, $plan);
+        }
+
+        $subscription = $this->asStripeSubscription();
+
+        $subscription->items->create(array_merge([
+            'plan' => $plan,
+            'prorate' => $this->prorate,
+            'quantity' => $quantity,
+            'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
+        ], $options));
+
+        if ($this->items()->count() > 1) {
+            $this->fill([
+                'stripe_plan' => null,
+                'quantity' => null,
+            ])->save();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a new Stripe plan to the subscription, and invoice immediately.
+     *
+     * @param  string  $plan
+     * @param  int  $quantity
+     * @param  array  $options
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function addPlanAndInvoice($plan, $quantity = 1, $options = [])
+    {
+        $subscription = $this->addPlan($plan, $quantity, $options);
+
+        $this->invoice();
+
+        return $subscription;
+    }
+
+    /**
+     * Remove a Stripe plan from the subscription.
+     *
+     * @param  string  $plan
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function removePlan($plan)
+    {
+        $item = $this->findItemOrFail($plan);
+
+        if ($this->hasSinglePlan()) {
+            throw SubscriptionUpdateFailure::cannotDeleteLastPlan($this);
+        }
+
+        $item->asStripeSubscriptionItem()->delete();
+
+        $item->delete();
+
+        if ($this->items()->count() === 1) {
+            $item = $this->items()->first();
+
+            $this->fill([
+                'stripe_plan' => $item->stripe_plan,
+                'quantity' => $item->quantity,
+            ])->save();
+        }
+
+        return $this;
+    }
+
+    /**
      * Cancel the subscription at the end of the billing period.
      *
      * @return $this
@@ -777,6 +868,19 @@ class Subscription extends Model
             $stripeSubscriptionItem->tax_rates = $this->user->itemRates($item->stripe_plan);
 
             $stripeSubscriptionItem->save();
+        }
+    }
+
+    /**
+     * Get the plan tax rates for the Stripe payload.
+     *
+     * @param  string  $plan
+     * @return array|null
+     */
+    protected function getPlanTaxRatesForPayload($plan)
+    {
+        if ($taxRates = $this->owner->planTaxRates()) {
+            return $taxRates[$plan] ?? null;
         }
     }
 

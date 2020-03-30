@@ -167,7 +167,7 @@ trait ManagesSubscriptions
      *
      * @return array
      */
-    public function itemTaxRates()
+    public function planTaxRates()
     {
         return [];
     }

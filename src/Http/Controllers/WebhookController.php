@@ -76,11 +76,11 @@ class WebhookController extends Controller
                     return;
                 }
 
-                // Quantity...
-                $subscription->quantity = $data['quantity'];
-
                 // Plan...
                 $subscription->stripe_plan = $data['plan']['id'] ?? null;
+
+                // Quantity...
+                $subscription->quantity = $data['quantity'];
 
                 // Trial ending date...
                 if (isset($data['trial_end'])) {
