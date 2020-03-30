@@ -125,13 +125,7 @@ trait ManagesSubscriptions
         }
 
         foreach ((array) $plans as $plan) {
-            if ($subscription->hasMultiplePlans()) {
-                foreach ($subscription->items as $item) {
-                    if ($item->stripe_plan === $plan) {
-                        return true;
-                    }
-                }
-            } elseif ($subscription->stripe_plan === $plan) {
+            if ($subscription->hasPlan($plan)) {
                 return true;
             }
         }
