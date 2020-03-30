@@ -562,6 +562,10 @@ class Subscription extends Model
      */
     public function swap($plan, $options = [])
     {
+        if ($this->hasMultiplePlans()) {
+            throw SubscriptionUpdateFailure::swapOnMultiplan($this);
+        }
+
         if ($this->incomplete()) {
             throw SubscriptionUpdateFailure::incompleteSubscription($this);
         }
