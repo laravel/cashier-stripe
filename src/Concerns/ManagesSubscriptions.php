@@ -34,12 +34,11 @@ trait ManagesSubscriptions
 
         $subscription = $this->subscription($subscription);
 
-        if (is_null($plan)) {
-            return $subscription && $subscription->onTrial();
+        if (! $subscription || ! $subscription->onTrial()) {
+            return false;
         }
 
-        return $subscription && $subscription->onTrial() &&
-            $subscription->stripe_plan === $plan;
+        return $plan ? $subscription->hasPlan($plan) : true;
     }
 
     /**
@@ -63,16 +62,11 @@ trait ManagesSubscriptions
     {
         $subscription = $this->subscription($subscription);
 
-        if (is_null($subscription)) {
+        if (! $subscription || ! $subscription->valid()) {
             return false;
         }
 
-        if (is_null($plan)) {
-            return $subscription->valid();
-        }
-
-        return $subscription->valid() &&
-            $subscription->stripe_plan === $plan;
+        return $plan ? $subscription->hasPlan($plan) : true;
     }
 
     /**
@@ -81,12 +75,12 @@ trait ManagesSubscriptions
      * @param  string  $subscription
      * @return \Laravel\Cashier\Subscription|null
      */
-    public function subscription($subscription = 'default')
+    public function subscription($name = 'default')
     {
-        return $this->subscriptions->sortByDesc(function ($value) {
-            return $value->created_at->getTimestamp();
-        })->first(function ($value) use ($subscription) {
-            return $value->name === $subscription;
+        return $this->subscriptions->sortByDesc(function (Subscription $subscription) {
+            return $subscription->created_at->getTimestamp();
+        })->first(function (Subscription $subscription) use ($name) {
+            return $subscription->name === $name;
         });
     }
 
@@ -131,7 +125,13 @@ trait ManagesSubscriptions
         }
 
         foreach ((array) $plans as $plan) {
-            if ($subscription->stripe_plan === $plan) {
+            if ($subscription->hasMultiplePlans()) {
+                foreach ($subscription->items as $item) {
+                    if ($item->stripe_plan === $plan) {
+                        return true;
+                    }
+                }
+            } elseif ($subscription->stripe_plan === $plan) {
                 return true;
             }
         }
@@ -140,15 +140,15 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Determine if the entity is on the given plan.
+     * Determine if the entity has a valid subscription on the given plan.
      *
      * @param  string  $plan
      * @return bool
      */
     public function onPlan($plan)
     {
-        return ! is_null($this->subscriptions->first(function ($value) use ($plan) {
-            return $value->stripe_plan === $plan && $value->valid();
+        return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($plan) {
+            return $subscription->valid() && $subscription->hasPlan($plan);
         }));
     }
 

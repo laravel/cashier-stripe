@@ -105,6 +105,23 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription has a specific plan.
+     *
+     * @param  string  $plan
+     * @return bool
+     */
+    public function hasPlan($plan)
+    {
+        if ($this->hasMultiplePlans()) {
+            return $this->items->has(function (SubscriptionItem $item) use ($plan) {
+                return $item->stripe_plan === $plan;
+            });
+        }
+
+        return $this->stripe_plan === $plan;
+    }
+
+    /**
      * Get the subscription item for the given plan.
      *
      * @param  string  $plan
