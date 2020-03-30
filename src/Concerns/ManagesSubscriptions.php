@@ -161,4 +161,14 @@ trait ManagesSubscriptions
     {
         return [];
     }
+
+    /**
+     * Get the tax rates to apply to individual subscription items.
+     *
+     * @return array
+     */
+    public function itemTaxRates()
+    {
+        return [];
+    }
 }

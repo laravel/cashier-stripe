@@ -78,23 +78,10 @@ class SubscriptionBuilder
     {
         $this->name = $name;
         $this->owner = $owner;
-        $this->items = $this->formatPlans((array) $plans);
-    }
 
-    /**
-     * Formats the given Stripe Plan IDs into an associative array.
-     *
-     * @param string[] $plans
-     * @return array
-     */
-    protected function formatPlans(array $plans)
-    {
-        return collect($plans)->mapWithKeys(function ($plan) {
-            return [$plan => [
-                'plan' => $plan,
-                'quantity' => 1,
-            ]];
-        })->all();
+        foreach ((array) $plans as $plan) {
+            $this->plan($plan);
+        }
     }
 
     /**
@@ -109,6 +96,7 @@ class SubscriptionBuilder
         $this->items[$plan] = [
             'plan' => $plan,
             'quantity' => $quantity,
+            'tax_rates' => $this->getTaxRatesForPlan($plan),
         ];
 
         return $this;
@@ -354,5 +342,20 @@ class SubscriptionBuilder
         if ($taxRates = $this->owner->taxRates()) {
             return $taxRates;
         }
+    }
+
+    /**
+     * Get the tax rates for an individual subscription item.
+     *
+     * @param  string  $plan
+     * @return array|null
+     */
+    protected function getTaxRatesForPlan($plan)
+    {
+        if ($taxRates = $this->owner->itemTaxRates()) {
+            return $taxRates[$plan] ?? null;
+        }
+
+        return null;
     }
 }
