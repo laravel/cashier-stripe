@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Exceptions\PaymentActionRequired;
 use Laravel\Cashier\Notifications\ConfirmPayment;
-use Laravel\Cashier\Tests\Fixtures\User;
 use Stripe\Plan;
 use Stripe\Product;
 
@@ -85,7 +84,7 @@ class WebhooksTest extends FeatureTestCase
                             'id' => 'bar',
                             'plan' => ['id' => 'plan_foo'],
                             'quantity' => 10,
-                        ]]
+                        ]],
                     ],
                 ],
             ],
