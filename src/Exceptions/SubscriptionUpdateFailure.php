@@ -13,10 +13,50 @@ class SubscriptionUpdateFailure extends Exception
      * @param  \Laravel\Cashier\Subscription  $subscription
      * @return static
      */
+    public static function swapOnMultiplan(Subscription $subscription)
+    {
+        return new static(
+            "The subscription \"{$subscription->stripe_id}\" cannot be swapped because it has multiple plans."
+        );
+    }
+
+    /**
+     * Create a new SubscriptionUpdateFailure instance.
+     *
+     * @param  \Laravel\Cashier\Subscription  $subscription
+     * @return static
+     */
     public static function incompleteSubscription(Subscription $subscription)
     {
         return new static(
             "The subscription \"{$subscription->stripe_id}\" cannot be updated because its payment is incomplete."
+        );
+    }
+
+    /**
+     * Create a new SubscriptionUpdateFailure instance.
+     *
+     * @param  \Laravel\Cashier\Subscription  $subscription
+     * @param  string  $plan
+     * @return static
+     */
+    public static function duplicatePlan(Subscription $subscription, $plan)
+    {
+        return new static(
+            "The plan \"$plan\" on subscription \"{$subscription->stripe_id}\" already exists."
+        );
+    }
+
+    /**
+     * Create a new SubscriptionUpdateFailure instance.
+     *
+     * @param  \Laravel\Cashier\Subscription  $subscription
+     * @return static
+     */
+    public static function cannotDeleteLastPlan(Subscription $subscription)
+    {
+        return new static(
+            "The plan on subscription \"{$subscription->stripe_id}\" cannot be removed because it is the last one."
         );
     }
 }

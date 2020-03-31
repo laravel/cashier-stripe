@@ -46,12 +46,12 @@ abstract class FeatureTestCase extends TestCase
         }
     }
 
-    protected function createCustomer($description = 'taylor'): User
+    protected function createCustomer($description = 'taylor', $options = []): User
     {
-        return User::create([
+        return User::create(array_merge([
             'email' => "{$description}@cashier-test.com",
             'name' => 'Taylor Otwell',
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
-        ]);
+        ], $options));
     }
 }
