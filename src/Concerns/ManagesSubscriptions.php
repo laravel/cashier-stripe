@@ -10,29 +10,29 @@ trait ManagesSubscriptions
     /**
      * Begin creating a new subscription.
      *
-     * @param  string  $subscription
+     * @param  string  $name
      * @param  string|array  $plans
      * @return \Laravel\Cashier\SubscriptionBuilder
      */
-    public function newSubscription($subscription, $plans)
+    public function newSubscription($name, $plans)
     {
-        return new SubscriptionBuilder($this, $subscription, $plans);
+        return new SubscriptionBuilder($this, $name, $plans);
     }
 
     /**
      * Determine if the Stripe model is on trial.
      *
-     * @param  string  $subscription
+     * @param  string  $name
      * @param  string|null  $plan
      * @return bool
      */
-    public function onTrial($subscription = 'default', $plan = null)
+    public function onTrial($name = 'default', $plan = null)
     {
         if (func_num_args() === 0 && $this->onGenericTrial()) {
             return true;
         }
 
-        $subscription = $this->subscription($subscription);
+        $subscription = $this->subscription($name);
 
         if (! $subscription || ! $subscription->onTrial()) {
             return false;
@@ -54,13 +54,13 @@ trait ManagesSubscriptions
     /**
      * Determine if the Stripe model has a given subscription.
      *
-     * @param  string  $subscription
+     * @param  string  $name
      * @param  string|null  $plan
      * @return bool
      */
-    public function subscribed($subscription = 'default', $plan = null)
+    public function subscribed($name = 'default', $plan = null)
     {
-        $subscription = $this->subscription($subscription);
+        $subscription = $this->subscription($name);
 
         if (! $subscription || ! $subscription->valid()) {
             return false;
@@ -72,7 +72,7 @@ trait ManagesSubscriptions
     /**
      * Get a subscription instance by name.
      *
-     * @param  string  $subscription
+     * @param  string  $name
      * @return \Laravel\Cashier\Subscription|null
      */
     public function subscription($name = 'default')
@@ -97,12 +97,12 @@ trait ManagesSubscriptions
     /**
      * Determine if the customer's subscription has an incomplete payment.
      *
-     * @param  string  $subscription
+     * @param  string  $name
      * @return bool
      */
-    public function hasIncompletePayment($subscription = 'default')
+    public function hasIncompletePayment($name = 'default')
     {
-        if ($subscription = $this->subscription($subscription)) {
+        if ($subscription = $this->subscription($name)) {
             return $subscription->hasIncompletePayment();
         }
 
@@ -113,12 +113,12 @@ trait ManagesSubscriptions
      * Determine if the Stripe model is actively subscribed to one of the given plans.
      *
      * @param  array|string  $plans
-     * @param  string  $subscription
+     * @param  string  $name
      * @return bool
      */
-    public function subscribedToPlan($plans, $subscription = 'default')
+    public function subscribedToPlan($plans, $name = 'default')
     {
-        $subscription = $this->subscription($subscription);
+        $subscription = $this->subscription($name);
 
         if (! $subscription || ! $subscription->valid()) {
             return false;

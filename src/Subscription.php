@@ -39,6 +39,15 @@ class Subscription extends Model
     ];
 
     /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'quantity' => 'integer',
+    ];
+
+    /**
      * Indicates if the plan change should be prorated.
      *
      * @var bool
@@ -113,7 +122,7 @@ class Subscription extends Model
     public function hasPlan($plan)
     {
         if ($this->hasMultiplePlans()) {
-            return $this->items->has(function (SubscriptionItem $item) use ($plan) {
+            return $this->items->contains(function (SubscriptionItem $item) use ($plan) {
                 return $item->stripe_plan === $plan;
             });
         }
@@ -661,12 +670,20 @@ class Subscription extends Model
 
         $subscription = $this->asStripeSubscription();
 
-        $subscription->items->create(array_merge([
+        $item = $subscription->items->create(array_merge([
             'plan' => $plan,
             'prorate' => $this->prorate,
             'quantity' => $quantity,
             'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
         ], $options));
+
+        $this->items()->create([
+            'stripe_id' => $item->id,
+            'stripe_plan' => $plan,
+            'quantity' => $quantity,
+        ]);
+
+        unset($this->items);
 
         if ($this->items()->count() > 1) {
             $this->fill([
@@ -716,7 +733,9 @@ class Subscription extends Model
 
         $item->asStripeSubscriptionItem()->delete();
 
-        $item->delete();
+        $this->items()->where('stripe_plan', $plan)->delete();
+
+        unset($this->items);
 
         if ($this->items()->count() === 1) {
             $item = $this->items()->first();

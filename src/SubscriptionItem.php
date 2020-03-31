@@ -15,6 +15,15 @@ class SubscriptionItem extends Model
     protected $guarded = [];
 
     /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'quantity' => 'integer',
+    ];
+
+    /**
      * Get the subscription where the item belongs to.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

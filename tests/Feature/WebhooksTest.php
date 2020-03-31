@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Exceptions\PaymentActionRequired;
 use Laravel\Cashier\Notifications\ConfirmPayment;
+use Laravel\Cashier\Tests\Fixtures\User;
 use Stripe\Plan;
 use Stripe\Product;
 
@@ -51,6 +52,62 @@ class WebhooksTest extends FeatureTestCase
 
         static::deleteStripeResource(new Plan(static::$planId));
         static::deleteStripeResource(new Product(static::$productId));
+    }
+
+    public function test_subscriptions_are_updated()
+    {
+        $user = $this->createCustomer('subscriptions_are_updated');
+
+        $subscription = $user->subscriptions()->create([
+            'name' => 'main',
+            'stripe_id' => 'sub_foo',
+            'stripe_plan' => 'plan_foo',
+            'stripe_status' => 'active',
+        ]);
+
+        $item = $subscription->items()->create([
+            'stripe_id' => 'it_foo',
+            'stripe_plan' => 'plan_bar',
+            'quantity' => 1,
+        ]);
+
+        $this->postJson('stripe/webhook', [
+            'id' => 'foo',
+            'type' => 'customer.subscription.updated',
+            'data' => [
+                'object' => [
+                    'id' => $subscription->stripe_id,
+                    'customer' => $user->stripe_id,
+                    'cancel_at_period_end' => false,
+                    'quantity' => 5,
+                    'items' => [
+                        'data' => [[
+                            'id' => 'bar',
+                            'plan' => ['id' => 'plan_foo'],
+                            'quantity' => 10,
+                        ]]
+                    ],
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'user_id' => $user->id,
+            'stripe_id' => 'sub_foo',
+            'quantity' => 5,
+        ]);
+
+        $this->assertDatabaseHas('subscription_items', [
+            'subscription_id' => $subscription->id,
+            'stripe_id' => 'bar',
+            'stripe_plan' => 'plan_foo',
+            'quantity' => 10,
+        ]);
+
+        $this->assertDatabaseMissing('subscription_items', [
+            'id' => $item->id,
+        ]);
     }
 
     public function test_cancelled_subscription_is_properly_reactivated()
