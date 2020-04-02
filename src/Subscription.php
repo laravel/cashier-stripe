@@ -373,7 +373,7 @@ class Subscription extends Model
 
         $subscription->quantity = $quantity;
 
-        $subscription->prorate = $this->prorate;
+        $subscription->proration_behavior = $this->prorateBehavior();
 
         $subscription->save();
 
@@ -406,6 +406,16 @@ class Subscription extends Model
         $this->prorate = true;
 
         return $this;
+    }
+
+    /**
+     * Determine the prorating behavior when updating the subscription.
+     *
+     * @return string
+     */
+    public function prorateBehavior()
+    {
+        return $this->prorate ? 'create_prorations' : 'none';
     }
 
     /**
@@ -483,7 +493,7 @@ class Subscription extends Model
 
         $subscription->plan = $plan;
 
-        $subscription->prorate = $this->prorate;
+        $subscription->proration_behavior = $this->prorateBehavior();
 
         $subscription->cancel_at_period_end = false;
 
