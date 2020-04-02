@@ -171,7 +171,7 @@ class Subscription extends Model
 
         $this->save();
     }
-    
+
     /**
      * Sync the Stripe status of the subscription.
      *
