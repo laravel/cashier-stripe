@@ -156,6 +156,23 @@ class Subscription extends Model
     }
 
     /**
+     * Sync the Stripe subscription.
+     *
+     * @return void
+     */
+    public function syncStripe()
+    {
+        $subscription = $this->asStripeSubscription();
+
+        $this->stripe_status = $subscription->status;
+        $this->quantity = $subscription->quantity;
+        $this->trial_ends_at = $subscription->trial_end;
+        $this->ends_at = $subscription->ended_at;
+        
+        $this->save();
+    }
+    
+    /**
      * Sync the Stripe status of the subscription.
      *
      * @return void
