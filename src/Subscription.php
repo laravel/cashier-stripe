@@ -168,7 +168,7 @@ class Subscription extends Model
         $this->quantity = $subscription->quantity;
         $this->trial_ends_at = $subscription->trial_end;
         $this->ends_at = $subscription->ended_at;
-        
+
         $this->save();
     }
     
