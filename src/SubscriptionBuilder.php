@@ -113,7 +113,7 @@ class SubscriptionBuilder
     {
         if (is_null($plan)) {
             if (count($this->items) > 1) {
-                throw new InvalidArgumentException('Plan is required when creating multi plan subscriptions.');
+                throw new InvalidArgumentException('Plan is required when creating multi-plan subscriptions.');
             }
 
             $plan = Arr::first($this->items)['plan'];
