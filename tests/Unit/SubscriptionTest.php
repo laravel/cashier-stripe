@@ -102,4 +102,20 @@ class SubscriptionTest extends TestCase
 
         (new Subscription)->extendTrial(now()->subDay());
     }
+
+    public function test_we_can_check_if_it_has_a_single_plan()
+    {
+        $subscription = new Subscription(['stripe_plan' => 'foo']);
+
+        $this->assertTrue($subscription->hasSinglePlan());
+        $this->assertFalse($subscription->hasMultiplePlans());
+    }
+
+    public function test_we_can_check_if_it_has_multiple_plans()
+    {
+        $subscription = new Subscription(['stripe_plan' => null]);
+
+        $this->assertTrue($subscription->hasMultiplePlans());
+        $this->assertFalse($subscription->hasSinglePlan());
+    }
 }

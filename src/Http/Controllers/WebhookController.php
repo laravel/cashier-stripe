@@ -13,6 +13,7 @@ use Laravel\Cashier\Events\WebhookReceived;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
+use Laravel\Cashier\SubscriptionItem;
 use Stripe\PaymentIntent as StripePaymentIntent;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -69,20 +70,17 @@ class WebhookController extends Controller
                 return $subscription->stripe_id === $data['id'];
             })->each(function (Subscription $subscription) use ($data) {
                 if (isset($data['status']) && $data['status'] === 'incomplete_expired') {
+                    $subscription->items()->delete();
                     $subscription->delete();
 
                     return;
                 }
 
-                // Quantity...
-                if (isset($data['quantity'])) {
-                    $subscription->quantity = $data['quantity'];
-                }
-
                 // Plan...
-                if (isset($data['plan']['id'])) {
-                    $subscription->stripe_plan = $data['plan']['id'];
-                }
+                $subscription->stripe_plan = $data['plan']['id'] ?? null;
+
+                // Quantity...
+                $subscription->quantity = $data['quantity'];
 
                 // Trial ending date...
                 if (isset($data['trial_end'])) {
@@ -110,6 +108,26 @@ class WebhookController extends Controller
                 }
 
                 $subscription->save();
+
+                // Update subscription items...
+                if (isset($data['items'])) {
+                    $stripeIds = [];
+
+                    foreach ($data['items']['data'] as $item) {
+                        $stripeIds[] = $item['id'];
+
+                        SubscriptionItem::updateOrCreate([
+                            'stripe_id' => $item['id'],
+                        ], [
+                            'subscription_id' => $subscription->id,
+                            'stripe_plan' => $item['plan']['id'],
+                            'quantity' => $item['quantity'],
+                        ]);
+                    }
+
+                    // Delete items that aren't attached to the subscription anymore...
+                    $subscription->items()->whereNotIn('stripe_id', $stripeIds)->delete();
+                }
             });
         }
 

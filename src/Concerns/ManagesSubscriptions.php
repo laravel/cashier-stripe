@@ -10,36 +10,35 @@ trait ManagesSubscriptions
     /**
      * Begin creating a new subscription.
      *
-     * @param  string  $subscription
-     * @param  string  $plan
+     * @param  string  $name
+     * @param  string|array  $plans
      * @return \Laravel\Cashier\SubscriptionBuilder
      */
-    public function newSubscription($subscription, $plan)
+    public function newSubscription($name, $plans)
     {
-        return new SubscriptionBuilder($this, $subscription, $plan);
+        return new SubscriptionBuilder($this, $name, $plans);
     }
 
     /**
      * Determine if the Stripe model is on trial.
      *
-     * @param  string  $subscription
+     * @param  string  $name
      * @param  string|null  $plan
      * @return bool
      */
-    public function onTrial($subscription = 'default', $plan = null)
+    public function onTrial($name = 'default', $plan = null)
     {
         if (func_num_args() === 0 && $this->onGenericTrial()) {
             return true;
         }
 
-        $subscription = $this->subscription($subscription);
+        $subscription = $this->subscription($name);
 
-        if (is_null($plan)) {
-            return $subscription && $subscription->onTrial();
+        if (! $subscription || ! $subscription->onTrial()) {
+            return false;
         }
 
-        return $subscription && $subscription->onTrial() &&
-            $subscription->stripe_plan === $plan;
+        return $plan ? $subscription->hasPlan($plan) : true;
     }
 
     /**
@@ -55,38 +54,33 @@ trait ManagesSubscriptions
     /**
      * Determine if the Stripe model has a given subscription.
      *
-     * @param  string  $subscription
+     * @param  string  $name
      * @param  string|null  $plan
      * @return bool
      */
-    public function subscribed($subscription = 'default', $plan = null)
+    public function subscribed($name = 'default', $plan = null)
     {
-        $subscription = $this->subscription($subscription);
+        $subscription = $this->subscription($name);
 
-        if (is_null($subscription)) {
+        if (! $subscription || ! $subscription->valid()) {
             return false;
         }
 
-        if (is_null($plan)) {
-            return $subscription->valid();
-        }
-
-        return $subscription->valid() &&
-            $subscription->stripe_plan === $plan;
+        return $plan ? $subscription->hasPlan($plan) : true;
     }
 
     /**
      * Get a subscription instance by name.
      *
-     * @param  string  $subscription
+     * @param  string  $name
      * @return \Laravel\Cashier\Subscription|null
      */
-    public function subscription($subscription = 'default')
+    public function subscription($name = 'default')
     {
-        return $this->subscriptions->sortByDesc(function ($value) {
-            return $value->created_at->getTimestamp();
-        })->first(function ($value) use ($subscription) {
-            return $value->name === $subscription;
+        return $this->subscriptions->sortByDesc(function (Subscription $subscription) {
+            return $subscription->created_at->getTimestamp();
+        })->first(function (Subscription $subscription) use ($name) {
+            return $subscription->name === $name;
         });
     }
 
@@ -103,12 +97,12 @@ trait ManagesSubscriptions
     /**
      * Determine if the customer's subscription has an incomplete payment.
      *
-     * @param  string  $subscription
+     * @param  string  $name
      * @return bool
      */
-    public function hasIncompletePayment($subscription = 'default')
+    public function hasIncompletePayment($name = 'default')
     {
-        if ($subscription = $this->subscription($subscription)) {
+        if ($subscription = $this->subscription($name)) {
             return $subscription->hasIncompletePayment();
         }
 
@@ -119,19 +113,19 @@ trait ManagesSubscriptions
      * Determine if the Stripe model is actively subscribed to one of the given plans.
      *
      * @param  array|string  $plans
-     * @param  string  $subscription
+     * @param  string  $name
      * @return bool
      */
-    public function subscribedToPlan($plans, $subscription = 'default')
+    public function subscribedToPlan($plans, $name = 'default')
     {
-        $subscription = $this->subscription($subscription);
+        $subscription = $this->subscription($name);
 
         if (! $subscription || ! $subscription->valid()) {
             return false;
         }
 
         foreach ((array) $plans as $plan) {
-            if ($subscription->stripe_plan === $plan) {
+            if ($subscription->hasPlan($plan)) {
                 return true;
             }
         }
@@ -140,15 +134,15 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Determine if the entity is on the given plan.
+     * Determine if the entity has a valid subscription on the given plan.
      *
      * @param  string  $plan
      * @return bool
      */
     public function onPlan($plan)
     {
-        return ! is_null($this->subscriptions->first(function ($value) use ($plan) {
-            return $value->stripe_plan === $plan && $value->valid();
+        return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($plan) {
+            return $subscription->valid() && $subscription->hasPlan($plan);
         }));
     }
 
@@ -158,6 +152,16 @@ trait ManagesSubscriptions
      * @return array
      */
     public function taxRates()
+    {
+        return [];
+    }
+
+    /**
+     * Get the tax rates to apply to individual subscription items.
+     *
+     * @return array
+     */
+    public function planTaxRates()
     {
         return [];
     }
