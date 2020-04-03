@@ -43,7 +43,7 @@ class SubscriptionUpdateFailure extends Exception
     public static function duplicatePlan(Subscription $subscription, $plan)
     {
         return new static(
-            "The plan \"$plan\" on subscription \"{$subscription->stripe_id}\" already exists."
+            "The plan \"$plan\" is already attached to subscription \"{$subscription->stripe_id}\"."
         );
     }
 
