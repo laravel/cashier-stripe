@@ -24,7 +24,7 @@ class SubscriptionItem extends Model
     ];
 
     /**
-     * Get the subscription where the item belongs to.
+     * Get the subscription that the item belongs to.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
