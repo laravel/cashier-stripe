@@ -600,9 +600,7 @@ class Subscription extends Model
         $subscription = $this->asStripeSubscription();
 
         $subscription->plan = $plan;
-
         $subscription->proration_behavior = $this->prorateBehavior();
-
         $subscription->cancel_at_period_end = false;
 
         if (! is_null($this->billingCycleAnchor)) {
