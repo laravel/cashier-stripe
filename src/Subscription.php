@@ -29,6 +29,15 @@ class Subscription extends Model
     protected $with = ['items'];
 
     /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'quantity' => 'integer',
+    ];
+
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
@@ -36,15 +45,6 @@ class Subscription extends Model
     protected $dates = [
         'trial_ends_at', 'ends_at',
         'created_at', 'updated_at',
-    ];
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'quantity' => 'integer',
     ];
 
     /**
@@ -953,7 +953,7 @@ class Subscription extends Model
     {
         if (is_null($plan) && $this->hasMultiplePlans()) {
             throw new InvalidArgumentException(
-                'This method needs a plan argument because the subscription has multiple plans.'
+                'This method requires a plan argument since the subscription has multiple plans.'
             );
         }
     }
