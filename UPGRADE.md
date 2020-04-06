@@ -89,7 +89,15 @@ Previously, when a customer wasn't a Stripe customer yet, the methods `upcomingI
 
 ## Renamed Exceptions
 
+PR: https://github.com/laravel/cashier/pull/881
+
 The exception `Laravel\Cashier\Exceptions\InvalidStripeCustomer` has been split up into two new ones: `Laravel\Cashier\Exceptions\CustomerAlreadyCreated` and `Laravel\Cashier\Exceptions\InvalidCustomer`. The `createAsStripeCustomer` method will now throw the new `CustomerAlreadyCreated` exception while old usages of `InvalidStripeCustomer` are replaced by `InvalidCustomer`.
+
+## Invoice number
+
+PR: https://github.com/laravel/cashier/pull/878
+
+Previously, in the default `receipt.blade.php` view, Cashier made use of the Stripe identifier of an invoice for an invoice number. This has been corrected to the proper `$invoice->number` attribute.
 
 
 ## Upgrading To 10.0 From 9.0
