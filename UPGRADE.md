@@ -67,11 +67,11 @@ Secondly, the `syncTaxPercentage` method has been renamed to `syncTaxRates` whic
 
 Thirdly, the `InvoiceItem` class has been renamed to `InvoiceLineItem` which better represents what it actually is and is consistent with Stripe's own terminology. Several methods have also been renamed to better reflect this.
 
-Lastly, the [`receipt.blade.php`](https://github.com/laravel/cashier/blob/11.x/resources/views/receipt.blade.php) view has gotten a thorough update. If you exported the view it's best that you do so again:
+Lastly, the [`receipt.blade.php`](https://github.com/laravel/cashier/blob/11.x/resources/views/receipt.blade.php) view has been thoroughly updated. If you have previously exported this view we recommend that you export it again to receive these updates:
 
     php artisan vendor:publish --tag="cashier-views" --force
 
-It is also highly recommended that you read up on Stripe's guides on Tax Rates:
+We also recommended that you familiarize yourself with Stripe's guides on Tax Rates:
 
 Stripe migration guide: https://stripe.com/docs/billing/migration/taxes
 Tax Rates documentation: https://stripe.com/docs/billing/taxes/tax-rates
@@ -81,26 +81,25 @@ Tax Rates on invoices: https://stripe.com/docs/billing/invoices/tax-rates
 
 PR: https://github.com/laravel/cashier/pull/838
 
-The method `hasPaymentMethod` previously returned `true` or `false` when the customer had a default payment method set. Instead, a dedicated `hasDefaultPaymentMethod` method has been added for this. The old `hasPaymentMethod` method will now return `true` or `false` when the customer has at least one payment method set.
+The `hasPaymentMethod` method previously returned `true` or `false` when the customer had a default payment method set. A new `hasDefaultPaymentMethod` method has been created for this purpose, while the `hasPaymentMethod` method will now return `true` or `false` when the customer has at least one payment method set.
 
 ## Loosened Exception Throwing
 
 PR: https://github.com/laravel/cashier/pull/882
 
-Previously, when a customer wasn't a Stripe customer yet, the methods `upcomingInvoice`, `invoices` and `paymentMethods` would throw an `InvalidStripeCustomer` exception. This has been adjusted so these methods return an empty collection for `invoices` and `paymentMethods` and `null` for `upcomingInvoice` without the need for creating a Stripe customer first.
+Previously, when a user wasn't yet a Stripe customer, the `upcomingInvoice`, `invoices`, and `paymentMethods` methods would throw an `InvalidStripeCustomer` exception. This has been adjusted so these methods return an empty collection for `invoices` and `paymentMethods`, and `null` for `upcomingInvoice`. An exception will no longer be thrown if the user is not a Stripe customer.
 
 ## Renamed Exceptions
 
 PR: https://github.com/laravel/cashier/pull/881
 
-The exception `Laravel\Cashier\Exceptions\InvalidStripeCustomer` has been split up into two new ones: `Laravel\Cashier\Exceptions\CustomerAlreadyCreated` and `Laravel\Cashier\Exceptions\InvalidCustomer`. The `createAsStripeCustomer` method will now throw the new `CustomerAlreadyCreated` exception while old usages of `InvalidStripeCustomer` are replaced by `InvalidCustomer`.
+The exception `Laravel\Cashier\Exceptions\InvalidStripeCustomer` has been split up into two new exceptions: `Laravel\Cashier\Exceptions\CustomerAlreadyCreated` and `Laravel\Cashier\Exceptions\InvalidCustomer`. The `createAsStripeCustomer` method will now throw the new `CustomerAlreadyCreated` exception while old usages of `InvalidStripeCustomer` are replaced by `InvalidCustomer`.
 
-## Invoice number
+## Invoice Numbers
 
 PR: https://github.com/laravel/cashier/pull/878
 
 Previously, in the default `receipt.blade.php` view, Cashier made use of the Stripe identifier of an invoice for an invoice number. This has been corrected to the proper `$invoice->number` attribute.
-
 
 ## Upgrading To 10.0 From 9.0
 
