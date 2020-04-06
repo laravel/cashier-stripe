@@ -4,7 +4,7 @@
 
 ### Minimum Versions
 
-The following dependencies were bumped to new minimum versions:
+The following required dependency versions have been updated:
 
 - The minimum PHP version is now v7.2
 - The minimum Laravel version is now v6.0
@@ -14,22 +14,13 @@ The following dependencies were bumped to new minimum versions:
 
 PR: https://github.com/laravel/cashier/pull/905
 
-The Stripe API version for v11 will be `2020-03-02`. Even though Cashier uses this version, it's recommended that you upgrade your own settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version as well after deploying the Cashier upgrade. If you use the Stripe SDK directly, make sure to properly test your integration after updating.
+The Stripe API version for Cashier 11.x will be `2020-03-02`. Even though Cashier uses this version, it's recommended that you upgrade your own settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version as well after deploying the Cashier upgrade. If you use the Stripe SDK directly, make sure to properly test your integration after updating.
 
 ## Multiplan Subscriptions
 
 PR: https://github.com/laravel/cashier/pull/900
 
-With Cashier v11, multiplan subscription support has finally landed. With this addition, you should keep in mind that from now on the `stripe_plan` and `quantity` attributes on the `Subscription` model can be `null`. This is only the case when a subscription has multiple plans. If you need to determine the subscription's plans and quantities you can reference the individual items:
-
-```php
-foreach ($subscription->items as $item) {
-    $item->stripe_plan;
-    $item->quantity;
-}
-```
-
-You should make sure that the `stripe_plan` and `quantity` columns on subscriptions are nullable fields. You can do so with this migration: 
+With Cashier 11.x, multiple plans per subscription is now supported. To support this, the `stripe_plan` and `quantity` attributes on the `Subscription` model may now be `null`. This will occur only when a subscription has multiple plans. To accommodate these changes, please execute the following migration against your database:
 
 ```php
 Schema::table('subscriptions', function (Blueprint $table) {
@@ -38,7 +29,7 @@ Schema::table('subscriptions', function (Blueprint $table) {
 });
 ```
 
-And if you've disabled Cashier's migrations then you should also manually add a new table for the new subscription items:
+If you have disabled Cashier's migrations then you should also manually create a new migration to add a table for subscription items:
 
 ```php
 Schema::create('subscription_items', function (Blueprint $table) {
@@ -53,17 +44,28 @@ Schema::create('subscription_items', function (Blueprint $table) {
 });
 ```
 
+If you need to access the subscription's plans and their respective quantities you may do using the new `items` relationship available on the subscription:
+
+```php
+foreach ($subscription->items as $item) {
+    $item->stripe_plan;
+    $item->quantity;
+}
+```
+
+For more information on subscriptions with multiple plans, please consult the [full Cashier documentation](https://laravel.com/docs/billing) available on the Laravel website.
+
 ## Tax Rates Support
 
 PR: https://github.com/laravel/cashier/pull/830
 
-Cashier v11 ships with support for Stripe's Tax Rates. This brings along several changes.
+Cashier 11.x includes support for Stripe's "Tax Rates" services. Several changes have been made to Cashier to support this new feature.
 
-First of all, instead of defining a default tax percentage on the Billable model, an array of Tax Rate ids needs to be returned. If you were overriding the `taxPercentage` method you need to rename it to `taxRates`. Instead of returning a percentage you'll need to return an array with a an Stripe ID of a Tax Rate that you define [in your Stripe Dashboard](https://dashboard.stripe.com/tax-rates).
+First, instead of defining a default tax percentage on the `Billable` model, an array of Tax Rate IDs must be returned. If you were overriding the `taxPercentage` method you should rename it to `taxRates`. Instead of returning a percentage you'll need to return an array containing Stripe ID of a Tax Rate that you define [in your Stripe Dashboard](https://dashboard.stripe.com/tax-rates).
 
-Secondly, the `syncTaxPercentage` method has been renamed to `syncTaxRates` which will now also sync tax rates for any subscription items of the subscription.
+Secondly, the `syncTaxPercentage` method has been renamed to `syncTaxRates` which, when using multi-plan subscriptions, will also sync tax rates for any subscription items of the subscription.
 
-Thirdly, the `InvoiceItem` class has been renamed to `InvoiceLineItem` which better represents what it actually is and is the same naming that Stripe uses. Several methods have also been renamed to better reflect this.
+Thirdly, the `InvoiceItem` class has been renamed to `InvoiceLineItem` which better represents what it actually is and is consistent with Stripe's own terminology. Several methods have also been renamed to better reflect this.
 
 Lastly, the [`receipt.blade.php`](https://github.com/laravel/cashier/blob/11.x/resources/views/receipt.blade.php) view has gotten a thorough update. If you exported the view it's best that you do so again:
 
@@ -168,7 +170,7 @@ try {
 
 The `IncompletePayment` exception above could be an instance of a `PaymentFailure` when a card failure occurred or an instance of `PaymentActionRequired` when a secondary confirmation action is needed to complete the payment. In the example above, the user is redirected to a new, dedicated payment page which ships with Cashier. Here, the user can confirm their payment details and fulfill the secondary action (such as 3D Secure). After confirming their payment, the user will be redirected to the URL provided in the `redirect` route parameter.
 
-Exceptions may be thrown for the following methods: `charge`, `invoiceFor`, and `invoice` on the `Billable` user. When handling subscriptions, the `create` method and `swap` methods may throw exceptions. The payment page provided by Cashier offers an easy transition to handling the new European SCA requirements. 
+Exceptions may be thrown for the following methods: `charge`, `invoiceFor`, and `invoice` on the `Billable` user. When handling subscriptions, the `create` method and `swap` methods may throw exceptions. The payment page provided by Cashier offers an easy transition to handling the new European SCA requirements.
 
 > If you would like to let Stripe host your payment verification pages, [you may configure this in your Stripe settings](https://dashboard.stripe.com/account/billing/automatic). However, you should still handle payment exceptions in your application and inform the user they will receive an email with further payment confirmation instructions.
 
@@ -216,7 +218,7 @@ To ensure that off-session payment confirmation notifications are delivered, ver
 
 ### Cards And Payment Methods
 
-PR: https://github.com/laravel/cashier/pull/696  
+PR: https://github.com/laravel/cashier/pull/696
 PR: https://github.com/laravel/cashier/pull/701
 
 Cashier has migrated to the new recommended [Stripe Payment Methods API](https://stripe.com/docs/payments/payment-methods). This API effectively [replaces the former Sources and Tokens API](https://stripe.com/docs/payments/payment-methods#transitioning). At the moment, the Payment Methods API only supports cards but support for all of the other payment flows [is planned](https://stripe.com/docs/payments/payment-methods#transitioning).
@@ -231,7 +233,7 @@ use Stripe\BankAccount as StripeBankAccount;
 
 $defaultPaymentMethod = $user->defaultPaymentMethod();
 
-if ($defaultPaymentMethod instanceof StripeCard || 
+if ($defaultPaymentMethod instanceof StripeCard ||
     $defaultPaymentMethod instanceof StripeBankAccount) {
     // Gather payment method and store it using new payment method APIs...
 }
@@ -318,7 +320,7 @@ The following methods now require that the `Billable` user has an associated Str
 
 To accommodate for this new behavior from now on Cashier will cancel that subscription immediately and throw a custom `SubscriptionCreationFailed` exception when a subscription is created with an "incomplete" or "incomplete_expired" status. We've decided to do this because in general you want to let a customer only start using your product when payment was received.
 
-If you were relying on catching the `\Stripe\Error\Card` exception before you should now rely on catching the `Laravel\Cashier\Exceptions\SubscriptionCreationFailed` exception instead. 
+If you were relying on catching the `\Stripe\Error\Card` exception before you should now rely on catching the `Laravel\Cashier\Exceptions\SubscriptionCreationFailed` exception instead.
 
 ### Card Failure When Swapping Plans
 
