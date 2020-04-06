@@ -1,5 +1,97 @@
 # Upgrade Guide
 
+## Upgrading To 11.0 From 10.0
+
+### Minimum Versions
+
+The following dependencies were bumped to new minimum versions:
+
+- The minimum PHP version is now v7.2
+- The minimum Laravel version is now v6.0
+- The minimum Stripe SDK version is now v7.0
+
+### Stripe API Version
+
+PR: https://github.com/laravel/cashier/pull/905
+
+The Stripe API version for v11 will be `2020-03-02`. Even though Cashier uses this version, it's recommended that you upgrade your own settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version as well after deploying the Cashier upgrade. If you use the Stripe SDK directly, make sure to properly test your integration after updating.
+
+## Multiplan Subscriptions
+
+PR: https://github.com/laravel/cashier/pull/900
+
+With Cashier v11, multiplan subscription support has finally landed. With this addition, you should keep in mind that from now on the `stripe_plan` and `quantity` attributes on the `Subscription` model can be `null`. This is only the case when a subscription has multiple plans. If you need to determine the subscription's plans and quantities you can reference the individual items:
+
+```php
+foreach ($subscription->items as $item) {
+    $item->stripe_plan;
+    $item->quantity;
+}
+```
+
+You should make sure that the `stripe_plan` and `quantity` columns on subscriptions are nullable fields. You can do so with this migration: 
+
+```php
+Schema::table('subscriptions', function (Blueprint $table) {
+     $table->string('stripe_plan')->nullable()->change();
+     $table->integer('quantity')->nullable()->change();
+});
+```
+
+And if you've disabled Cashier's migrations then you should also manually add a new table for the new subscription items:
+
+```php
+Schema::create('subscription_items', function (Blueprint $table) {
+    $table->bigIncrements('id');
+    $table->unsignedBigInteger('subscription_id');
+    $table->string('stripe_id')->index();
+    $table->string('stripe_plan');
+    $table->integer('quantity');
+    $table->timestamps();
+
+    $table->unique(['subscription_id', 'stripe_plan']);
+});
+```
+
+## Tax Rates Support
+
+PR: https://github.com/laravel/cashier/pull/830
+
+Cashier v11 ships with support for Stripe's Tax Rates. This brings along several changes.
+
+First of all, instead of defining a default tax percentage on the Billable model, an array of Tax Rate ids needs to be returned. If you were overriding the `taxPercentage` method you need to rename it to `taxRates`. Instead of returning a percentage you'll need to return an array with a an Stripe ID of a Tax Rate that you define [in your Stripe Dashboard](https://dashboard.stripe.com/tax-rates).
+
+Secondly, the `syncTaxPercentage` method has been renamed to `syncTaxRates` which will now also sync tax rates for any subscription items of the subscription.
+
+Thirdly, the `InvoiceItem` class has been renamed to `InvoiceLineItem` which better represents what it actually is and is the same naming that Stripe uses. Several methods have also been renamed to better reflect this.
+
+Lastly, the [`receipt.blade.php`](https://github.com/laravel/cashier/blob/11.x/resources/views/receipt.blade.php) view has gotten a thorough update. If you exported the view it's best that you do so again:
+
+    php artisan vendor:publish --tag="cashier-views" --force
+
+It is also highly recommended that you read up on Stripe's guides on Tax Rates:
+
+Stripe migration guide: https://stripe.com/docs/billing/migration/taxes
+Tax Rates documentation: https://stripe.com/docs/billing/taxes/tax-rates
+Tax Rates on invoices: https://stripe.com/docs/billing/invoices/tax-rates
+
+## `hasPaymentMethod` Changes
+
+PR: https://github.com/laravel/cashier/pull/838
+
+The method `hasPaymentMethod` previously returned `true` or `false` when the customer had a default payment method set. Instead, a dedicated `hasDefaultPaymentMethod` method has been added for this. The old `hasPaymentMethod` method will now return `true` or `false` when the customer has at least one payment method set.
+
+## Loosened Exception Throwing
+
+PR: https://github.com/laravel/cashier/pull/882
+
+Previously, when a customer wasn't a Stripe customer yet, the methods `upcomingInvoice`, `invoices` and `paymentMethods` would throw an `InvalidStripeCustomer` exception. This has been adjusted so these methods return a proper response without the need for creating a Stripe customer first.
+
+## Renamed Exceptions
+
+The exception `Laravel\Cashier\Exceptions\InvalidStripeCustomer` has been split up into two new ones: `Laravel\Cashier\Exceptions\CustomerAlreadyCreated` and `Laravel\Cashier\Exceptions\InvalidCustomer`. The `createAsStripeCustomer` method will now throw the new `CustomerAlreadyCreated` exception while old usages of `InvalidStripeCustomer` are replaced by `InvalidCustomer`.
+
+
 ## Upgrading To 10.0 From 9.0
 
 Cashier 10.0 is a major release that provides support for new Stripe APIs as well as provide compliance with SCA regulations in Europe that begin September 2019. If you have a business in the EU, we recommend you review [Stripe's guide on PSD2 and SCA](https://stripe.com/guides/strong-customer-authentication) as well as [their documentation on the SCA API's](https://stripe.com/docs/strong-customer-authentication).
@@ -10,7 +102,7 @@ In this upgrade guide we'll try to cover as much as possible. Please read it tho
 
 ### Minimum Versions
 
-The following libraries were bumped to new minimum versions:
+The following dependencies were bumped to new minimum versions:
 
 - The minimum Laravel version is now v5.8
 - The minimum Symfony dependencies are now v4.3
