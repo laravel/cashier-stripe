@@ -63,7 +63,7 @@ Cashier 11.x includes support for Stripe's "Tax Rates" services. Several changes
 
 First, instead of defining a default tax percentage on the `Billable` model, an array of Tax Rate IDs must be returned. If you were overriding the `taxPercentage` method you should rename it to `taxRates`. Instead of returning a percentage you'll need to return an array containing Stripe ID of a Tax Rate that you define [in your Stripe Dashboard](https://dashboard.stripe.com/tax-rates).
 
-Secondly, the `syncTaxPercentage` method has been renamed to `syncTaxRates` which, when using multi-plan subscriptions, will also sync tax rates for any subscription items of the subscription.
+Secondly, the `syncTaxPercentage` method has been renamed to `syncTaxRates` which, when using multiplan subscriptions, will also sync tax rates for any subscription items of the subscription.
 
 Thirdly, the `InvoiceItem` class has been renamed to `InvoiceLineItem` which better represents what it actually is and is consistent with Stripe's own terminology. Several methods have also been renamed to better reflect this.
 
