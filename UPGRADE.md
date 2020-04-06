@@ -85,7 +85,7 @@ The method `hasPaymentMethod` previously returned `true` or `false` when the cus
 
 PR: https://github.com/laravel/cashier/pull/882
 
-Previously, when a customer wasn't a Stripe customer yet, the methods `upcomingInvoice`, `invoices` and `paymentMethods` would throw an `InvalidStripeCustomer` exception. This has been adjusted so these methods return a proper response without the need for creating a Stripe customer first.
+Previously, when a customer wasn't a Stripe customer yet, the methods `upcomingInvoice`, `invoices` and `paymentMethods` would throw an `InvalidStripeCustomer` exception. This has been adjusted so these methods return an empty collection for `invoices` and `paymentMethods` and `null` for `upcomingInvoice` without the need for creating a Stripe customer first.
 
 ## Renamed Exceptions
 
