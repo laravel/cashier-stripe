@@ -16,7 +16,7 @@ PR: https://github.com/laravel/cashier/pull/905
 
 The Stripe API version for Cashier 11.x will be `2020-03-02`. Even though Cashier uses this version, it's recommended that you upgrade your own settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version as well after deploying the Cashier upgrade. If you use the Stripe SDK directly, make sure to properly test your integration after updating.
 
-## Multiplan Subscriptions
+### Multiplan Subscriptions
 
 PR: https://github.com/laravel/cashier/pull/900
 
@@ -55,7 +55,7 @@ foreach ($subscription->items as $item) {
 
 For more information on subscriptions with multiple plans, please consult the [full Cashier documentation](https://laravel.com/docs/billing) available on the Laravel website.
 
-## Tax Rates Support
+### Tax Rates Support
 
 PR: https://github.com/laravel/cashier/pull/830
 
@@ -77,25 +77,25 @@ Stripe migration guide: https://stripe.com/docs/billing/migration/taxes
 Tax Rates documentation: https://stripe.com/docs/billing/taxes/tax-rates
 Tax Rates on invoices: https://stripe.com/docs/billing/invoices/tax-rates
 
-## `hasPaymentMethod` Changes
+### hasPaymentMethod Changes
 
 PR: https://github.com/laravel/cashier/pull/838
 
 The `hasPaymentMethod` method previously returned `true` or `false` when the customer had a default payment method set. A new `hasDefaultPaymentMethod` method has been created for this purpose, while the `hasPaymentMethod` method will now return `true` or `false` when the customer has at least one payment method set.
 
-## Loosened Exception Throwing
+### Loosened Exception Throwing
 
 PR: https://github.com/laravel/cashier/pull/882
 
 Previously, when a user wasn't yet a Stripe customer, the `upcomingInvoice`, `invoices`, and `paymentMethods` methods would throw an `InvalidStripeCustomer` exception. This has been adjusted so these methods return an empty collection for `invoices` and `paymentMethods`, and `null` for `upcomingInvoice`. An exception will no longer be thrown if the user is not a Stripe customer.
 
-## Renamed Exceptions
+### Renamed Exceptions
 
 PR: https://github.com/laravel/cashier/pull/881
 
 The exception `Laravel\Cashier\Exceptions\InvalidStripeCustomer` has been split up into two new exceptions: `Laravel\Cashier\Exceptions\CustomerAlreadyCreated` and `Laravel\Cashier\Exceptions\InvalidCustomer`. The `createAsStripeCustomer` method will now throw the new `CustomerAlreadyCreated` exception while old usages of `InvalidStripeCustomer` are replaced by `InvalidCustomer`.
 
-## Invoice Numbers
+### Invoice Numbers
 
 PR: https://github.com/laravel/cashier/pull/878
 
