@@ -1,9 +1,25 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v10.7.1...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v11.0.0...master)
+
+
+## [v11.0.0 (2020-04-07)](https://github.com/laravel/cashier/compare/v10.7.1...v11.0.0)
+
+### Added
+- Multiplan subscriptions ([#900](https://github.com/laravel/cashier/pull/900))
+- Tax Rates ([#830](https://github.com/laravel/cashier/pull/830))
+- Add new has payment method ([#838](https://github.com/laravel/cashier/pull/838))
 
 ### Changed
+- Update stripe api version ([#905](https://github.com/laravel/cashier/pull/905))
+- Require PHP 7.2 ([f0f8cd1](https://github.com/laravel/cashier/commit/f0f8cd1c58751e98ad1d9387b37bf7cfe9883c4a))
 - Dropped Laravel 5.8 support ([b6256a2](https://github.com/laravel/cashier/commit/b6256a2a2e486478a26043cb2926dc744dc0a42a))
+- Allow for subscription options ([#868](https://github.com/laravel/cashier/pull/868), [#901](https://github.com/laravel/cashier/pull/901))
+- Use proper invoice number ([#878](https://github.com/laravel/cashier/pull/878))
+- Loosen exception throwing ([#882](https://github.com/laravel/cashier/pull/882))
+- Rename some exceptions ([#881](https://github.com/laravel/cashier/pull/881))
+- Allow for custom filename with downloadInvoice method ([#889](https://github.com/laravel/cashier/pull/889))
+- Split `Billable` trait into multiple concerns ([#898](https://github.com/laravel/cashier/pull/898))
 
 
 ## [v10.7.1 (2020-03-24)](https://github.com/laravel/cashier/compare/v10.7.0...v10.7.1)
