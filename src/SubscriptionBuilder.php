@@ -71,7 +71,7 @@ class SubscriptionBuilder
      *
      * @param  mixed  $owner
      * @param  string  $name
-     * @param  string|array  $plans
+     * @param  string|string[]  $plans
      * @return void
      */
     public function __construct($owner, $name, $plans = null)
