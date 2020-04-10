@@ -11,7 +11,6 @@ use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use LogicException;
 use Stripe\Subscription as StripeSubscription;
-use Stripe\SubscriptionItem as StripeSubscriptionItem;
 
 class Subscription extends Model
 {
