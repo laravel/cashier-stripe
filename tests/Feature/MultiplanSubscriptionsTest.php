@@ -210,6 +210,22 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         $subscription->swap(self::$premiumPlanId);
     }
 
+    /** @group Swap */
+    public function test_multiple_plans_can_be_swapped()
+    {
+        $user = $this->createCustomer('multiple_plans_can_be_swapped');
+
+        $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
+
+        $subscription = $subscription->swap([static::$otherPlanId, static::$premiumPlanId]);
+
+        $plans = $subscription->items()->pluck('stripe_plan');
+
+        $this->assertCount(2, $plans);
+        $this->assertContains(self::$otherPlanId, $plans);
+        $this->assertContains(self::$premiumPlanId, $plans);
+    }
+
     public function test_subscription_item_changes_can_be_prorated()
     {
         $user = $this->createCustomer('subscription_item_changes_can_be_prorated');
@@ -245,7 +261,8 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         $subscription = $user->subscriptions()->create([
             'name' => 'main',
             'stripe_id' => 'sub_foo',
-            'stripe_plan' => 'plan_foo',
+            'stripe_plan' => self::$planId,
+            'quantity' => 1,
             'stripe_status' => 'active',
         ]);
 
@@ -269,6 +286,7 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         $subscription = $this->createSubscriptionWithSinglePlan($user);
 
         $subscription->stripe_plan = null;
+        $subscription->quantity = null;
         $subscription->save();
 
         $subscription->items()->create([

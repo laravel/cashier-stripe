@@ -13,7 +13,6 @@ use Laravel\Cashier\Events\WebhookReceived;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
-use Laravel\Cashier\SubscriptionItem;
 use Stripe\PaymentIntent as StripePaymentIntent;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -111,22 +110,21 @@ class WebhookController extends Controller
 
                 // Update subscription items...
                 if (isset($data['items'])) {
-                    $stripeIds = [];
+                    $plans = [];
 
                     foreach ($data['items']['data'] as $item) {
-                        $stripeIds[] = $item['id'];
+                        $plans[] = $item['plan']['id'];
 
-                        SubscriptionItem::updateOrCreate([
+                        $subscription->items()->updateOrCreate([
                             'stripe_id' => $item['id'],
                         ], [
-                            'subscription_id' => $subscription->id,
                             'stripe_plan' => $item['plan']['id'],
                             'quantity' => $item['quantity'],
                         ]);
                     }
 
                     // Delete items that aren't attached to the subscription anymore...
-                    $subscription->items()->whereNotIn('stripe_id', $stripeIds)->delete();
+                    $subscription->items()->whereNotIn('stripe_plan', $plans)->delete();
                 }
             });
         }

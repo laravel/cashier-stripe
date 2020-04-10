@@ -11,7 +11,7 @@ trait ManagesSubscriptions
      * Begin creating a new subscription.
      *
      * @param  string  $name
-     * @param  string|array  $plans
+     * @param  string|string[]  $plans
      * @return \Laravel\Cashier\SubscriptionBuilder
      */
     public function newSubscription($name, $plans)
@@ -112,7 +112,7 @@ trait ManagesSubscriptions
     /**
      * Determine if the Stripe model is actively subscribed to one of the given plans.
      *
-     * @param  array|string  $plans
+     * @param  string|string[]  $plans
      * @param  string  $name
      * @return bool
      */
