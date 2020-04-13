@@ -560,7 +560,7 @@ class Subscription extends Model
             throw SubscriptionUpdateFailure::incompleteSubscription($this);
         }
 
-        $items = $this->mergePlansThatShouldBeDeletedDuringSwap(
+        $items = $this->mergeItemsThatShouldBeDeletedDuringSwap(
             $this->parseSwapPlans($plans)
         );
 
