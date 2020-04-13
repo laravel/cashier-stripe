@@ -205,13 +205,17 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
 
         $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
 
-        $subscription = $subscription->swap([static::$otherPlanId, static::$premiumPlanId]);
+        $subscription = $subscription->swap([static::$otherPlanId, static::$premiumPlanId => ['quantity' => 3]]);
 
         $plans = $subscription->items()->pluck('stripe_plan');
 
         $this->assertCount(2, $plans);
         $this->assertContains(self::$otherPlanId, $plans);
         $this->assertContains(self::$premiumPlanId, $plans);
+
+        $premiumPlan = $subscription->findItemOrFail(static::$premiumPlanId);
+
+        $this->assertEquals(3, $premiumPlan->quantity);
     }
 
     public function test_subscription_items_can_swap_plans()

@@ -544,13 +544,12 @@ class Subscription extends Model
      * Swap the subscription to new Stripe plans.
      *
      * @param  string|string[]  $plans
-     * @param  array  $subscriptionOptions
-     * @param  array  $planOptions
+     * @param  array  $options
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function swap($plans, $subscriptionOptions = [], $planOptions = [])
+    public function swap($plans, $options = [])
     {
         if (empty($plans = (array) $plans)) {
             throw new InvalidArgumentException('Please provide at least one plan when swapping.');
@@ -560,11 +559,14 @@ class Subscription extends Model
             throw SubscriptionUpdateFailure::incompleteSubscription($this);
         }
 
-        $items = collect($plans)->unique()->mapWithKeys(function ($plan) use ($planOptions) {
-            return [$plan =>array_merge([
+        $items = collect($plans)->mapWithKeys(function ($options, $plan) {
+            $plan = is_string($options) ? $options : $plan;
+            $options = is_string($options) ? [] : $options;
+
+            return [$plan => array_merge([
                 'plan' => $plan,
                 'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
-            ], $planOptions[$plan] ?? [])];
+            ], $options)];
         });
 
         /** @var \Stripe\SubscriptionItem $stripeSubscriptionItem */
@@ -582,7 +584,7 @@ class Subscription extends Model
             'items' => $items->values()->all(),
             'proration_behavior' => $this->prorateBehavior(),
             'cancel_at_period_end' => false,
-        ], $subscriptionOptions);
+        ], $options);
 
         if (! is_null($this->billingCycleAnchor)) {
             $options['billing_cycle_anchor'] = $this->billingCycleAnchor;
@@ -626,16 +628,15 @@ class Subscription extends Model
      * Swap the subscription to new Stripe plans, and invoice immediately.
      *
      * @param  string|string[]  $plans
-     * @param  array  $subscriptionOptions
-     * @param  array  $planOptions
+     * @param  array  $options
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function swapAndInvoice($plans, $subscriptionOptions = [], $planOptions = [])
+    public function swapAndInvoice($plans, $options = [])
     {
-        $subscription = $this->swap($plans, $subscriptionOptions, $planOptions);
+        $subscription = $this->swap($plans, $options);
 
         $this->invoice();
 
