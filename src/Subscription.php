@@ -564,7 +564,7 @@ class Subscription extends Model
         );
 
         $stripeSubscription = StripeSubscription::update(
-            $this->stripe_id, $this->getSwapOptions($items), $this->owner->stripeOptions()
+            $this->stripe_id, $this->getSwapOptions($items, $options), $this->owner->stripeOptions()
         );
 
         $this->fill([
@@ -654,9 +654,10 @@ class Subscription extends Model
      * Get the options array for a swap operation.
      *
      * @param  \Illuminate\Support\Collection  $items
+     * @param  array  $options
      * @return array
      */
-    protected function getSwapOptions(Collection $items)
+    protected function getSwapOptions(Collection $items, $options)
     {
         $options = array_merge([
             'items' => $items->values()->all(),
