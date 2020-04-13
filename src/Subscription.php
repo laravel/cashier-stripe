@@ -618,7 +618,7 @@ class Subscription extends Model
      */
     protected function parseSwapPlans($plans)
     {
-        $items = collect($plans)->mapWithKeys(function ($options, $plan) {
+        return collect($plans)->mapWithKeys(function ($options, $plan) {
             $plan = is_string($options) ? $options : $plan;
             $options = is_string($options) ? [] : $options;
 
