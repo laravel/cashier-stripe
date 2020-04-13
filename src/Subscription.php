@@ -559,47 +559,13 @@ class Subscription extends Model
             throw SubscriptionUpdateFailure::incompleteSubscription($this);
         }
 
-        $items = collect($plans)->mapWithKeys(function ($options, $plan) {
-            $plan = is_string($options) ? $options : $plan;
-            $options = is_string($options) ? [] : $options;
+        $items = $this->mergePlansThatShouldBeDeletedDuringSwap(
+            $this->parseSwapPlans($plans)
+        );
 
-            return [$plan => array_merge([
-                'plan' => $plan,
-                'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
-            ], $options)];
-        });
-
-        /** @var \Stripe\SubscriptionItem $stripeSubscriptionItem */
-        foreach ($this->asStripeSubscription()->items->data as $stripeSubscriptionItem) {
-            $plan = $stripeSubscriptionItem->plan->id;
-
-            if (! $item = $items->get($plan, [])) {
-                $item['deleted'] = true;
-            }
-
-            $items->put($plan, $item + ['id' => $stripeSubscriptionItem->id]);
-        }
-
-        $options = array_merge([
-            'items' => $items->values()->all(),
-            'proration_behavior' => $this->prorateBehavior(),
-            'cancel_at_period_end' => false,
-        ], $options);
-
-        if (! is_null($this->billingCycleAnchor)) {
-            $options['billing_cycle_anchor'] = $this->billingCycleAnchor;
-        }
-
-        // If no specific trial end date has been set, the default behavior should be
-        // to maintain the current trial state, whether that is "active" or to run
-        // the swap out with the exact number of days left on this current plan.
-        if ($this->onTrial()) {
-            $options['trial_end'] = $this->trial_ends_at->getTimestamp();
-        } else {
-            $options['trial_end'] = 'now';
-        }
-
-        $stripeSubscription = StripeSubscription::update($this->stripe_id, $options, $this->owner->stripeOptions());
+        $stripeSubscription = StripeSubscription::update(
+            $this->stripe_id, $this->getSwapOptions($items), $this->owner->stripeOptions()
+        );
 
         $this->fill([
             'stripe_plan' => $stripeSubscription->plan ? $stripeSubscription->plan->id : null,
@@ -641,6 +607,72 @@ class Subscription extends Model
         $this->invoice();
 
         return $subscription;
+    }
+
+    /**
+     * Parse the given plans for a swap operation.
+     *
+     * @param  string|string[]  $plans
+     * @return \Illuminate\Support\Collection
+     */
+    protected function parseSwapPlans($plans)
+    {
+        $items = collect($plans)->mapWithKeys(function ($options, $plan) {
+            $plan = is_string($options) ? $options : $plan;
+            $options = is_string($options) ? [] : $options;
+
+            return [$plan => array_merge([
+                'plan' => $plan,
+                'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
+            ], $options)];
+        });
+    }
+
+    /**
+     * Merge the items that should be deleted during swap into the given items collection.
+     *
+     * @param  \Illuminate\Support\Collection  $items
+     * @return \Illuminate\Support\Collection
+     */
+    protected function mergeItemsThatShouldBeDeletedDuringSwap(Collection $items)
+    {
+        /** @var \Stripe\SubscriptionItem $stripeSubscriptionItem */
+        foreach ($this->asStripeSubscription()->items->data as $stripeSubscriptionItem) {
+            $plan = $stripeSubscriptionItem->plan->id;
+
+            if (! $item = $items->get($plan, [])) {
+                $item['deleted'] = true;
+            }
+
+            $items->put($plan, $item + ['id' => $stripeSubscriptionItem->id]);
+        }
+
+        return $items;
+    }
+
+    /**
+     * Get the options array for a swap operation.
+     *
+     * @param  \Illuminate\Support\Collection  $items
+     * @return array
+     */
+    protected function getSwapOptions(Collection $items)
+    {
+        $options = array_merge([
+            'items' => $items->values()->all(),
+            'proration_behavior' => $this->prorateBehavior(),
+            'cancel_at_period_end' => false,
+        ], $options);
+
+        if (! is_null($this->billingCycleAnchor)) {
+            $options['billing_cycle_anchor'] = $this->billingCycleAnchor;
+        }
+
+        $options['trial_end'] = $this->onTrial()
+                        ? $this->trial_ends_at->getTimestamp()
+                        : 'now';
+
+        return $options;
     }
 
     /**
