@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Exceptions\IncompletePayment;
