@@ -199,15 +199,39 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         $this->assertSame(5, $item->quantity);
     }
 
-    public function test_plans_cannot_be_swapped_when_subscription_has_multiple_plans()
+    public function test_multiple_plans_can_be_swapped()
     {
-        $user = $this->createCustomer('plans_cannot_be_swapped_when_subscription_has_multiple_plans');
+        $user = $this->createCustomer('multiple_plans_can_be_swapped');
 
-        $subscription = $this->createSubscriptionWithMultiplePlans($user);
+        $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
 
-        $this->expectException(SubscriptionUpdateFailure::class);
+        $subscription = $subscription->swap([static::$otherPlanId, static::$premiumPlanId => ['quantity' => 3]]);
 
-        $subscription->swap(self::$premiumPlanId);
+        $plans = $subscription->items()->pluck('stripe_plan');
+
+        $this->assertCount(2, $plans);
+        $this->assertContains(self::$otherPlanId, $plans);
+        $this->assertContains(self::$premiumPlanId, $plans);
+
+        $premiumPlan = $subscription->findItemOrFail(static::$premiumPlanId);
+
+        $this->assertEquals(3, $premiumPlan->quantity);
+    }
+
+    public function test_subscription_items_can_swap_plans()
+    {
+        $user = $this->createCustomer('subscription_items_can_swap_plans');
+
+        $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
+
+        $item = $subscription->items()->first()->swap(static::$otherPlanId, ['quantity' => 3]);
+
+        $subscription->refresh();
+
+        $this->assertCount(1, $subscription->items);
+        $this->assertSame(self::$otherPlanId, $subscription->stripe_plan);
+        $this->assertSame(self::$otherPlanId, $item->stripe_plan);
+        $this->assertSame(3, $item->quantity);
     }
 
     public function test_subscription_item_changes_can_be_prorated()
@@ -245,7 +269,8 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         $subscription = $user->subscriptions()->create([
             'name' => 'main',
             'stripe_id' => 'sub_foo',
-            'stripe_plan' => 'plan_foo',
+            'stripe_plan' => self::$planId,
+            'quantity' => 1,
             'stripe_status' => 'active',
         ]);
 
@@ -269,6 +294,7 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         $subscription = $this->createSubscriptionWithSinglePlan($user);
 
         $subscription->stripe_plan = null;
+        $subscription->quantity = null;
         $subscription->save();
 
         $subscription->items()->create([

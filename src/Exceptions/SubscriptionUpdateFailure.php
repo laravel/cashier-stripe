@@ -13,19 +13,6 @@ class SubscriptionUpdateFailure extends Exception
      * @param  \Laravel\Cashier\Subscription  $subscription
      * @return static
      */
-    public static function swapOnMultiplan(Subscription $subscription)
-    {
-        return new static(
-            "The subscription \"{$subscription->stripe_id}\" cannot be swapped because it has multiple plans."
-        );
-    }
-
-    /**
-     * Create a new SubscriptionUpdateFailure instance.
-     *
-     * @param  \Laravel\Cashier\Subscription  $subscription
-     * @return static
-     */
     public static function incompleteSubscription(Subscription $subscription)
     {
         return new static(

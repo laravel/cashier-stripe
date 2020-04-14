@@ -6,7 +6,9 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use LogicException;
@@ -14,6 +16,8 @@ use Stripe\Subscription as StripeSubscription;
 
 class Subscription extends Model
 {
+    use Prorates;
+
     /**
      * The attributes that are not mass assignable.
      *
@@ -46,13 +50,6 @@ class Subscription extends Model
         'trial_ends_at', 'ends_at',
         'created_at', 'updated_at',
     ];
-
-    /**
-     * Indicates if the plan change should be prorated.
-     *
-     * @var bool
-     */
-    protected $prorate = true;
 
     /**
      * The date on which the billing cycle should be anchored.
@@ -489,40 +486,6 @@ class Subscription extends Model
     }
 
     /**
-     * Indicate that the plan change should not be prorated.
-     *
-     * @return $this
-     */
-    public function noProrate()
-    {
-        $this->prorate = false;
-
-        return $this;
-    }
-
-    /**
-     * Indicate that the plan change should be prorated.
-     *
-     * @return $this
-     */
-    public function prorate()
-    {
-        $this->prorate = true;
-
-        return $this;
-    }
-
-    /**
-     * Determine the prorating behavior when updating the subscription.
-     *
-     * @return string
-     */
-    public function prorateBehavior()
-    {
-        return $this->prorate ? 'create_prorations' : 'none';
-    }
-
-    /**
      * Change the billing cycle anchor on a plan change.
      *
      * @param  \DateTimeInterface|int|string  $date
@@ -579,81 +542,139 @@ class Subscription extends Model
     }
 
     /**
-     * Swap the subscription to a new Stripe plan.
+     * Swap the subscription to new Stripe plans.
      *
-     * @param  string  $plan
+     * @param  string|string[]  $plans
      * @param  array  $options
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function swap($plan, $options = [])
+    public function swap($plans, $options = [])
     {
-        if ($this->hasMultiplePlans()) {
-            throw SubscriptionUpdateFailure::swapOnMultiplan($this);
+        if (empty($plans = (array) $plans)) {
+            throw new InvalidArgumentException('Please provide at least one plan when swapping.');
         }
 
         if ($this->incomplete()) {
             throw SubscriptionUpdateFailure::incompleteSubscription($this);
         }
 
-        $subscription = $this->asStripeSubscription();
+        $items = $this->mergeItemsThatShouldBeDeletedDuringSwap(
+            $this->parseSwapPlans($plans)
+        );
 
-        $subscription->plan = $plan;
-        $subscription->proration_behavior = $this->prorateBehavior();
-        $subscription->cancel_at_period_end = false;
-
-        if (! is_null($this->billingCycleAnchor)) {
-            $subscription->billing_cycle_anchor = $this->billingCycleAnchor;
-        }
-
-        foreach ($options as $key => $option) {
-            $subscription->$key = $option;
-        }
-
-        // If no specific trial end date has been set, the default behavior should be
-        // to maintain the current trial state, whether that is "active" or to run
-        // the swap out with the exact number of days left on this current plan.
-        if ($this->onTrial()) {
-            $subscription->trial_end = $this->trial_ends_at->getTimestamp();
-        } else {
-            $subscription->trial_end = 'now';
-        }
-
-        // Again, if no explicit quantity was set, the default behaviors should be to
-        // maintain the current quantity onto the new plan. This is a sensible one
-        // that should be the expected behavior for most developers with Stripe.
-        if ($this->quantity) {
-            $subscription->quantity = $this->quantity;
-        }
-
-        $subscription->save();
+        $stripeSubscription = StripeSubscription::update(
+            $this->stripe_id, $this->getSwapOptions($items, $options), $this->owner->stripeOptions()
+        );
 
         $this->fill([
-            'stripe_plan' => $plan,
+            'stripe_plan' => $stripeSubscription->plan ? $stripeSubscription->plan->id : null,
+            'quantity' => $stripeSubscription->quantity,
             'ends_at' => null,
         ])->save();
+
+        foreach ($stripeSubscription->items as $item) {
+            $this->items()->updateOrCreate([
+                'stripe_id' => $item->id,
+            ], [
+                'stripe_plan' => $item->plan->id,
+                'quantity' => $item->quantity,
+            ]);
+        }
+
+        // Delete items that aren't attached to the subscription anymore...
+        $this->items()->whereNotIn('stripe_plan', $items->pluck('plan')->filter())->delete();
+
+        $this->unsetRelation('items');
 
         return $this;
     }
 
     /**
-     * Swap the subscription to a new Stripe plan, and invoice immediately.
+     * Swap the subscription to new Stripe plans, and invoice immediately.
      *
-     * @param  string  $plan
+     * @param  string|string[]  $plans
      * @param  array  $options
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function swapAndInvoice($plan, $options = [])
+    public function swapAndInvoice($plans, $options = [])
     {
-        $subscription = $this->swap($plan, $options);
+        $subscription = $this->swap($plans, $options);
 
         $this->invoice();
 
         return $subscription;
+    }
+
+    /**
+     * Parse the given plans for a swap operation.
+     *
+     * @param  string|string[]  $plans
+     * @return \Illuminate\Support\Collection
+     */
+    protected function parseSwapPlans($plans)
+    {
+        return collect($plans)->mapWithKeys(function ($options, $plan) {
+            $plan = is_string($options) ? $options : $plan;
+            $options = is_string($options) ? [] : $options;
+
+            return [$plan => array_merge([
+                'plan' => $plan,
+                'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
+            ], $options)];
+        });
+    }
+
+    /**
+     * Merge the items that should be deleted during swap into the given items collection.
+     *
+     * @param  \Illuminate\Support\Collection  $items
+     * @return \Illuminate\Support\Collection
+     */
+    protected function mergeItemsThatShouldBeDeletedDuringSwap(Collection $items)
+    {
+        /** @var \Stripe\SubscriptionItem $stripeSubscriptionItem */
+        foreach ($this->asStripeSubscription()->items->data as $stripeSubscriptionItem) {
+            $plan = $stripeSubscriptionItem->plan->id;
+
+            if (! $item = $items->get($plan, [])) {
+                $item['deleted'] = true;
+            }
+
+            $items->put($plan, $item + ['id' => $stripeSubscriptionItem->id]);
+        }
+
+        return $items;
+    }
+
+    /**
+     * Get the options array for a swap operation.
+     *
+     * @param  \Illuminate\Support\Collection  $items
+     * @param  array  $options
+     * @return array
+     */
+    protected function getSwapOptions(Collection $items, $options)
+    {
+        $options = array_merge([
+            'items' => $items->values()->all(),
+            'proration_behavior' => $this->prorateBehavior(),
+            'cancel_at_period_end' => false,
+        ], $options);
+
+        if (! is_null($this->billingCycleAnchor)) {
+            $options['billing_cycle_anchor'] = $this->billingCycleAnchor;
+        }
+
+        $options['trial_end'] = $this->onTrial()
+                        ? $this->trial_ends_at->getTimestamp()
+                        : 'now';
+
+        return $options;
     }
 
     /**
@@ -733,11 +754,11 @@ class Subscription extends Model
      */
     public function removePlan($plan)
     {
-        $item = $this->findItemOrFail($plan);
-
         if ($this->hasSinglePlan()) {
             throw SubscriptionUpdateFailure::cannotDeleteLastPlan($this);
         }
+
+        $item = $this->findItemOrFail($plan);
 
         $item->asStripeSubscriptionItem()->delete([
             'proration_behavior' => $this->prorateBehavior(),
@@ -911,7 +932,7 @@ class Subscription extends Model
      * @param  string  $plan
      * @return array|null
      */
-    protected function getPlanTaxRatesForPayload($plan)
+    public function getPlanTaxRatesForPayload($plan)
     {
         if ($taxRates = $this->owner->planTaxRates()) {
             return $taxRates[$plan] ?? null;
