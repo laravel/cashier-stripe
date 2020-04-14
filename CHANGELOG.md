@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v11.0.0...11.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v11.1.0...11.x)
+
+
+## [v11.1.0 (2020-04-14)](https://github.com/laravel/cashier/compare/v11.0.0...v11.1.0)
+
+### Added
+- Multiplan swapping ([#915](https://github.com/laravel/cashier/pull/915))
 
 
 ## [v11.0.0 (2020-04-07)](https://github.com/laravel/cashier/compare/v10.7.1...v11.0.0)
