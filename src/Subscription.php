@@ -935,7 +935,7 @@ class Subscription extends Model
         foreach ($this->items as $item) {
             $stripeSubscriptionItem = $item->asStripeSubscriptionItem();
 
-            $stripeSubscriptionItem->tax_rates = $this->user->planTaxRates($item->stripe_plan);
+            $stripeSubscriptionItem->tax_rates = $this->getPlanTaxRatesForPayload($item->stripe_plan);
 
             $stripeSubscriptionItem->save();
         }
