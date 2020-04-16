@@ -391,7 +391,7 @@ class Subscription extends Model
      */
     public function incrementQuantity($count = 1, $plan = null)
     {
-        $this->updateQuantity($this->quantity + $count, $plan = null);
+        $this->updateQuantity($this->quantity + $count, $plan);
 
         return $this;
     }
