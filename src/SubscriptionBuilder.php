@@ -93,11 +93,16 @@ class SubscriptionBuilder
      */
     public function plan($plan, $quantity = 1)
     {
-        $this->items[$plan] = [
+        $options = [
             'plan' => $plan,
             'quantity' => $quantity,
-            'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
         ];
+
+        if ($taxRates = $this->getPlanTaxRatesForPayload($plan)) {
+            $options['tax_rates'] = $taxRates;
+        }
+
+        $this->items[$plan] = $options;
 
         return $this;
     }
@@ -304,16 +309,23 @@ class SubscriptionBuilder
      */
     protected function buildPayload()
     {
-        return array_filter([
+        $payload = array_filter([
             'billing_cycle_anchor' => $this->billingCycleAnchor,
             'coupon' => $this->coupon,
             'expand' => ['latest_invoice.payment_intent'],
             'metadata' => $this->metadata,
             'items' => collect($this->items)->values()->all(),
-            'default_tax_rates' => $this->getTaxRatesForPayload(),
             'trial_end' => $this->getTrialEndForPayload(),
             'off_session' => true,
         ]);
+
+        if ($taxRates = $this->getTaxRatesForPayload()) {
+            $payload['default_tax_rates'] = $taxRates;
+        } elseif ($taxPercentage = $this->getTaxPercentageForPayload()) {
+            $payload['tax_percent'] = $taxPercentage;
+        }
+
+        return $payload;
     }
 
     /**
@@ -329,6 +341,19 @@ class SubscriptionBuilder
 
         if ($this->trialExpires) {
             return $this->trialExpires->getTimestamp();
+        }
+    }
+
+    /**
+     * Get the tax percentage for the Stripe payload.
+     *
+     * @return int|float|null
+     * @deprecated Please migrate to the new Tax Rates API.
+     */
+    protected function getTaxPercentageForPayload()
+    {
+        if ($taxPercentage = $this->owner->taxPercentage()) {
+            return $taxPercentage;
         }
     }
 
