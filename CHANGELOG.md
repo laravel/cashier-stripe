@@ -3,6 +3,16 @@
 ## [Unreleased](https://github.com/laravel/cashier/compare/v11.1.0...11.x)
 
 
+## [v11.2.0 (2020-04-16)](https://github.com/laravel/cashier/compare/v11.1.0...v11.2.0)
+
+### Changed
+- Re-add tax percentage ([#916](https://github.com/laravel/cashier/pull/916))
+
+### Fixed
+- Fix syncing of tax rates ([0489030](https://github.com/laravel/cashier/commit/0489030c50c0f5443abe37849c73935a34699387))
+- Remove null assignment ([8520443](https://github.com/laravel/cashier/commit/85204430cbc1681d776b50ca42d5b9194e8c14d7))
+
+
 ## [v11.1.0 (2020-04-14)](https://github.com/laravel/cashier/compare/v11.0.0...v11.1.0)
 
 ### Added
