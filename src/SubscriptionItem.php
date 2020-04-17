@@ -4,7 +4,6 @@ namespace Laravel\Cashier;
 
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Concerns\Prorates;
-use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use Stripe\SubscriptionItem as StripeSubscriptionItem;
 
 /**
@@ -41,6 +40,87 @@ class SubscriptionItem extends Model
     }
 
     /**
+     * Increment the quantity of the subscription item.
+     *
+     * @param  int  $count
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function incrementQuantity($count = 1)
+    {
+        $this->updateQuantity($this->quantity + $count);
+
+        return $this;
+    }
+
+    /**
+     *  Increment the quantity of the subscription item, and invoice immediately.
+     *
+     * @param  int  $count
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function incrementAndInvoice($count = 1)
+    {
+        $this->incrementQuantity($count);
+
+        $this->subscription->invoice();
+
+        return $this;
+    }
+
+    /**
+     * Decrement the quantity of the subscription item.
+     *
+     * @param  int  $count
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function decrementQuantity($count = 1)
+    {
+        $this->updateQuantity(max(1, $this->quantity - $count));
+
+        return $this;
+    }
+
+    /**
+     * Update the quantity of the subscription item.
+     *
+     * @param  int  $quantity
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function updateQuantity($quantity)
+    {
+        $this->subscription->guardAgainstIncomplete();
+
+        $stripeSubscriptionItem = $this->asStripeSubscriptionItem();
+
+        $stripeSubscriptionItem->quantity = $quantity;
+
+        $stripeSubscriptionItem->proration_behavior = $this->prorateBehavior();
+
+        $stripeSubscriptionItem->save();
+
+        $this->quantity = $quantity;
+
+        $this->save();
+
+        if ($this->subscription->hasSinglePlan()) {
+            $this->subscription->quantity = $quantity;
+
+            $this->subscription->save();
+        }
+
+        return $this;
+    }
+
+    /**
      * Swap the subscription item to a new Stripe plan.
      *
      * @param  string  $plan
@@ -51,9 +131,7 @@ class SubscriptionItem extends Model
      */
     public function swap($plan, $options = [])
     {
-        if ($this->subscription->incomplete()) {
-            throw SubscriptionUpdateFailure::incompleteSubscription($this->subscription);
-        }
+        $this->subscription->guardAgainstIncomplete();
 
         $options = array_merge([
             'plan' => $plan,
