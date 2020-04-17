@@ -391,6 +391,16 @@ class Subscription extends Model
      */
     public function incrementQuantity($count = 1, $plan = null)
     {
+        $this->guardAgainstIncomplete();
+
+        if ($plan) {
+            $this->findItemOrFail($plan)->incrementQuantity($count);
+
+            return $this->refresh();
+        }
+
+        $this->guardAgainstMultiplePlans();
+
         $this->updateQuantity($this->quantity + $count, $plan);
 
         return $this;
@@ -408,6 +418,16 @@ class Subscription extends Model
      */
     public function incrementAndInvoice($count = 1, $plan = null)
     {
+        $this->guardAgainstIncomplete();
+
+        if ($plan) {
+            $this->findItemOrFail($plan)->incrementQuantity($count);
+
+            return $this->refresh();
+        }
+
+        $this->guardAgainstMultiplePlans();
+
         $this->incrementQuantity($count, $plan);
 
         $this->invoice();
@@ -426,9 +446,17 @@ class Subscription extends Model
      */
     public function decrementQuantity($count = 1, $plan = null)
     {
-        $this->updateQuantity(max(1, $this->quantity - $count), $plan);
+        $this->guardAgainstIncomplete();
 
-        return $this;
+        if ($plan) {
+            $this->findItemOrFail($plan)->decrementQuantity($count);
+
+            return $this->refresh();
+        }
+
+        $this->guardAgainstMultiplePlans();
+
+        return $this->updateQuantity(max(1, $this->quantity - $count), $plan);
     }
 
     /**
@@ -442,45 +470,27 @@ class Subscription extends Model
      */
     public function updateQuantity($quantity, $plan = null)
     {
-        if ($this->incomplete()) {
-            throw SubscriptionUpdateFailure::incompleteSubscription($this);
+        $this->guardAgainstIncomplete();
+
+        if ($plan) {
+            $this->findItemOrFail($plan)->updateQuantity($quantity);
+
+            return $this->refresh();
         }
 
-        $this->guardAgainstMultiplePlans($plan);
+        $this->guardAgainstMultiplePlans();
 
-        $item = null;
+        $stripeSubscription = $this->asStripeSubscription();
 
-        if ($this->hasSinglePlan()) {
-            $stripeSubscription = $this->asStripeSubscription();
+        $stripeSubscription->quantity = $quantity;
 
-            $stripeSubscription->quantity = $quantity;
+        $stripeSubscription->proration_behavior = $this->prorateBehavior();
 
-            $stripeSubscription->proration_behavior = $this->prorateBehavior();
+        $stripeSubscription->save();
 
-            $stripeSubscription->save();
+        $this->quantity = $quantity;
 
-            $this->quantity = $quantity;
-
-            $this->save();
-
-            $item = $this->items()->first();
-        } elseif ($plan) {
-            $item = $this->findItemOrFail($plan);
-        }
-
-        if ($item) {
-            $stripeSubscriptionItem = $item->asStripeSubscriptionItem();
-
-            $stripeSubscriptionItem->quantity = $quantity;
-
-            $stripeSubscriptionItem->proration_behavior = $this->prorateBehavior();
-
-            $stripeSubscriptionItem->save();
-
-            $item->quantity = $quantity;
-
-            $item->save();
-        }
+        $this->save();
 
         return $this;
     }
@@ -556,9 +566,7 @@ class Subscription extends Model
             throw new InvalidArgumentException('Please provide at least one plan when swapping.');
         }
 
-        if ($this->incomplete()) {
-            throw SubscriptionUpdateFailure::incompleteSubscription($this);
-        }
+        $this->guardAgainstIncomplete();
 
         $items = $this->mergeItemsThatShouldBeDeletedDuringSwap(
             $this->parseSwapPlans($plans)
@@ -689,9 +697,7 @@ class Subscription extends Model
      */
     public function addPlan($plan, $quantity = 1, $options = [])
     {
-        if ($this->incomplete()) {
-            throw SubscriptionUpdateFailure::incompleteSubscription($this);
-        }
+        $this->guardAgainstIncomplete();
 
         if ($this->items->contains('stripe_plan', $plan)) {
             throw SubscriptionUpdateFailure::duplicatePlan($this, $plan);
@@ -981,16 +987,29 @@ class Subscription extends Model
     }
 
     /**
+     * Make sure a subscription is not incomplete when performing changes.
+     *
+     * @return void
+     *
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function guardAgainstIncomplete()
+    {
+        if ($this->incomplete()) {
+            throw SubscriptionUpdateFailure::incompleteSubscription($this);
+        }
+    }
+
+    /**
      * Make sure a plan argument is provided when the subscription is a multi plan subscription.
      *
-     * @param  string|null  $plan
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    protected function guardAgainstMultiplePlans($plan)
+    public function guardAgainstMultiplePlans()
     {
-        if (is_null($plan) && $this->hasMultiplePlans()) {
+        if ($this->hasMultiplePlans()) {
             throw new InvalidArgumentException(
                 'This method requires a plan argument since the subscription has multiple plans.'
             );
