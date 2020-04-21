@@ -199,6 +199,42 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         $this->assertSame(5, $item->quantity);
     }
 
+    public function test_subscription_item_quantities_can_be_incremented()
+    {
+        $user = $this->createCustomer('subscription_item_quantities_can_be_updated');
+
+        $subscription = $user->newSubscription('main', [self::$planId, self::$otherPlanId])->create('pm_card_visa');
+
+        $subscription->incrementQuantity(3, self::$otherPlanId);
+
+        $item = $subscription->findItemOrFail(self::$otherPlanId);
+
+        $this->assertSame(4, $item->quantity);
+
+        $item->incrementQuantity(3);
+
+        $this->assertSame(7, $item->quantity);
+    }
+
+    public function test_subscription_item_quantities_can_be_decremented()
+    {
+        $user = $this->createCustomer('subscription_item_quantities_can_be_updated');
+
+        $subscription = $user->newSubscription('main', [self::$planId, self::$otherPlanId])
+            ->quantity(5, self::$otherPlanId)
+            ->create('pm_card_visa');
+
+        $subscription->decrementQuantity(2, self::$otherPlanId);
+
+        $item = $subscription->findItemOrFail(self::$otherPlanId);
+
+        $this->assertSame(3, $item->quantity);
+
+        $item->decrementQuantity(2);
+
+        $this->assertSame(1, $item->quantity);
+    }
+
     public function test_multiple_plans_can_be_swapped()
     {
         $user = $this->createCustomer('multiple_plans_can_be_swapped');
