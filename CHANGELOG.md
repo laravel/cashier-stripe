@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v11.1.0...11.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v11.2.1...11.x)
+
+
+## [v11.2.1 (2020-04-21)](https://github.com/laravel/cashier/compare/v11.2.0...v11.2.1)
+
+### Fixed
+- Fix quantity methods ([#919](https://github.com/laravel/cashier/pull/919))
 
 
 ## [v11.2.0 (2020-04-16)](https://github.com/laravel/cashier/compare/v11.1.0...v11.2.0)
