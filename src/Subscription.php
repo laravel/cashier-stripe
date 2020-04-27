@@ -720,7 +720,7 @@ class Subscription extends Model
 
         $this->unsetRelation('items');
 
-        if ($this->items()->count() > 1) {
+        if ($this->hasSinglePlan()) {
             $this->fill([
                 'stripe_plan' => null,
                 'quantity' => null,
@@ -774,7 +774,7 @@ class Subscription extends Model
 
         $this->unsetRelation('items');
 
-        if ($this->items()->count() === 1) {
+        if ($this->items()->count() < 2) {
             $item = $this->items()->first();
 
             $this->fill([
