@@ -175,6 +175,23 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         $subscription->removePlan(self::$planId);
     }
 
+    public function test_multiplan_subscriptions_can_be_resumed()
+    {
+        $user = $this->createCustomer('multiplan_subscriptions_can_be_resumed');
+
+        $subscription = $user->newSubscription('main', [self::$planId, self::$otherPlanId])->create('pm_card_visa');
+
+        $subscription->cancel();
+
+        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->onGracePeriod());
+
+        $subscription->resume();
+
+        $this->assertTrue($subscription->active());
+        $this->assertFalse($subscription->onGracePeriod());
+    }
+
     public function test_plan_is_required_when_updating_quantities_for_multiplan_subscriptions()
     {
         $user = $this->createCustomer('plan_is_required_when_updating_quantities_for_multiplan_subscriptions');
