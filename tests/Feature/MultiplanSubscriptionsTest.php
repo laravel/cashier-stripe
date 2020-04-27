@@ -294,6 +294,21 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);
     }
 
+    public function test_subscription_item_quantity_changes_can_be_prorated()
+    {
+        $user = $this->createCustomer('subscription_item_quantity_changes_can_be_prorated');
+
+        $subscription = $user->newSubscription('main', [self::$planId, self::$otherPlanId])
+            ->quantity(3, self::$otherPlanId)
+            ->create('pm_card_visa');
+
+        $this->assertEquals(4000, ($invoice = $user->invoices()->first())->rawTotal());
+
+        $subscription->noProrate()->updateQuantity(1, self::$otherPlanId);
+
+        $this->assertEquals(2000, $user->upcomingInvoice()->rawTotal());
+    }
+
     /**
      * Create a subscription with a single plan.
      *

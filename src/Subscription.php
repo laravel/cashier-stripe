@@ -394,7 +394,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->incrementQuantity($count);
+            $this->findItemOrFail($plan)->setProrate($this->prorate)->incrementQuantity($count);
 
             return $this->refresh();
         }
@@ -421,7 +421,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->incrementQuantity($count);
+            $this->findItemOrFail($plan)->setProrate($this->prorate)->incrementQuantity($count);
 
             return $this->refresh();
         }
@@ -449,7 +449,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->decrementQuantity($count);
+            $this->findItemOrFail($plan)->setProrate($this->prorate)->decrementQuantity($count);
 
             return $this->refresh();
         }
@@ -473,7 +473,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->updateQuantity($quantity);
+            $this->findItemOrFail($plan)->setProrate($this->prorate)->updateQuantity($quantity);
 
             return $this->refresh();
         }
