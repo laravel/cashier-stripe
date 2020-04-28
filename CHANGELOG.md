@@ -1,6 +1,14 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v11.2.1...11.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v11.2.2...11.x)
+
+
+## [v11.2.2 (2020-04-28)](https://github.com/laravel/cashier/compare/v11.2.1...v11.2.2)
+
+### Fixed
+- Fix add and remove plan ([#926](https://github.com/laravel/cashier/pull/926))
+- Fix quantity prorating ([#924](https://github.com/laravel/cashier/pull/924))
+- Fix multiplan subscription swapping ([#925](https://github.com/laravel/cashier/pull/925))
 
 
 ## [v11.2.1 (2020-04-21)](https://github.com/laravel/cashier/compare/v11.2.0...v11.2.1)
