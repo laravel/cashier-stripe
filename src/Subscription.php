@@ -394,7 +394,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->incrementQuantity($count);
+            $this->findItemOrFail($plan)->setProrate($this->prorate)->incrementQuantity($count);
 
             return $this->refresh();
         }
@@ -421,7 +421,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->incrementQuantity($count);
+            $this->findItemOrFail($plan)->setProrate($this->prorate)->incrementQuantity($count);
 
             return $this->refresh();
         }
@@ -449,7 +449,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->decrementQuantity($count);
+            $this->findItemOrFail($plan)->setProrate($this->prorate)->decrementQuantity($count);
 
             return $this->refresh();
         }
@@ -473,7 +473,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->updateQuantity($quantity);
+            $this->findItemOrFail($plan)->setProrate($this->prorate)->updateQuantity($quantity);
 
             return $this->refresh();
         }
@@ -720,7 +720,7 @@ class Subscription extends Model
 
         $this->unsetRelation('items');
 
-        if ($this->items()->count() > 1) {
+        if ($this->hasSinglePlan()) {
             $this->fill([
                 'stripe_plan' => null,
                 'quantity' => null,
@@ -774,7 +774,7 @@ class Subscription extends Model
 
         $this->unsetRelation('items');
 
-        if ($this->items()->count() === 1) {
+        if ($this->items()->count() < 2) {
             $item = $this->items()->first();
 
             $this->fill([
@@ -863,11 +863,6 @@ class Subscription extends Model
         $subscription = $this->asStripeSubscription();
 
         $subscription->cancel_at_period_end = false;
-
-        // To resume the subscription we need to set the plan parameter on the Stripe
-        // subscription object. This will force Stripe to resume this subscription
-        // where we left off. Then, we'll set the proper trial ending timestamp.
-        $subscription->plan = $this->stripe_plan;
 
         if ($this->onTrial()) {
             $subscription->trial_end = $this->trial_ends_at->getTimestamp();

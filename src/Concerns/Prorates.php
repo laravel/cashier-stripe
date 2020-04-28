@@ -36,6 +36,19 @@ trait Prorates
     }
 
     /**
+     * Set the prorating behavior.
+     *
+     * @param  bool  $prorate
+     * @return $this
+     */
+    public function setProrate($prorate)
+    {
+        $this->prorate = $prorate;
+
+        return $this;
+    }
+
+    /**
      * Determine the prorating behavior when updating the subscription.
      *
      * @return string

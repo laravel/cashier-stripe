@@ -175,6 +175,23 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         $subscription->removePlan(self::$planId);
     }
 
+    public function test_multiplan_subscriptions_can_be_resumed()
+    {
+        $user = $this->createCustomer('multiplan_subscriptions_can_be_resumed');
+
+        $subscription = $user->newSubscription('main', [self::$planId, self::$otherPlanId])->create('pm_card_visa');
+
+        $subscription->cancel();
+
+        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->onGracePeriod());
+
+        $subscription->resume();
+
+        $this->assertTrue($subscription->active());
+        $this->assertFalse($subscription->onGracePeriod());
+    }
+
     public function test_plan_is_required_when_updating_quantities_for_multiplan_subscriptions()
     {
         $user = $this->createCustomer('plan_is_required_when_updating_quantities_for_multiplan_subscriptions');
@@ -292,6 +309,21 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
 
         // Assert that no new invoice was created because of no prorating.
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);
+    }
+
+    public function test_subscription_item_quantity_changes_can_be_prorated()
+    {
+        $user = $this->createCustomer('subscription_item_quantity_changes_can_be_prorated');
+
+        $subscription = $user->newSubscription('main', [self::$planId, self::$otherPlanId])
+            ->quantity(3, self::$otherPlanId)
+            ->create('pm_card_visa');
+
+        $this->assertEquals(4000, ($invoice = $user->invoices()->first())->rawTotal());
+
+        $subscription->noProrate()->updateQuantity(1, self::$otherPlanId);
+
+        $this->assertEquals(2000, $user->upcomingInvoice()->rawTotal());
     }
 
     /**
