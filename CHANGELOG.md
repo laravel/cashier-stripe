@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v11.2.2...11.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v11.2.3...11.x)
+
+
+## [v11.2.3 (2020-05-05)](https://github.com/laravel/cashier/compare/v11.2.2...v11.2.3)
+
+### Security
+- Protect against host mismatch ([#930](https://github.com/laravel/cashier/pull/930))
 
 
 ## [v11.2.2 (2020-04-28)](https://github.com/laravel/cashier/compare/v11.2.1...v11.2.2)
