@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v11.2.3...11.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v11.2.4...11.x)
+
+
+## [v11.2.4 (2020-05-08)](https://github.com/laravel/cashier/compare/v11.2.4...v11.2.4)
+
+### Fixed
+- Fix undefined redirect error ([0fc4c6e](https://github.com/laravel/cashier/commit/0fc4c6e7b3b44ea05cb7803820a87d11ddb29baa))
 
 
 ## [v11.2.3 (2020-05-05)](https://github.com/laravel/cashier/compare/v11.2.2...v11.2.3)
