@@ -32,4 +32,16 @@ class VerifyRedirectUrlTest extends TestCase
             //
         });
     }
+
+    public function test_it_is_skipped_when_no_redirect_is_present()
+    {
+        $request = Request::create('http://baz.com/stripe/payment', 'GET');
+        $middleware = new VerifyRedirectUrl;
+
+        $response = $middleware->handle($request, function () {
+            return 'Hello World!';
+        });
+
+        $this->assertSame('Hello World!', $response);
+    }
 }

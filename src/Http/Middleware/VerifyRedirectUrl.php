@@ -20,7 +20,7 @@ class VerifyRedirectUrl
     {
         $redirect = $request->get('redirect');
 
-        if (parse_url($redirect)['host'] !== $request->getHost()) {
+        if ($redirect && parse_url($redirect)['host'] !== $request->getHost()) {
             throw new AccessDeniedHttpException('Redirect host mismatch.');
         }
 
