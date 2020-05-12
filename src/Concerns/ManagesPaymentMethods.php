@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Concerns;
 
+use Exception;
 use Laravel\Cashier\PaymentMethod;
 use Stripe\BankAccount as StripeBankAccount;
 use Stripe\Card as StripeCard;
