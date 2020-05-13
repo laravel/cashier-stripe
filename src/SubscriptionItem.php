@@ -183,12 +183,13 @@ class SubscriptionItem extends Model
     /**
      * Get the subscription as a Stripe subscription item object.
      *
+     * @param  array  $expand
      * @return StripeSubscriptionItem
      */
-    public function asStripeSubscriptionItem()
+    public function asStripeSubscriptionItem(array $expand = [])
     {
         return StripeSubscriptionItem::retrieve(
-            $this->stripe_id,
+            ['id' => $this->stripe_id, 'expand' => $expand],
             $this->subscription->owner->stripeOptions()
         );
     }
