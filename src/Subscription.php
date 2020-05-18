@@ -145,7 +145,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function valid()
+    public function isValid()
     {
         return $this->isActive() || $this->isOnTrial() || $this->isOnGracePeriod();
     }

@@ -422,6 +422,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertFalse($subscription->isRecurring());
         $this->assertFalse($subscription->isEnded());
         $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
+        $this->assertTrue($user->isOnTrial('main'));
 
         // Cancel Subscription
         $subscription->cancel();
@@ -440,6 +441,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertFalse($subscription->isRecurring());
         $this->assertFalse($subscription->isEnded());
         $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
+        $this->assertTrue($user->isOnTrial('main'));
     }
 
     public function test_creating_subscription_with_explicit_trial()
@@ -622,6 +624,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertTrue($subscription->isActive());
         $this->assertTrue($user->subscriptions()->active()->exists());
+        $this->assertTrue($user->subscriptions()->pastDue()->exists());
 
         // Reset deactivate past due state to default to not conflict with other tests.
         Cashier::$deactivatePastDue = true;

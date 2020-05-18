@@ -14,15 +14,15 @@ class CustomerTest extends TestCase
     {
         $user = new User;
 
-        $this->assertFalse($user->onGenericTrial());
+        $this->assertFalse($user->isOnGenericTrial());
 
         $user->trial_ends_at = Carbon::tomorrow();
 
-        $this->assertTrue($user->onGenericTrial());
+        $this->assertTrue($user->isOnGenericTrial());
 
         $user->trial_ends_at = Carbon::today()->subDays(5);
 
-        $this->assertFalse($user->onGenericTrial());
+        $this->assertFalse($user->isOnGenericTrial());
     }
 
     public function test_we_can_determine_if_it_has_a_payment_method()

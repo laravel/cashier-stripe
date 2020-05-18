@@ -40,21 +40,21 @@ class SubscriptionTest extends TestCase
     {
         $subscription = new Subscription(['stripe_status' => 'incomplete']);
 
-        $this->assertFalse($subscription->valid());
+        $this->assertFalse($subscription->isValid());
     }
 
     public function test_a_past_due_subscription_is_not_valid()
     {
         $subscription = new Subscription(['stripe_status' => 'past_due']);
 
-        $this->assertFalse($subscription->valid());
+        $this->assertFalse($subscription->isValid());
     }
 
     public function test_an_active_subscription_is_valid()
     {
         $subscription = new Subscription(['stripe_status' => 'active']);
 
-        $this->assertTrue($subscription->valid());
+        $this->assertTrue($subscription->isValid());
     }
 
     public function test_payment_is_incomplete_when_status_is_incomplete()

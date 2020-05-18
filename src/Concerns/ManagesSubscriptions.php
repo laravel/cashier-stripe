@@ -26,9 +26,9 @@ trait ManagesSubscriptions
      * @param  string|null  $plan
      * @return bool
      */
-    public function onTrial($name = 'default', $plan = null)
+    public function isOnTrial($name = 'default', $plan = null)
     {
-        if (func_num_args() === 0 && $this->onGenericTrial()) {
+        if (func_num_args() === 0 && $this->isOnGenericTrial()) {
             return true;
         }
 
@@ -46,7 +46,7 @@ trait ManagesSubscriptions
      *
      * @return bool
      */
-    public function onGenericTrial()
+    public function isOnGenericTrial()
     {
         return $this->trial_ends_at && $this->trial_ends_at->isFuture();
     }
@@ -62,7 +62,7 @@ trait ManagesSubscriptions
     {
         $subscription = $this->subscription($name);
 
-        if (! $subscription || ! $subscription->valid()) {
+        if (! $subscription || ! $subscription->isValid()) {
             return false;
         }
 
@@ -120,7 +120,7 @@ trait ManagesSubscriptions
     {
         $subscription = $this->subscription($name);
 
-        if (! $subscription || ! $subscription->valid()) {
+        if (! $subscription || ! $subscription->isValid()) {
             return false;
         }
 
@@ -142,7 +142,7 @@ trait ManagesSubscriptions
     public function onPlan($plan)
     {
         return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($plan) {
-            return $subscription->valid() && $subscription->hasPlan($plan);
+            return $subscription->isValid() && $subscription->hasPlan($plan);
         }));
     }
 
