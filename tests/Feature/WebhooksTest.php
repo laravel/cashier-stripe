@@ -115,7 +115,7 @@ class WebhooksTest extends FeatureTestCase
         $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
         $subscription->cancel();
 
-        $this->assertTrue($subscription->cancelled());
+        $this->assertTrue($subscription->isCancelled());
 
         $this->postJson('stripe/webhook', [
             'id' => 'foo',
@@ -130,7 +130,7 @@ class WebhooksTest extends FeatureTestCase
             ],
         ])->assertOk();
 
-        $this->assertFalse($subscription->fresh()->cancelled(), 'Subscription is still cancelled.');
+        $this->assertFalse($subscription->fresh()->isCancelled(), 'Subscription is still cancelled.');
     }
 
     public function test_subscription_is_marked_as_cancelled_when_deleted_in_stripe()
@@ -138,7 +138,7 @@ class WebhooksTest extends FeatureTestCase
         $user = $this->createCustomer('subscription_is_marked_as_cancelled_when_deleted_in_stripe');
         $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
 
-        $this->assertFalse($subscription->cancelled());
+        $this->assertFalse($subscription->isCancelled());
 
         $this->postJson('stripe/webhook', [
             'id' => 'foo',
@@ -152,7 +152,7 @@ class WebhooksTest extends FeatureTestCase
             ],
         ])->assertOk();
 
-        $this->assertTrue($subscription->fresh()->cancelled(), 'Subscription is still active.');
+        $this->assertTrue($subscription->fresh()->isCancelled(), 'Subscription is still active.');
     }
 
     public function test_subscription_is_deleted_when_status_is_incomplete_expired()

@@ -183,13 +183,13 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
 
         $subscription->cancel();
 
-        $this->assertTrue($subscription->active());
-        $this->assertTrue($subscription->onGracePeriod());
+        $this->assertTrue($subscription->isActive());
+        $this->assertTrue($subscription->isOnGracePeriod());
 
         $subscription->resume();
 
-        $this->assertTrue($subscription->active());
-        $this->assertFalse($subscription->onGracePeriod());
+        $this->assertTrue($subscription->isActive());
+        $this->assertFalse($subscription->isOnGracePeriod());
     }
 
     public function test_plan_is_required_when_updating_quantities_for_multiplan_subscriptions()

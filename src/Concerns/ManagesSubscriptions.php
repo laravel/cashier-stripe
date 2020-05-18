@@ -34,7 +34,7 @@ trait ManagesSubscriptions
 
         $subscription = $this->subscription($name);
 
-        if (! $subscription || ! $subscription->onTrial()) {
+        if (! $subscription || ! $subscription->isOnTrial()) {
             return false;
         }
 

@@ -139,42 +139,42 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertFalse($user->subscribedToPlan(static::$otherPlanId, 'main'));
         $this->assertTrue($user->subscribed('main', static::$planId));
         $this->assertFalse($user->subscribed('main', static::$otherPlanId));
-        $this->assertTrue($user->subscription('main')->active());
-        $this->assertFalse($user->subscription('main')->cancelled());
-        $this->assertFalse($user->subscription('main')->onGracePeriod());
-        $this->assertTrue($user->subscription('main')->recurring());
-        $this->assertFalse($user->subscription('main')->ended());
+        $this->assertTrue($user->subscription('main')->isActive());
+        $this->assertFalse($user->subscription('main')->isCancelled());
+        $this->assertFalse($user->subscription('main')->isOnGracePeriod());
+        $this->assertTrue($user->subscription('main')->isRecurring());
+        $this->assertFalse($user->subscription('main')->isEnded());
 
         // Cancel Subscription
         $subscription = $user->subscription('main');
         $subscription->cancel();
 
-        $this->assertTrue($subscription->active());
-        $this->assertTrue($subscription->cancelled());
-        $this->assertTrue($subscription->onGracePeriod());
-        $this->assertFalse($subscription->recurring());
-        $this->assertFalse($subscription->ended());
+        $this->assertTrue($subscription->isActive());
+        $this->assertTrue($subscription->isCancelled());
+        $this->assertTrue($subscription->isOnGracePeriod());
+        $this->assertFalse($subscription->isRecurring());
+        $this->assertFalse($subscription->isEnded());
 
         // Modify Ends Date To Past
         $oldGracePeriod = $subscription->ends_at;
         $subscription->fill(['ends_at' => Carbon::now()->subDays(5)])->save();
 
-        $this->assertFalse($subscription->active());
-        $this->assertTrue($subscription->cancelled());
-        $this->assertFalse($subscription->onGracePeriod());
-        $this->assertFalse($subscription->recurring());
-        $this->assertTrue($subscription->ended());
+        $this->assertFalse($subscription->isActive());
+        $this->assertTrue($subscription->isCancelled());
+        $this->assertFalse($subscription->isOnGracePeriod());
+        $this->assertFalse($subscription->isRecurring());
+        $this->assertTrue($subscription->isEnded());
 
         $subscription->fill(['ends_at' => $oldGracePeriod])->save();
 
         // Resume Subscription
         $subscription->resume();
 
-        $this->assertTrue($subscription->active());
-        $this->assertFalse($subscription->cancelled());
-        $this->assertFalse($subscription->onGracePeriod());
-        $this->assertTrue($subscription->recurring());
-        $this->assertFalse($subscription->ended());
+        $this->assertTrue($subscription->isActive());
+        $this->assertFalse($subscription->isCancelled());
+        $this->assertFalse($subscription->isOnGracePeriod());
+        $this->assertTrue($subscription->isRecurring());
+        $this->assertFalse($subscription->isEnded());
 
         // Increment & Decrement
         $subscription->incrementQuantity();
@@ -229,7 +229,7 @@ class SubscriptionsTest extends FeatureTestCase
             $this->assertInstanceOf(Subscription::class, $subscription = $user->subscription('main'));
 
             // Assert subscription is incomplete.
-            $this->assertTrue($subscription->incomplete());
+            $this->assertTrue($subscription->isIncomplete());
         }
     }
 
@@ -249,7 +249,7 @@ class SubscriptionsTest extends FeatureTestCase
             $this->assertInstanceOf(Subscription::class, $subscription = $user->subscription('main'));
 
             // Assert subscription is incomplete.
-            $this->assertTrue($subscription->incomplete());
+            $this->assertTrue($subscription->isIncomplete());
         }
     }
 
@@ -275,7 +275,7 @@ class SubscriptionsTest extends FeatureTestCase
             $this->assertEquals(static::$premiumPlanId, $subscription->refresh()->stripe_plan);
 
             // Assert subscription is past due.
-            $this->assertTrue($subscription->pastDue());
+            $this->assertTrue($subscription->isPastDue());
         }
     }
 
@@ -301,7 +301,7 @@ class SubscriptionsTest extends FeatureTestCase
             $this->assertEquals(static::$premiumPlanId, $subscription->refresh()->stripe_plan);
 
             // Assert subscription is past due.
-            $this->assertTrue($subscription->pastDue());
+            $this->assertTrue($subscription->isPastDue());
         }
     }
 
@@ -321,7 +321,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals(static::$planId, $subscription->refresh()->stripe_plan);
 
         // Assert subscription is still active.
-        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->isActive());
     }
 
     public function test_downgrade_with_3d_secure_does_not_incomplete_subscription()
@@ -340,7 +340,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals(static::$planId, $subscription->refresh()->stripe_plan);
 
         // Assert subscription is still active.
-        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->isActive());
     }
 
     public function test_creating_subscription_with_coupons()
@@ -357,11 +357,11 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($user->subscribed('main'));
         $this->assertTrue($user->subscribed('main', static::$planId));
         $this->assertFalse($user->subscribed('main', static::$otherPlanId));
-        $this->assertTrue($subscription->active());
-        $this->assertFalse($subscription->cancelled());
-        $this->assertFalse($subscription->onGracePeriod());
-        $this->assertTrue($subscription->recurring());
-        $this->assertFalse($subscription->ended());
+        $this->assertTrue($subscription->isActive());
+        $this->assertFalse($subscription->isCancelled());
+        $this->assertFalse($subscription->isOnGracePeriod());
+        $this->assertTrue($subscription->isRecurring());
+        $this->assertFalse($subscription->isEnded());
 
         // Invoice Tests
         $invoice = $user->invoices()[0];
@@ -386,11 +386,11 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($user->subscribed('main'));
         $this->assertTrue($user->subscribed('main', static::$planId));
         $this->assertFalse($user->subscribed('main', static::$otherPlanId));
-        $this->assertTrue($subscription->active());
-        $this->assertFalse($subscription->cancelled());
-        $this->assertFalse($subscription->onGracePeriod());
-        $this->assertTrue($subscription->recurring());
-        $this->assertFalse($subscription->ended());
+        $this->assertTrue($subscription->isActive());
+        $this->assertFalse($subscription->isCancelled());
+        $this->assertFalse($subscription->isOnGracePeriod());
+        $this->assertTrue($subscription->isRecurring());
+        $this->assertFalse($subscription->isEnded());
 
         // Invoice Tests
         $invoice = $user->invoices()[0];
@@ -417,28 +417,28 @@ class SubscriptionsTest extends FeatureTestCase
 
         $subscription = $user->subscription('main');
 
-        $this->assertTrue($subscription->active());
-        $this->assertTrue($subscription->onTrial());
-        $this->assertFalse($subscription->recurring());
-        $this->assertFalse($subscription->ended());
+        $this->assertTrue($subscription->isActive());
+        $this->assertTrue($subscription->isOnTrial());
+        $this->assertFalse($subscription->isRecurring());
+        $this->assertFalse($subscription->isEnded());
         $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
 
         // Cancel Subscription
         $subscription->cancel();
 
-        $this->assertTrue($subscription->active());
-        $this->assertTrue($subscription->onGracePeriod());
-        $this->assertFalse($subscription->recurring());
-        $this->assertFalse($subscription->ended());
+        $this->assertTrue($subscription->isActive());
+        $this->assertTrue($subscription->isOnGracePeriod());
+        $this->assertFalse($subscription->isRecurring());
+        $this->assertFalse($subscription->isEnded());
 
         // Resume Subscription
         $subscription->resume();
 
-        $this->assertTrue($subscription->active());
-        $this->assertFalse($subscription->onGracePeriod());
-        $this->assertTrue($subscription->onTrial());
-        $this->assertFalse($subscription->recurring());
-        $this->assertFalse($subscription->ended());
+        $this->assertTrue($subscription->isActive());
+        $this->assertFalse($subscription->isOnGracePeriod());
+        $this->assertTrue($subscription->isOnTrial());
+        $this->assertFalse($subscription->isRecurring());
+        $this->assertFalse($subscription->isEnded());
         $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
     }
 
@@ -453,28 +453,28 @@ class SubscriptionsTest extends FeatureTestCase
 
         $subscription = $user->subscription('main');
 
-        $this->assertTrue($subscription->active());
-        $this->assertTrue($subscription->onTrial());
-        $this->assertFalse($subscription->recurring());
-        $this->assertFalse($subscription->ended());
+        $this->assertTrue($subscription->isActive());
+        $this->assertTrue($subscription->isOnTrial());
+        $this->assertFalse($subscription->isRecurring());
+        $this->assertFalse($subscription->isEnded());
         $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
 
         // Cancel Subscription
         $subscription->cancel();
 
-        $this->assertTrue($subscription->active());
-        $this->assertTrue($subscription->onGracePeriod());
-        $this->assertFalse($subscription->recurring());
-        $this->assertFalse($subscription->ended());
+        $this->assertTrue($subscription->isActive());
+        $this->assertTrue($subscription->isOnGracePeriod());
+        $this->assertFalse($subscription->isRecurring());
+        $this->assertFalse($subscription->isEnded());
 
         // Resume Subscription
         $subscription->resume();
 
-        $this->assertTrue($subscription->active());
-        $this->assertFalse($subscription->onGracePeriod());
-        $this->assertTrue($subscription->onTrial());
-        $this->assertFalse($subscription->recurring());
-        $this->assertFalse($subscription->ended());
+        $this->assertTrue($subscription->isActive());
+        $this->assertFalse($subscription->isOnGracePeriod());
+        $this->assertTrue($subscription->isOnTrial());
+        $this->assertFalse($subscription->isRecurring());
+        $this->assertFalse($subscription->isEnded());
         $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
     }
 
@@ -613,14 +613,14 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($user->subscriptions()->ended()->exists());
 
         // Enable past_due as active state.
-        $this->assertFalse($subscription->active());
+        $this->assertFalse($subscription->isActive());
         $this->assertFalse($user->subscriptions()->active()->exists());
 
         Cashier::keepPastDueSubscriptionsActive();
 
         $subscription->update(['ends_at' => null, 'stripe_status' => StripeSubscription::STATUS_PAST_DUE]);
 
-        $this->assertTrue($subscription->active());
+        $this->assertTrue($subscription->isActive());
         $this->assertTrue($user->subscriptions()->active()->exists());
 
         // Reset deactivate past due state to default to not conflict with other tests.

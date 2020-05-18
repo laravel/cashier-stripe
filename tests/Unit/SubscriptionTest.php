@@ -13,27 +13,27 @@ class SubscriptionTest extends TestCase
     {
         $subscription = new Subscription(['stripe_status' => 'incomplete']);
 
-        $this->assertTrue($subscription->incomplete());
-        $this->assertFalse($subscription->pastDue());
-        $this->assertFalse($subscription->active());
+        $this->assertTrue($subscription->isIncomplete());
+        $this->assertFalse($subscription->isPastDue());
+        $this->assertFalse($subscription->isActive());
     }
 
     public function test_we_can_check_if_a_subscription_is_past_due()
     {
         $subscription = new Subscription(['stripe_status' => 'past_due']);
 
-        $this->assertFalse($subscription->incomplete());
-        $this->assertTrue($subscription->pastDue());
-        $this->assertFalse($subscription->active());
+        $this->assertFalse($subscription->isIncomplete());
+        $this->assertTrue($subscription->isPastDue());
+        $this->assertFalse($subscription->isActive());
     }
 
     public function test_we_can_check_if_a_subscription_is_active()
     {
         $subscription = new Subscription(['stripe_status' => 'active']);
 
-        $this->assertFalse($subscription->incomplete());
-        $this->assertFalse($subscription->pastDue());
-        $this->assertTrue($subscription->active());
+        $this->assertFalse($subscription->isIncomplete());
+        $this->assertFalse($subscription->isPastDue());
+        $this->assertTrue($subscription->isActive());
     }
 
     public function test_an_incomplete_subscription_is_not_valid()

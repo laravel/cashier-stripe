@@ -147,7 +147,7 @@ class Subscription extends Model
      */
     public function valid()
     {
-        return $this->active() || $this->onTrial() || $this->onGracePeriod();
+        return $this->isActive() || $this->isOnTrial() || $this->isOnGracePeriod();
     }
 
     /**
@@ -155,7 +155,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function incomplete()
+    public function isIncomplete()
     {
         return $this->stripe_status === StripeSubscription::STATUS_INCOMPLETE;
     }
@@ -176,7 +176,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function pastDue()
+    public function isPastDue()
     {
         return $this->stripe_status === StripeSubscription::STATUS_PAST_DUE;
     }
@@ -197,9 +197,9 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function active()
+    public function isActive()
     {
-        return (is_null($this->ends_at) || $this->onGracePeriod()) &&
+        return (is_null($this->ends_at) || $this->isOnGracePeriod()) &&
             $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE &&
             $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE_EXPIRED &&
             (! Cashier::$deactivatePastDue || $this->stripe_status !== StripeSubscription::STATUS_PAST_DUE) &&
@@ -247,9 +247,9 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function recurring()
+    public function isRecurring()
     {
-        return ! $this->onTrial() && ! $this->cancelled();
+        return ! $this->isOnTrial() && ! $this->isCancelled();
     }
 
     /**
@@ -268,7 +268,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function cancelled()
+    public function isCancelled()
     {
         return ! is_null($this->ends_at);
     }
@@ -300,9 +300,9 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function ended()
+    public function isEnded()
     {
-        return $this->cancelled() && ! $this->onGracePeriod();
+        return $this->isCancelled() && ! $this->isOnGracePeriod();
     }
 
     /**
@@ -321,7 +321,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function onTrial()
+    public function isOnTrial()
     {
         return $this->trial_ends_at && $this->trial_ends_at->isFuture();
     }
@@ -353,7 +353,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function onGracePeriod()
+    public function isOnGracePeriod()
     {
         return $this->ends_at && $this->ends_at->isFuture();
     }
@@ -678,7 +678,7 @@ class Subscription extends Model
             $options['billing_cycle_anchor'] = $this->billingCycleAnchor;
         }
 
-        $options['trial_end'] = $this->onTrial()
+        $options['trial_end'] = $this->isOnTrial()
                         ? $this->trial_ends_at->getTimestamp()
                         : 'now';
 
@@ -804,7 +804,7 @@ class Subscription extends Model
         // If the user was on trial, we will set the grace period to end when the trial
         // would have ended. Otherwise, we'll retrieve the end of the billing period
         // period and make that the end of the grace period for this current user.
-        if ($this->onTrial()) {
+        if ($this->isOnTrial()) {
             $this->ends_at = $this->trial_ends_at;
         } else {
             $this->ends_at = Carbon::createFromTimestamp(
@@ -856,7 +856,7 @@ class Subscription extends Model
      */
     public function resume()
     {
-        if (! $this->onGracePeriod()) {
+        if (! $this->isOnGracePeriod()) {
             throw new LogicException('Unable to resume subscription that is not within grace period.');
         }
 
@@ -864,7 +864,7 @@ class Subscription extends Model
 
         $subscription->cancel_at_period_end = false;
 
-        if ($this->onTrial()) {
+        if ($this->isOnTrial()) {
             $subscription->trial_end = $this->trial_ends_at->getTimestamp();
         } else {
             $subscription->trial_end = 'now';
@@ -962,7 +962,7 @@ class Subscription extends Model
      */
     public function hasIncompletePayment()
     {
-        return $this->pastDue() || $this->incomplete();
+        return $this->isPastDue() || $this->isIncomplete();
     }
 
     /**
@@ -990,7 +990,7 @@ class Subscription extends Model
      */
     public function guardAgainstIncomplete()
     {
-        if ($this->incomplete()) {
+        if ($this->isIncomplete()) {
             throw SubscriptionUpdateFailure::incompleteSubscription($this);
         }
     }

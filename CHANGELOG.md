@@ -2,6 +2,8 @@
 
 ## [Unreleased](https://github.com/laravel/cashier/compare/v11.2.4...master)
 
+### Changed
+- Renamed all Subscription boolean method with a `is` prefix. ([#940](https://github.com/laravel/cashier/issues/940))
 
 ## [v11.2.4 (2020-05-08)](https://github.com/laravel/cashier/compare/v11.2.4...v11.2.4)
 
