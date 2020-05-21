@@ -76,7 +76,11 @@ trait ManagesInvoices
             /** @var \Stripe\Invoice $invoice */
             $stripeInvoice = StripeInvoice::create($parameters, $this->stripeOptions());
 
-            $stripeInvoice = $stripeInvoice->pay();
+            if ($stripeInvoice->collection_method === StripeInvoice::COLLECTION_METHOD_CHARGE_AUTOMATICALLY) {
+                $stripeInvoice = $stripeInvoice->pay();
+            } else {
+                $stripeInvoice = $stripeInvoice->sendInvoice();
+            }
 
             return new Invoice($this, $stripeInvoice);
         } catch (StripeInvalidRequestException $exception) {
