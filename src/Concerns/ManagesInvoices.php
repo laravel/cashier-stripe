@@ -76,7 +76,7 @@ trait ManagesInvoices
             /** @var \Stripe\Invoice $invoice */
             $stripeInvoice = StripeInvoice::create($parameters, $this->stripeOptions());
 
-            if ($stripeInvoice->collection_method == 'charge_automatically') {
+            if ($stripeInvoice->collection_method === StripeInvoice::COLLECTION_METHOD_CHARGE_AUTOMATICALLY) {
                 $stripeInvoice = $stripeInvoice->pay();
             } else {
                 $stripeInvoice = $stripeInvoice->sendInvoice();
