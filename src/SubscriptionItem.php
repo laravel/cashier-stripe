@@ -181,6 +181,19 @@ class SubscriptionItem extends Model
     }
 
     /**
+     * Update the underlying Stripe subscription item information for the model.
+     *
+     * @param  array  $options
+     * @return \Stripe\SubscriptionItem
+     */
+    public function updateStripeSubscriptionItem(array $options = [])
+    {
+        return StripeSubscriptionItem::update(
+            $this->stripe_id, $options, $this->subscription->owner->stripeOptions()
+        );
+    }
+
+    /**
      * Get the subscription as a Stripe subscription item object.
      *
      * @return StripeSubscriptionItem
@@ -188,8 +201,7 @@ class SubscriptionItem extends Model
     public function asStripeSubscriptionItem()
     {
         return StripeSubscriptionItem::retrieve(
-            $this->stripe_id,
-            $this->subscription->owner->stripeOptions()
+            $this->stripe_id, $this->subscription->owner->stripeOptions()
         );
     }
 }
