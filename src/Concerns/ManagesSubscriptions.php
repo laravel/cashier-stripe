@@ -174,8 +174,6 @@ trait ManagesSubscriptions
      */
     public function planTaxRates()
     {
-        return [
-
-        ];
+        return [];
     }
 }
