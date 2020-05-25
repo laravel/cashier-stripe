@@ -10,7 +10,6 @@ use Stripe\Product;
 
 class PendingUpdatesTest extends FeatureTestCase
 {
-
     /**
      * @var string
      */
