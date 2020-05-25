@@ -7,9 +7,9 @@ trait Prorates
     /**
      * Indicates if the plan change should be prorated.
      *
-     * @var bool
+     * @var string
      */
-    protected $prorate = true;
+    protected $prorationBehavior = 'create_prorations';
 
     /**
      * Indicate that the plan change should not be prorated.
@@ -18,7 +18,7 @@ trait Prorates
      */
     public function noProrate()
     {
-        $this->prorate = false;
+        $this->prorationBehavior = 'none';
 
         return $this;
     }
@@ -30,7 +30,19 @@ trait Prorates
      */
     public function prorate()
     {
-        $this->prorate = true;
+        $this->prorationBehavior = 'create_prorations';
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the plan change should always be invoiced.
+     *
+     * @return $this
+     */
+    public function alwaysInvoice()
+    {
+        $this->prorationBehavior = 'always_invoice';
 
         return $this;
     }
@@ -38,12 +50,12 @@ trait Prorates
     /**
      * Set the prorating behavior.
      *
-     * @param  bool  $prorate
+     * @param  string  $prorationBehavior
      * @return $this
      */
-    public function setProrate($prorate)
+    public function setProrationBehavior($prorationBehavior)
     {
-        $this->prorate = $prorate;
+        $this->prorationBehavior = $prorationBehavior;
 
         return $this;
     }
@@ -55,6 +67,6 @@ trait Prorates
      */
     public function prorateBehavior()
     {
-        return $this->prorate ? 'create_prorations' : 'none';
+        return $this->prorationBehavior;
     }
 }

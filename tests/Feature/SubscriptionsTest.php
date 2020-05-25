@@ -485,20 +485,20 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertEquals(2000, ($invoice = $user->invoices()->first())->rawTotal());
 
-        $subscription->noProrate()->swapAndInvoice(static::$planId);
+        $subscription->noProrate()->swap(static::$planId);
 
         // Assert that no new invoice was created because of no prorating.
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);
 
-        $subscription->swapAndInvoice(static::$premiumPlanId);
+        $subscription->swap(static::$premiumPlanId);
 
         // Assert that no new invoice was created because of no prorating.
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);
 
-        $subscription->prorate()->swapAndInvoice(static::$planId);
+        $subscription->prorate()->swap(static::$planId);
 
         // Get back from unused time on premium plan.
-        $this->assertEquals(-1000, $user->invoices()->first()->rawTotal());
+        $this->assertEquals(0, $user->upcomingInvoice()->rawTotal());
     }
 
     public function test_trials_can_be_extended()

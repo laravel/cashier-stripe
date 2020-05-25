@@ -65,9 +65,9 @@ class SubscriptionItem extends Model
      */
     public function incrementAndInvoice($count = 1)
     {
-        $this->incrementQuantity($count);
+        $this->alwaysInvoice();
 
-        $this->subscription->invoice();
+        $this->incrementQuantity($count);
 
         return $this;
     }
@@ -173,11 +173,9 @@ class SubscriptionItem extends Model
      */
     public function swapAndInvoice($plan, $options = [])
     {
-        $item = $this->swap($plan, $options);
+        $this->alwaysInvoice();
 
-        $this->subscription->invoice();
-
-        return $item;
+        return $this->swap($plan, $options);
     }
 
     /**

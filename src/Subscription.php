@@ -59,6 +59,13 @@ class Subscription extends Model
     protected $billingCycleAnchor = null;
 
     /**
+     * Set the payment behavior for any subscription updates.
+     *
+     * @var string
+     */
+    protected $paymentBehavior = 'allow_incomplete';
+
+    /**
      * Get the user that owns the subscription.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -394,7 +401,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->setProrate($this->prorate)->incrementQuantity($count);
+            $this->findItemOrFail($plan)->setProrationBehavior($this->prorationBehavior)->incrementQuantity($count);
 
             return $this->refresh();
         }
@@ -420,8 +427,10 @@ class Subscription extends Model
     {
         $this->guardAgainstIncomplete();
 
+        $this->alwaysInvoice();
+
         if ($plan) {
-            $this->findItemOrFail($plan)->setProrate($this->prorate)->incrementQuantity($count);
+            $this->findItemOrFail($plan)->setProrationBehavior($this->prorationBehavior)->incrementQuantity($count);
 
             return $this->refresh();
         }
@@ -429,8 +438,6 @@ class Subscription extends Model
         $this->guardAgainstMultiplePlans();
 
         $this->incrementQuantity($count, $plan);
-
-        $this->invoice();
 
         return $this;
     }
@@ -449,7 +456,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->setProrate($this->prorate)->decrementQuantity($count);
+            $this->findItemOrFail($plan)->setProrationBehavior($this->prorationBehavior)->decrementQuantity($count);
 
             return $this->refresh();
         }
@@ -473,7 +480,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->setProrate($this->prorate)->updateQuantity($quantity);
+            $this->findItemOrFail($plan)->setProrationBehavior($this->prorationBehavior)->updateQuantity($quantity);
 
             return $this->refresh();
         }
@@ -522,6 +529,34 @@ class Subscription extends Model
     public function skipTrial()
     {
         $this->trial_ends_at = null;
+
+        return $this;
+    }
+
+    /**
+     * Set any subscription change as pending until payment is successful.
+     *
+     * This method must be combined with swap, resume, etc.
+     *
+     * @return $this
+     */
+    public function pendingIfIncomplete()
+    {
+        $this->paymentBehavior = 'pending_if_incomplete';
+
+        return $this;
+    }
+
+    /**
+     * Prevent any subscription change if payment is unsuccessful.
+     *
+     * This method must be combined with swap, etc.
+     *
+     * @return $this
+     */
+    public function errorIfIncomplete()
+    {
+        $this->paymentBehavior = 'error_if_incomplete';
 
         return $this;
     }
@@ -577,6 +612,7 @@ class Subscription extends Model
         );
 
         $this->fill([
+            'stripe_status' => $stripeSubscription->status,
             'stripe_plan' => $stripeSubscription->plan ? $stripeSubscription->plan->id : null,
             'quantity' => $stripeSubscription->quantity,
             'ends_at' => null,
@@ -596,6 +632,12 @@ class Subscription extends Model
 
         $this->unsetRelation('items');
 
+        if ($stripeSubscription->latest_invoice->payment_intent) {
+            (new Payment(
+                $stripeSubscription->latest_invoice->payment_intent
+            ))->validate();
+        }
+
         return $this;
     }
 
@@ -611,11 +653,9 @@ class Subscription extends Model
      */
     public function swapAndInvoice($plans, $options = [])
     {
-        $subscription = $this->swap($plans, $options);
+        $this->alwaysInvoice();
 
-        $this->invoice();
-
-        return $subscription;
+        return $this->swap($plans, $options);
     }
 
     /**
@@ -668,21 +708,28 @@ class Subscription extends Model
      */
     protected function getSwapOptions(Collection $items, $options)
     {
-        $options = array_merge([
+        $payload = [
             'items' => $items->values()->all(),
+            'payment_behavior' => $this->paymentBehavior,
             'proration_behavior' => $this->prorateBehavior(),
-            'cancel_at_period_end' => false,
-        ], $options);
+            'expand' => ['latest_invoice.payment_intent'],
+        ];
 
-        if (! is_null($this->billingCycleAnchor)) {
-            $options['billing_cycle_anchor'] = $this->billingCycleAnchor;
+        if ($payload['payment_behavior'] !== 'pending_if_incomplete') {
+            $payload['cancel_at_period_end'] = false;
         }
 
-        $options['trial_end'] = $this->onTrial()
+        $payload = array_merge($payload, $options);
+
+        if (! is_null($this->billingCycleAnchor)) {
+            $payload['billing_cycle_anchor'] = $this->billingCycleAnchor;
+        }
+
+        $payload['trial_end'] = $this->onTrial()
                         ? $this->trial_ends_at->getTimestamp()
                         : 'now';
 
-        return $options;
+        return $payload;
     }
 
     /**
@@ -743,11 +790,9 @@ class Subscription extends Model
      */
     public function addPlanAndInvoice($plan, $quantity = 1, $options = [])
     {
-        $subscription = $this->addPlan($plan, $quantity, $options);
+        $this->alwaysInvoice();
 
-        $this->invoice();
-
-        return $subscription;
+        return $this->addPlan($plan, $quantity, $options);
     }
 
     /**
