@@ -204,30 +204,28 @@
                     @endif
 
                     <!-- Display The Taxes -->
-                    @if ($invoice->hasTax())
-                        @unless ($invoice->isNotTaxExempt())
+                    @unless ($invoice->isNotTaxExempt())
+                        <tr>
+                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
+                                @if ($invoice->isTaxExempt())
+                                    Tax is exempted
+                                @else
+                                    Tax to be paid on reverse charge basis
+                                @endif
+                            </td>
+                            <td></td>
+                        </tr>
+                    @else
+                        @foreach ($invoice->taxes() as $tax)
                             <tr>
-                                <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
-                                    @if ($invoice->isTaxExempt())
-                                        Tax is exempted
-                                    @else
-                                        Tax to be paid on reverse charge basis
-                                    @endif
+                                <td colspan="3" style="text-align: right;">
+                                    {{ $tax->display_name }} {{ $tax->jurisdiction ? ' - '.$tax->jurisdiction : '' }}
+                                    ({{ $tax->percentage }}%{{ $tax->isInclusive() ? ' incl.' : '' }})
                                 </td>
-                                <td></td>
+                                <td>{{ $tax->amount() }}</td>
                             </tr>
-                        @else
-                            @foreach ($invoice->taxes() as $tax)
-                                <tr>
-                                    <td colspan="3" style="text-align: right;">
-                                        {{ $tax->display_name }} {{ $tax->jurisdiction ? ' - '.$tax->jurisdiction : '' }}
-                                        ({{ $tax->percentage }}%{{ $tax->isInclusive() ? ' incl.' : '' }})
-                                    </td>
-                                    <td>{{ $tax->amount() }}</td>
-                                </tr>
-                            @endforeach
-                        @endunless
-                    @endif
+                        @endforeach
+                    @endunless
 
                     <!-- Starting Balance -->
                     @if ($invoice->hasStartingBalance())
