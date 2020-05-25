@@ -59,6 +59,13 @@ class Subscription extends Model
     protected $billingCycleAnchor = null;
 
     /**
+     * Set the payment behavior for any subscription updates.
+     *
+     * @var string
+     */
+    protected $paymentBehavior = 'allow_incomplete';
+
+    /**
      * Get the user that owns the subscription.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -527,6 +534,34 @@ class Subscription extends Model
     }
 
     /**
+     * Set any subscription change as pending until payment is successful.
+     *
+     * This method must be combined with swap, resume, etc.
+     *
+     * @return $this
+     */
+    public function pendingIfIncomplete()
+    {
+        $this->paymentBehavior = 'pending_if_incomplete';
+
+        return $this;
+    }
+
+    /**
+     * Prevent any subscription change if payment is unsuccessful.
+     *
+     * This method must be combined with swap, etc.
+     *
+     * @return $this
+     */
+    public function errorIfIncomplete()
+    {
+        $this->paymentBehavior = 'error_if_incomplete';
+
+        return $this;
+    }
+
+    /**
      * Extend an existing subscription's trial period.
      *
      * @param  \Carbon\CarbonInterface  $date
@@ -650,7 +685,7 @@ class Subscription extends Model
             $plan = $stripeSubscriptionItem->plan->id;
 
             if (! $item = $items->get($plan, [])) {
-                $item['deleted'] = true;
+                // $item['deleted'] = true;
             }
 
             $items->put($plan, $item + ['id' => $stripeSubscriptionItem->id]);
@@ -668,21 +703,27 @@ class Subscription extends Model
      */
     protected function getSwapOptions(Collection $items, $options)
     {
-        $options = array_merge([
+        $payload = [
             'items' => $items->values()->all(),
+            'payment_behavior' => $this->paymentBehavior,
             'proration_behavior' => $this->prorateBehavior(),
-            'cancel_at_period_end' => false,
-        ], $options);
+        ];
 
-        if (! is_null($this->billingCycleAnchor)) {
-            $options['billing_cycle_anchor'] = $this->billingCycleAnchor;
+        if ($payload['payment_behavior'] !== 'pending_if_incomplete') {
+            $payload['cancel_at_period_end'] = false;
         }
 
-        $options['trial_end'] = $this->onTrial()
+        $payload = array_merge($payload, $options);
+
+        if (! is_null($this->billingCycleAnchor)) {
+            $payload['billing_cycle_anchor'] = $this->billingCycleAnchor;
+        }
+
+        $payload['trial_end'] = $this->onTrial()
                         ? $this->trial_ends_at->getTimestamp()
                         : 'now';
 
-        return $options;
+        return $payload;
     }
 
     /**
