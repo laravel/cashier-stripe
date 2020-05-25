@@ -120,7 +120,7 @@ class SubscriptionsTest extends FeatureTestCase
         static::deleteStripeResource(new Plan(static::$premiumPlanId));
         static::deleteStripeResource(new Product(static::$productId));
         static::deleteStripeResource(new Coupon(static::$couponId));
-        static::deleteStripeResource(new Coupon(static::$taxRateId));
+        static::deleteStripeResource(new TaxRate(static::$taxRateId));
     }
 
     public function test_subscriptions_can_be_created()
