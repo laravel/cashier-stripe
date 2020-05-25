@@ -295,15 +295,15 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
 
         $this->assertEquals(2000, ($invoice = $user->invoices()->first())->rawTotal());
 
-        $subscription->noProrate()->addPlanAndInvoice(self::$otherPlanId);
+        $subscription->noProrate()->addPlan(self::$otherPlanId);
 
         // Assert that no new invoice was created because of no prorating.
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);
 
-        $subscription->prorate()->addPlanAndInvoice(self::$planId);
+        $subscription->prorate()->addPlan(self::$planId);
 
         // Assert that a new invoice was created because of no prorating.
-        $this->assertEquals(1000, ($invoice = $user->invoices()->first())->rawTotal());
+        $this->assertEquals(5000, $user->upcomingInvoice()->rawTotal());
 
         $subscription->noProrate()->removePlan(self::$premiumPlanId);
 
