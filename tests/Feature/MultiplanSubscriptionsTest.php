@@ -287,7 +287,6 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         $this->assertSame(3, $item->quantity);
     }
 
-    /** @group Prorate */
     public function test_subscription_item_changes_can_be_prorated()
     {
         $user = $this->createCustomer('subscription_item_changes_can_be_prorated');

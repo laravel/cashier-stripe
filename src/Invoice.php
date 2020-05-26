@@ -453,6 +453,19 @@ class Invoice
     }
 
     /**
+     * Void the Stripe invoice.
+     *
+     * @param  array  $options
+     * @return $this
+     */
+    public function void(array $options = [])
+    {
+        $this->invoice = $this->invoice->voidInvoice($options, $this->owner->stripeOptions());
+
+        return $this;
+    }
+
+    /**
      * Get the Stripe model instance.
      *
      * @return \Illuminate\Database\Eloquent\Model

@@ -133,6 +133,15 @@ class PendingUpdatesTest extends FeatureTestCase
 
             // Assert subscription is active.
             $this->assertTrue($subscription->active());
+
+            // Assert subscription has pending updates.
+            $this->assertTrue($subscription->pending());
+
+            // Void the last invoice to cancel any pending updates.
+            $subscription->latestInvoice()->void();
+
+            // Assert subscription has no more pending updates.
+            $this->assertFalse($subscription->pending());
         }
     }
 }

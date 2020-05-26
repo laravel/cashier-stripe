@@ -899,6 +899,16 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription has pending updates.
+     *
+     * @return bool
+     */
+    public function pending()
+    {
+        return $this->asStripeSubscription()->pending_update !== null;
+    }
+
+    /**
      * Invoice the subscription outside of the regular billing cycle.
      *
      * @param  array  $options
@@ -918,6 +928,18 @@ class Subscription extends Model
 
             throw $exception;
         }
+    }
+
+    /**
+     * Get the latest invoice for the subscription.
+     *
+     * @return \Laravel\Cashier\Invoice
+     */
+    public function latestInvoice()
+    {
+        $stripeSubscription = $this->asStripeSubscription(['latest_invoice']);
+
+        return new Invoice($this->owner, $stripeSubscription->latest_invoice);
     }
 
     /**
