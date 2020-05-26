@@ -1,9 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v11.2.4...11.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v11.3.0...11.x)
 
 
-## [v11.2.4 (2020-05-08)](https://github.com/laravel/cashier/compare/v11.2.4...v11.2.4)
+## [v11.3.0 (2020-05-26)](https://github.com/laravel/cashier/compare/v11.2.4...v11.3.0)
+
+### Added
+- Add convenience methods to update stripe objects ([#943](https://github.com/laravel/cashier/pull/943))
+
+### Fixed
+- Send invoice when charging automatically ([#942](https://github.com/laravel/cashier/pull/942))
+- Remove unnecessary if statement on receipt ([#946](https://github.com/laravel/cashier/pull/946))
+
+
+## [v11.2.4 (2020-05-08)](https://github.com/laravel/cashier/compare/v11.2.3...v11.2.4)
 
 ### Fixed
 - Fix undefined redirect error ([0fc4c6e](https://github.com/laravel/cashier/commit/0fc4c6e7b3b44ea05cb7803820a87d11ddb29baa))
