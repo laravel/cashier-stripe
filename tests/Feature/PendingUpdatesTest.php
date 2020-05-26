@@ -98,7 +98,7 @@ class PendingUpdatesTest extends FeatureTestCase
 
         try {
             // Attempt to swap and pay with a faulty card.
-            $subscription = $subscription->errorIfIncomplete()->swapAndInvoice(static::$premiumPlanId);
+            $subscription = $subscription->errorIfPaymentFails()->swapAndInvoice(static::$premiumPlanId);
 
             $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
         } catch (StripeCardException $e) {
@@ -121,7 +121,7 @@ class PendingUpdatesTest extends FeatureTestCase
 
         try {
             // Attempt to swap and pay with a faulty card.
-            $subscription = $subscription->pendingIfIncomplete()->swapAndInvoice(static::$premiumPlanId);
+            $subscription = $subscription->pendingIfPaymentFails()->swapAndInvoice(static::$premiumPlanId);
 
             $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
         } catch (PaymentActionRequired $e) {

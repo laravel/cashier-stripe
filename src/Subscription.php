@@ -8,6 +8,7 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Laravel\Cashier\Concerns\PaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
@@ -16,6 +17,7 @@ use Stripe\Subscription as StripeSubscription;
 
 class Subscription extends Model
 {
+    use PaymentBehavior;
     use Prorates;
 
     /**
@@ -57,13 +59,6 @@ class Subscription extends Model
      * @var string|null
      */
     protected $billingCycleAnchor = null;
-
-    /**
-     * Set the payment behavior for any subscription updates.
-     *
-     * @var string
-     */
-    protected $paymentBehavior = 'allow_incomplete';
 
     /**
      * Get the user that owns the subscription.
@@ -491,6 +486,8 @@ class Subscription extends Model
 
         $stripeSubscription->quantity = $quantity;
 
+        $stripeSubscription->payment_behavior = $this->paymentBehavior();
+
         $stripeSubscription->proration_behavior = $this->prorateBehavior();
 
         $stripeSubscription->save();
@@ -529,34 +526,6 @@ class Subscription extends Model
     public function skipTrial()
     {
         $this->trial_ends_at = null;
-
-        return $this;
-    }
-
-    /**
-     * Set any subscription change as pending until payment is successful.
-     *
-     * This method must be combined with swap, resume, etc.
-     *
-     * @return $this
-     */
-    public function pendingIfIncomplete()
-    {
-        $this->paymentBehavior = 'pending_if_incomplete';
-
-        return $this;
-    }
-
-    /**
-     * Prevent any subscription change if payment is unsuccessful.
-     *
-     * This method must be combined with swap, etc.
-     *
-     * @return $this
-     */
-    public function errorIfIncomplete()
-    {
-        $this->paymentBehavior = 'error_if_incomplete';
 
         return $this;
     }
@@ -710,7 +679,7 @@ class Subscription extends Model
     {
         $payload = [
             'items' => $items->values()->all(),
-            'payment_behavior' => $this->paymentBehavior,
+            'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
             'expand' => ['latest_invoice.payment_intent'],
         ];
@@ -756,6 +725,7 @@ class Subscription extends Model
             'plan' => $plan,
             'quantity' => $quantity,
             'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
+            'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
         ], $options));
 

@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Cashier\Concerns\PaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Stripe\SubscriptionItem as StripeSubscriptionItem;
 
@@ -11,6 +12,7 @@ use Stripe\SubscriptionItem as StripeSubscriptionItem;
  */
 class SubscriptionItem extends Model
 {
+    use PaymentBehavior;
     use Prorates;
 
     /**
@@ -103,6 +105,8 @@ class SubscriptionItem extends Model
 
         $stripeSubscriptionItem->quantity = $quantity;
 
+        $stripeSubscriptionItem->payment_behavior = $this->paymentBehavior();
+
         $stripeSubscriptionItem->proration_behavior = $this->prorateBehavior();
 
         $stripeSubscriptionItem->save();
@@ -136,6 +140,7 @@ class SubscriptionItem extends Model
         $options = array_merge([
             'plan' => $plan,
             'quantity' => $this->quantity,
+            'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
             'tax_rates' => $this->subscription->getPlanTaxRatesForPayload($plan),
         ], $options);
