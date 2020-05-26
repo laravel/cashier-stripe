@@ -287,6 +287,7 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         $this->assertSame(3, $item->quantity);
     }
 
+    /** @group Prorate */
     public function test_subscription_item_changes_can_be_prorated()
     {
         $user = $this->createCustomer('subscription_item_changes_can_be_prorated');
@@ -300,15 +301,17 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
         // Assert that no new invoice was created because of no prorating.
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);
 
-        $subscription->prorate()->addPlan(self::$planId);
+        $subscription->addPlanAndInvoice(self::$planId);
 
         // Assert that a new invoice was created because of no prorating.
-        $this->assertEquals(5000, $user->upcomingInvoice()->rawTotal());
+        $this->assertEquals(1000, ($invoice = $user->invoices()->first())->rawTotal());
+        $this->assertEquals(4000, $user->upcomingInvoice()->rawTotal());
 
         $subscription->noProrate()->removePlan(self::$premiumPlanId);
 
         // Assert that no new invoice was created because of no prorating.
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);
+        $this->assertEquals(2000, $user->upcomingInvoice()->rawTotal());
     }
 
     public function test_subscription_item_quantity_changes_can_be_prorated()

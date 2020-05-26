@@ -490,10 +490,10 @@ class SubscriptionsTest extends FeatureTestCase
         // Assert that no new invoice was created because of no prorating.
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);
 
-        $subscription->swap(static::$premiumPlanId);
+        $subscription->swapAndInvoice(static::$premiumPlanId);
 
-        // Assert that no new invoice was created because of no prorating.
-        $this->assertEquals($invoice->id, $user->invoices()->first()->id);
+        // Assert that a new invoice was created because of immediate invoicing.
+        $this->assertNotSame($invoice->id, $user->invoices()->first()->id);
 
         $subscription->prorate()->swap(static::$planId);
 
