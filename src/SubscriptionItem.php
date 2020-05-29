@@ -3,7 +3,7 @@
 namespace Laravel\Cashier;
 
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Cashier\Concerns\PaymentBehavior;
+use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Stripe\SubscriptionItem as StripeSubscriptionItem;
 
@@ -12,7 +12,7 @@ use Stripe\SubscriptionItem as StripeSubscriptionItem;
  */
 class SubscriptionItem extends Model
 {
-    use PaymentBehavior;
+    use InteractsWithPaymentBehavior;
     use Prorates;
 
     /**
