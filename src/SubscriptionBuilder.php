@@ -6,10 +6,15 @@ use Carbon\Carbon;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
+use Laravel\Cashier\Concerns\Prorates;
 use Stripe\Subscription as StripeSubscription;
 
 class SubscriptionBuilder
 {
+    use InteractsWithPaymentBehavior;
+    use Prorates;
+
     /**
      * The model that is subscribing.
      *
@@ -315,6 +320,8 @@ class SubscriptionBuilder
             'expand' => ['latest_invoice.payment_intent'],
             'metadata' => $this->metadata,
             'items' => collect($this->items)->values()->all(),
+            'payment_behavior' => $this->paymentBehavior(),
+            'proration_behavior' => $this->prorateBehavior(),
             'trial_end' => $this->getTrialEndForPayload(),
             'off_session' => true,
         ]);

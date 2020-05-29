@@ -477,6 +477,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals(Carbon::tomorrow()->hour(3)->minute(15), $subscription->trial_ends_at);
     }
 
+    /** @group Prorate */
     public function test_subscription_changes_can_be_prorated()
     {
         $user = $this->createCustomer('subscription_changes_can_be_prorated');
@@ -485,20 +486,23 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertEquals(2000, ($invoice = $user->invoices()->first())->rawTotal());
 
-        $subscription->noProrate()->swapAndInvoice(static::$planId);
+        $subscription->noProrate()->swap(static::$planId);
 
         // Assert that no new invoice was created because of no prorating.
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);
+        $this->assertEquals(1000, $user->upcomingInvoice()->rawTotal());
 
         $subscription->swapAndInvoice(static::$premiumPlanId);
 
-        // Assert that no new invoice was created because of no prorating.
-        $this->assertEquals($invoice->id, $user->invoices()->first()->id);
+        // Assert that a new invoice was created because of immediate invoicing.
+        $this->assertNotSame($invoice->id, ($invoice = $user->invoices()->first())->id);
+        $this->assertEquals(1000, $invoice->rawTotal());
+        $this->assertEquals(2000, $user->upcomingInvoice()->rawTotal());
 
-        $subscription->prorate()->swapAndInvoice(static::$planId);
+        $subscription->prorate()->swap(static::$planId);
 
-        // Get back from unused time on premium plan.
-        $this->assertEquals(-1000, $user->invoices()->first()->rawTotal());
+        // Get back from unused time on premium plan on next invoice.
+        $this->assertEquals(0, $user->upcomingInvoice()->rawTotal());
     }
 
     public function test_trials_can_be_extended()

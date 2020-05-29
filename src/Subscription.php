@@ -8,6 +8,7 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
@@ -16,6 +17,7 @@ use Stripe\Subscription as StripeSubscription;
 
 class Subscription extends Model
 {
+    use InteractsWithPaymentBehavior;
     use Prorates;
 
     /**
@@ -394,7 +396,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->setProrate($this->prorate)->incrementQuantity($count);
+            $this->findItemOrFail($plan)->setProrationBehavior($this->prorationBehavior)->incrementQuantity($count);
 
             return $this->refresh();
         }
@@ -420,8 +422,10 @@ class Subscription extends Model
     {
         $this->guardAgainstIncomplete();
 
+        $this->alwaysInvoice();
+
         if ($plan) {
-            $this->findItemOrFail($plan)->setProrate($this->prorate)->incrementQuantity($count);
+            $this->findItemOrFail($plan)->setProrationBehavior($this->prorationBehavior)->incrementQuantity($count);
 
             return $this->refresh();
         }
@@ -429,8 +433,6 @@ class Subscription extends Model
         $this->guardAgainstMultiplePlans();
 
         $this->incrementQuantity($count, $plan);
-
-        $this->invoice();
 
         return $this;
     }
@@ -449,7 +451,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->setProrate($this->prorate)->decrementQuantity($count);
+            $this->findItemOrFail($plan)->setProrationBehavior($this->prorationBehavior)->decrementQuantity($count);
 
             return $this->refresh();
         }
@@ -473,7 +475,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($plan) {
-            $this->findItemOrFail($plan)->setProrate($this->prorate)->updateQuantity($quantity);
+            $this->findItemOrFail($plan)->setProrationBehavior($this->prorationBehavior)->updateQuantity($quantity);
 
             return $this->refresh();
         }
@@ -483,7 +485,7 @@ class Subscription extends Model
         $stripeSubscription = $this->asStripeSubscription();
 
         $stripeSubscription->quantity = $quantity;
-
+        $stripeSubscription->payment_behavior = $this->paymentBehavior();
         $stripeSubscription->proration_behavior = $this->prorateBehavior();
 
         $stripeSubscription->save();
@@ -577,6 +579,7 @@ class Subscription extends Model
         );
 
         $this->fill([
+            'stripe_status' => $stripeSubscription->status,
             'stripe_plan' => $stripeSubscription->plan ? $stripeSubscription->plan->id : null,
             'quantity' => $stripeSubscription->quantity,
             'ends_at' => null,
@@ -596,6 +599,12 @@ class Subscription extends Model
 
         $this->unsetRelation('items');
 
+        if ($stripeSubscription->latest_invoice->payment_intent) {
+            (new Payment(
+                $stripeSubscription->latest_invoice->payment_intent
+            ))->validate();
+        }
+
         return $this;
     }
 
@@ -611,11 +620,9 @@ class Subscription extends Model
      */
     public function swapAndInvoice($plans, $options = [])
     {
-        $subscription = $this->swap($plans, $options);
+        $this->alwaysInvoice();
 
-        $this->invoice();
-
-        return $subscription;
+        return $this->swap($plans, $options);
     }
 
     /**
@@ -668,21 +675,28 @@ class Subscription extends Model
      */
     protected function getSwapOptions(Collection $items, $options)
     {
-        $options = array_merge([
+        $payload = [
             'items' => $items->values()->all(),
+            'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
-            'cancel_at_period_end' => false,
-        ], $options);
+            'expand' => ['latest_invoice.payment_intent'],
+        ];
 
-        if (! is_null($this->billingCycleAnchor)) {
-            $options['billing_cycle_anchor'] = $this->billingCycleAnchor;
+        if ($payload['payment_behavior'] !== 'pending_if_incomplete') {
+            $payload['cancel_at_period_end'] = false;
         }
 
-        $options['trial_end'] = $this->onTrial()
+        $payload = array_merge($payload, $options);
+
+        if (! is_null($this->billingCycleAnchor)) {
+            $payload['billing_cycle_anchor'] = $this->billingCycleAnchor;
+        }
+
+        $payload['trial_end'] = $this->onTrial()
                         ? $this->trial_ends_at->getTimestamp()
                         : 'now';
 
-        return $options;
+        return $payload;
     }
 
     /**
@@ -709,6 +723,7 @@ class Subscription extends Model
             'plan' => $plan,
             'quantity' => $quantity,
             'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
+            'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
         ], $options));
 
@@ -743,11 +758,9 @@ class Subscription extends Model
      */
     public function addPlanAndInvoice($plan, $quantity = 1, $options = [])
     {
-        $subscription = $this->addPlan($plan, $quantity, $options);
+        $this->alwaysInvoice();
 
-        $this->invoice();
-
-        return $subscription;
+        return $this->addPlan($plan, $quantity, $options);
     }
 
     /**
@@ -884,6 +897,16 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription has pending updates.
+     *
+     * @return bool
+     */
+    public function pending()
+    {
+        return $this->asStripeSubscription()->pending_update !== null;
+    }
+
+    /**
      * Invoice the subscription outside of the regular billing cycle.
      *
      * @param  array  $options
@@ -903,6 +926,18 @@ class Subscription extends Model
 
             throw $exception;
         }
+    }
+
+    /**
+     * Get the latest invoice for the subscription.
+     *
+     * @return \Laravel\Cashier\Invoice
+     */
+    public function latestInvoice()
+    {
+        $stripeSubscription = $this->asStripeSubscription(['latest_invoice']);
+
+        return new Invoice($this->owner, $stripeSubscription->latest_invoice);
     }
 
     /**
