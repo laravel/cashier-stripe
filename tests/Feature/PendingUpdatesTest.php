@@ -110,38 +110,38 @@ class PendingUpdatesTest extends FeatureTestCase
         }
     }
 
-    public function test_subscription_can_be_pending_if_incomplete()
-    {
-        $user = $this->createCustomer('subscription_can_be_pending_if_incomplete');
-
-        $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
-
-        // Set a faulty card as the customer's default payment method.
-        $user->updateDefaultPaymentMethod('pm_card_threeDSecure2Required');
-
-        try {
-            // Attempt to swap and pay with a faulty card.
-            $subscription = $subscription->pendingIfPaymentFails()->swapAndInvoice(static::$premiumPlanId);
-
-            $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
-        } catch (PaymentActionRequired $e) {
-            // Assert that the payment needs an extra action.
-            $this->assertTrue($e->payment->requiresAction());
-
-            // Assert that the plan was not swapped.
-            $this->assertEquals(static::$planId, $subscription->refresh()->stripe_plan);
-
-            // Assert subscription is active.
-            $this->assertTrue($subscription->active());
-
-            // Assert subscription has pending updates.
-            $this->assertTrue($subscription->pending());
-
-            // Void the last invoice to cancel any pending updates.
-            $subscription->latestInvoice()->void();
-
-            // Assert subscription has no more pending updates.
-            $this->assertFalse($subscription->pending());
-        }
-    }
+    // public function test_subscription_can_be_pending_if_incomplete()
+    // {
+    //     $user = $this->createCustomer('subscription_can_be_pending_if_incomplete');
+    //
+    //     $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
+    //
+    //     // Set a faulty card as the customer's default payment method.
+    //     $user->updateDefaultPaymentMethod('pm_card_threeDSecure2Required');
+    //
+    //     try {
+    //         // Attempt to swap and pay with a faulty card.
+    //         $subscription = $subscription->pendingIfPaymentFails()->swapAndInvoice(static::$premiumPlanId);
+    //
+    //         $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
+    //     } catch (PaymentActionRequired $e) {
+    //         // Assert that the payment needs an extra action.
+    //         $this->assertTrue($e->payment->requiresAction());
+    //
+    //         // Assert that the plan was not swapped.
+    //         $this->assertEquals(static::$planId, $subscription->refresh()->stripe_plan);
+    //
+    //         // Assert subscription is active.
+    //         $this->assertTrue($subscription->active());
+    //
+    //         // Assert subscription has pending updates.
+    //         $this->assertTrue($subscription->pending());
+    //
+    //         // Void the last invoice to cancel any pending updates.
+    //         $subscription->latestInvoice()->void();
+    //
+    //         // Assert subscription has no more pending updates.
+    //         $this->assertFalse($subscription->pending());
+    //     }
+    // }
 }
