@@ -8,7 +8,7 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
-use Laravel\Cashier\Concerns\PaymentBehavior;
+use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
@@ -17,7 +17,7 @@ use Stripe\Subscription as StripeSubscription;
 
 class Subscription extends Model
 {
-    use PaymentBehavior;
+    use InteractsWithPaymentBehavior;
     use Prorates;
 
     /**
@@ -485,9 +485,7 @@ class Subscription extends Model
         $stripeSubscription = $this->asStripeSubscription();
 
         $stripeSubscription->quantity = $quantity;
-
         $stripeSubscription->payment_behavior = $this->paymentBehavior();
-
         $stripeSubscription->proration_behavior = $this->prorateBehavior();
 
         $stripeSubscription->save();
