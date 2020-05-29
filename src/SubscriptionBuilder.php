@@ -7,7 +7,6 @@ use DateTimeInterface;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
-use Laravel\Cashier\Concerns\PaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Stripe\Subscription as StripeSubscription;
 
