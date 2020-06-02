@@ -1,5 +1,18 @@
 # Upgrade Guide
 
+## Upgrading To 12.0 From 11.0
+
+### Proration Changes
+
+PR: https://github.com/laravel/cashier/pull/949
+
+Proration has been updated to make fully use of [all the new proration options](https://stripe.com/docs/api/subscriptions/update#update_subscription-proration_behavior). If you were applying `noProrate` and using any `xAndInvoice` method afterwards, that usually should not generate a new invoice. With the new behavior any `xAndInvoice` method will always generate a new invoice and undo the `noProrate` behavior.
+
+Although the remaining behavior should remain the same, there might be a slightly difference in behavior if you were specifically relying on the invoice to be explicitly issued through the invoice endpoint with any `xAndInvoice` method. This is now done in one go with the `always_invoice` proration option. Please make sure to test this scenario before deploying to production to make sure your billing flow works as expected.
+
+All underlying proration logic has been updated to accommodate for the new proration logic. If you were relying directly on the `$prorate` property, this was now renamed to `$prorationBehavior`. Similarly, the `setProrate` method has been renamed to `setProrationBehavior`.
+
+
 ## Upgrading To 11.0 From 10.0
 
 ### Minimum Versions
