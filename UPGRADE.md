@@ -1,5 +1,17 @@
 # Upgrade Guide
 
+## Upgrading To 12.0 From 11.0
+
+### Proration Changes
+
+PR: https://github.com/laravel/cashier/pull/949
+
+Cashier's proration features have been updated to make use of [all the new proration options](https://stripe.com/docs/api/subscriptions/update#update_subscription-proration_behavior) provided by Stripe. Previously, calling the `noProrate` method and calling any `xAndInvoice` method afterwards would not typically generate a new invoice. However, in Cashier 12.x, the `xAndInvoice` method will always generate a new invoice.
+
+Although all other Cashier behavior should remain the same, there might be a slight difference in behavior if you were specifically relying on the invoice to be explicitly generated as a separate HTTP request through the invoice endpoint when using any `xAndInvoice` method. This is now accomplished in a single request using the `always_invoice` proration option. Of course, you will likely want to test your entire billing flow before deploying to production to make sure your application behaves as expected.
+
+All underlying proration logic has been updated to accommodate for the new proration logic. If you were relying directly on the `$prorate` property, this has been renamed to `$prorationBehavior`. Similarly, the `setProrate` method has been renamed to `setProrationBehavior`.
+
 ## Upgrading To 11.0 From 10.0
 
 ### Minimum Versions
