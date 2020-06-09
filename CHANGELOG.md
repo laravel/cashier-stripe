@@ -3,6 +3,12 @@
 ## [Unreleased](https://github.com/laravel/cashier/compare/v11.3.0...master)
 
 
+## [v12.0.0 (2020-06-09)](https://github.com/laravel/cashier/compare/v11.3.0...v12.0.0)
+
+### Changed
+- Implement new proration and pending updates ([#949](https://github.com/laravel/cashier/pull/949))
+
+
 ## [v11.3.0 (2020-05-26)](https://github.com/laravel/cashier/compare/v11.2.4...v11.3.0)
 
 ### Added
