@@ -1,6 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v11.3.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.0.0...master)
 
 
 ## [v12.0.0 (2020-06-09)](https://github.com/laravel/cashier/compare/v11.3.0...v12.0.0)
