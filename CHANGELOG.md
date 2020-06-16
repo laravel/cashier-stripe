@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.0.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.0.1...master)
+
+
+## [v12.0.1 (2020-06-16)](https://github.com/laravel/cashier/compare/v12.0.0...v12.0.1)
+
+### Fixed
+- Fix validating payment intent ([#959](https://github.com/laravel/cashier/pull/959))
 
 
 ## [v12.0.0 (2020-06-09)](https://github.com/laravel/cashier/compare/v11.3.0...v12.0.0)

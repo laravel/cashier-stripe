@@ -280,7 +280,7 @@ class SubscriptionBuilder
             ]);
         }
 
-        if ($subscription->incomplete()) {
+        if ($subscription->hasIncompletePayment()) {
             (new Payment(
                 $stripeSubscription->latest_invoice->payment_intent
             ))->validate();

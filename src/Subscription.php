@@ -599,7 +599,7 @@ class Subscription extends Model
 
         $this->unsetRelation('items');
 
-        if ($stripeSubscription->latest_invoice->payment_intent) {
+        if ($this->hasIncompletePayment()) {
             (new Payment(
                 $stripeSubscription->latest_invoice->payment_intent
             ))->validate();
