@@ -2,6 +2,8 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
+use Illuminate\Http\RedirectResponse;
+
 class CustomerTest extends FeatureTestCase
 {
     public function test_customers_in_stripe_can_be_updated()
@@ -14,7 +16,7 @@ class CustomerTest extends FeatureTestCase
         $this->assertEquals('Mohamed Said', $customer->description);
     }
 
-    public function test_customers_can_visit_their_customer_portal()
+    public function test_customers_can_generate_a_customer_portal_url()
     {
         $user = $this->createCustomer('customers_in_stripe_can_be_updated');
         $user->createAsStripeCustomer();
@@ -22,5 +24,16 @@ class CustomerTest extends FeatureTestCase
         $url = $user->customerPortalUrl('https://example.com');
 
         $this->assertStringStartsWith('https://billing.stripe.com/session/', $url);
+    }
+
+    public function test_customers_can_be_redirected_to_their_customer_portal()
+    {
+        $user = $this->createCustomer('customers_in_stripe_can_be_updated');
+        $user->createAsStripeCustomer();
+
+        $response = $user->redirectToCustomerPortal('https://example.com');
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertStringStartsWith('https://billing.stripe.com/session/', $response->getTargetUrl());
     }
 }

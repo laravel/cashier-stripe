@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Concerns;
 
+use Illuminate\Http\RedirectResponse;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Exceptions\CustomerAlreadyCreated;
 use Laravel\Cashier\Exceptions\InvalidCustomer;
@@ -167,6 +168,19 @@ trait ManagesCustomer
             'customer' => $this->stripeId(),
             'return_url' => $returnUrl ?? route('home'),
         ], $this->stripeOptions())['url'];
+    }
+
+    /**
+     * Generate a redirect response to the customer's Stripe customer portal.
+     *
+     * @param  string|null  $returnUrl
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function redirectToCustomerPortal($returnUrl = null)
+    {
+        return new RedirectResponse(
+            $this->customerPortalUrl($returnUrl)
+        );
     }
 
     /**
