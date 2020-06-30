@@ -2,9 +2,11 @@
 
 namespace Laravel\Cashier\Concerns;
 
+use Illuminate\Http\RedirectResponse;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Exceptions\CustomerAlreadyCreated;
 use Laravel\Cashier\Exceptions\InvalidCustomer;
+use Stripe\BillingPortal\Session as StripeBillingPortalSession;
 use Stripe\Customer as StripeCustomer;
 
 trait ManagesCustomer
@@ -150,6 +152,35 @@ trait ManagesCustomer
     public function preferredCurrency()
     {
         return config('cashier.currency');
+    }
+
+    /**
+     * Get the Stripe billing portal for this customer.
+     *
+     * @param  string|null  $returnUrl
+     * @return string
+     */
+    public function billingPortalUrl($returnUrl = null)
+    {
+        $this->assertCustomerExists();
+
+        return StripeBillingPortalSession::create([
+            'customer' => $this->stripeId(),
+            'return_url' => $returnUrl ?? route('home'),
+        ], $this->stripeOptions())['url'];
+    }
+
+    /**
+     * Generate a redirect response to the customer's Stripe billing portal.
+     *
+     * @param  string|null  $returnUrl
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function redirectToBillingPortal($returnUrl = null)
+    {
+        return new RedirectResponse(
+            $this->billingPortalUrl($returnUrl)
+        );
     }
 
     /**
