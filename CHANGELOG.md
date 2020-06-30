@@ -3,6 +3,12 @@
 ## [Unreleased](https://github.com/laravel/cashier/compare/v12.0.1...12.x)
 
 
+## [v12.1.0 (2020-06-30)](https://github.com/laravel/cashier/compare/v12.0.1...v12.1.0)
+
+### Added
+- Add support for Stripe's Customer Portal ([#966](https://github.com/laravel/cashier/pull/966))
+
+
 ## [v12.0.1 (2020-06-16)](https://github.com/laravel/cashier/compare/v12.0.0...v12.0.1)
 
 ### Fixed
