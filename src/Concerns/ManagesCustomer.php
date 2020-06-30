@@ -155,12 +155,12 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the Stripe customer portal for this customer.
+     * Get the Stripe billing portal for this customer.
      *
      * @param  string|null  $returnUrl
      * @return string
      */
-    public function customerPortalUrl($returnUrl = null)
+    public function billingPortalUrl($returnUrl = null)
     {
         $this->assertCustomerExists();
 
@@ -171,15 +171,15 @@ trait ManagesCustomer
     }
 
     /**
-     * Generate a redirect response to the customer's Stripe customer portal.
+     * Generate a redirect response to the customer's Stripe billing portal.
      *
      * @param  string|null  $returnUrl
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function redirectToCustomerPortal($returnUrl = null)
+    public function redirectToBillingPortal($returnUrl = null)
     {
         return new RedirectResponse(
-            $this->customerPortalUrl($returnUrl)
+            $this->billingPortalUrl($returnUrl)
         );
     }
 
