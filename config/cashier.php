@@ -61,6 +61,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Subscription Model
+    |--------------------------------------------------------------------------
+    |
+    | This is the model in your application that is used to track the
+    | subscriptions. It is used to run certain actions regarding
+    | the user subscription and the tracking of it.
+    |
+    */
+
+    'subscription_model' => env('CASHIER_SUBSCRIPTION_MODEL', Laravel\Cashier\Subscription::class),
+
+    /*
+    |--------------------------------------------------------------------------
     | Currency
     |--------------------------------------------------------------------------
     |

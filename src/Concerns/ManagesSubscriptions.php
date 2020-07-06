@@ -91,7 +91,7 @@ trait ManagesSubscriptions
      */
     public function subscriptions()
     {
-        return $this->hasMany(Subscription::class, $this->getForeignKey())->orderBy('created_at', 'desc');
+        return $this->hasMany(config('cashier.subscription_model'), $this->getForeignKey())->orderBy('created_at', 'desc');
     }
 
     /**
