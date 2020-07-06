@@ -84,7 +84,6 @@ trait ManagesSubscriptions
         });
     }
 
-
     /**
      * Get all of the subscriptions for the Stripe model.
      *
