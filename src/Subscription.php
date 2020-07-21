@@ -837,9 +837,26 @@ class Subscription extends Model
      */
     public function cancelNow()
     {
-        $subscription = $this->asStripeSubscription();
+        $this->asStripeSubscription()->cancel([
+            'prorate' => $this->prorateBehavior() === 'create_prorations',
+        ]);
 
-        $subscription->cancel();
+        $this->markAsCancelled();
+
+        return $this;
+    }
+
+    /**
+     * Cancel the subscription immediately.
+     *
+     * @return $this
+     */
+    public function cancelNowAndInvoice()
+    {
+        $this->asStripeSubscription()->cancel([
+            'invoice_now' => true,
+            'prorate' => $this->prorateBehavior() === 'create_prorations',
+        ]);
 
         $this->markAsCancelled();
 
