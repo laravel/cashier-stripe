@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.1.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.2.0...master)
+
+
+## [v12.2.0 (2020-07-21)](https://github.com/laravel/cashier/compare/v12.1.0...v12.2.0)
+
+### Added
+- Apply prorate and invoice_now for cancelNow ([#975](https://github.com/laravel/cashier-stripe/pull/975))
 
 
 ## [v12.1.0 (2020-06-30)](https://github.com/laravel/cashier/compare/v12.0.1...v12.1.0)
