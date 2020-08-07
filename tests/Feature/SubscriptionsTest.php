@@ -584,7 +584,7 @@ class SubscriptionsTest extends FeatureTestCase
         $subscription = $user->subscriptions()->create([
             'name' => 'yearly',
             'stripe_id' => 'xxxx',
-            'stripe_status' => 'incomplete',
+            'stripe_status' => StripeSubscription::STATUS_INCOMPLETE,
             'stripe_plan' => 'stripe-yearly',
             'quantity' => 1,
             'trial_ends_at' => null,

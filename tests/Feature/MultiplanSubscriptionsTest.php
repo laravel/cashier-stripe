@@ -9,6 +9,7 @@ use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Stripe\Plan;
 use Stripe\Product;
+use Stripe\Subscription;
 use Stripe\TaxRate;
 
 class MultiplanSubscriptionsTest extends FeatureTestCase
@@ -341,7 +342,7 @@ class MultiplanSubscriptionsTest extends FeatureTestCase
             'stripe_id' => 'sub_foo',
             'stripe_plan' => self::$planId,
             'quantity' => 1,
-            'stripe_status' => 'active',
+            'stripe_status' => Subscription::STATUS_ACTIVE,
         ]);
 
         $subscription->items()->create([

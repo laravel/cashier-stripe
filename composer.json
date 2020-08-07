@@ -27,7 +27,7 @@
         "illuminate/view": "^6.0|^7.0",
         "moneyphp/money": "^3.2",
         "nesbot/carbon": "^2.0",
-        "stripe/stripe-php": "^7.29",
+        "stripe/stripe-php": "^7.39",
         "symfony/http-kernel": "^4.3|^5.0",
         "symfony/intl": "^4.3|^5.0"
     },
