@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Tests\Unit;
 use Laravel\Cashier\Payment;
 use PHPUnit\Framework\TestCase;
 use Stripe\PaymentIntent;
+use Stripe\Subscription;
 
 class PaymentTest extends TestCase
 {
@@ -29,7 +30,7 @@ class PaymentTest extends TestCase
     public function test_it_can_return_its_cancelled_status()
     {
         $paymentIntent = new PaymentIntent();
-        $paymentIntent->status = 'canceled'; // Stripe uses American spelling for "cancelled".
+        $paymentIntent->status = Subscription::STATUS_CANCELED;
         $payment = new Payment($paymentIntent);
 
         $this->assertTrue($payment->isCancelled());

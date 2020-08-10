@@ -682,7 +682,7 @@ class Subscription extends Model
             'expand' => ['latest_invoice.payment_intent'],
         ];
 
-        if ($payload['payment_behavior'] !== 'pending_if_incomplete') {
+        if ($payload['payment_behavior'] !== StripeSubscription::PAYMENT_BEHAVIOR_PENDING_IF_INCOMPLETE) {
             $payload['cancel_at_period_end'] = false;
         }
 

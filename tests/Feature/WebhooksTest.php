@@ -8,6 +8,7 @@ use Laravel\Cashier\Exceptions\PaymentActionRequired;
 use Laravel\Cashier\Notifications\ConfirmPayment;
 use Stripe\Plan;
 use Stripe\Product;
+use Stripe\Subscription;
 
 class WebhooksTest extends FeatureTestCase
 {
@@ -61,7 +62,7 @@ class WebhooksTest extends FeatureTestCase
             'name' => 'main',
             'stripe_id' => 'sub_foo',
             'stripe_plan' => 'plan_foo',
-            'stripe_status' => 'active',
+            'stripe_status' => Subscription::STATUS_ACTIVE,
         ]);
 
         $item = $subscription->items()->create([
@@ -169,7 +170,7 @@ class WebhooksTest extends FeatureTestCase
                 'object' => [
                     'id' => $subscription->stripe_id,
                     'customer' => $user->stripe_id,
-                    'status' => 'incomplete_expired',
+                    'status' => Subscription::STATUS_INCOMPLETE_EXPIRED,
                     'quantity' => 1,
                 ],
             ],
