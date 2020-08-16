@@ -29,11 +29,15 @@ class PaymentController extends Controller
      */
     public function show($id)
     {
+        $payment = new Payment(
+            StripePaymentIntent::retrieve($id, Cashier::stripeOptions())
+        );
+
         return view('cashier::payment', [
             'stripeKey' => config('cashier.key'),
-            'payment' => new Payment(
-                StripePaymentIntent::retrieve($id, Cashier::stripeOptions())
-            ),
+            'requiresPaymentMethod' => json_encode($payment->requiresPaymentMethod()),
+            'requiresAction' => json_encode($payment->requiresAction()),
+            'payment' => $payment,
             'redirect' => request('redirect'),
         ]);
     }
