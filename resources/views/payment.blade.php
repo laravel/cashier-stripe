@@ -129,22 +129,7 @@
             @endif
 
             methods: {
-                configStripe: function () {
-                    const elements = stripe.elements();
-
-                    this.cardElement = elements.create('card');
-                    this.cardElement.mount('#card-element');
-                },
-
-                requestingNewPaymentMethod: function () {
-                    this.configStripe();
-
-
-                    this.requiresPaymentMethod = true;
-                    this.requiresAction = false;
-                },
-
-                addNewPaymentMethod: function () {
+                addPaymentMethod: function () {
                     var self = this;
 
                     this.paymentProcessing = true;
@@ -194,7 +179,7 @@
                         
                         if (result.error) {
                             if (result.error.code === 'payment_intent_authentication_failure') {
-                                self.requestingNewPaymentMethod()
+                                self.requestPaymentMethod()
                             } else {
                                 self.errorMessage = result.error.message;
                             }
@@ -204,6 +189,21 @@
                             self.successMessage = '{{ __('The payment was successful.') }}';
                         }
                     });
+                },
+
+                configStripe: function () {
+                    const elements = stripe.elements();
+
+                    this.cardElement = elements.create('card');
+                    this.cardElement.mount('#card-element');
+                },
+
+                requestPaymentMethod: function () {
+                    this.configStripe();
+
+
+                    this.requiresPaymentMethod = true;
+                    this.requiresAction = false;
                 },
 
                 goBack: function () {
