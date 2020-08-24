@@ -19,6 +19,7 @@ class VerifyRedirectUrl
     public function handle($request, Closure $next)
     {
         $redirect = $request->get('redirect');
+
         $url = parse_url($redirect);
 
         if ($redirect && (! isset($url['host']) || $url['host'] !== $request->getHost())) {
