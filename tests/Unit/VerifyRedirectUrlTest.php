@@ -33,6 +33,18 @@ class VerifyRedirectUrlTest extends TestCase
         });
     }
 
+    public function test_it_fails_when_the_url_is_invalid()
+    {
+        $request = Request::create('http://baz.com/stripe/payment', 'GET', ['redirect' => 'foo/bar']);
+        $middleware = new VerifyRedirectUrl;
+
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $middleware->handle($request, function () {
+            //
+        });
+    }
+
     public function test_it_is_skipped_when_no_redirect_is_present()
     {
         $request = Request::create('http://baz.com/stripe/payment', 'GET');

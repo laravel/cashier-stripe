@@ -1,6 +1,18 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.2.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.3.0...master)
+
+
+## [v12.3.0 (2020-08-25)](https://github.com/laravel/cashier/compare/v12.2.0...v12.3.0)
+
+### Added
+- Support Laravel 8 ([#985](https://github.com/laravel/cashier-stripe/pull/985))
+
+### Changed
+- Stripe SDK minimum version is now `^7.39` ([#981](https://github.com/laravel/cashier-stripe/pull/981))
+
+### Fixed
+- Fix url checking for invalid urls ([#984](https://github.com/laravel/cashier-stripe/pull/984))
 
 
 ## [v12.2.0 (2020-07-21)](https://github.com/laravel/cashier/compare/v12.1.0...v12.2.0)

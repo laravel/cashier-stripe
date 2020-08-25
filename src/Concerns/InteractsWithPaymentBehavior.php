@@ -2,6 +2,8 @@
 
 namespace Laravel\Cashier\Concerns;
 
+use Stripe\Subscription as StripeSubscription;
+
 trait InteractsWithPaymentBehavior
 {
     /**
@@ -9,7 +11,7 @@ trait InteractsWithPaymentBehavior
      *
      * @var string
      */
-    protected $paymentBehavior = 'allow_incomplete';
+    protected $paymentBehavior = StripeSubscription::PAYMENT_BEHAVIOR_ALLOW_INCOMPLETE;
 
     /**
      * Allow subscription changes even if payment fails.
@@ -18,7 +20,7 @@ trait InteractsWithPaymentBehavior
      */
     public function allowPaymentFailures()
     {
-        $this->paymentBehavior = 'allow_incomplete';
+        $this->paymentBehavior = StripeSubscription::PAYMENT_BEHAVIOR_ALLOW_INCOMPLETE;
 
         return $this;
     }
@@ -30,7 +32,7 @@ trait InteractsWithPaymentBehavior
      */
     public function pendingIfPaymentFails()
     {
-        $this->paymentBehavior = 'pending_if_incomplete';
+        $this->paymentBehavior = StripeSubscription::PAYMENT_BEHAVIOR_PENDING_IF_INCOMPLETE;
 
         return $this;
     }
@@ -42,7 +44,7 @@ trait InteractsWithPaymentBehavior
      */
     public function errorIfPaymentFails()
     {
-        $this->paymentBehavior = 'error_if_incomplete';
+        $this->paymentBehavior = StripeSubscription::PAYMENT_BEHAVIOR_ERROR_IF_INCOMPLETE;
 
         return $this;
     }

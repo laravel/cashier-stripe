@@ -11,6 +11,7 @@ use Laravel\Cashier\Exceptions\PaymentFailure;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
 use Stripe\Coupon;
+use Stripe\Invoice;
 use Stripe\Plan;
 use Stripe\Product;
 use Stripe\Subscription as StripeSubscription;
@@ -524,6 +525,30 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($subscription->active());
     }
 
+    public function test_swap_and_invoice_after_no_prorate_with_billing_cycle_anchor_delays_invoicing()
+    {
+        $user = $this->createCustomer('always_invoice_after_no_prorate');
+
+        $subscription = $user->newSubscription('main', static::$planId)->noProrate()->create('pm_card_visa', [], [
+            'collection_method' => 'send_invoice',
+            'days_until_due' => 30,
+            'backdate_start_date' => Carbon::now()->addDays(5)->subYear()->startOfDay()->unix(),
+            'billing_cycle_anchor' => Carbon::now()->addDays(5)->startOfDay()->unix(),
+        ]);
+
+        $this->assertEquals(static::$planId, $subscription->stripe_plan);
+        $this->assertCount(0, $user->invoices());
+        $this->assertSame(Invoice::STATUS_DRAFT, $user->upcomingInvoice()->status);
+        $this->assertTrue($subscription->active());
+
+        $subscription = $subscription->swapAndInvoice(self::$otherPlanId);
+
+        $this->assertEquals(static::$otherPlanId, $subscription->stripe_plan);
+        $this->assertCount(0, $user->invoices());
+        $this->assertSame(Invoice::STATUS_DRAFT, $user->upcomingInvoice()->status);
+        $this->assertTrue($subscription->active());
+    }
+
     public function test_trials_can_be_extended()
     {
         $user = $this->createCustomer('trials_can_be_extended');
@@ -559,7 +584,7 @@ class SubscriptionsTest extends FeatureTestCase
         $subscription = $user->subscriptions()->create([
             'name' => 'yearly',
             'stripe_id' => 'xxxx',
-            'stripe_status' => 'incomplete',
+            'stripe_status' => StripeSubscription::STATUS_INCOMPLETE,
             'stripe_plan' => 'stripe-yearly',
             'quantity' => 1,
             'trial_ends_at' => null,

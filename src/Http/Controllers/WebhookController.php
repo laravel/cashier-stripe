@@ -14,6 +14,7 @@ use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
 use Stripe\PaymentIntent as StripePaymentIntent;
+use Stripe\Subscription as StripeSubscription;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
@@ -68,7 +69,10 @@ class WebhookController extends Controller
             $user->subscriptions->filter(function (Subscription $subscription) use ($data) {
                 return $subscription->stripe_id === $data['id'];
             })->each(function (Subscription $subscription) use ($data) {
-                if (isset($data['status']) && $data['status'] === 'incomplete_expired') {
+                if (
+                    isset($data['status']) &&
+                    $data['status'] === StripeSubscription::STATUS_INCOMPLETE_EXPIRED
+                ) {
                     $subscription->items()->delete();
                     $subscription->delete();
 
