@@ -48,48 +48,48 @@
                     <p class="mb-6">{{ __('This payment was cancelled.') }}</p>
                 @else
                     <div id="payment-elements" v-if="! paymentProcessed">
-                            <!-- Payment Method Form -->
-                            <div v-show="requiresPaymentMethod">
-                                <!-- Instructions -->
-                                <h1 class="text-xl mt-2 mb-4 text-gray-700">
-                                    {{ __('Confirm your :amount payment', ['amount' => $payment->amount()]) }}
-                                </h1>
+                        <!-- Payment Method Form -->
+                        <div v-show="requiresPaymentMethod">
+                            <!-- Instructions -->
+                            <h1 class="text-xl mt-2 mb-4 text-gray-700">
+                                {{ __('Confirm your :amount payment', ['amount' => $payment->amount()]) }}
+                            </h1>
 
-                                <p class="mb-6">
-                                    {{ __('Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.') }}
-                                </p>
+                            <p class="mb-6">
+                                {{ __('Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.') }}
+                            </p>
 
-                                <!-- Name -->
-                                <label for="cardholder-name" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Full name') }}</label>
+                            <!-- Name -->
+                            <label for="cardholder-name" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Full name') }}</label>
 
-                                <input id="cardholder-name" type="text" placeholder="{{ __('Jane Doe') }}" required
-                                    class="inline-block bg-gray-200 border border-gray-400 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
-                                    v-model="name">
+                            <input id="cardholder-name" type="text" placeholder="{{ __('Jane Doe') }}" required
+                                class="inline-block bg-gray-200 border border-gray-400 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
+                                v-model="name">
 
-                                <!-- Card -->
-                                <label for="card-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Card') }}</label>
+                            <!-- Card -->
+                            <label for="card-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Card') }}</label>
 
-                                <div id="card-element" class="bg-gray-200 border border-gray-400 rounded-lg p-4 mb-6"></div>
+                            <div id="card-element" class="bg-gray-200 border border-gray-400 rounded-lg p-4 mb-6"></div>
 
-                                <!-- Pay Button -->
-                                <button id="card-button"
-                                        class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
-                                        :class="{ 'bg-blue-400': paymentProcessing, 'bg-blue-600': ! paymentProcessing }"
-                                        @click="addNewPaymentMethod"
-                                        :disabled="paymentProcessing">
-                                    {{ __('Pay :amount', ['amount' => $payment->amount()]) }}
-                                </button>
-                            </div>
-
-                            <!-- Confirm Payment Method Button -->
+                            <!-- Pay Button -->
                             <button id="card-button"
                                     class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
                                     :class="{ 'bg-blue-400': paymentProcessing, 'bg-blue-600': ! paymentProcessing }"
-                                    @click="confirmPaymentMethod"
-                                    :disabled="paymentProcessing"
-                                    v-show="requiresAction">
-                                {{ __('Confirm Pay :amount', ['amount' => $payment->amount()]) }}
+                                    @click="addNewPaymentMethod"
+                                    :disabled="paymentProcessing">
+                                {{ __('Pay :amount', ['amount' => $payment->amount()]) }}
                             </button>
+                        </div>
+
+                        <!-- Confirm Payment Method Button -->
+                        <button id="card-button"
+                                class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
+                                :class="{ 'bg-blue-400': paymentProcessing, 'bg-blue-600': ! paymentProcessing }"
+                                @click="confirmPaymentMethod"
+                                :disabled="paymentProcessing"
+                                v-show="requiresAction">
+                            {{ __('Confirm Pay :amount', ['amount' => $payment->amount()]) }}
+                        </button>
                     </div>
                 @endif
 
@@ -176,7 +176,7 @@
                         }
                     ).then(function (result) {
                         self.paymentProcessing = false;
-                        
+
                         if (result.error) {
                             if (result.error.code === 'payment_intent_authentication_failure') {
                                 self.requestPaymentMethod()
