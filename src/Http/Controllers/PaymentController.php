@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Http\Middleware\VerifyRedirectUrl;
@@ -29,15 +28,11 @@ class PaymentController extends Controller
      */
     public function show($id)
     {
-        $payment = new Payment(
-            StripePaymentIntent::retrieve($id, Cashier::stripeOptions())
-        );
-
         return view('cashier::payment', [
             'stripeKey' => config('cashier.key'),
-            'requiresPaymentMethod' => json_encode($payment->requiresPaymentMethod()),
-            'requiresAction' => json_encode($payment->requiresAction()),
-            'payment' => $payment,
+            'payment' => new Payment(
+                StripePaymentIntent::retrieve($id, Cashier::stripeOptions())
+            ),
             'redirect' => request('redirect'),
         ]);
     }

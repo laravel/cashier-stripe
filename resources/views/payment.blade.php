@@ -39,7 +39,9 @@
                         {{ __('Payment Successful') }}
                     </h1>
 
-                    <p class="mb-6">{{ __('This payment was already successfully confirmed.') }}</p>
+                    <p class="mb-6">
+                        {{ __('This payment was already successfully confirmed.') }}
+                    </p>
                 @elseif ($payment->isCancelled())
                     <h1 class="text-xl mt-2 mb-4 text-gray-700">
                         {{ __('Payment Cancelled') }}
@@ -60,36 +62,49 @@
                             </p>
 
                             <!-- Name -->
-                            <label for="cardholder-name" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Full name') }}</label>
+                            <label for="cardholder-name" class="inline-block text-sm text-gray-700 font-semibold mb-2">
+                                {{ __('Full name') }}
+                            </label>
 
-                            <input id="cardholder-name" type="text" placeholder="{{ __('Jane Doe') }}" required
+                            <input
+                                id="cardholder-name"
+                                type="text" placeholder="{{ __('Jane Doe') }}"
+                                required
                                 class="inline-block bg-gray-200 border border-gray-400 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
-                                v-model="name">
+                                v-model="name"
+                            />
 
                             <!-- Card -->
-                            <label for="card-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Card') }}</label>
+                            <label for="card-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">
+                                {{ __('Card') }}
+                            </label>
 
                             <div id="card-element" class="bg-gray-200 border border-gray-400 rounded-lg p-4 mb-6"></div>
 
                             <!-- Pay Button -->
-                            <button id="card-button"
-                                    class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
-                                    :class="{ 'bg-blue-400': paymentProcessing, 'bg-blue-600': ! paymentProcessing }"
-                                    @click="addNewPaymentMethod"
-                                    :disabled="paymentProcessing">
+                            <button
+                                id="card-button"
+                                class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
+                                :class="{ 'bg-blue-400': paymentProcessing, 'bg-blue-600': ! paymentProcessing }"
+                                @click="addPaymentMethod"
+                                :disabled="paymentProcessing"
+                            >
                                 {{ __('Pay :amount', ['amount' => $payment->amount()]) }}
                             </button>
                         </div>
 
                         <!-- Confirm Payment Method Button -->
-                        <button id="card-button"
+                        <div v-show="requiresAction">
+                            <button
+                                id="card-button"
                                 class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
                                 :class="{ 'bg-blue-400': paymentProcessing, 'bg-blue-600': ! paymentProcessing }"
                                 @click="confirmPaymentMethod"
                                 :disabled="paymentProcessing"
-                                v-show="requiresAction">
-                            {{ __('Confirm Pay :amount', ['amount' => $payment->amount()]) }}
-                        </button>
+                            >
+                                {{ __('Confirm :amount payment', ['amount' => $payment->amount()]) }}
+                            </button>
+                        </div>
                     </div>
                 @endif
 
@@ -116,8 +131,8 @@
                 cardElement: null,
                 paymentProcessing: false,
                 paymentProcessed: false,
-                requiresPaymentMethod: {{ $requiresPaymentMethod }},
-                requiresAction: {{ $requiresAction }},
+                requiresPaymentMethod: @json($payment->requiresPaymentMethod()),
+                requiresAction: @json($payment->requiresAction()),
                 successMessage: '',
                 errorMessage: ''
             },
@@ -148,7 +163,7 @@
                         self.paymentProcessing = false;
 
                         if (result.error) {
-                            if (result.error.code === 'parameter_invalid_empty' &&
+                            if (result.error.code === '{{ Stripe\ErrorObject::CODE_PARAMETER_INVALID_EMPTY }}' &&
                                 result.error.param === 'payment_method_data[billing_details][name]') {
                                 self.errorMessage = '{{ __('Please provide your name.') }}';
                             } else {
@@ -178,10 +193,10 @@
                         self.paymentProcessing = false;
 
                         if (result.error) {
-                            if (result.error.code === 'payment_intent_authentication_failure') {
-                                self.requestPaymentMethod()
-                            } else {
-                                self.errorMessage = result.error.message;
+                            self.errorMessage = result.error.message;
+
+                            if (result.error.code === '{{ Stripe\ErrorObject::CODE_PAYMENT_INTENT_AUTHENTICATION_FAILURE }}') {
+                                self.requestPaymentMethod();
                             }
                         } else {
                             self.paymentProcessed = true;
@@ -200,7 +215,6 @@
 
                 requestPaymentMethod: function () {
                     this.configStripe();
-
 
                     this.requiresPaymentMethod = true;
                     this.requiresAction = false;
