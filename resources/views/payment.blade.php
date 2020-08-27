@@ -102,7 +102,7 @@
                                 @click="confirmPaymentMethod"
                                 :disabled="paymentProcessing"
                             >
-                                {{ __('Confirm :amount payment', ['amount' => $payment->amount()]) }}
+                                {{ __('Confirm your :amount payment', ['amount' => $payment->amount()]) }}
                             </button>
                         </div>
                     </div>
