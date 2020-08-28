@@ -139,7 +139,7 @@
 
             @if (! $payment->isSucceeded() && ! $payment->isCancelled() && ! $payment->requiresAction())
                 mounted: function () {
-                    this.configStripe();
+                    this.configureStripe();
                 },
             @endif
 
@@ -206,18 +206,18 @@
                     });
                 },
 
-                configStripe: function () {
+                requestPaymentMethod: function () {
+                    this.configureStripe();
+
+                    this.requiresPaymentMethod = true;
+                    this.requiresAction = false;
+                },
+
+                configureStripe: function () {
                     const elements = stripe.elements();
 
                     this.cardElement = elements.create('card');
                     this.cardElement.mount('#card-element');
-                },
-
-                requestPaymentMethod: function () {
-                    this.configStripe();
-
-                    this.requiresPaymentMethod = true;
-                    this.requiresAction = false;
                 },
 
                 goBack: function () {
