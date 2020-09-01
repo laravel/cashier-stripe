@@ -39,7 +39,9 @@
                         {{ __('Payment Successful') }}
                     </h1>
 
-                    <p class="mb-6">{{ __('This payment was already successfully confirmed.') }}</p>
+                    <p class="mb-6">
+                        {{ __('This payment was already successfully confirmed.') }}
+                    </p>
                 @elseif ($payment->isCancelled())
                     <h1 class="text-xl mt-2 mb-4 text-gray-700">
                         {{ __('Payment Cancelled') }}
@@ -48,35 +50,61 @@
                     <p class="mb-6">{{ __('This payment was cancelled.') }}</p>
                 @else
                     <div id="payment-elements" v-if="! paymentProcessed">
-                        <!-- Instructions -->
-                        <h1 class="text-xl mt-2 mb-4 text-gray-700">
-                            {{ __('Confirm your :amount payment', ['amount' => $payment->amount()]) }}
-                        </h1>
+                        <!-- Payment Method Form -->
+                        <div v-show="requiresPaymentMethod">
+                            <!-- Instructions -->
+                            <h1 class="text-xl mt-2 mb-4 text-gray-700">
+                                {{ __('Confirm your :amount payment', ['amount' => $payment->amount()]) }}
+                            </h1>
 
-                        <p class="mb-6">
-                            {{ __('Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.') }}
-                        </p>
+                            <p class="mb-6">
+                                {{ __('Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.') }}
+                            </p>
 
-                        <!-- Name -->
-                        <label for="cardholder-name" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Full name') }}</label>
+                            <!-- Name -->
+                            <label for="cardholder-name" class="inline-block text-sm text-gray-700 font-semibold mb-2">
+                                {{ __('Full name') }}
+                            </label>
 
-                        <input id="cardholder-name" type="text" placeholder="{{ __('Jane Doe') }}" required
-                               class="inline-block bg-gray-200 border border-gray-400 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
-                               v-model="name">
+                            <input
+                                id="cardholder-name"
+                                type="text" placeholder="{{ __('Jane Doe') }}"
+                                required
+                                class="inline-block bg-gray-200 border border-gray-400 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
+                                v-model="name"
+                            />
 
-                        <!-- Card -->
-                        <label for="card-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">{{ __('Card') }}</label>
+                            <!-- Card -->
+                            <label for="card-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">
+                                {{ __('Card') }}
+                            </label>
 
-                        <div id="card-element" class="bg-gray-200 border border-gray-400 rounded-lg p-4 mb-6"></div>
+                            <div id="card-element" class="bg-gray-200 border border-gray-400 rounded-lg p-4 mb-6"></div>
 
-                        <!-- Pay Button -->
-                        <button id="card-button"
+                            <!-- Pay Button -->
+                            <button
+                                id="card-button"
                                 class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
                                 :class="{ 'bg-blue-400': paymentProcessing, 'bg-blue-600': ! paymentProcessing }"
-                                @click="confirmPayment"
-                                :disabled="paymentProcessing">
-                            {{ __('Pay :amount', ['amount' => $payment->amount()]) }}
-                        </button>
+                                @click="addPaymentMethod"
+                                :disabled="paymentProcessing"
+                            >
+                                {{ __('Pay :amount', ['amount' => $payment->amount()]) }}
+                            </button>
+                        </div>
+
+                        <!-- Confirm Payment Method Button -->
+                        <div v-show="requiresAction">
+                            <button
+                                id="card-button"
+                                class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
+                                :class="{ 'bg-blue-400': paymentProcessing, 'bg-blue-600': ! paymentProcessing }"
+                                @click="confirmPaymentMethod"
+                                :disabled="paymentProcessing"
+                            >
+                                {{ __('Confirm your :amount payment', ['amount' => $payment->amount()]) }}
+                            </button>
+                        </div>
                     </div>
                 @endif
 
@@ -103,21 +131,20 @@
                 cardElement: null,
                 paymentProcessing: false,
                 paymentProcessed: false,
+                requiresPaymentMethod: @json($payment->requiresPaymentMethod()),
+                requiresAction: @json($payment->requiresAction()),
                 successMessage: '',
                 errorMessage: ''
             },
 
-            @if (! $payment->isSucceeded() && ! $payment->isCancelled())
+            @if (! $payment->isSucceeded() && ! $payment->isCancelled() && ! $payment->requiresAction())
                 mounted: function () {
-                    const elements = stripe.elements();
-
-                    this.cardElement = elements.create('card');
-                    this.cardElement.mount('#card-element');
+                    this.configureStripe();
                 },
             @endif
 
             methods: {
-                confirmPayment: function () {
+                addPaymentMethod: function () {
                     var self = this;
 
                     this.paymentProcessing = true;
@@ -136,7 +163,7 @@
                         self.paymentProcessing = false;
 
                         if (result.error) {
-                            if (result.error.code === 'parameter_invalid_empty' &&
+                            if (result.error.code === '{{ Stripe\ErrorObject::CODE_PARAMETER_INVALID_EMPTY }}' &&
                                 result.error.param === 'payment_method_data[billing_details][name]') {
                                 self.errorMessage = '{{ __('Please provide your name.') }}';
                             } else {
@@ -148,6 +175,49 @@
                             self.successMessage = '{{ __('The payment was successful.') }}';
                         }
                     });
+                },
+
+                confirmPaymentMethod: function () {
+                    var self = this;
+
+                    this.paymentProcessing = true;
+                    this.paymentProcessed = false;
+                    this.successMessage = '';
+                    this.errorMessage = '';
+
+                    stripe.confirmCardPayment(
+                        '{{ $payment->clientSecret() }}', {
+                            payment_method: '{{ $payment->payment_method }}'
+                        }
+                    ).then(function (result) {
+                        self.paymentProcessing = false;
+
+                        if (result.error) {
+                            self.errorMessage = result.error.message;
+
+                            if (result.error.code === '{{ Stripe\ErrorObject::CODE_PAYMENT_INTENT_AUTHENTICATION_FAILURE }}') {
+                                self.requestPaymentMethod();
+                            }
+                        } else {
+                            self.paymentProcessed = true;
+
+                            self.successMessage = '{{ __('The payment was successful.') }}';
+                        }
+                    });
+                },
+
+                requestPaymentMethod: function () {
+                    this.configureStripe();
+
+                    this.requiresPaymentMethod = true;
+                    this.requiresAction = false;
+                },
+
+                configureStripe: function () {
+                    const elements = stripe.elements();
+
+                    this.cardElement = elements.create('card');
+                    this.cardElement.mount('#card-element');
                 },
 
                 goBack: function () {

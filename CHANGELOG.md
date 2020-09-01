@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.3.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.3.1...master)
+
+
+## [v12.3.1 (2020-09-01)](https://github.com/laravel/cashier/compare/v12.3.0...v12.3.1)
+
+### Fixed
+- Fix double payment method ([#987](https://github.com/laravel/cashier-stripe/pull/987))
 
 
 ## [v12.3.0 (2020-08-25)](https://github.com/laravel/cashier/compare/v12.2.0...v12.3.0)
