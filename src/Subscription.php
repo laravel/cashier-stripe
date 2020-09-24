@@ -633,13 +633,11 @@ class Subscription extends Model
      */
     protected function parseSwapPlans(array $plans)
     {
-        // When the subscription is a single plan subscription,
-        // we need to make sure that the new subscription item
-        // will get the same quantity as the previous one.
         $isSinglePlanSwap = $this->hasSinglePlan() && count($plans) === 1;
 
         return collect($plans)->mapWithKeys(function ($options, $plan) use ($isSinglePlanSwap) {
             $plan = is_string($options) ? $options : $plan;
+
             $options = is_string($options) ? [] : $options;
 
             return [$plan => array_merge([
