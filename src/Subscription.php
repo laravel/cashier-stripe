@@ -644,7 +644,7 @@ class Subscription extends Model
 
             return [$plan => array_merge([
                 'plan' => $plan,
-                'quantity' => $isSinglePlanSwap ? $this->quantity: 1,
+                'quantity' => $isSinglePlanSwap ? $this->quantity : 1,
                 'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
             ], $options)];
         });
