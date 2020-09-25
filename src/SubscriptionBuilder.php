@@ -328,8 +328,6 @@ class SubscriptionBuilder
 
         if ($taxRates = $this->getTaxRatesForPayload()) {
             $payload['default_tax_rates'] = $taxRates;
-        } elseif ($taxPercentage = $this->getTaxPercentageForPayload()) {
-            $payload['tax_percent'] = $taxPercentage;
         }
 
         return $payload;
@@ -348,19 +346,6 @@ class SubscriptionBuilder
 
         if ($this->trialExpires) {
             return $this->trialExpires->getTimestamp();
-        }
-    }
-
-    /**
-     * Get the tax percentage for the Stripe payload.
-     *
-     * @return int|float|null
-     * @deprecated Please migrate to the new Tax Rates API.
-     */
-    protected function getTaxPercentageForPayload()
-    {
-        if ($taxPercentage = $this->owner->taxPercentage()) {
-            return $taxPercentage;
         }
     }
 
