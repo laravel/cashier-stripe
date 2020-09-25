@@ -92,11 +92,7 @@ trait ManagesSubscriptions
      */
     public function subscription($name = 'default')
     {
-        return $this->subscriptions->sortByDesc(function (Subscription $subscription) {
-            return $subscription->created_at->getTimestamp();
-        })->first(function (Subscription $subscription) use ($name) {
-            return $subscription->name === $name;
-        });
+        return $this->subscriptions()->where('name', $name)->first();
     }
 
     /**
