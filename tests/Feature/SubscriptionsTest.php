@@ -447,7 +447,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($subscription->onTrial());
         $this->assertFalse($subscription->recurring());
         $this->assertFalse($subscription->ended());
-        $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
+        $this->assertEquals(Carbon::today()->addDays(7)->day, $user->trialEndsAt('main')->day);
 
         // Cancel Subscription
         $subscription->cancel();
