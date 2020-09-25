@@ -108,13 +108,16 @@ trait ManagesCustomer
     /**
      * Get the Stripe customer for the model.
      *
+     * @param  array  $expand
      * @return \Stripe\Customer
      */
-    public function asStripeCustomer()
+    public function asStripeCustomer(array $expand = [])
     {
         $this->assertCustomerExists();
 
-        return StripeCustomer::retrieve($this->stripe_id, $this->stripeOptions());
+        return StripeCustomer::retrieve(
+            ['id' => $this->stripe_id, 'expand' => $expand], $this->stripeOptions()
+        );
     }
 
     /**
