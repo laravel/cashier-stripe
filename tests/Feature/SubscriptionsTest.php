@@ -213,6 +213,32 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals(static::$couponId, $subscription->asStripeSubscription()->discount->coupon->id);
     }
 
+    public function test_swapping_subscription_and_preserving_quantity()
+    {
+        $user = $this->createCustomer('swapping_subscription_and_preserving_quantity');
+        $subscription = $user->newSubscription('main', static::$planId)
+            ->quantity(5, static::$planId)
+            ->create('pm_card_visa');
+
+        $subscription = $subscription->swap(static::$otherPlanId);
+
+        $this->assertSame(5, $subscription->quantity);
+        $this->assertSame(5, $subscription->asStripeSubscription()->quantity);
+    }
+
+    public function test_swapping_subscription_and_adopting_new_quantity()
+    {
+        $user = $this->createCustomer('swapping_subscription_and_adopting_new_quantity');
+        $subscription = $user->newSubscription('main', static::$planId)
+            ->quantity(5, static::$planId)
+            ->create('pm_card_visa');
+
+        $subscription = $subscription->swap([static::$otherPlanId => ['quantity' => 3]]);
+
+        $this->assertSame(3, $subscription->quantity);
+        $this->assertSame(3, $subscription->asStripeSubscription()->quantity);
+    }
+
     public function test_declined_card_during_subscribing_results_in_an_exception()
     {
         $user = $this->createCustomer('declined_card_during_subscribing_results_in_an_exception');
@@ -421,7 +447,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($subscription->onTrial());
         $this->assertFalse($subscription->recurring());
         $this->assertFalse($subscription->ended());
-        $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
+        $this->assertEquals(Carbon::today()->addDays(7)->day, $user->trialEndsAt('main')->day);
 
         // Cancel Subscription
         $subscription->cancel();

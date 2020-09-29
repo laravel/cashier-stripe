@@ -57,7 +57,7 @@ return [
     |
     */
 
-    'model' => env('CASHIER_MODEL', App\User::class),
+    'model' => env('CASHIER_MODEL', class_exists(App\Models\User::class) ? App\Models\User::class : App\User::class),
 
     /*
     |--------------------------------------------------------------------------

@@ -1,6 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.3.1...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.4.0...master)
+
+
+## [v12.4.0 (2020-09-29)](https://github.com/laravel/cashier/compare/v12.3.1...v12.4.0)
+
+### Added
+- Implement `trialEndsAt` ([#1000](https://github.com/laravel/cashier-stripe/pull/1000))
+
+### Changed
+- Simplify subscription method ([#1003](https://github.com/laravel/cashier-stripe/pull/1003))
+
+### Fixed
+- Fix quantity preserving ([#999](https://github.com/laravel/cashier-stripe/pull/999))
+- Fix Models namespace for Laravel 8 ([9024107](https://github.com/laravel/cashier-stripe/commit/9024107f51bcdd69607395dc5606fdcd35498f85))
 
 
 ## [v12.3.1 (2020-09-01)](https://github.com/laravel/cashier/compare/v12.3.0...v12.3.1)

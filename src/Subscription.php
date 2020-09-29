@@ -556,7 +556,7 @@ class Subscription extends Model
     /**
      * Swap the subscription to new Stripe plans.
      *
-     * @param  string|string[]  $plans
+     * @param  string|array  $plans
      * @param  array  $options
      * @return $this
      *
@@ -611,7 +611,7 @@ class Subscription extends Model
     /**
      * Swap the subscription to new Stripe plans, and invoice immediately.
      *
-     * @param  string|string[]  $plans
+     * @param  string|array  $plans
      * @param  array  $options
      * @return $this
      *
@@ -628,17 +628,21 @@ class Subscription extends Model
     /**
      * Parse the given plans for a swap operation.
      *
-     * @param  string|string[]  $plans
+     * @param  array  $plans
      * @return \Illuminate\Support\Collection
      */
-    protected function parseSwapPlans($plans)
+    protected function parseSwapPlans(array $plans)
     {
-        return collect($plans)->mapWithKeys(function ($options, $plan) {
+        $isSinglePlanSwap = $this->hasSinglePlan() && count($plans) === 1;
+
+        return collect($plans)->mapWithKeys(function ($options, $plan) use ($isSinglePlanSwap) {
             $plan = is_string($options) ? $options : $plan;
+
             $options = is_string($options) ? [] : $options;
 
             return [$plan => array_merge([
                 'plan' => $plan,
+                'quantity' => $isSinglePlanSwap ? $this->quantity : 1,
                 'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
             ], $options)];
         });
