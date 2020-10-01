@@ -962,21 +962,6 @@ class Subscription extends Model
     }
 
     /**
-     * Sync the tax percentage of the user to the subscription.
-     *
-     * @return void
-     * @deprecated Please migrate to the new Tax Rates API.
-     */
-    public function syncTaxPercentage()
-    {
-        $subscription = $this->asStripeSubscription();
-
-        $subscription->tax_percent = $this->user->taxPercentage();
-
-        $subscription->save();
-    }
-
-    /**
      * Sync the tax rates of the user to the subscription.
      *
      * @return void

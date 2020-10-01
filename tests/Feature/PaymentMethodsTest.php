@@ -91,7 +91,7 @@ class PaymentMethodsTest extends FeatureTestCase
     public function test_legacy_we_can_retrieve_an_old_default_source_as_a_default_payment_method()
     {
         $user = $this->createCustomer('we_can_retrieve_an_old_default_source_as_a_default_payment_method');
-        $customer = $user->createAsStripeCustomer();
+        $customer = $user->createAsStripeCustomer(['expand' => ['sources']]);
 
         $card = $customer->sources->create(['source' => 'tok_visa']);
         $customer->default_source = $card->id;

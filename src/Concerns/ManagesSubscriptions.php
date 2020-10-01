@@ -158,17 +158,6 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Get the tax percentage to apply to the subscription.
-     *
-     * @return int|float
-     * @deprecated Please migrate to the new Tax Rates API.
-     */
-    public function taxPercentage()
-    {
-        return 0;
-    }
-
-    /**
      * Get the tax rates to apply to the subscription.
      *
      * @return array
