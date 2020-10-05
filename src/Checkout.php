@@ -8,17 +8,21 @@ use Stripe\Checkout\Session;
 class Checkout
 {
     /**
+     * The Stripe model instance.
+     *
      * @var \Illuminate\Database\Eloquent\Model
      */
     protected $owner;
 
     /**
+     * The Stripe Checkout Session instance.
+     *
      * @var \Stripe\Checkout\Session
      */
     protected $session;
 
     /**
-     * Create a new Checkout instance.
+     * Create a new Checkout Session instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @param  \Stripe\Checkout\Session  $session
@@ -28,16 +32,6 @@ class Checkout
     {
         $this->owner = $owner;
         $this->session = $session;
-    }
-
-    /**
-     * Get the Checkout Session ID.
-     *
-     * @return string
-     */
-    public function sessionId()
-    {
-        return $this->session->id;
     }
 
     /**
@@ -55,8 +49,8 @@ class Checkout
         $session = Session::create(array_merge([
             'customer' => $customer->id,
             'mode' => 'payment',
-            'success_url' => route('home').'?checkout=success',
-            'cancel_url' => route('home').'?checkout=cancelled',
+            'success_url' => $sessionOptions['success_url'] ?? route('home').'?checkout=success',
+            'cancel_url' => $sessionOptions['cancel_url'] ?? route('home').'?checkout=cancelled',
             'payment_method_types' => ['card'],
         ], $sessionOptions), Cashier::stripeOptions());
 
@@ -80,10 +74,23 @@ class Checkout
     }
 
     /**
+     * Get the Checkout Session as a Stripe Checkout Session object.
+     *
      * @return \Stripe\Checkout\Session
      */
     public function asStripeCheckoutSession()
     {
         return $this->session;
+    }
+
+    /**
+     * Dynamically get values from the Stripe Checkout Session.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        return $this->session->{$key};
     }
 }
