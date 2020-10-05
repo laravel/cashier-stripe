@@ -75,6 +75,7 @@ class Checkout
         return View::make('cashier::checkout', array_merge([
             'label' => $label,
             'sessionId' => $this->session->id,
+            'stripeKey' => config('cashier.key'),
         ], $options));
     }
 
