@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Concerns;
 
+use Laravel\Cashier\Checkout;
 use Laravel\Cashier\Payment;
 use Stripe\PaymentIntent as StripePaymentIntent;
 use Stripe\Refund as StripeRefund;
@@ -56,5 +57,50 @@ trait PerformsCharges
             ['payment_intent' => $paymentIntent] + $options,
             $this->stripeOptions()
         );
+    }
+
+    /**
+     * Begin a new Checkout Session.
+     *
+     * @param  int  $amount
+     * @param  string  $name
+     * @param  int  $quantity
+     * @param  array  $sessionOptions
+     * @param  array  $customerOptions
+     * @return \Laravel\Cashier\Checkout
+     */
+    public function checkout($amount, $name, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
+    {
+        return Checkout::create($this, array_merge([
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => $this->preferredCurrency(),
+                    'product_data' => [
+                        'name' => $name,
+                    ],
+                    'unit_amount' => $amount,
+                ],
+                'quantity' => $quantity,
+            ]],
+        ], $sessionOptions), $customerOptions);
+    }
+
+    /**
+     * Begin a new Checkout Session.
+     *
+     * @param  string  $price
+     * @param  int  $quantity
+     * @param  array  $sessionOptions
+     * @param  array  $customerOptions
+     * @return \Laravel\Cashier\Checkout
+     */
+    public function checkoutProduct($price, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
+    {
+        return Checkout::create($this, array_merge([
+            'line_items' => [[
+                'price' => $price,
+                'quantity' => $quantity,
+            ]],
+        ], $sessionOptions), $customerOptions);
     }
 }
