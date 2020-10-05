@@ -15,7 +15,7 @@
 
         checkoutButton.addEventListener('click', function () {
             // When the customer clicks on the button, redirect them to Checkout.
-            Stripe('{{ config('cashier.key') }}').redirectToCheckout({
+            Stripe('{{ $stripeKey }}').redirectToCheckout({
                 sessionId: '{{ $sessionId }}'
             }).then(function (result) {
                 // If `redirectToCheckout` fails due to a browser or network
