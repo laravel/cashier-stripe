@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.4.0...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.4.1...12.x)
+
+
+## [v12.4.1 (2020-10-06)](https://github.com/laravel/cashier/compare/v12.4.0...v12.4.1)
+
+### Fixed
+- Fix n+1 problem with subscription retrieval ([#1009](https://github.com/laravel/cashier-stripe/pull/1009))
 
 
 ## [v12.4.0 (2020-09-29)](https://github.com/laravel/cashier/compare/v12.3.1...v12.4.0)
