@@ -92,7 +92,7 @@ trait ManagesSubscriptions
      */
     public function subscription($name = 'default')
     {
-        return $this->subscriptions()->where('name', $name)->first();
+        return $this->subscriptions->where('name', $name)->first();
     }
 
     /**
