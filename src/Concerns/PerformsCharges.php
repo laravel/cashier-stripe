@@ -60,7 +60,26 @@ trait PerformsCharges
     }
 
     /**
-     * Begin a new Checkout Session.
+     * Begin a new Checkout Session for an existing Price ID.
+     *
+     * @param  string  $price
+     * @param  int  $quantity
+     * @param  array  $sessionOptions
+     * @param  array  $customerOptions
+     * @return \Laravel\Cashier\Checkout
+     */
+    public function checkout($price, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
+    {
+        return Checkout::create($this, array_merge([
+            'line_items' => [[
+                'price' => $price,
+                'quantity' => $quantity,
+            ]],
+        ], $sessionOptions), $customerOptions);
+    }
+
+    /**
+     * Begin a new Checkout Session for a "one-off" charge.
      *
      * @param  int  $amount
      * @param  string  $name
@@ -69,7 +88,7 @@ trait PerformsCharges
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
-    public function checkout($amount, $name, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
+    public function checkoutCharge($amount, $name, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
     {
         return Checkout::create($this, array_merge([
             'line_items' => [[
@@ -80,25 +99,6 @@ trait PerformsCharges
                     ],
                     'unit_amount' => $amount,
                 ],
-                'quantity' => $quantity,
-            ]],
-        ], $sessionOptions), $customerOptions);
-    }
-
-    /**
-     * Begin a new Checkout Session.
-     *
-     * @param  string  $price
-     * @param  int  $quantity
-     * @param  array  $sessionOptions
-     * @param  array  $customerOptions
-     * @return \Laravel\Cashier\Checkout
-     */
-    public function checkoutProduct($price, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
-    {
-        return Checkout::create($this, array_merge([
-            'line_items' => [[
-                'price' => $price,
                 'quantity' => $quantity,
             ]],
         ], $sessionOptions), $customerOptions);
