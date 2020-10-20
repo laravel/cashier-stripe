@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.4.1...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.4.2...master)
+
+
+## [v12.4.2 (2020-10-20)](https://github.com/laravel/cashier/compare/v12.4.1...v12.4.2)
+
+### Fixed
+- Fix trial ends at check ([#1015](https://github.com/laravel/cashier-stripe/pull/1015))
 
 
 ## [v12.4.1 (2020-10-06)](https://github.com/laravel/cashier/compare/v12.4.0...v12.4.1)

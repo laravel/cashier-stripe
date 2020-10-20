@@ -10,6 +10,7 @@ use Laravel\Cashier\Exceptions\PaymentActionRequired;
 use Laravel\Cashier\Exceptions\PaymentFailure;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
+use Laravel\Cashier\Tests\Fixtures\User;
 use Stripe\Coupon;
 use Stripe\Invoice;
 use Stripe\Plan;
@@ -466,6 +467,15 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertFalse($subscription->recurring());
         $this->assertFalse($subscription->ended());
         $this->assertEquals(Carbon::today()->addDays(7)->day, $subscription->trial_ends_at->day);
+    }
+
+    public function test_user_without_subscriptions_can_return_its_generic_trial_end_date()
+    {
+        $user = new User;
+        $user->trial_ends_at = $tomorrow = Carbon::tomorrow();
+
+        $this->assertTrue($user->onGenericTrial());
+        $this->assertSame($tomorrow, $user->trialEndsAt());
     }
 
     public function test_creating_subscription_with_explicit_trial()

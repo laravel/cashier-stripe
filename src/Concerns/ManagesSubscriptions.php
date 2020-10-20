@@ -59,11 +59,11 @@ trait ManagesSubscriptions
      */
     public function trialEndsAt($name = 'default')
     {
-        if ($this->onGenericTrial()) {
-            return $this->trial_ends_at;
+        if ($subscription = $this->subscription($name)) {
+            return $subscription->trial_ends_at;
         }
 
-        return $this->subscription($name)->trial_ends_at;
+        return $this->trial_ends_at;
     }
 
     /**

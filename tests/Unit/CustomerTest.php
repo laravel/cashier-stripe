@@ -19,7 +19,6 @@ class CustomerTest extends TestCase
         $user->trial_ends_at = $tomorrow = Carbon::tomorrow();
 
         $this->assertTrue($user->onGenericTrial());
-        $this->assertSame($tomorrow, $user->trialEndsAt());
 
         $user->trial_ends_at = Carbon::today()->subDays(5);
 
