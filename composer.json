@@ -24,7 +24,7 @@
         "illuminate/support": "~5.7.0|~5.8.0|^6.0",
         "illuminate/view": "~5.7.0|~5.8.0|^6.0",
         "nesbot/carbon": "^1.26.3|^2.0",
-        "stripe/stripe-php": "~6.0",
+        "stripe/stripe-php": "~7.0",
         "symfony/http-kernel": "~4.0"
     },
     "require-dev": {
