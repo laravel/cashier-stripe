@@ -56,12 +56,15 @@ class CheckoutTest extends FeatureTestCase
             'unit_amount' => 1500,
         ]);
 
-        $checkout = $user->newSubscription('default', $price->id)->checkout([
-            'success_url' => 'http://example.com',
-            'cancel_url' => 'http://example.com',
-        ]);
+        $checkout = $user->newSubscription('default', $price->id)
+            ->allowPromotionCodes()
+            ->checkout([
+                'success_url' => 'http://example.com',
+                'cancel_url' => 'http://example.com',
+            ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
-        $this->assertInstanceOf(StripeCheckoutSession::class, $checkout->asStripeCheckoutSession());
+        $this->assertInstanceOf(StripeCheckoutSession::class, $session = $checkout->asStripeCheckoutSession());
+        $this->assertTrue($session->allow_promotion_codes);
     }
 }

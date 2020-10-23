@@ -65,6 +65,13 @@ class SubscriptionBuilder
     protected $coupon;
 
     /**
+     * Determines if user redeemable promotion codes are available in Stripe Checkout.
+     *
+     * @var bool
+     */
+    protected $allowPromotionCodes = false;
+
+    /**
      * The metadata to apply to the subscription.
      *
      * @var array
@@ -201,6 +208,18 @@ class SubscriptionBuilder
     }
 
     /**
+     * Enables user redeemable promotion codes.
+     *
+     * @return $this
+     */
+    public function allowPromotionCodes()
+    {
+        $this->allowPromotionCodes = true;
+
+        return $this;
+    }
+
+    /**
      * The metadata to apply to a new subscription.
      *
      * @param  array  $metadata
@@ -312,9 +331,12 @@ class SubscriptionBuilder
         return Checkout::create($this->owner, array_merge([
             'mode' => 'subscription',
             'line_items' => collect($this->items)->values()->all(),
+            'allow_promotion_codes' => $this->allowPromotionCodes,
+            'discounts' => [
+                'coupon' => $this->coupon,
+            ],
             'default_tax_rates' => $this->getTaxRatesForPayload(),
             'subscription_data' => [
-                'coupon' => $this->coupon,
                 'trial_end' => $trialEnd ? $trialEnd->getTimestamp() : null,
                 'metadata' => array_merge($this->metadata, ['name' => $this->name]),
             ],
