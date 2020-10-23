@@ -95,7 +95,7 @@ class WebhookController extends Controller
             }
         }
 
-        return new Response('Webhook Handled', 200);
+        return $this->successMethod();
     }
 
     /**
