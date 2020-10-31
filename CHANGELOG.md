@@ -64,10 +64,16 @@
 - Fix validating payment intent ([#959](https://github.com/laravel/cashier/pull/959))
 
 
-## [v12.0.0 (2020-06-09)](https://github.com/laravel/cashier/compare/v11.3.0...v12.0.0)
+## [v12.0.0 (2020-06-09)](https://github.com/laravel/cashier/compare/v11.3.1...v12.0.0)
 
 ### Changed
 - Implement new proration and pending updates ([#949](https://github.com/laravel/cashier/pull/949))
+
+
+## [v11.3.1 (2020-10-31)](https://github.com/laravel/cashier/compare/v11.3.0...v11.3.1)
+
+### Fixed
+- Fail url checking when url is invalid ([#1021](https://github.com/laravel/cashier-stripe/pull/1021))
 
 
 ## [v11.3.0 (2020-05-26)](https://github.com/laravel/cashier/compare/v11.2.4...v11.3.0)
