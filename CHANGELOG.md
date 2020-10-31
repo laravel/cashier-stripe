@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v11.3.0...11.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v11.3.1...11.x)
+
+
+## [v11.3.1 (2020-10-31)](https://github.com/laravel/cashier/compare/v11.3.0...v11.3.1)
+
+### Fixed
+- Fail url checking when url is invalid ([#1021](https://github.com/laravel/cashier-stripe/pull/1021))
 
 
 ## [v11.3.0 (2020-05-26)](https://github.com/laravel/cashier/compare/v11.2.4...v11.3.0)
