@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.4.2...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.5.0...master)
+
+
+## [v12.5.0 (2020-11-03)](https://github.com/laravel/cashier/compare/v12.4.2...v12.5.0)
+
+### Added
+- PHP 8 Support ([#1020](https://github.com/laravel/cashier-stripe/pull/1020))
 
 
 ## [v12.4.2 (2020-10-20)](https://github.com/laravel/cashier/compare/v12.4.1...v12.4.2)
