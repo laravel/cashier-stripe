@@ -57,11 +57,11 @@ trait ManagesPaymentMethods
             return collect();
         }
 
-        $parameters = array_merge(['limit' => 24], $parameters);
+        $parameters = array_merge(['limit' => 24, 'type' => 'card'], $parameters);
 
         // "type" is temporarily required by Stripe...
         $paymentMethods = StripePaymentMethod::all(
-            ['customer' => $this->stripe_id, 'type' => 'card'] + $parameters,
+            ['customer' => $this->stripe_id] + $parameters,
             $this->stripeOptions()
         );
 
