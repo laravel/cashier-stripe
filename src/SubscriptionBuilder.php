@@ -58,11 +58,18 @@ class SubscriptionBuilder
     protected $billingCycleAnchor = null;
 
     /**
-     * The coupon code being applied to the customer.
+     * The coupon being applied to the subscription.
      *
      * @var string|null
      */
     protected $coupon;
+
+    /**
+     * The promotion code being applied to the subscription.
+     *
+     * @var string|null
+     */
+    protected $promotionCode;
 
     /**
      * The metadata to apply to the subscription.
@@ -201,6 +208,19 @@ class SubscriptionBuilder
     }
 
     /**
+     * The promotion code to apply to a new subscription.
+     *
+     * @param  string  $promotionCode
+     * @return $this
+     */
+    public function withPromotionCode($promotionCode)
+    {
+        $this->promotionCode = $promotionCode;
+
+        return $this;
+    }
+
+    /**
      * The metadata to apply to a new subscription.
      *
      * @param  array  $metadata
@@ -321,6 +341,7 @@ class SubscriptionBuilder
             'metadata' => $this->metadata,
             'items' => collect($this->items)->values()->all(),
             'payment_behavior' => $this->paymentBehavior(),
+            'promotion_code' => $this->promotionCode,
             'proration_behavior' => $this->prorateBehavior(),
             'trial_end' => $this->getTrialEndForPayload(),
             'off_session' => true,

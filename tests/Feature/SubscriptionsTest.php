@@ -129,10 +129,13 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('subscriptions_can_be_created');
 
         // Create Subscription
-        $user->newSubscription('main', static::$planId)->create('pm_card_visa');
+        $user->newSubscription('main', static::$planId)
+            ->withMetadata($metadata = ['order_id' => '8'])
+            ->create('pm_card_visa');
 
         $this->assertEquals(1, count($user->subscriptions));
-        $this->assertNotNull($user->subscription('main')->stripe_id);
+        $this->assertNotNull(($subscription = $user->subscription('main'))->stripe_id);
+        $this->assertSame($metadata, $subscription->asStripeSubscription()->metadata->toArray());
 
         $this->assertTrue($user->subscribed('main'));
         $this->assertTrue($user->subscribedToPlan(static::$planId, 'main'));

@@ -403,9 +403,7 @@ class Subscription extends Model
 
         $this->guardAgainstMultiplePlans();
 
-        $this->updateQuantity($this->quantity + $count, $plan);
-
-        return $this;
+        return $this->updateQuantity($this->quantity + $count, $plan);
     }
 
     /**
@@ -424,17 +422,7 @@ class Subscription extends Model
 
         $this->alwaysInvoice();
 
-        if ($plan) {
-            $this->findItemOrFail($plan)->setProrationBehavior($this->prorationBehavior)->incrementQuantity($count);
-
-            return $this->refresh();
-        }
-
-        $this->guardAgainstMultiplePlans();
-
-        $this->incrementQuantity($count, $plan);
-
-        return $this;
+        return $this->incrementQuantity($count, $plan);
     }
 
     /**
