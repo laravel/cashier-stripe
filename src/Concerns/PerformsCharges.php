@@ -10,6 +10,13 @@ use Stripe\Refund as StripeRefund;
 trait PerformsCharges
 {
     /**
+     * Determines if user redeemable promotion codes are available in Stripe Checkout.
+     *
+     * @var bool
+     */
+    protected $allowPromotionCodes = false;
+
+    /**
      * Make a "one off" charge on the customer for the given amount.
      *
      * @param  int  $amount
@@ -71,6 +78,7 @@ trait PerformsCharges
     public function checkout($price, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
     {
         return Checkout::create($this, array_merge([
+            'allow_promotion_codes' => $this->allowPromotionCodes,
             'line_items' => [[
                 'price' => $price,
                 'quantity' => $quantity,
@@ -91,6 +99,7 @@ trait PerformsCharges
     public function checkoutCharge($amount, $name, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
     {
         return Checkout::create($this, array_merge([
+            'allow_promotion_codes' => $this->allowPromotionCodes,
             'line_items' => [[
                 'price_data' => [
                     'currency' => $this->preferredCurrency(),
@@ -102,5 +111,17 @@ trait PerformsCharges
                 'quantity' => $quantity,
             ]],
         ], $sessionOptions), $customerOptions);
+    }
+
+    /**
+     * Enables user redeemable promotion codes.
+     *
+     * @return $this
+     */
+    public function allowPromotionCodes()
+    {
+        $this->allowPromotionCodes = true;
+
+        return $this;
     }
 }
