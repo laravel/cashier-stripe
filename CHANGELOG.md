@@ -1,6 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.5.0...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.6.0...12.x)
+
+
+## [v12.6.0 (2020-11-24)](https://github.com/laravel/cashier/compare/v12.5.0...v12.6.0)
+
+### Added
+- Add `withPromotionCode` method ([#1032](https://github.com/laravel/cashier-stripe/pull/1032))
+
+### Changed
+- Refactor duplicated code ([#1029](https://github.com/laravel/cashier-stripe/pull/1029))
 
 
 ## [v12.5.0 (2020-11-03)](https://github.com/laravel/cashier/compare/v12.4.2...v12.5.0)
