@@ -69,21 +69,59 @@ trait PerformsCharges
     /**
      * Begin a new Checkout Session for an existing Price ID.
      *
-     * @param  string  $price
-     * @param  int  $quantity
+     * @param  mixed  $items
      * @param  array  $sessionOptions
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
-    public function checkout($price, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
+    public function checkout($items, array $sessionOptions = [], array $customerOptions = [])
     {
         return Checkout::create($this, array_merge([
             'allow_promotion_codes' => $this->allowPromotionCodes,
-            'line_items' => [[
-                'price' => $price,
-                'quantity' => $quantity,
-            ]],
+            'line_items' => $this->transformLineItems($items),
         ], $sessionOptions), $customerOptions);
+    }
+
+    /**
+     * Method to transform the line items to a multi-dimensional array
+     * as required by Stripe.
+     * $items can be the following:
+     *  - String representing 1 price (we will assume quantity = 1)
+     *  - An array with just 1 price ['price' => 'price_xx', quantity => 1]
+     *  - Multi dimensional array with multiple prices [['price' => 'price_xx', quantity => 1], [...]]
+     *
+     * @param mixed $items
+     * @return array
+     */
+    private function transformLineItems($items)
+    {
+        if (is_string($items)) {
+            return [[
+                'price' => $items,
+                'quantity' => 1,
+            ]];
+        }
+
+        // If $items is one dimension i.e. ['price' => 'price_xxx', 'quantity' => 1]
+        if (count($items) === count($items, COUNT_RECURSIVE)) {
+            return $this->ensureItemsHasQuantity([$items]);
+        }
+
+        // $items is multi-dimentions i.e. [['price' => 'price_xxx', 'quantity' => 1], [...]]
+        return $this->ensureItemsHasQuantity($items);
+    }
+
+    /**
+     * Add quantity to the items array if it doesn't exist
+     *
+     * @param array $items
+     * @return array
+     */
+    private function ensureItemsHasQuantity($items)
+    {
+        return collect($items)->transform(function ($item) {
+            return array_key_exists('quantity', $item) ? $item : array_merge($item, ['quantity' => 1]);
+        })->toArray();
     }
 
     /**
