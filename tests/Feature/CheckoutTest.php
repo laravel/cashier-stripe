@@ -12,7 +12,7 @@ class CheckoutTest extends FeatureTestCase
     {
         $user = $this->createCustomer('customers_can_start_a_product_checkout_session');
 
-        $price = StripePrice::create([
+        $shirtPrice = StripePrice::create([
             'currency' => 'USD',
             'product_data' => [
                 'name' => 'T-shirt',
@@ -20,7 +20,17 @@ class CheckoutTest extends FeatureTestCase
             'unit_amount' => 1500,
         ]);
 
-        $checkout = $user->checkout($price->id, 1, [
+        $carPrice = StripePrice::create([
+            'currency' => 'USD',
+            'product_data' => [
+                'name' => 'Car',
+            ],
+            'unit_amount' => 30000,
+        ]);
+
+        $items = [$shirtPrice->id => 5, $carPrice->id];
+
+        $checkout = $user->checkout($items, [
             'success_url' => 'http://example.com',
             'cancel_url' => 'http://example.com',
         ]);

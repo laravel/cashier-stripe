@@ -67,22 +67,34 @@ trait PerformsCharges
     }
 
     /**
-     * Begin a new Checkout Session for an existing Price ID.
+     * Begin a new Checkout Session for existing Prices.
      *
-     * @param  string  $price
+     * @param  array|string  $items
      * @param  int  $quantity
      * @param  array  $sessionOptions
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
-    public function checkout($price, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
+    public function checkout($items, array $sessionOptions = [], array $customerOptions = [])
     {
+        $items = collect((array) $items)->map(function ($item, $key) {
+            // If the key is a string, we'll assume it's a Price ID and its value is its quantity.
+            if (is_string($key)) {
+                return ['price' => $key, 'quantity' => $item];
+            }
+
+            // If the value is a string, we'll assume it's a Price ID.
+            $item = is_string($item) ? ['price' => $item] : $item;
+
+            // Ensure a quantity is set.
+            $item['quantity'] = $item['quantity'] ?? 1;
+
+            return $item;
+        })->values()->all();
+
         return Checkout::create($this, array_merge([
             'allow_promotion_codes' => $this->allowPromotionCodes,
-            'line_items' => [[
-                'price' => $price,
-                'quantity' => $quantity,
-            ]],
+            'line_items' => $items,
         ], $sessionOptions), $customerOptions);
     }
 
@@ -98,19 +110,16 @@ trait PerformsCharges
      */
     public function checkoutCharge($amount, $name, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
     {
-        return Checkout::create($this, array_merge([
-            'allow_promotion_codes' => $this->allowPromotionCodes,
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => $this->preferredCurrency(),
-                    'product_data' => [
-                        'name' => $name,
-                    ],
-                    'unit_amount' => $amount,
+        return $this->checkout([[
+            'price_data' => [
+                'currency' => $this->preferredCurrency(),
+                'product_data' => [
+                    'name' => $name,
                 ],
-                'quantity' => $quantity,
-            ]],
-        ], $sessionOptions), $customerOptions);
+                'unit_amount' => $amount,
+            ],
+            'quantity' => $quantity,
+        ]], $sessionOptions, $customerOptions);
     }
 
     /**
