@@ -78,7 +78,6 @@ class SubscriptionBuilder
      */
     protected $allowPromotionCodes = false;
 
-
     /**
      * The metadata to apply to the subscription.
      *
