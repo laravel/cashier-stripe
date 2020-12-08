@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.6.0...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.6.1...12.x)
+
+
+## [v12.6.1 (2020-12-08)](https://github.com/laravel/cashier/compare/v12.6.0...v12.6.1)
+
+### Fixed
+- Fix proration behaviour being forced when syncing tax rates ([#1028](https://github.com/laravel/cashier-stripe/pull/1028))
 
 
 ## [v12.6.0 (2020-11-24)](https://github.com/laravel/cashier/compare/v12.5.0...v12.6.0)
