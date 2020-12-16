@@ -2,22 +2,9 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
-use Carbon\Carbon;
-use DateTime;
-use Illuminate\Support\Str;
-use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Exceptions\PaymentActionRequired;
-use Laravel\Cashier\Exceptions\PaymentFailure;
-use Laravel\Cashier\Payment;
-use Laravel\Cashier\Subscription;
-use Laravel\Cashier\Tests\Fixtures\User;
-use Stripe\Coupon;
-use Stripe\Invoice;
+use Stripe\Exception\InvalidRequestException;
 use Stripe\Price;
 use Stripe\Product;
-use Stripe\Exception\InvalidRequestException;
-use Stripe\Subscription as StripeSubscription;
-use Stripe\TaxRate;
 
 class MeteredBillingTest extends FeatureTestCase
 {
