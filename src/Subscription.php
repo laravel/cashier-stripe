@@ -515,7 +515,6 @@ class Subscription extends Model
      */
     public function updateUsageRecord($quantity, $timestamp, $plan = null)
     {
-
         if (! $plan) {
             $this->guardAgainstMultiplePlans();
         }
