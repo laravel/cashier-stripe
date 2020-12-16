@@ -13,7 +13,7 @@ class CreateSubscriptionUsageTable extends Migration
      */
     public function up()
     {
-        Schema::create('subscription_usage', function (Blueprint $table) {
+        Schema::create('subscription_usages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('subscription_item_id');
             $table->integer('quantity');
@@ -30,6 +30,6 @@ class CreateSubscriptionUsageTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('subscription_usage');
+        Schema::dropIfExists('subscription_usages');
     }
 }
