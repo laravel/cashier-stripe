@@ -13,7 +13,7 @@ use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Stripe\Coupon;
 use Stripe\Invoice;
-use Stripe\Plan;
+use Stripe\Price;
 use Stripe\Product;
 use Stripe\Subscription as StripeSubscription;
 use Stripe\TaxRate;
@@ -33,32 +33,13 @@ class MeteredBillingTest extends FeatureTestCase
     /**
      * @var string
      */
-    protected static $otherPlanId;
-
-    /**
-     * @var string
-     */
-    protected static $premiumPlanId;
-
-    /**
-     * @var string
-     */
-    protected static $couponId;
-
-    /**
-     * @var string
-     */
-    protected static $taxRateId;
+    protected static $licensedPlanId;
 
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
 
         static::$productId = static::$stripePrefix.'product-1'.Str::random(10);
-        static::$planId = static::$stripePrefix.'monthly-10-'.Str::random(10);
-        static::$otherPlanId = static::$stripePrefix.'monthly-10-'.Str::random(10);
-        static::$premiumPlanId = static::$stripePrefix.'monthly-20-premium-'.Str::random(10);
-        static::$couponId = static::$stripePrefix.'coupon-'.Str::random(10);
 
         Product::create([
             'id' => static::$productId,
@@ -66,62 +47,38 @@ class MeteredBillingTest extends FeatureTestCase
             'type' => 'service',
         ]);
 
-        Plan::create([
+        static::$planId = Price::create([
             'id' => static::$planId,
-            'nickname' => 'Monthly $10',
+            'nickname' => 'Monthly Metered $1 per unit',
             'currency' => 'USD',
-            'interval' => 'month',
-            'billing_scheme' => 'per_unit',
-            'amount' => 1000,
+            'recurring' => [
+                'interval' => 'month',
+                'usage_type' => 'metered'
+            ],
+            'unit_amount' => 100,
             'product' => static::$productId,
-        ]);
-
-        Plan::create([
-            'id' => static::$otherPlanId,
-            'nickname' => 'Monthly $10 Other',
-            'currency' => 'USD',
-            'interval' => 'month',
-            'billing_scheme' => 'per_unit',
-            'amount' => 1000,
-            'product' => static::$productId,
-        ]);
-
-        Plan::create([
-            'id' => static::$premiumPlanId,
-            'nickname' => 'Monthly $20 Premium',
-            'currency' => 'USD',
-            'interval' => 'month',
-            'billing_scheme' => 'per_unit',
-            'amount' => 2000,
-            'product' => static::$productId,
-        ]);
-
-        Coupon::create([
-            'id' => static::$couponId,
-            'duration' => 'repeating',
-            'amount_off' => 500,
-            'duration_in_months' => 3,
-            'currency' => 'USD',
-        ]);
-
-        static::$taxRateId = TaxRate::create([
-            'display_name' => 'VAT',
-            'description' => 'VAT Belgium',
-            'jurisdiction' => 'BE',
-            'percentage' => 21,
-            'inclusive' => false,
         ])->id;
+
+        static::$licensedPlanId = Price::create([
+            'id' => static::$licensedPlanId,
+            'nickname' => 'Monthly $10 Licensed',
+            'currency' => 'USD',
+            'recurring' => [
+                'interval' => 'month'
+            ],
+            'unit_amount' => 1000,
+            'product' => static::$productId,
+        ])->id;
+
     }
 
     public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
 
-        static::deleteStripeResource(new Plan(static::$planId));
-        static::deleteStripeResource(new Plan(static::$otherPlanId));
-        static::deleteStripeResource(new Plan(static::$premiumPlanId));
+        static::deleteStripeResource(new Price(static::$planId));
+        static::deleteStripeResource(new Price(static::$licensedPlanId));
         static::deleteStripeResource(new Product(static::$productId));
-        static::deleteStripeResource(new Coupon(static::$couponId));
     }
 
     public function test_null_quantity_items_can_be_created()
