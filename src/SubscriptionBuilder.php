@@ -107,7 +107,7 @@ class SubscriptionBuilder
      * Set a plan on the subscription builder.
      *
      * @param  string  $plan
-     * @param  int  $quantity
+     * @param  int|null  $quantity
      * @return $this
      */
     public function plan($plan, $quantity = 1)
@@ -116,6 +116,10 @@ class SubscriptionBuilder
             'price' => $plan,
             'quantity' => $quantity,
         ];
+
+        if (! is_null($quantity)) {
+            $options['quantity'] = $quantity;
+        }
 
         if ($taxRates = $this->getPlanTaxRatesForPayload($plan)) {
             $options['tax_rates'] = $taxRates;
