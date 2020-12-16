@@ -189,7 +189,7 @@ class SubscriptionItem extends Model
     }
 
     /**
-     * Provides Stripe with usage information for a subscription item with a metered Stripe plan
+     * Provides Stripe with usage information for a subscription item with a metered Stripe plan.
      *
      * @param  int  $quantity
      * @return $this
@@ -201,14 +201,14 @@ class SubscriptionItem extends Model
         StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
             'quantity' => $quantity,
             'action' => 'increment',
-            'timestamp' => $record->created_at->timestamp
+            'timestamp' => $record->created_at->timestamp,
         ]);
 
         return $this;
     }
 
     /**
-     * Updates a usage record at a particular timestamp with a quantity
+     * Updates a usage record at a particular timestamp with a quantity.
      *
      * @param  int  $quantity
      * @param  \Carbon\Carbon|null $timestamp  Overwrites the usage quantity at a particular timestamp
@@ -224,7 +224,7 @@ class SubscriptionItem extends Model
         StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
             'quantity' => $quantity,
             'action' => 'set',
-            'timestamp' => $record->created_at->timestamp
+            'timestamp' => $record->created_at->timestamp,
         ]);
 
         $record->quantity = $quantity;
