@@ -41,7 +41,7 @@ class MeteredBillingTest extends FeatureTestCase
             'currency' => 'USD',
             'recurring' => [
                 'interval' => 'month',
-                'usage_type' => 'metered'
+                'usage_type' => 'metered',
             ],
             'unit_amount' => 100,
             'product' => static::$productId,
@@ -52,7 +52,7 @@ class MeteredBillingTest extends FeatureTestCase
             'nickname' => 'Monthly $10 Licensed',
             'currency' => 'USD',
             'recurring' => [
-                'interval' => 'month'
+                'interval' => 'month',
             ],
             'unit_amount' => 1000,
             'product' => static::$productId,
