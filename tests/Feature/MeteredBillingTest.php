@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
+use Illuminate\Support\Str;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\Price;
 use Stripe\Product;
@@ -57,7 +58,6 @@ class MeteredBillingTest extends FeatureTestCase
             'unit_amount' => 1000,
             'product' => static::$productId,
         ])->id;
-
     }
 
     public static function tearDownAfterClass(): void
