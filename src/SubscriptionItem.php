@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
@@ -196,12 +197,15 @@ class SubscriptionItem extends Model
      */
     public function incrementUsage($quantity = 1)
     {
-        $record = $this->usageRecords()->create(compact('quantity'));
-
-        StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
+        $usageRecord = StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
             'quantity' => $quantity,
             'action' => 'increment',
             'timestamp' => $record->created_at->timestamp,
+        ]);
+
+        $record = $this->usageRecords()->create([
+            'quantity' => $quantity,
+            'created_at' => Carbon::createFromTimestamp($usageRecord->timestamp),
         ]);
 
         return $this;
@@ -216,10 +220,7 @@ class SubscriptionItem extends Model
      */
     public function updateUsageRecord($quantity, $timestamp)
     {
-        $record = $this->usageRecords()->firstOrCreate(
-            ['created_at' => $timestamp],
-            compact('quantity')
-        );
+        $record = $this->usageRecords()->where('created_at', $timestamp)->firstOrFail();
 
         StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
             'quantity' => $quantity,
