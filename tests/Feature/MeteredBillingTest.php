@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Tests\Feature;
 use Illuminate\Support\Str;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\Price;
+use Stripe\Plan;
 use Stripe\Product;
 
 class MeteredBillingTest extends FeatureTestCase
@@ -64,8 +65,8 @@ class MeteredBillingTest extends FeatureTestCase
     {
         parent::tearDownAfterClass();
 
-        static::deleteStripeResource(new Price(static::$planId));
-        static::deleteStripeResource(new Price(static::$licensedPlanId));
+        static::deleteStripeResource(new Plan(static::$planId));
+        static::deleteStripeResource(new Plan(static::$licensedPlanId));
         static::deleteStripeResource(new Product(static::$productId));
     }
 
@@ -93,9 +94,21 @@ class MeteredBillingTest extends FeatureTestCase
         $subscription->incrementUsage();
         $subscription->incrementUsage(10);
         $subscription->incrementUsage(10, static::$planId);
+    }
 
-        $this->assertTrue($user->subscribed('main'));
+    public function test_usage_report_with_licensed_subscription()
+    {
+        $user = $this->createCustomer('test_usage_report_with_licensed_subscription');
 
-        // $this->expectException(InvalidRequestException::class);
+        $subscription = $user->newSubscription('main', static::$licensedPlanId)
+            ->quantity(null, static::$licensedPlanId)
+            ->create('pm_card_visa');
+
+        $this->expectException(InvalidRequestException::class);
+        $subscription->incrementUsage();
+
+        $subscription->swap(static::$planId);
+
+        $subscription->incrementUsage();
     }
 }
