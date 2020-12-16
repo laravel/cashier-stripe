@@ -92,7 +92,9 @@ class MeteredBillingTest extends FeatureTestCase
             ->create('pm_card_visa');
 
         $subscription->incrementUsage();
+        sleep(1);
         $subscription->incrementUsage(10);
+        sleep(1);
         $subscription->incrementUsage(10, static::$planId);
     }
 
@@ -109,6 +111,7 @@ class MeteredBillingTest extends FeatureTestCase
 
         $subscription->swap(static::$planId);
 
+        sleep(1);
         $subscription->incrementUsage();
     }
 }
