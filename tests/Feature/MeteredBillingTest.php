@@ -15,6 +15,7 @@ use Stripe\Coupon;
 use Stripe\Invoice;
 use Stripe\Price;
 use Stripe\Product;
+use Stripe\Exception\InvalidRequestException;
 use Stripe\Subscription as StripeSubscription;
 use Stripe\TaxRate;
 
@@ -85,10 +86,29 @@ class MeteredBillingTest extends FeatureTestCase
     {
         $user = $this->createCustomer('test_null_quantity_items_can_be_created');
 
-        $user->newSubscription('main', static::$planId)
+        $subscription = $user->newSubscription('main', static::$planId)
             ->quantity(null, static::$planId)
             ->create('pm_card_visa');
 
         $this->assertTrue($user->subscribed('main'));
+
+        $subscription->cancel();
+    }
+
+    public function test_usage_report_with_single_item_subscription()
+    {
+        $user = $this->createCustomer('test_usage_report_with_single_item_subscription');
+
+        $subscription = $user->newSubscription('main', static::$planId)
+            ->quantity(null, static::$planId)
+            ->create('pm_card_visa');
+
+        $subscription->incrementUsage();
+        $subscription->incrementUsage(10);
+        $subscription->incrementUsage(10, static::$planId);
+
+        $this->assertTrue($user->subscribed('main'));
+
+        // $this->expectException(InvalidRequestException::class);
     }
 }
