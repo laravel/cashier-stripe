@@ -486,6 +486,44 @@ class Subscription extends Model
     }
 
     /**
+     * Provides Stripe with usage information for a subscription item with a metered Stripe plan
+     *
+     * @param  int  $quantity
+     * @param  string|null  $plan
+     * @return $this
+     */
+    public function incrementUsage($quantity = 1, $plan = null)
+    {
+        if (! $plan) {
+            $this->guardAgainstMultiplePlans();
+        }
+
+        $this->findItemOrFail($plan ?? $this->stripe_plan)->incrementUsage($quantity);
+
+        return $this;
+    }
+
+    /**
+     * Updates a usage record at a particular timestamp with a quantity
+     *
+     * @param  int  $quantity
+     * @param  \Carbon\Carbon|null $timestamp  Overwrites the usage quantity at a particular timestamp
+     * @param  string|null  $plan
+     * @return $this
+     */
+    public function updateUsageRecord($quantity, $timestamp, $plan = null)
+    {
+
+        if (! $plan) {
+            $this->guardAgainstMultiplePlans();
+        }
+
+        $this->findItemOrFail($plan ?? $this->stripe_plan)->incrementUsage($quantity);
+
+        return $this;
+    }
+
+    /**
      * Change the billing cycle anchor on a plan change.
      *
      * @param  \DateTimeInterface|int|string  $date
