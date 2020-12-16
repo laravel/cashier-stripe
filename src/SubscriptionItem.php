@@ -41,6 +41,11 @@ class SubscriptionItem extends Model
         return $this->belongsTo(Subscription::class);
     }
 
+    public function usageRecords()
+    {
+        return $this->hasMany(SubscriptionUsage::class);
+    }
+
     /**
      * Increment the quantity of the subscription item.
      *
@@ -181,6 +186,51 @@ class SubscriptionItem extends Model
         $this->alwaysInvoice();
 
         return $this->swap($plan, $options);
+    }
+
+    /**
+     * Provides Stripe with usage information for a subscription item with a metered Stripe plan
+     *
+     * @param  int  $quantity
+     * @return $this
+     */
+    public function incrementUsage($quantity = 1)
+    {
+        $record = $this->usageRecords()->create(compact('quantity'));
+
+        StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
+            'quantity' => $quantity,
+            'action' => 'increment',
+            'timestamp' => $record->created_at->timestamp
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Updates a usage record at a particular timestamp with a quantity
+     *
+     * @param  int  $quantity
+     * @param  \Carbon\Carbon|null $timestamp  Overwrites the usage quantity at a particular timestamp
+     * @return $this
+     */
+    public function updateUsageRecord($quantity, $timestamp)
+    {
+        $record = $this->usageRecords()->firstOrCreate(
+            ['created_at' => $timestamp],
+            compact('quantity')
+        );
+
+        StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
+            'quantity' => $quantity,
+            'action' => 'set',
+            'timestamp' => $record->created_at->timestamp
+        ]);
+
+        $record->quantity = $quantity;
+        $record->save();
+
+        return $this;
     }
 
     /**
