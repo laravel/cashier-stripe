@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Laravel\Cashier;
 
 use Illuminate\Database\Eloquent\Model;
 
