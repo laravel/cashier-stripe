@@ -96,6 +96,8 @@ class MeteredBillingTest extends FeatureTestCase
         $subscription->incrementUsage(10);
         sleep(1);
         $subscription->incrementUsage(10, static::$planId);
+
+        $this->assertSame($subscription->items->first()->usageRecords->count(), 3);
     }
 
     public function test_usage_report_with_licensed_subscription()
