@@ -488,7 +488,7 @@ class Subscription extends Model
     }
 
     /**
-     * Provides Stripe with usage information for a subscription item with a metered Stripe plan
+     * Provides Stripe with usage information for a subscription with a metered Stripe plan.
      *
      * @param  int  $quantity
      * @param  string|null  $plan
@@ -506,7 +506,7 @@ class Subscription extends Model
     }
 
     /**
-     * Updates a usage record at a particular timestamp with a quantity
+     * Updates a usage record at a particular timestamp with a quantity.
      *
      * @param  int  $quantity
      * @param  \Carbon\Carbon|null $timestamp  Overwrites the usage quantity at a particular timestamp
