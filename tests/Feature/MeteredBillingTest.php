@@ -105,13 +105,16 @@ class MeteredBillingTest extends FeatureTestCase
         $user = $this->createCustomer('test_usage_report_with_licensed_subscription');
 
         $subscription = $user->newSubscription('main', static::$licensedPlanId)
-            ->quantity(null, static::$licensedPlanId)
             ->create('pm_card_visa');
 
         $this->expectException(InvalidRequestException::class);
         $subscription->incrementUsage();
 
-        $subscription->swap(static::$planId);
+        $subscription->swap([
+            static::$planId => [
+                'quantity' => null
+            ]
+        ]);
 
         sleep(1);
         $subscription->incrementUsage();
