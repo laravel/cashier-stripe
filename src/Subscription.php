@@ -672,7 +672,7 @@ class Subscription extends Model
                 'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
             ];
 
-            if (!isset($options['quantity'])) {
+            if (! isset($options['quantity'])) {
                 $defaultOptions['quantity'] = $isSinglePlanSwap ? $this->quantity : 1;
             } elseif (is_null($options['quantity'])) {
                 unset($options['quantity']);
