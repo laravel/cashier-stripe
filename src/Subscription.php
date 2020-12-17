@@ -615,7 +615,7 @@ class Subscription extends Model
                 'stripe_id' => $item->id,
             ], [
                 'stripe_plan' => $item->plan->id,
-                'quantity' => $item->quantity,
+                'quantity' => $item->quantity ?? null,
             ]);
         }
 
@@ -665,11 +665,18 @@ class Subscription extends Model
 
             $options = is_string($options) ? [] : $options;
 
-            return [$plan => array_merge([
+            $defaultOptions = [
                 'plan' => $plan,
-                'quantity' => $isSinglePlanSwap ? $this->quantity : 1,
                 'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
-            ], $options)];
+            ];
+
+            if (!isset($options['quantity'])) {
+                $defaultOptions['quantity'] = $isSinglePlanSwap ? $this->quantity : 1;
+            } elseif (is_null($options['quantity'])) {
+                unset($options['quantity']);
+            }
+
+            return [$plan => array_merge($defaultOptions, $options)];
         });
     }
 

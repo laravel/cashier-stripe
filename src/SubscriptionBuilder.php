@@ -299,7 +299,7 @@ class SubscriptionBuilder
             $subscription->items()->create([
                 'stripe_id' => $item->id,
                 'stripe_plan' => $item->plan->id,
-                'quantity' => $item->quantity,
+                'quantity' => $item->quantity ?? null,
             ]);
         }
 
