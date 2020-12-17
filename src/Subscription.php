@@ -757,13 +757,18 @@ class Subscription extends Model
 
         $subscription = $this->asStripeSubscription();
 
-        $item = $subscription->items->create(array_merge([
+        $defaultOptions = [
             'plan' => $plan,
-            'quantity' => $quantity,
             'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
-        ], $options));
+        ];
+
+        if (! is_null($quantity)) {
+            $defaultOptions['quantity'] = $quantity;
+        }
+
+        $item = $subscription->items->create(array_merge($defaultOptions, $options));
 
         $this->items()->create([
             'stripe_id' => $item->id,
