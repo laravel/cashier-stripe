@@ -23,6 +23,11 @@ class MeteredBillingTest extends FeatureTestCase
     /**
      * @var string
      */
+    protected static $secondPlanId;
+
+    /**
+     * @var string
+     */
     protected static $licensedPlanId;
 
     public static function setUpBeforeClass(): void
@@ -38,7 +43,6 @@ class MeteredBillingTest extends FeatureTestCase
         ]);
 
         static::$planId = Price::create([
-            'id' => static::$planId,
             'nickname' => 'Monthly Metered $1 per unit',
             'currency' => 'USD',
             'recurring' => [
@@ -49,8 +53,18 @@ class MeteredBillingTest extends FeatureTestCase
             'product' => static::$productId,
         ])->id;
 
+        static::$secondPlanId = Price::create([
+            'nickname' => 'Monthly Metered $2 per unit',
+            'currency' => 'USD',
+            'recurring' => [
+                'interval' => 'month',
+                'usage_type' => 'metered',
+            ],
+            'unit_amount' => 200,
+            'product' => static::$productId,
+        ])->id;
+
         static::$licensedPlanId = Price::create([
-            'id' => static::$licensedPlanId,
             'nickname' => 'Monthly $10 Licensed',
             'currency' => 'USD',
             'recurring' => [
@@ -66,6 +80,7 @@ class MeteredBillingTest extends FeatureTestCase
         parent::tearDownAfterClass();
 
         static::deleteStripeResource(new Plan(static::$planId));
+        static::deleteStripeResource(new Plan(static::$secondPlanId));
         static::deleteStripeResource(new Plan(static::$licensedPlanId));
         static::deleteStripeResource(new Product(static::$productId));
     }
@@ -118,5 +133,33 @@ class MeteredBillingTest extends FeatureTestCase
 
         sleep(1);
         $subscription->incrementUsage();
+    }
+
+    public function test_usage_report_with_multiplan()
+    {
+        $user = $this->createCustomer('test_usage_report_with_multiplan');
+
+        $subscription = $user->newSubscription('main', static::$planId)
+            ->quantity(null, static::$planId)
+            ->create('pm_card_visa');
+
+        $subscription->addPlan(static::$secondPlanId, null);
+
+        $secondSub = $user->newSubscription('test_swap', static::$planId)
+            ->quantity(null, static::$planId)
+            ->create('pm_card_visa');
+
+        $secondSub->swap([
+            static::$secondPlanId => [
+                'quantity' => null
+            ]
+        ]);
+
+        $secondSub->assertSame($secondSub->items->count(), 2);
+
+        $secondSub->incrementUsage(10, static::$secondPlanId);
+
+        $secondSub->findItemOrFail(static::$planId)->incrementUsage(14);
+
     }
 }
