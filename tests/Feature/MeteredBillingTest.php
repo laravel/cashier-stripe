@@ -4,8 +4,8 @@ namespace Laravel\Cashier\Tests\Feature;
 
 use Illuminate\Support\Str;
 use Stripe\Exception\InvalidRequestException;
-use Stripe\Price;
 use Stripe\Plan;
+use Stripe\Price;
 use Stripe\Product;
 
 class MeteredBillingTest extends FeatureTestCase
@@ -127,8 +127,8 @@ class MeteredBillingTest extends FeatureTestCase
 
         $subscription->swap([
             static::$planId => [
-                'quantity' => null
-            ]
+                'quantity' => null,
+            ],
         ]);
 
         sleep(1);
@@ -151,8 +151,8 @@ class MeteredBillingTest extends FeatureTestCase
 
         $secondSub->swap([
             static::$secondPlanId => [
-                'quantity' => null
-            ]
+                'quantity' => null,
+            ],
         ]);
 
         $secondSub->assertSame($secondSub->items->count(), 2);
@@ -160,6 +160,5 @@ class MeteredBillingTest extends FeatureTestCase
         $secondSub->incrementUsage(10, static::$secondPlanId);
 
         $secondSub->findItemOrFail(static::$planId)->incrementUsage(14);
-
     }
 }
