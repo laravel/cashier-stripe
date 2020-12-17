@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
+use Laravel\Cashier\SubscriptionUsage;
 use Illuminate\Support\Str;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\Plan;
@@ -113,6 +114,7 @@ class MeteredBillingTest extends FeatureTestCase
         $subscription->incrementUsage(10, static::$planId);
 
         $this->assertSame($subscription->items->first()->usageRecords->count(), 3);
+        $this->assertSame(SubscriptionUsage::all()->sum('quantity'), 21);
     }
 
     public function test_usage_report_with_licensed_subscription()
@@ -133,6 +135,7 @@ class MeteredBillingTest extends FeatureTestCase
 
         sleep(1);
         $subscription->incrementUsage();
+        $this->assertSame(SubscriptionUsage::all()->sum('quantity'), 1);
     }
 
     public function test_usage_report_with_multiplan()
@@ -148,10 +151,12 @@ class MeteredBillingTest extends FeatureTestCase
         $this->assertSame($subscription->items->count(), 2);
 
         $subscription->incrementUsage(20, static::$secondPlanId);
+        $this->assertSame(SubscriptionUsage::all()->sum('quantity'), 20);
 
         $subscription->removePlan(static::$secondPlanId);
 
         $this->assertSame($subscription->items->count(), 1);
+        $this->assertSame(SubscriptionUsage::all()->sum('quantity'), 0);
 
         $secondSub = $user->newSubscription('test_swap', static::$planId)
             ->quantity(null, static::$planId)
