@@ -2,8 +2,8 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
-use Laravel\Cashier\SubscriptionUsage;
 use Illuminate\Support\Str;
+use Laravel\Cashier\SubscriptionUsage;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\Plan;
 use Stripe\Price;
