@@ -200,7 +200,7 @@ class SubscriptionItem extends Model
         $usageRecord = StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
             'quantity' => $quantity,
             'action' => 'increment',
-            'timestamp' => $record->created_at->timestamp,
+            'timestamp' => now()->timestamp,
         ]);
 
         $record = $this->usageRecords()->create([
