@@ -752,4 +752,40 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertEquals($backdateStartDate, $stripeSubscription->start_date);
     }
+
+    /** @link https://github.com/laravel/cashier-stripe/issues/1041 */
+    public function test_new_subscription_after_previous_cancellation_means_customer_is_subscribed()
+    {
+        $user = $this->createCustomer('subscriptions_with_options_can_be_created');
+
+        $subscription = $user->subscriptions()->create([
+            'name' => 'default',
+            'stripe_id' => 'sub_xxx',
+            'stripe_status' => 'active',
+            'stripe_plan' => 'price_xxx',
+            'quantity' => 1,
+            'trial_ends_at' => null,
+            'ends_at' => null,
+        ]);
+
+        $this->assertTrue($user->refresh()->subscribed());
+
+        $subscription->markAsCancelled();
+
+        $this->assertFalse($user->refresh()->subscribed());
+
+        $subscription->markAsCancelled();
+
+        $user->subscriptions()->create([
+            'name' => 'default',
+            'stripe_id' => 'sub_xxx',
+            'stripe_status' => 'active',
+            'stripe_plan' => 'price_xxx',
+            'quantity' => 1,
+            'trial_ends_at' => null,
+            'ends_at' => null,
+        ]);
+
+        $this->assertTrue($user->refresh()->subscribed());
+    }
 }
