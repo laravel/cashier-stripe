@@ -110,6 +110,7 @@ class MeteredBillingTest extends FeatureTestCase
         $subscription->incrementUsage();
         sleep(1);
         $subscription->incrementUsage(10);
+
         sleep(1);
         $subscription->incrementUsage(10, static::$planId);
 
