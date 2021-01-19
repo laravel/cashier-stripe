@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.6.2...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.6.3...master)
+
+
+## [v12.6.3 (2021-01-19)](https://github.com/laravel/cashier/compare/v12.6.2...v12.6.3)
+
+### Fixed
+- Fix image support in PDF invoices ([#1045](https://github.com/laravel/cashier-stripe/pull/1045), [bb7d17e8](https://github.com/laravel/cashier-stripe/commit/bb7d17e8707700e3f71cb30ef3c60dc68071bb8f))
 
 
 ## [v12.6.2 (2021-01-05)](https://github.com/laravel/cashier/compare/v12.6.1...v12.6.2)
