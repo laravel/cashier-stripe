@@ -56,6 +56,49 @@ class WebhookController extends Controller
     }
 
     /**
+     * Handle customer subscription created.
+     *
+     * @param  array $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleCustomerSubscriptionCreated(array $payload)
+    {
+        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
+
+        if ($user) {
+            $data = $payload['data']['object'];
+
+            if (! $user->subscriptions->contains('stripe_id', $data['id'])) {
+                if (isset($data['trial_end'])) {
+                    $trialEndsAt = Carbon::createFromTimestamp($data['trial_end']);
+                } else {
+                    $trialEndsAt = null;
+                }
+
+                $subscription = $user->subscriptions()->create([
+                    'name' => $data['metadata']['name'],
+                    'stripe_id' => $data['id'],
+                    'stripe_status' => $data['status'],
+                    'stripe_plan' =>  $data['plan']['id'] ?? null,
+                    'quantity' => $data['quantity'],
+                    'trial_ends_at' => $trialEndsAt,
+                    'ends_at' => null,
+                ]);
+
+                foreach ($data['items']['data'] as $item) {
+                    $subscription->items()->create([
+                        'stripe_id' => $item['id'],
+                        'stripe_plan' => $item['plan']['id'],
+                        'quantity' => $item['quantity'],
+                    ]);
+                }
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
      * Handle customer subscription updated.
      *
      * @param  array  $payload

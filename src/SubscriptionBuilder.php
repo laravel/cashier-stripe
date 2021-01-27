@@ -72,11 +72,18 @@ class SubscriptionBuilder
     protected $promotionCode;
 
     /**
+     * Determines if user redeemable promotion codes are available in Stripe Checkout.
+     *
+     * @var bool
+     */
+    protected $allowPromotionCodes = false;
+
+    /**
      * The metadata to apply to the subscription.
      *
-     * @var array|null
+     * @var array
      */
-    protected $metadata;
+    protected $metadata = [];
 
     /**
      * Create a new subscription builder instance.
@@ -106,7 +113,7 @@ class SubscriptionBuilder
     public function plan($plan, $quantity = 1)
     {
         $options = [
-            'plan' => $plan,
+            'price' => $plan,
             'quantity' => $quantity,
         ];
 
@@ -133,7 +140,7 @@ class SubscriptionBuilder
                 throw new InvalidArgumentException('Plan is required when creating multi-plan subscriptions.');
             }
 
-            $plan = Arr::first($this->items)['plan'];
+            $plan = Arr::first($this->items)['price'];
         }
 
         return $this->plan($plan, $quantity);
@@ -221,6 +228,18 @@ class SubscriptionBuilder
     }
 
     /**
+     * Enables user redeemable promotion codes.
+     *
+     * @return $this
+     */
+    public function allowPromotionCodes()
+    {
+        $this->allowPromotionCodes = true;
+
+        return $this;
+    }
+
+    /**
      * The metadata to apply to a new subscription.
      *
      * @param  array  $metadata
@@ -228,7 +247,7 @@ class SubscriptionBuilder
      */
     public function withMetadata($metadata)
     {
-        $this->metadata = $metadata;
+        $this->metadata = (array) $metadata;
 
         return $this;
     }
@@ -307,6 +326,41 @@ class SubscriptionBuilder
         }
 
         return $subscription;
+    }
+
+    /**
+     * Begin a new Checkout Session.
+     *
+     * @param  array  $sessionOptions
+     * @param  array  $customerOptions
+     * @return \Laravel\Cashier\Checkout
+     */
+    public function checkout(array $sessionOptions = [], array $customerOptions = [])
+    {
+        if (! $this->skipTrial && $this->trialExpires) {
+            // Checkout Sessions are active for 24 hours after their creation and within that time frame the customer
+            // can complete the payment at any time. Stripe requires the trial end at least 48 hours in the future
+            // so that there is still at least a one day trial if your customer pays at the end of the 24 hours.
+            $minimumTrialPeriod = Carbon::now()->addHours(48);
+
+            $trialEnd = $this->trialExpires->gt($minimumTrialPeriod) ? $this->trialExpires : $minimumTrialPeriod;
+        } else {
+            $trialEnd = null;
+        }
+
+        return Checkout::create($this->owner, array_merge([
+            'mode' => 'subscription',
+            'line_items' => collect($this->items)->values()->all(),
+            'allow_promotion_codes' => $this->allowPromotionCodes,
+            'discounts' => [
+                'coupon' => $this->coupon,
+            ],
+            'default_tax_rates' => $this->getTaxRatesForPayload(),
+            'subscription_data' => [
+                'trial_end' => $trialEnd ? $trialEnd->getTimestamp() : null,
+                'metadata' => array_merge($this->metadata, ['name' => $this->name]),
+            ],
+        ], $sessionOptions), $customerOptions);
     }
 
     /**
