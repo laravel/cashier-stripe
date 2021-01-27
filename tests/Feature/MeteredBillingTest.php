@@ -125,8 +125,11 @@ class MeteredBillingTest extends FeatureTestCase
         $subscription = $user->newSubscription('main', static::$licensedPlanId)
             ->create('pm_card_visa');
 
-        $this->expectException(InvalidRequestException::class);
-        $subscription->incrementUsage();
+        try {
+            $subscription->incrementUsage();
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(InvalidRequestException::class, $e);
+        }
 
         $subscription->swap([
             static::$planId => [
