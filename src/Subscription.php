@@ -622,7 +622,11 @@ class Subscription extends Model
         }
 
         // Delete items that aren't attached to the subscription anymore...
-        $this->items()->whereNotIn('stripe_plan', $items->pluck('plan')->filter())->delete();
+        $orphanedItems = $this->items()->whereNotIn('stripe_plan', $items->pluck('plan')->filter())->get();
+        foreach ($orphanedItems as $orphan) {
+            $orphan->usageRecords()->delete();
+            $orphan->delete();
+        }
 
         $this->unsetRelation('items');
 
@@ -692,13 +696,18 @@ class Subscription extends Model
     {
         /** @var \Stripe\SubscriptionItem $stripeSubscriptionItem */
         foreach ($this->asStripeSubscription()->items->data as $stripeSubscriptionItem) {
-            $plan = $stripeSubscriptionItem->plan->id;
+            $stripePlan = $stripeSubscriptionItem->plan;
+            $planId = $stripePlan->id;
 
-            if (! $item = $items->get($plan, [])) {
+            if (! $item = $items->get($planId, [])) {
                 $item['deleted'] = true;
+
+                if ($stripePlan->usage_type == 'metered') {
+                    $item['clear_usage'] = true;
+                }
             }
 
-            $items->put($plan, $item + ['id' => $stripeSubscriptionItem->id]);
+            $items->put($planId, $item + ['id' => $stripeSubscriptionItem->id]);
         }
 
         return $items;
