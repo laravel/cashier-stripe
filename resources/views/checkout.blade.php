@@ -14,13 +14,9 @@
         const checkoutButton = document.getElementById('checkout-{{ $sessionId }}');
 
         checkoutButton.addEventListener('click', function () {
-            // When the customer clicks on the button, redirect them to Checkout.
             Stripe('{{ $stripeKey }}').redirectToCheckout({
                 sessionId: '{{ $sessionId }}'
             }).then(function (result) {
-                // If `redirectToCheckout` fails due to a browser or network
-                // error, display the localized error message to your customer
-                // using `result.error.message`.
                 if (result.error) {
                     document.getElementById('error-message').innerText = result.error.message;
                 }

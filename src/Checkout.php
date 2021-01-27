@@ -15,14 +15,14 @@ class Checkout
     protected $owner;
 
     /**
-     * The Stripe Checkout Session instance.
+     * The Stripe checkout session instance.
      *
      * @var \Stripe\Checkout\Session
      */
     protected $session;
 
     /**
-     * Create a new Checkout Session instance.
+     * Create a new checkout session instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @param  \Stripe\Checkout\Session  $session
@@ -35,7 +35,7 @@ class Checkout
     }
 
     /**
-     * Begin a new Checkout Session.
+     * Begin a new checkout session.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @param  array  $sessionOptions
@@ -58,7 +58,7 @@ class Checkout
     }
 
     /**
-     * Get the View instance for the button.
+     * Get the view instance for the button.
      *
      * @param  string  $label
      * @param  array  $options

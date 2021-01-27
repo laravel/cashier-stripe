@@ -67,7 +67,7 @@ trait PerformsCharges
     }
 
     /**
-     * Begin a new Checkout Session for existing Prices.
+     * Begin a new checkout session for existing prices.
      *
      * @param  array|string  $items
      * @param  int  $quantity
@@ -78,15 +78,12 @@ trait PerformsCharges
     public function checkout($items, array $sessionOptions = [], array $customerOptions = [])
     {
         $items = collect((array) $items)->map(function ($item, $key) {
-            // If the key is a string, we'll assume it's a Price ID and its value is its quantity.
             if (is_string($key)) {
                 return ['price' => $key, 'quantity' => $item];
             }
 
-            // If the value is a string, we'll assume it's a Price ID.
             $item = is_string($item) ? ['price' => $item] : $item;
 
-            // Ensure a quantity is set.
             $item['quantity'] = $item['quantity'] ?? 1;
 
             return $item;
@@ -99,7 +96,7 @@ trait PerformsCharges
     }
 
     /**
-     * Begin a new Checkout Session for a "one-off" charge.
+     * Begin a new checkout session for a "one-off" charge.
      *
      * @param  int  $amount
      * @param  string  $name
