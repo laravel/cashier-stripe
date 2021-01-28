@@ -1,6 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.6.1...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.6.3...12.x)
+
+
+## [v12.6.3 (2021-01-19)](https://github.com/laravel/cashier/compare/v12.6.2...v12.6.3)
+
+### Fixed
+- Fix image support in PDF invoices ([#1045](https://github.com/laravel/cashier-stripe/pull/1045), [bb7d17e8](https://github.com/laravel/cashier-stripe/commit/bb7d17e8707700e3f71cb30ef3c60dc68071bb8f))
+
+
+## [v12.6.2 (2021-01-05)](https://github.com/laravel/cashier/compare/v12.6.1...v12.6.2)
+
+### Changed
+- Bump dompdf to v0.8.4 ([8a4b495](https://github.com/laravel/cashier-stripe/commit/8a4b495b5feffd9359e20c11e8ac9febc2d3995a))
+- Allow dompdf v1.0 ([4949af9](https://github.com/laravel/cashier-stripe/commit/4949af98b8e890fb062c134177f178cb5f375752))
 
 
 ## [v12.6.1 (2020-12-08)](https://github.com/laravel/cashier/compare/v12.6.0...v12.6.1)

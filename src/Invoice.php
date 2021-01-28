@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
@@ -413,7 +414,10 @@ class Invoice
             define('DOMPDF_ENABLE_AUTOLOAD', false);
         }
 
-        $dompdf = new Dompdf;
+        $options = new Options;
+        $options->setChroot(base_path());
+
+        $dompdf = new Dompdf($options);
         $dompdf->setPaper(config('cashier.paper', 'letter'));
         $dompdf->loadHtml($this->view($data)->render());
         $dompdf->render();
