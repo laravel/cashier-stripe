@@ -488,7 +488,7 @@ class Subscription extends Model
     }
 
     /**
-     * Report usage for a metered subscription.
+     * Report usage for a metered product.
      *
      * @param  int  $quantity
      * @param  \DateTimeInterface|int|null  $timestamp
