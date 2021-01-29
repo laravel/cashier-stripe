@@ -2,8 +2,8 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
+use Exception;
 use Illuminate\Support\Str;
-use Laravel\Cashier\SubscriptionUsage;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\Plan;
 use Stripe\Price;
@@ -86,19 +86,6 @@ class MeteredBillingTest extends FeatureTestCase
         static::deleteStripeResource(new Product(static::$productId));
     }
 
-    public function test_null_quantity_items_can_be_created()
-    {
-        $user = $this->createCustomer('test_null_quantity_items_can_be_created');
-
-        $subscription = $user->newSubscription('main', static::$planId)
-            ->quantity(null, static::$planId)
-            ->create('pm_card_visa');
-
-        $this->assertTrue($user->subscribed('main'));
-
-        $subscription->cancel();
-    }
-
     public function test_usage_report_with_single_item_subscription()
     {
         $user = $this->createCustomer('test_usage_report_with_single_item_subscription');
@@ -107,12 +94,11 @@ class MeteredBillingTest extends FeatureTestCase
             ->quantity(null, static::$planId)
             ->create('pm_card_visa');
 
-        $subscription->incrementUsage();
+        $subscription->reportUsage();
         sleep(1);
-        $subscription->incrementUsage(10);
-
+        $subscription->reportUsage(10);
         sleep(1);
-        $subscription->incrementUsage(10, static::$planId);
+        $subscription->reportUsageFor(static::$planId, 10);
 
         $summary = $subscription->items->first()->getStripeUsageRecordSummary()->first();
 
@@ -123,12 +109,11 @@ class MeteredBillingTest extends FeatureTestCase
     {
         $user = $this->createCustomer('test_usage_report_with_licensed_subscription');
 
-        $subscription = $user->newSubscription('main', static::$licensedPlanId)
-            ->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$licensedPlanId)->create('pm_card_visa');
 
         try {
-            $subscription->incrementUsage();
-        } catch (\Exception $e) {
+            $subscription->reportUsage();
+        } catch (Exception $e) {
             $this->assertInstanceOf(InvalidRequestException::class, $e);
         }
 
@@ -139,8 +124,10 @@ class MeteredBillingTest extends FeatureTestCase
         ]);
 
         sleep(1);
-        $subscription->incrementUsage();
+        $subscription->reportUsage();
+
         $summary = $subscription->items->first()->getStripeUsageRecordSummary()->first();
+
         $this->assertSame($summary->total_usage, 1);
     }
 
@@ -156,10 +143,12 @@ class MeteredBillingTest extends FeatureTestCase
 
         $this->assertSame($subscription->items->count(), 2);
 
-        $subscription->incrementUsage(20, static::$secondPlanId);
+        $subscription->reportUsageFor(static::$secondPlanId, 20);
 
         $summary = $subscription->findItemOrFail(static::$secondPlanId)->getStripeUsageRecordSummary()->first();
+
         $this->assertSame($summary->total_usage, 20);
+
         $subscription->removePlan(static::$secondPlanId);
 
         $this->assertSame($subscription->items->count(), 1);
@@ -179,14 +168,15 @@ class MeteredBillingTest extends FeatureTestCase
 
         $this->assertSame($secondSub->items->count(), 2);
 
-        $secondSub->incrementUsage(10, static::$secondPlanId);
+        $secondSub->reportUsageFor(static::$secondPlanId, 10);
         $summary = $secondSub->findItemOrFail(static::$secondPlanId)->getStripeUsageRecordSummary()->first();
+
         $this->assertSame($summary->total_usage, 10);
 
         $subItem = $secondSub->findItemOrFail(static::$planId);
-        $subItem->incrementUsage(14);
+        $subItem->reportUsage(14);
         $summary = $subItem->getStripeUsageRecordSummary()->first();
-        $this->assertSame($summary->total_usage, 14);
 
+        $this->assertSame($summary->total_usage, 14);
     }
 }
