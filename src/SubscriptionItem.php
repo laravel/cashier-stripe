@@ -2,7 +2,7 @@
 
 namespace Laravel\Cashier;
 
-use Carbon\Carbon;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
@@ -185,38 +185,21 @@ class SubscriptionItem extends Model
     }
 
     /**
-     * Provides Stripe with usage information for a subscription item with a metered Stripe plan.
+     * Report usage information for a subscription item with a metered product.
      *
      * @param  int  $quantity
-     * @return $this
+     * @param  \DateTimeInterface|int|null  $timestamp
+     * @return \Stripe\UsageRecord
      */
-    public function incrementUsage($quantity = 1)
+    public function reportUsage($quantity = 1, $timestamp = null)
     {
-        $usageRecord = StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
+        $timestamp = $timestamp instanceof DateTimeInterface ? $timestamp->getTimestamp() : $timestamp;
+
+        return StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
             'quantity' => $quantity,
-            'action' => 'increment',
-            'timestamp' => now()->timestamp,
+            'action' => $timestamp ? 'set' : 'increment',
+            'timestamp' => $timestamp ?? time(),
         ], $this->subscription->owner->stripeOptions());
-
-        return $this;
-    }
-
-    /**
-     * Updates a usage record at a particular timestamp with a quantity.
-     *
-     * @param  int  $quantity
-     * @param  \Carbon\Carbon|null $timestamp  Overwrites the usage quantity at a particular timestamp
-     * @return $this
-     */
-    public function updateUsageRecord($quantity, $timestamp)
-    {
-        StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
-            'quantity' => $quantity,
-            'action' => 'set',
-            'timestamp' => $timestamp->timestamp,
-        ], $this->subscription->owner->stripeOptions());
-
-        return $this;
     }
 
     /**

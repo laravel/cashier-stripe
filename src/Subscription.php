@@ -488,40 +488,33 @@ class Subscription extends Model
     }
 
     /**
-     * Provides Stripe with usage information for a subscription with a metered Stripe plan.
+     * Report usage for a metered subscription.
      *
      * @param  int  $quantity
+     * @param  \DateTimeInterface|int|null  $timestamp
      * @param  string|null  $plan
-     * @return $this
+     * @return \Stripe\UsageRecord
      */
-    public function incrementUsage($quantity = 1, $plan = null)
+    public function reportUsage($quantity = 1, $timestamp = null, $plan = null)
     {
         if (! $plan) {
             $this->guardAgainstMultiplePlans();
         }
 
-        $this->findItemOrFail($plan ?? $this->stripe_plan)->incrementUsage($quantity);
-
-        return $this;
+        return $this->findItemOrFail($plan ?? $this->stripe_plan)->reportUsage($quantity, $timestamp);
     }
 
     /**
-     * Updates a usage record at a particular timestamp with a quantity.
+     * Report usage for specific price of a metered product.
      *
+     * @param  string  $plan
      * @param  int  $quantity
-     * @param  \Carbon\Carbon|null $timestamp  Overwrites the usage quantity at a particular timestamp
-     * @param  string|null  $plan
-     * @return $this
+     * @param  \DateTimeInterface|int|null  $timestamp
+     * @return \Stripe\UsageRecord
      */
-    public function updateUsageRecord($quantity, $timestamp, $plan = null)
+    public function reportUsageFor($plan, $quantity = 1, $timestamp = null)
     {
-        if (! $plan) {
-            $this->guardAgainstMultiplePlans();
-        }
-
-        $this->findItemOrFail($plan ?? $this->stripe_plan)->incrementUsage($quantity);
-
-        return $this;
+        return $this->reportUsage($quantity, $timestamp, $plan);
     }
 
     /**
@@ -617,7 +610,7 @@ class Subscription extends Model
                 'stripe_id' => $item->id,
             ], [
                 'stripe_plan' => $item->plan->id,
-                'quantity' => $item->quantity ?? null,
+                'quantity' => $item->quantity,
             ]);
         }
 
