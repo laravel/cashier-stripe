@@ -196,7 +196,7 @@ class SubscriptionItem extends Model
             'quantity' => $quantity,
             'action' => 'increment',
             'timestamp' => now()->timestamp,
-        ]);
+        ], $this->subscription->owner->stripeOptions());
 
         return $this;
     }
@@ -214,7 +214,7 @@ class SubscriptionItem extends Model
             'quantity' => $quantity,
             'action' => 'set',
             'timestamp' => $timestamp->timestamp,
-        ]);
+        ], $this->subscription->owner->stripeOptions());
 
         return $this;
     }
