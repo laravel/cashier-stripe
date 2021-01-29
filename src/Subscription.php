@@ -518,6 +518,34 @@ class Subscription extends Model
     }
 
     /**
+     * Get the usage records for a metered product.
+     *
+     * @param  array  $options
+     * @param  string|null  $plan
+     * @return \Illuminate\Support\Collection
+     */
+    public function usageRecords($options = [], $plan = null)
+    {
+        if (! $plan) {
+            $this->guardAgainstMultiplePlans();
+        }
+
+        return $this->findItemOrFail($plan ?? $this->stripe_plan)->usageRecords($options);
+    }
+
+    /**
+     * Get the usage records for a specific price of a metered product.
+     *
+     * @param  string  $plan
+     * @param  array  $options
+     * @return \Illuminate\Support\Collection
+     */
+    public function usageRecordsFor($plan, $options = [])
+    {
+        return $this->usageRecords($options, $plan);
+    }
+
+    /**
      * Change the billing cycle anchor on a plan change.
      *
      * @param  \DateTimeInterface|int|string  $date
