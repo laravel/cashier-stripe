@@ -42,11 +42,6 @@ class SubscriptionItem extends Model
         return $this->belongsTo(Subscription::class);
     }
 
-    public function usageRecords()
-    {
-        return $this->hasMany(SubscriptionUsage::class);
-    }
-
     /**
      * Increment the quantity of the subscription item.
      *
@@ -203,11 +198,6 @@ class SubscriptionItem extends Model
             'timestamp' => now()->timestamp,
         ]);
 
-        $record = $this->usageRecords()->create([
-            'quantity' => $quantity,
-            'created_at' => Carbon::createFromTimestamp($usageRecord->timestamp),
-        ]);
-
         return $this;
     }
 
@@ -220,16 +210,11 @@ class SubscriptionItem extends Model
      */
     public function updateUsageRecord($quantity, $timestamp)
     {
-        $record = $this->usageRecords()->where('created_at', $timestamp)->firstOrFail();
-
         StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
             'quantity' => $quantity,
             'action' => 'set',
-            'timestamp' => $record->created_at->timestamp,
+            'timestamp' => $timestamp->timestamp,
         ]);
-
-        $record->quantity = $quantity;
-        $record->save();
 
         return $this;
     }
