@@ -688,18 +688,11 @@ class Subscription extends Model
 
             $options = is_string($options) ? [] : $options;
 
-            $defaultOptions = [
+            return [$plan => array_merge([
                 'plan' => $plan,
+                'quantity' => $isSinglePlanSwap ? $this->quantity : 1,
                 'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
-            ];
-
-            if (! isset($options['quantity'])) {
-                $defaultOptions['quantity'] = $isSinglePlanSwap ? $this->quantity : 1;
-            } elseif (is_null($options['quantity'])) {
-                unset($options['quantity']);
-            }
-
-            return [$plan => array_merge($defaultOptions, $options)];
+            ], $options)];
         });
     }
 
@@ -713,18 +706,17 @@ class Subscription extends Model
     {
         /** @var \Stripe\SubscriptionItem $stripeSubscriptionItem */
         foreach ($this->asStripeSubscription()->items->data as $stripeSubscriptionItem) {
-            $stripePlan = $stripeSubscriptionItem->plan;
-            $planId = $stripePlan->id;
+            $plan = $stripeSubscriptionItem->plan;
 
-            if (! $item = $items->get($planId, [])) {
+            if (! $item = $items->get($plan->id, [])) {
                 $item['deleted'] = true;
 
-                if ($stripePlan->usage_type == 'metered') {
+                if ($plan->usage_type == 'metered') {
                     $item['clear_usage'] = true;
                 }
             }
 
-            $items->put($planId, $item + ['id' => $stripeSubscriptionItem->id]);
+            $items->put($plan->id, $item + ['id' => $stripeSubscriptionItem->id]);
         }
 
         return $items;
@@ -767,7 +759,7 @@ class Subscription extends Model
      * Add a new Stripe plan to the subscription.
      *
      * @param  string  $plan
-     * @param  int  $quantity
+     * @param  int|null  $quantity
      * @param  array  $options
      * @return $this
      *
@@ -783,18 +775,13 @@ class Subscription extends Model
 
         $subscription = $this->asStripeSubscription();
 
-        $defaultOptions = [
+        $item = $subscription->items->create(array_merge([
             'plan' => $plan,
+            'quantity' => $quantity,
             'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
-        ];
-
-        if (! is_null($quantity)) {
-            $defaultOptions['quantity'] = $quantity;
-        }
-
-        $item = $subscription->items->create(array_merge($defaultOptions, $options));
+        ], $options));
 
         $this->items()->create([
             'stripe_id' => $item->id,

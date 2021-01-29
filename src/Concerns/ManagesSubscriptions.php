@@ -14,7 +14,7 @@ trait ManagesSubscriptions
      * @param  string|string[]  $plans
      * @return \Laravel\Cashier\SubscriptionBuilder
      */
-    public function newSubscription($name, $plans)
+    public function newSubscription($name, $plans = [])
     {
         return new SubscriptionBuilder($this, $name, $plans);
     }

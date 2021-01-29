@@ -90,8 +90,8 @@ class MeteredBillingTest extends FeatureTestCase
     {
         $user = $this->createCustomer('test_usage_report_with_single_item_subscription');
 
-        $subscription = $user->newSubscription('main', static::$planId)
-            ->quantity(null, static::$planId)
+        $subscription = $user->newSubscription('main')
+            ->meteredPlan(static::$planId)
             ->create('pm_card_visa');
 
         $subscription->reportUsage();
@@ -135,8 +135,8 @@ class MeteredBillingTest extends FeatureTestCase
     {
         $user = $this->createCustomer('test_usage_report_with_multiplan');
 
-        $subscription = $user->newSubscription('main', static::$planId)
-            ->quantity(null, static::$planId)
+        $subscription = $user->newSubscription('main')
+            ->meteredPlan(static::$planId)
             ->create('pm_card_visa');
 
         $subscription->addPlan(static::$secondPlanId, null);
@@ -153,8 +153,8 @@ class MeteredBillingTest extends FeatureTestCase
 
         $this->assertSame($subscription->items->count(), 1);
 
-        $secondSub = $user->newSubscription('test_swap', static::$planId)
-            ->quantity(null, static::$planId)
+        $secondSub = $user->newSubscription('test_swap')
+            ->meteredPlan(static::$planId)
             ->create('pm_card_visa');
 
         $secondSub->swap([
