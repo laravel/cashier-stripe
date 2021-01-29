@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use DateTimeInterface;
+use Exception;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
@@ -93,7 +94,7 @@ class SubscriptionBuilder
      * @param  string|string[]  $plans
      * @return void
      */
-    public function __construct($owner, $name, $plans = null)
+    public function __construct($owner, $name, $plans = [])
     {
         $this->name = $name;
         $this->owner = $owner;
@@ -117,10 +118,6 @@ class SubscriptionBuilder
             'quantity' => $quantity,
         ];
 
-        if (! is_null($quantity)) {
-            $options['quantity'] = $quantity;
-        }
-
         if ($taxRates = $this->getPlanTaxRatesForPayload($plan)) {
             $options['tax_rates'] = $taxRates;
         }
@@ -131,9 +128,20 @@ class SubscriptionBuilder
     }
 
     /**
+     * Set a metered plan on the subscription builder.
+     *
+     * @param  string  $plan
+     * @return $this
+     */
+    public function meteredPlan($plan)
+    {
+        return $this->plan($plan, null);
+    }
+
+    /**
      * Specify the quantity of a subscription item.
      *
-     * @param  int  $quantity
+     * @param  int|null  $quantity
      * @param  string|null  $plan
      * @return $this
      */
@@ -279,11 +287,16 @@ class SubscriptionBuilder
      * @param  array  $subscriptionOptions
      * @return \Laravel\Cashier\Subscription
      *
+     * @throws \Exception
      * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
      * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
     public function create($paymentMethod = null, array $customerOptions = [], array $subscriptionOptions = [])
     {
+        if (empty($this->items)) {
+            throw new Exception('At least one plan is required when starting subscriptions.');
+        }
+
         $customer = $this->getStripeCustomer($paymentMethod, $customerOptions);
 
         $payload = array_merge(
@@ -341,6 +354,10 @@ class SubscriptionBuilder
      */
     public function checkout(array $sessionOptions = [], array $customerOptions = [])
     {
+        if (empty($this->items)) {
+            throw new Exception('At least one plan is required when starting subscriptions.');
+        }
+
         if (! $this->skipTrial && $this->trialExpires) {
             // Checkout Sessions are active for 24 hours after their creation and within that time frame the customer
             // can complete the payment at any time. Stripe requires the trial end at least 48 hours in the future
