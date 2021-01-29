@@ -100,7 +100,7 @@ class MeteredBillingTest extends FeatureTestCase
         sleep(1);
         $subscription->reportUsageFor(static::$planId, 10);
 
-        $summary = $subscription->items->first()->getStripeUsageRecordSummary()->first();
+        $summary = $subscription->usageRecords()->first();
 
         $this->assertSame($summary->total_usage, 21);
     }
@@ -126,7 +126,7 @@ class MeteredBillingTest extends FeatureTestCase
         sleep(1);
         $subscription->reportUsage();
 
-        $summary = $subscription->items->first()->getStripeUsageRecordSummary()->first();
+        $summary = $subscription->usageRecords()->first();
 
         $this->assertSame($summary->total_usage, 1);
     }
@@ -145,7 +145,7 @@ class MeteredBillingTest extends FeatureTestCase
 
         $subscription->reportUsageFor(static::$secondPlanId, 20);
 
-        $summary = $subscription->findItemOrFail(static::$secondPlanId)->getStripeUsageRecordSummary()->first();
+        $summary = $subscription->usageRecordsFor(static::$secondPlanId)->first();
 
         $this->assertSame($summary->total_usage, 20);
 
@@ -169,13 +169,13 @@ class MeteredBillingTest extends FeatureTestCase
         $this->assertSame($secondSub->items->count(), 2);
 
         $secondSub->reportUsageFor(static::$secondPlanId, 10);
-        $summary = $secondSub->findItemOrFail(static::$secondPlanId)->getStripeUsageRecordSummary()->first();
+        $summary = $secondSub->usageRecordsFor(static::$secondPlanId)->first();
 
         $this->assertSame($summary->total_usage, 10);
 
         $subItem = $secondSub->findItemOrFail(static::$planId);
         $subItem->reportUsage(14);
-        $summary = $subItem->getStripeUsageRecordSummary()->first();
+        $summary = $subItem->usageRecords()->first();
 
         $this->assertSame($summary->total_usage, 14);
     }

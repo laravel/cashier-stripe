@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Stripe\SubscriptionItem as StripeSubscriptionItem;
@@ -185,6 +186,19 @@ class SubscriptionItem extends Model
     }
 
     /**
+     * Update the underlying Stripe subscription item information for the model.
+     *
+     * @param  array  $options
+     * @return \Stripe\SubscriptionItem
+     */
+    public function updateStripeSubscriptionItem(array $options = [])
+    {
+        return StripeSubscriptionItem::update(
+            $this->stripe_id, $options, $this->subscription->owner->stripeOptions()
+        );
+    }
+
+    /**
      * Report usage for a metered product.
      *
      * @param  int  $quantity
@@ -203,16 +217,16 @@ class SubscriptionItem extends Model
     }
 
     /**
-     * Update the underlying Stripe subscription item information for the model.
+     * Get the usage records for a metered product.
      *
      * @param  array  $options
-     * @return \Stripe\SubscriptionItem
+     * @return \Illuminate\Support\Collection
      */
-    public function updateStripeSubscriptionItem(array $options = [])
+    public function usageRecords($options = [])
     {
-        return StripeSubscriptionItem::update(
+        return new Collection(StripeSubscriptionItem::allUsageRecordSummaries(
             $this->stripe_id, $options, $this->subscription->owner->stripeOptions()
-        );
+        )->data);
     }
 
     /**
@@ -226,20 +240,6 @@ class SubscriptionItem extends Model
         return StripeSubscriptionItem::retrieve(
             ['id' => $this->stripe_id, 'expand' => $expand],
             $this->subscription->owner->stripeOptions()
-        );
-    }
-
-    /**
-     * Get a list of a summary of the subscription item's usage records. Usage records are summarised by billing periods.
-     * https://stripe.com/docs/api/usage_records/subscription_item_summary_list?lang=php
-     *
-     * @param  array  $options
-     * @return \Stripe\Collection
-     */
-    public function getStripeUsageRecordSummary($options = [])
-    {
-        return StripeSubscriptionItem::allUsageRecordSummaries(
-            $this->stripe_id, $options, $this->subscription->owner->stripeOptions()
         );
     }
 }
