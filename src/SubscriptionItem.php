@@ -245,4 +245,18 @@ class SubscriptionItem extends Model
             $this->subscription->owner->stripeOptions()
         );
     }
+
+    /**
+     * Get a list of a summary of the subscription item's usage records. Usage records are summarised by billing periods.
+     * https://stripe.com/docs/api/usage_records/subscription_item_summary_list?lang=php
+     *
+     * @param  array  $options
+     * @return \Stripe\Collection
+     */
+    public function getStripeUsageRecordSummary($options = [])
+    {
+        return StripeSubscriptionItem::allUsageRecordSummaries(
+            $this->stripe_id, $options, $this->subscription->owner->stripeOptions()
+        );
+    }
 }
