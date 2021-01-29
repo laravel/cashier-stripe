@@ -114,8 +114,9 @@ class MeteredBillingTest extends FeatureTestCase
         sleep(1);
         $subscription->incrementUsage(10, static::$planId);
 
-        $this->assertSame($subscription->items->first()->usageRecords->count(), 3);
-        $this->assertSame(SubscriptionUsage::all()->sum('quantity'), 21);
+        $summary = $subscription->items->first()->getStripeUsageRecordSummary()->first();
+
+        $this->assertSame($summary->total_usage, 21);
     }
 
     public function test_usage_report_with_licensed_subscription()
@@ -139,7 +140,8 @@ class MeteredBillingTest extends FeatureTestCase
 
         sleep(1);
         $subscription->incrementUsage();
-        $this->assertSame(SubscriptionUsage::all()->sum('quantity'), 1);
+        $summary = $subscription->items->first()->getStripeUsageRecordSummary()->first();
+        $this->assertSame($summary->total_usage, 1);
     }
 
     public function test_usage_report_with_multiplan()
@@ -155,18 +157,21 @@ class MeteredBillingTest extends FeatureTestCase
         $this->assertSame($subscription->items->count(), 2);
 
         $subscription->incrementUsage(20, static::$secondPlanId);
-        $this->assertSame(SubscriptionUsage::all()->sum('quantity'), 20);
 
+        $summary = $subscription->findItemOrFail(static::$secondPlanId)->getStripeUsageRecordSummary()->first();
+        $this->assertSame($summary->total_usage, 20);
         $subscription->removePlan(static::$secondPlanId);
 
         $this->assertSame($subscription->items->count(), 1);
-        $this->assertSame(SubscriptionUsage::all()->sum('quantity'), 0);
 
         $secondSub = $user->newSubscription('test_swap', static::$planId)
             ->quantity(null, static::$planId)
             ->create('pm_card_visa');
 
         $secondSub->swap([
+            static::$planId => [
+                'quantity' => null
+            ],
             static::$secondPlanId => [
                 'quantity' => null,
             ],
@@ -175,7 +180,13 @@ class MeteredBillingTest extends FeatureTestCase
         $this->assertSame($secondSub->items->count(), 2);
 
         $secondSub->incrementUsage(10, static::$secondPlanId);
+        $summary = $secondSub->findItemOrFail(static::$secondPlanId)->getStripeUsageRecordSummary()->first();
+        $this->assertSame($summary->total_usage, 10);
 
-        $secondSub->findItemOrFail(static::$planId)->incrementUsage(14);
+        $subItem = $secondSub->findItemOrFail(static::$planId);
+        $subItem->incrementUsage(14);
+        $summary = $subItem->getStripeUsageRecordSummary()->first();
+        $this->assertSame($summary->total_usage, 14);
+
     }
 }
