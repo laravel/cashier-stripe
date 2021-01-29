@@ -114,7 +114,7 @@ class SubscriptionBuilder
     public function plan($plan, $quantity = 1)
     {
         $options = [
-            'plan' => $plan,
+            'price' => $plan,
             'quantity' => $quantity,
         ];
 
