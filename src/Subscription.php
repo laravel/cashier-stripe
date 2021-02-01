@@ -833,22 +833,14 @@ class Subscription extends Model
             throw SubscriptionUpdateFailure::cannotDeleteLastPlan($this);
         }
 
-        $item = $this->findItemOrFail($plan);
+        $stripeItem = $this->findItemOrFail($plan)->asStripeSubscriptionItem();
 
-        $stripeItem = $item->asStripeSubscriptionItem();
-
-        $deleteOptions = [
+        $stripeItem->delete(array_filter([
+            'clear_usage' => $stripeItem->plan->usage_type === 'metered' ? true : null,
             'proration_behavior' => $this->prorateBehavior(),
-        ];
+        ]));
 
-        if ($stripeItem->price->recurring->usage_type === 'metered') {
-            $deleteOptions['clear_usage'] = true;
-        }
-        $stripeItem->delete($deleteOptions);
-
-        // Delete item and related usage records
-        $item = $this->items()->where('stripe_plan', $plan)->first();
-        $item->delete();
+        $this->items()->where('stripe_plan', $plan)->delete();
 
         $this->unsetRelation('items');
 
