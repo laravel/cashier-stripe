@@ -200,7 +200,7 @@ class SubscriptionItem extends Model
      * Get the subscription as a Stripe subscription item object.
      *
      * @param  array  $expand
-     * @return StripeSubscriptionItem
+     * @return \Stripe\SubscriptionItem
      */
     public function asStripeSubscriptionItem(array $expand = [])
     {

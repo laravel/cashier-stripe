@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.6.3...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.7.0...master)
+
+
+## [v12.7.0 (2021-02-02)](https://github.com/laravel/cashier/compare/v12.6.3...v12.7.0)
+
+### Added
+- Stripe Checkout Support ([#1007](https://github.com/laravel/cashier-stripe/pull/1007))
 
 
 ## [v12.6.3 (2021-01-19)](https://github.com/laravel/cashier/compare/v12.6.2...v12.6.3)
