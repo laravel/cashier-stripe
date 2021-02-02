@@ -95,9 +95,13 @@ class MeteredBillingTest extends FeatureTestCase
             ->create('pm_card_visa');
 
         $subscription->reportUsage();
+
         sleep(1);
+
         $subscription->reportUsage(10);
+
         sleep(1);
+
         $subscription->reportUsageFor(static::$planId, 10);
 
         $summary = $subscription->usageRecords()->first();
@@ -124,6 +128,7 @@ class MeteredBillingTest extends FeatureTestCase
         ]);
 
         sleep(1);
+
         $subscription->reportUsage();
 
         $summary = $subscription->usageRecords()->first();
@@ -159,7 +164,7 @@ class MeteredBillingTest extends FeatureTestCase
 
         $secondSub->swap([
             static::$planId => [
-                'quantity' => null
+                'quantity' => null,
             ],
             static::$secondPlanId => [
                 'quantity' => null,
@@ -178,5 +183,29 @@ class MeteredBillingTest extends FeatureTestCase
         $summary = $subItem->usageRecords()->first();
 
         $this->assertSame($summary->total_usage, 14);
+    }
+
+    public function test_swap_specific_subscription_item_to_different_plan()
+    {
+        $this->markTestIncomplete();
+    }
+
+    public function test_clear_usage_before_swapping_specific_subscription_item_to_different_plan()
+    {
+        $this->markTestIncomplete();
+    }
+
+    public function test_cancel_metered_subscription()
+    {
+        $this->markTestIncomplete();
+
+        // Check final invoice
+    }
+
+    public function test_clear_usage_before_cancelling_metered_subscription()
+    {
+        $this->markTestIncomplete();
+
+        // Check final invoice
     }
 }
