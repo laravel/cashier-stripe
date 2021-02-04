@@ -83,7 +83,7 @@ class WebhookController extends Controller
                     'stripe_id' => $data['id'],
                     'stripe_status' => $data['status'],
                     'stripe_plan' => $isSinglePlan ? $firstItem['plan']['id'] : null,
-                    'quantity' => $isSinglePlan ? $firstItem['quantity'] : null,
+                    'quantity' => $isSinglePlan && isset( $firstItem['quantity']) ? $firstItem['quantity'] : null,
                     'trial_ends_at' => $trialEndsAt,
                     'ends_at' => null,
                 ]);
@@ -92,7 +92,7 @@ class WebhookController extends Controller
                     $subscription->items()->create([
                         'stripe_id' => $item['id'],
                         'stripe_plan' => $item['plan']['id'],
-                        'quantity' => $item['quantity'],
+                        'quantity' => $item['quantity'] ?? null,
                     ]);
                 }
             }
@@ -132,7 +132,7 @@ class WebhookController extends Controller
                 $subscription->stripe_plan = $isSinglePlan ? $firstItem['plan']['id'] : null;
 
                 // Quantity...
-                $subscription->quantity = $isSinglePlan ? $firstItem['quantity'] : null;
+                $subscription->quantity = $isSinglePlan && isset($firstItem['quantity']) ? $firstItem['quantity'] : null;
 
                 // Trial ending date...
                 if (isset($data['trial_end'])) {
@@ -172,7 +172,7 @@ class WebhookController extends Controller
                             'stripe_id' => $item['id'],
                         ], [
                             'stripe_plan' => $item['plan']['id'],
-                            'quantity' => $item['quantity'],
+                            'quantity' => $item['quantity'] ?? null,
                         ]);
                     }
 
