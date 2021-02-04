@@ -355,8 +355,8 @@ class SubscriptionBuilder
             'discounts' => [
                 'coupon' => $this->coupon,
             ],
-            'default_tax_rates' => $this->getTaxRatesForPayload(),
             'subscription_data' => [
+                'default_tax_rates' => $this->getTaxRatesForPayload(),
                 'trial_end' => $trialEnd ? $trialEnd->getTimestamp() : null,
                 'metadata' => array_merge($this->metadata, ['name' => $this->name]),
             ],

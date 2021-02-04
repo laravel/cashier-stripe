@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Tests\Feature;
 use Laravel\Cashier\Checkout;
 use Stripe\Checkout\Session as StripeCheckoutSession;
 use Stripe\Price as StripePrice;
+use Stripe\TaxRate;
 
 class CheckoutTest extends FeatureTestCase
 {
@@ -65,6 +66,16 @@ class CheckoutTest extends FeatureTestCase
             'recurring' => ['interval' => 'year'],
             'unit_amount' => 1500,
         ]);
+
+        $taxRate = TaxRate::create([
+            'display_name' => 'VAT',
+            'description' => 'VAT Belgium',
+            'jurisdiction' => 'BE',
+            'percentage' => 21,
+            'inclusive' => false,
+        ]);
+
+        $user->taxRates = [$taxRate->id];
 
         $checkout = $user->newSubscription('default', $price->id)
             ->allowPromotionCodes()
