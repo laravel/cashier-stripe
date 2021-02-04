@@ -3,7 +3,6 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Exception;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Stripe\Exception\InvalidRequestException;
