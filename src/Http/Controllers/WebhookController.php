@@ -83,7 +83,7 @@ class WebhookController extends Controller
                     'stripe_id' => $data['id'],
                     'stripe_status' => $data['status'],
                     'stripe_plan' => $isSinglePlan ? $firstItem['plan']['id'] : null,
-                    'quantity' => $isSinglePlan && isset( $firstItem['quantity']) ? $firstItem['quantity'] : null,
+                    'quantity' => $isSinglePlan && isset($firstItem['quantity']) ? $firstItem['quantity'] : null,
                     'trial_ends_at' => $trialEndsAt,
                     'ends_at' => null,
                 ]);
