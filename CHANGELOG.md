@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.7.0...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.7.1...12.x)
+
+
+## [v12.7.1 (2021-02-04)](https://github.com/laravel/cashier/compare/v12.7.0...v12.7.1)
+
+### Fixed
+- Fix tax rates for subscription checkouts ([#1050](https://github.com/laravel/cashier-stripe/pull/1050))
 
 
 ## [v12.7.0 (2021-02-02)](https://github.com/laravel/cashier/compare/v12.6.3...v12.7.0)
