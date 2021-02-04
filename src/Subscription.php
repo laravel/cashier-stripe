@@ -626,10 +626,14 @@ class Subscription extends Model
             $this->stripe_id, $this->getSwapOptions($items, $options), $this->owner->stripeOptions()
         );
 
+        /** @var \Stripe\SubscriptionItem $firstItem */
+        $firstItem = $stripeSubscription->items->first();
+        $isSinglePlan = $stripeSubscription->items->count() === 1;
+
         $this->fill([
             'stripe_status' => $stripeSubscription->status,
-            'stripe_plan' => $stripeSubscription->plan ? $stripeSubscription->plan->id : null,
-            'quantity' => $stripeSubscription->quantity,
+            'stripe_plan' => $isSinglePlan ? $firstItem->plan->id : null,
+            'quantity' => $isSinglePlan ? $firstItem->quantity : null,
             'ends_at' => null,
         ])->save();
 
@@ -690,7 +694,7 @@ class Subscription extends Model
 
             return [$plan => array_merge([
                 'plan' => $plan,
-                'quantity' => $isSinglePlanSwap ? $this->quantity : 1,
+                'quantity' => $isSinglePlanSwap ? $this->quantity : null,
                 'tax_rates' => $this->getPlanTaxRatesForPayload($plan),
             ], $options)];
         });

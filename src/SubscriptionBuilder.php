@@ -40,7 +40,7 @@ class SubscriptionBuilder
     /**
      * The date and time the trial will expire.
      *
-     * @var \Carbon\Carbon|\Carbon\CarbonInterface
+     * @var \Carbon\Carbon|\Carbon\CarbonInterface|null
      */
     protected $trialExpires;
 
@@ -310,20 +310,18 @@ class SubscriptionBuilder
             $this->owner->stripeOptions()
         );
 
-        if ($this->skipTrial) {
-            $trialEndsAt = null;
-        } else {
-            $trialEndsAt = $this->trialExpires;
-        }
+        /** @var \Stripe\SubscriptionItem $firstItem */
+        $firstItem = $stripeSubscription->items->first();
+        $isSinglePlan = $stripeSubscription->items->count() === 1;
 
         /** @var \Laravel\Cashier\Subscription $subscription */
         $subscription = $this->owner->subscriptions()->create([
             'name' => $this->name,
             'stripe_id' => $stripeSubscription->id,
             'stripe_status' => $stripeSubscription->status,
-            'stripe_plan' => $stripeSubscription->plan ? $stripeSubscription->plan->id : null,
-            'quantity' => $stripeSubscription->quantity,
-            'trial_ends_at' => $trialEndsAt,
+            'stripe_plan' => $isSinglePlan ? $firstItem->plan->id : null,
+            'quantity' => $isSinglePlan ? $firstItem->quantity : null,
+            'trial_ends_at' => ! $this->skipTrial ? $this->trialExpires : null,
             'ends_at' => null,
         ]);
 

@@ -3,7 +3,9 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\Plan;
 use Stripe\Price;
@@ -19,17 +21,17 @@ class MeteredBillingTest extends FeatureTestCase
     /**
      * @var string
      */
-    protected static $planId;
+    protected static $meteredPrice;
 
     /**
      * @var string
      */
-    protected static $secondPlanId;
+    protected static $otherMeteredPrice;
 
     /**
      * @var string
      */
-    protected static $licensedPlanId;
+    protected static $licensedPrice;
 
     public static function setUpBeforeClass(): void
     {
@@ -43,7 +45,7 @@ class MeteredBillingTest extends FeatureTestCase
             'type' => 'service',
         ]);
 
-        static::$planId = Price::create([
+        static::$meteredPrice = Price::create([
             'nickname' => 'Monthly Metered $1 per unit',
             'currency' => 'USD',
             'recurring' => [
@@ -54,7 +56,7 @@ class MeteredBillingTest extends FeatureTestCase
             'product' => static::$productId,
         ])->id;
 
-        static::$secondPlanId = Price::create([
+        static::$otherMeteredPrice = Price::create([
             'nickname' => 'Monthly Metered $2 per unit',
             'currency' => 'USD',
             'recurring' => [
@@ -65,7 +67,7 @@ class MeteredBillingTest extends FeatureTestCase
             'product' => static::$productId,
         ])->id;
 
-        static::$licensedPlanId = Price::create([
+        static::$licensedPrice = Price::create([
             'nickname' => 'Monthly $10 Licensed',
             'currency' => 'USD',
             'recurring' => [
@@ -80,119 +82,140 @@ class MeteredBillingTest extends FeatureTestCase
     {
         parent::tearDownAfterClass();
 
-        static::deleteStripeResource(new Plan(static::$planId));
-        static::deleteStripeResource(new Plan(static::$secondPlanId));
-        static::deleteStripeResource(new Plan(static::$licensedPlanId));
+        static::deleteStripeResource(new Plan(static::$meteredPrice));
+        static::deleteStripeResource(new Plan(static::$otherMeteredPrice));
+        static::deleteStripeResource(new Plan(static::$licensedPrice));
         static::deleteStripeResource(new Product(static::$productId));
     }
 
-    public function test_usage_report_with_single_item_subscription()
+    public function test_report_usage_for_metered_price()
     {
-        $user = $this->createCustomer('test_usage_report_with_single_item_subscription');
+        $user = $this->createCustomer('report_usage_for_metered_price');
 
         $subscription = $user->newSubscription('main', [])
-            ->meteredPlan(static::$planId)
+            ->meteredPlan(static::$meteredPrice)
             ->create('pm_card_visa');
 
-        $subscription->reportUsage();
+        $subscription->reportUsage(5);
 
-        sleep(1);
-
-        $subscription->reportUsage(10);
-
-        sleep(1);
-
-        $subscription->reportUsageFor(static::$planId, 10);
+        $subscription->reportUsageFor(static::$meteredPrice, 10);
 
         $summary = $subscription->usageRecords()->first();
 
-        $this->assertSame($summary->total_usage, 21);
+        $this->assertSame($summary->total_usage, 15);
     }
 
-    public function test_usage_report_with_licensed_subscription()
+    public function test_reporting_usage_for_licensed_price_throws_exception()
     {
-        $user = $this->createCustomer('test_usage_report_with_licensed_subscription');
+        $user = $this->createCustomer('reporting_usage_for_licensed_price_throws_exception');
 
-        $subscription = $user->newSubscription('main', static::$licensedPlanId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$licensedPrice)->create('pm_card_visa');
 
         try {
             $subscription->reportUsage();
         } catch (Exception $e) {
             $this->assertInstanceOf(InvalidRequestException::class, $e);
         }
-
-        $subscription->swap([
-            static::$planId => [
-                'quantity' => null,
-            ],
-        ]);
-
-        sleep(1);
-
-        $subscription->reportUsage();
-
-        $summary = $subscription->usageRecords()->first();
-
-        $this->assertSame($summary->total_usage, 1);
     }
 
-    public function test_usage_report_with_multiplan()
+    public function test_reporting_usage_for_multi_plan_subscriptions()
     {
-        $user = $this->createCustomer('test_usage_report_with_multiplan');
+        $user = $this->createCustomer('reporting_usage_for_multi_plan_subscriptions');
 
-        $subscription = $user->newSubscription('main', [])
-            ->meteredPlan(static::$planId)
+        $subscription = $user->newSubscription('main', [static::$licensedPrice])
+            ->meteredPlan(static::$meteredPrice)
+            ->meteredPlan(static::$otherMeteredPrice)
             ->create('pm_card_visa');
-
-        $subscription->addPlan(static::$secondPlanId, null);
 
         $this->assertSame($subscription->items->count(), 2);
 
-        $subscription->reportUsageFor(static::$secondPlanId, 20);
+        try {
+            $subscription->reportUsage();
+        } catch (Exception $e) {
+            $this->assertInstanceOf(InvalidArgumentException::class, $e);
 
-        $summary = $subscription->usageRecordsFor(static::$secondPlanId)->first();
+            $this->assertSame(
+                'This method requires a plan argument since the subscription has multiple plans.', $e->getMessage()
+            );
+        }
+
+        $subscription->reportUsageFor(static::$otherMeteredPrice, 20);
+
+        $summary = $subscription->usageRecordsFor(static::$otherMeteredPrice)->first();
 
         $this->assertSame($summary->total_usage, 20);
 
-        $subscription->removePlan(static::$secondPlanId);
+        try {
+            $subscription->reportUsageFor(static::$licensedPrice);
+        } catch (Exception $e) {
+            $this->assertInstanceOf(InvalidRequestException::class, $e);
+        }
+    }
 
-        $this->assertSame($subscription->items->count(), 1);
+    public function test_swap_metered_price_to_different_price()
+    {
+        $user = $this->createCustomer('swap_metered_price_to_different_price');
 
-        $secondSub = $user->newSubscription('test_swap', [])
-            ->meteredPlan(static::$planId)
+        $subscription = $user->newSubscription('main', [])
+            ->meteredPlan(static::$meteredPrice)
             ->create('pm_card_visa');
 
-        $secondSub->swap([
-            static::$planId => [
-                'quantity' => null,
-            ],
-            static::$secondPlanId => [
-                'quantity' => null,
-            ],
-        ]);
+        $this->assertSame(static::$meteredPrice, $subscription->stripe_plan);
+        $this->assertNull($subscription->quantity);
 
-        $this->assertSame($secondSub->items->count(), 2);
+        $subscription = $subscription->swap(static::$otherMeteredPrice);
 
-        $secondSub->reportUsageFor(static::$secondPlanId, 10);
-        $summary = $secondSub->usageRecordsFor(static::$secondPlanId)->first();
+        $this->assertSame(static::$otherMeteredPrice, $subscription->stripe_plan);
+        $this->assertNull($subscription->quantity);
 
-        $this->assertSame($summary->total_usage, 10);
+        $subscription = $subscription->swap(static::$licensedPrice);
 
-        $subItem = $secondSub->findItemOrFail(static::$planId);
-        $subItem->reportUsage(14);
-        $summary = $subItem->usageRecords()->first();
-
-        $this->assertSame($summary->total_usage, 14);
+        $this->assertSame(static::$licensedPrice, $subscription->stripe_plan);
+        $this->assertSame(1, $subscription->quantity);
     }
 
-    public function test_swap_specific_subscription_item_to_different_plan()
+    /** @group FOO */
+    public function test_swap_metered_price_to_different_price_with_a_multi_plan_subscription()
     {
-        $this->markTestIncomplete();
-    }
+        $user = $this->createCustomer('swap_metered_price_to_different_price_with_a_multi_plan_subscription');
 
-    public function test_clear_usage_before_swapping_specific_subscription_item_to_different_plan()
-    {
-        $this->markTestIncomplete();
+        $subscription = $user->newSubscription('main', [])
+            ->meteredPlan(static::$meteredPrice)
+            ->create('pm_card_visa');
+
+        $this->assertSame(static::$meteredPrice, $subscription->stripe_plan);
+        $this->assertNull($subscription->quantity);
+
+        $subscription = $subscription->swap([static::$meteredPrice, static::$otherMeteredPrice]);
+
+        $item = $subscription->findItemOrFail(self::$meteredPrice);
+        $otherItem = $subscription->findItemOrFail(self::$otherMeteredPrice);
+
+        $this->assertCount(2, $subscription->items);
+        $this->assertNull($subscription->stripe_plan);
+        $this->assertNull($subscription->quantity);
+        $this->assertSame(self::$meteredPrice, $item->stripe_plan);
+        $this->assertNull($item->quantity);
+        $this->assertSame(self::$otherMeteredPrice, $otherItem->stripe_plan);
+        $this->assertNull($otherItem->quantity);
+
+        $subscription = $subscription->swap(static::$otherMeteredPrice);
+
+        $this->assertCount(1, $subscription->items);
+        $this->assertSame(self::$otherMeteredPrice, $subscription->stripe_plan);
+        $this->assertNull($subscription->quantity);
+
+        $subscription = $subscription->swap(static::$licensedPrice);
+
+        $this->assertCount(1, $subscription->items);
+        $this->assertSame(self::$licensedPrice, $subscription->stripe_plan);
+        $this->assertSame(1, $subscription->quantity);
+
+        $subscription = $subscription->swap([static::$licensedPrice, static::$meteredPrice]);
+
+        $this->assertCount(2, $subscription->items);
+        $this->assertNull($subscription->stripe_plan);
+        $this->assertNull($subscription->quantity);
     }
 
     public function test_cancel_metered_subscription()

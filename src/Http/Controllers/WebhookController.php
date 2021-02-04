@@ -75,12 +75,15 @@ class WebhookController extends Controller
                     $trialEndsAt = null;
                 }
 
+                $firstItem = $data['items']['data'][0];
+                $isSinglePlan = count($data['items']['data']) === 1;
+
                 $subscription = $user->subscriptions()->create([
                     'name' => $data['metadata']['name'],
                     'stripe_id' => $data['id'],
                     'stripe_status' => $data['status'],
-                    'stripe_plan' =>  $data['plan']['id'] ?? null,
-                    'quantity' => $data['quantity'],
+                    'stripe_plan' => $isSinglePlan ? $firstItem['plan']['id'] : null,
+                    'quantity' => $isSinglePlan ? $firstItem['quantity'] : null,
                     'trial_ends_at' => $trialEndsAt,
                     'ends_at' => null,
                 ]);
@@ -122,11 +125,14 @@ class WebhookController extends Controller
                     return;
                 }
 
+                $firstItem = $data['items']['data'][0];
+                $isSinglePlan = count($data['items']['data']) === 1;
+
                 // Plan...
-                $subscription->stripe_plan = $data['plan']['id'] ?? null;
+                $subscription->stripe_plan = $isSinglePlan ? $firstItem['plan']['id'] : null;
 
                 // Quantity...
-                $subscription->quantity = $data['quantity'];
+                $subscription->quantity = $isSinglePlan ? $firstItem['quantity'] : null;
 
                 // Trial ending date...
                 if (isset($data['trial_end'])) {
