@@ -892,7 +892,7 @@ class Subscription extends Model
     }
 
     /**
-     * Cancel the subscription immediately.
+     * Cancel the subscription immediately without invoicing.
      *
      * @return $this
      */
@@ -908,7 +908,7 @@ class Subscription extends Model
     }
 
     /**
-     * Cancel the subscription immediately.
+     * Cancel the subscription immediately and invoice.
      *
      * @return $this
      */

@@ -216,18 +216,37 @@ class MeteredBillingTest extends FeatureTestCase
         $this->assertNull($subscription->quantity);
     }
 
-    /** @group FOO */
     public function test_cancel_metered_subscription()
     {
-        $this->markTestIncomplete();
+        $user = $this->createCustomer('cancel_metered_subscription');
 
-        // Check final invoice
+        $subscription = $user->newSubscription('main', [])
+            ->meteredPlan(static::$meteredPrice)
+            ->create('pm_card_visa');
+
+        $subscription->reportUsage(10);
+
+        $subscription->cancel();
+
+        $invoice = $user->upcomingInvoice();
+
+        $this->assertEquals('$10.00', $invoice->total());
     }
 
-    public function test_clear_usage_before_cancelling_metered_subscription()
+    public function test_cancel_metered_subscription_immediately()
     {
-        $this->markTestIncomplete();
+        $user = $this->createCustomer('cancel_metered_subscription_immediately');
 
-        // Check final invoice
+        $subscription = $user->newSubscription('main', [])
+            ->meteredPlan(static::$meteredPrice)
+            ->create('pm_card_visa');
+
+        $subscription->reportUsage(10);
+
+        $subscription->cancelNowAndInvoice();
+
+        $this->assertNull($user->upcomingInvoice());
+        $this->assertCount(2, $invoices = $user->invoicesIncludingPending());
+        $this->assertEquals('$10.00', $invoices->first()->total());
     }
 }
