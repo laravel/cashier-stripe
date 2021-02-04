@@ -79,12 +79,11 @@ class WebhooksTest extends FeatureTestCase
                     'id' => $subscription->stripe_id,
                     'customer' => 'cus_foo',
                     'cancel_at_period_end' => false,
-                    'quantity' => 5,
                     'items' => [
                         'data' => [[
                             'id' => 'bar',
                             'plan' => ['id' => 'plan_foo'],
-                            'quantity' => 10,
+                            'quantity' => 5,
                         ]],
                     ],
                 ],
@@ -102,7 +101,7 @@ class WebhooksTest extends FeatureTestCase
             'subscription_id' => $subscription->id,
             'stripe_id' => 'bar',
             'stripe_plan' => 'plan_foo',
-            'quantity' => 10,
+            'quantity' => 5,
         ]);
 
         $this->assertDatabaseMissing('subscription_items', [
@@ -126,7 +125,13 @@ class WebhooksTest extends FeatureTestCase
                     'id' => $subscription->stripe_id,
                     'customer' => $user->stripe_id,
                     'cancel_at_period_end' => false,
-                    'quantity' => 1,
+                    'items' => [
+                        'data' => [[
+                            'id' => $subscription->items()->first()->stripe_id,
+                            'plan' => ['id' => static::$planId],
+                            'quantity' => 1,
+                        ]],
+                    ],
                 ],
             ],
         ])->assertOk();

@@ -3,7 +3,6 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Exception;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Stripe\Exception\InvalidRequestException;
@@ -127,7 +126,7 @@ class MeteredBillingTest extends FeatureTestCase
             ->meteredPlan(static::$otherMeteredPrice)
             ->create('pm_card_visa');
 
-        $this->assertSame($subscription->items->count(), 2);
+        $this->assertSame($subscription->items->count(), 3);
 
         try {
             $subscription->reportUsage();
@@ -174,7 +173,6 @@ class MeteredBillingTest extends FeatureTestCase
         $this->assertSame(1, $subscription->quantity);
     }
 
-    /** @group FOO */
     public function test_swap_metered_price_to_different_price_with_a_multi_plan_subscription()
     {
         $user = $this->createCustomer('swap_metered_price_to_different_price_with_a_multi_plan_subscription');
@@ -218,6 +216,7 @@ class MeteredBillingTest extends FeatureTestCase
         $this->assertNull($subscription->quantity);
     }
 
+    /** @group FOO */
     public function test_cancel_metered_subscription()
     {
         $this->markTestIncomplete();
