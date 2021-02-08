@@ -186,19 +186,6 @@ class SubscriptionItem extends Model
     }
 
     /**
-     * Update the underlying Stripe subscription item information for the model.
-     *
-     * @param  array  $options
-     * @return \Stripe\SubscriptionItem
-     */
-    public function updateStripeSubscriptionItem(array $options = [])
-    {
-        return StripeSubscriptionItem::update(
-            $this->stripe_id, $options, $this->subscription->owner->stripeOptions()
-        );
-    }
-
-    /**
      * Report usage for a metered product.
      *
      * @param  int  $quantity
@@ -227,6 +214,19 @@ class SubscriptionItem extends Model
         return new Collection(StripeSubscriptionItem::allUsageRecordSummaries(
             $this->stripe_id, $options, $this->subscription->owner->stripeOptions()
         )->data);
+    }
+
+    /**
+     * Update the underlying Stripe subscription item information for the model.
+     *
+     * @param  array  $options
+     * @return \Stripe\SubscriptionItem
+     */
+    public function updateStripeSubscriptionItem(array $options = [])
+    {
+        return StripeSubscriptionItem::update(
+            $this->stripe_id, $options, $this->subscription->owner->stripeOptions()
+        );
     }
 
     /**
