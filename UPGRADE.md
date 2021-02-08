@@ -4,7 +4,7 @@
 
 ### Metered Billing
 
-Cashier v12.8.0 brings support for Metered Billing. In order to allow metered billing to work in your current Cashier Stripe app you'll need to write a migration to make the `quantity` column on the `subscription_items` nullable:
+Cashier v12.8.0 brings support for Metered Billing. In order to allow metered billing to work in your current Cashier Stripe application, you will need to write a migration to update the `subscription_items` table's `quantity` column to be nullable:
 
 ```php
 Schema::table('subscription_items', function (Blueprint $table) {
