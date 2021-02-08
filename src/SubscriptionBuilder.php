@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use DateTimeInterface;
+use Exception;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
@@ -39,7 +40,7 @@ class SubscriptionBuilder
     /**
      * The date and time the trial will expire.
      *
-     * @var \Carbon\Carbon|\Carbon\CarbonInterface
+     * @var \Carbon\Carbon|\Carbon\CarbonInterface|null
      */
     protected $trialExpires;
 
@@ -93,7 +94,7 @@ class SubscriptionBuilder
      * @param  string|string[]  $plans
      * @return void
      */
-    public function __construct($owner, $name, $plans = null)
+    public function __construct($owner, $name, $plans = [])
     {
         $this->name = $name;
         $this->owner = $owner;
@@ -107,7 +108,7 @@ class SubscriptionBuilder
      * Set a plan on the subscription builder.
      *
      * @param  string  $plan
-     * @param  int  $quantity
+     * @param  int|null  $quantity
      * @return $this
      */
     public function plan($plan, $quantity = 1)
@@ -127,9 +128,20 @@ class SubscriptionBuilder
     }
 
     /**
+     * Set a metered plan on the subscription builder.
+     *
+     * @param  string  $plan
+     * @return $this
+     */
+    public function meteredPlan($plan)
+    {
+        return $this->plan($plan, null);
+    }
+
+    /**
      * Specify the quantity of a subscription item.
      *
-     * @param  int  $quantity
+     * @param  int|null  $quantity
      * @param  string|null  $plan
      * @return $this
      */
@@ -275,11 +287,16 @@ class SubscriptionBuilder
      * @param  array  $subscriptionOptions
      * @return \Laravel\Cashier\Subscription
      *
+     * @throws \Exception
      * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
      * @throws \Laravel\Cashier\Exceptions\PaymentFailure
      */
     public function create($paymentMethod = null, array $customerOptions = [], array $subscriptionOptions = [])
     {
+        if (empty($this->items)) {
+            throw new Exception('At least one plan is required when starting subscriptions.');
+        }
+
         $customer = $this->getStripeCustomer($paymentMethod, $customerOptions);
 
         $payload = array_merge(
@@ -293,20 +310,18 @@ class SubscriptionBuilder
             $this->owner->stripeOptions()
         );
 
-        if ($this->skipTrial) {
-            $trialEndsAt = null;
-        } else {
-            $trialEndsAt = $this->trialExpires;
-        }
+        /** @var \Stripe\SubscriptionItem $firstItem */
+        $firstItem = $stripeSubscription->items->first();
+        $isSinglePlan = $stripeSubscription->items->count() === 1;
 
         /** @var \Laravel\Cashier\Subscription $subscription */
         $subscription = $this->owner->subscriptions()->create([
             'name' => $this->name,
             'stripe_id' => $stripeSubscription->id,
             'stripe_status' => $stripeSubscription->status,
-            'stripe_plan' => $stripeSubscription->plan ? $stripeSubscription->plan->id : null,
-            'quantity' => $stripeSubscription->quantity,
-            'trial_ends_at' => $trialEndsAt,
+            'stripe_plan' => $isSinglePlan ? $firstItem->plan->id : null,
+            'quantity' => $isSinglePlan ? $firstItem->quantity : null,
+            'trial_ends_at' => ! $this->skipTrial ? $this->trialExpires : null,
             'ends_at' => null,
         ]);
 
@@ -337,6 +352,10 @@ class SubscriptionBuilder
      */
     public function checkout(array $sessionOptions = [], array $customerOptions = [])
     {
+        if (empty($this->items)) {
+            throw new Exception('At least one plan is required when starting subscriptions.');
+        }
+
         if (! $this->skipTrial && $this->trialExpires) {
             // Checkout Sessions are active for 24 hours after their creation and within that time frame the customer
             // can complete the payment at any time. Stripe requires the trial end at least 48 hours in the future

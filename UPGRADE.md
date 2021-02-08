@@ -1,5 +1,19 @@
 # Upgrade Guide
 
+## Upgrading To 12.8 From 12.7
+
+### Metered Billing
+
+Cashier v12.8.0 brings support for Metered Billing. In order to allow metered billing to work in your current Cashier Stripe application, you will need to write a migration to update the `subscription_items` table's `quantity` column to be nullable:
+
+```php
+Schema::table('subscription_items', function (Blueprint $table) {
+    $table->integer('quantity')->nullable()->change();
+});
+```
+
+Running this migration requires you to [install the `doctrine/dbal` package](https://laravel.com/docs/migrations#modifying-columns).
+
 ## Upgrading To 12.0 From 11.0
 
 ### Proration Changes
