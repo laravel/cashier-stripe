@@ -54,29 +54,16 @@ class WebhooksTest extends FeatureTestCase
         static::deleteStripeResource(new Product(static::$productId));
     }
 
-    public function test_subscriptions_are_updated()
+    public function test_subscriptions_are_created()
     {
         $user = $this->createCustomer('subscriptions_are_updated', ['stripe_id' => 'cus_foo']);
 
-        $subscription = $user->subscriptions()->create([
-            'name' => 'main',
-            'stripe_id' => 'sub_foo',
-            'stripe_plan' => 'plan_foo',
-            'stripe_status' => Subscription::STATUS_ACTIVE,
-        ]);
-
-        $item = $subscription->items()->create([
-            'stripe_id' => 'it_foo',
-            'stripe_plan' => 'plan_bar',
-            'quantity' => 1,
-        ]);
-
         $this->postJson('stripe/webhook', [
             'id' => 'foo',
-            'type' => 'customer.subscription.updated',
+            'type' => 'customer.subscription.created',
             'data' => [
                 'object' => [
-                    'id' => $subscription->stripe_id,
+                    'id' => 'sub_foo',
                     'customer' => 'cus_foo',
                     'cancel_at_period_end' => false,
                     'quantity' => 5,
@@ -87,26 +74,23 @@ class WebhooksTest extends FeatureTestCase
                             'quantity' => 10,
                         ]],
                     ],
+                    'status' => 'active',
                 ],
             ],
         ])->assertOk();
 
         $this->assertDatabaseHas('subscriptions', [
-            'id' => $subscription->id,
+            'name' => 'default',
             'user_id' => $user->id,
             'stripe_id' => 'sub_foo',
+            'stripe_status' => 'active',
             'quantity' => 5,
         ]);
 
         $this->assertDatabaseHas('subscription_items', [
-            'subscription_id' => $subscription->id,
             'stripe_id' => 'bar',
             'stripe_plan' => 'plan_foo',
             'quantity' => 10,
-        ]);
-
-        $this->assertDatabaseMissing('subscription_items', [
-            'id' => $item->id,
         ]);
     }
 

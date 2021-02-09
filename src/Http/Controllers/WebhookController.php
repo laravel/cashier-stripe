@@ -76,7 +76,7 @@ class WebhookController extends Controller
                 }
 
                 $subscription = $user->subscriptions()->create([
-                    'name' => $data['metadata']['name'],
+                    'name' => $data['metadata']['name'] ?? $this->newSubscriptionName(),
                     'stripe_id' => $data['id'],
                     'stripe_status' => $data['status'],
                     'stripe_plan' =>  $data['plan']['id'] ?? null,
@@ -96,6 +96,16 @@ class WebhookController extends Controller
         }
 
         return $this->successMethod();
+    }
+
+    /**
+     * Determines the name that should be used when new subscriptions are created from the Stripe dashboard.
+     *
+     * @return string
+     */
+    protected function newSubscriptionName()
+    {
+        return 'default';
     }
 
     /**
