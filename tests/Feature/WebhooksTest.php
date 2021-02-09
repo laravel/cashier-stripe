@@ -54,6 +54,46 @@ class WebhooksTest extends FeatureTestCase
         static::deleteStripeResource(new Product(static::$productId));
     }
 
+    public function test_subscriptions_are_created()
+    {
+        $user = $this->createCustomer('subscriptions_are_updated', ['stripe_id' => 'cus_foo']);
+
+        $this->postJson('stripe/webhook', [
+            'id' => 'foo',
+            'type' => 'customer.subscription.created',
+            'data' => [
+                'object' => [
+                    'id' => 'sub_foo',
+                    'customer' => 'cus_foo',
+                    'cancel_at_period_end' => false,
+                    'quantity' => 5,
+                    'items' => [
+                        'data' => [[
+                            'id' => 'bar',
+                            'plan' => ['id' => 'plan_foo'],
+                            'quantity' => 10,
+                        ]],
+                    ],
+                    'status' => 'active',
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'name' => 'default',
+            'user_id' => $user->id,
+            'stripe_id' => 'sub_foo',
+            'stripe_status' => 'active',
+            'quantity' => 5,
+        ]);
+
+        $this->assertDatabaseHas('subscription_items', [
+            'stripe_id' => 'bar',
+            'stripe_plan' => 'plan_foo',
+            'quantity' => 10,
+        ]);
+    }
+
     public function test_subscriptions_are_updated()
     {
         $user = $this->createCustomer('subscriptions_are_updated', ['stripe_id' => 'cus_foo']);
