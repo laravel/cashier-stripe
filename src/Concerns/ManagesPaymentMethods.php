@@ -38,7 +38,7 @@ trait ManagesPaymentMethods
     /**
      * Determines if the customer currently has at least one payment method of the given type.
      *
-     * @param String $type
+     * @param string $type
      * @return bool
      */
     public function hasPaymentMethod($type = 'card')
@@ -50,7 +50,7 @@ trait ManagesPaymentMethods
      * Get a collection of the entity's payment methods.
      *
      * @param  array  $parameters
-     * @param  String $type
+     * @param  string $type
      * @return \Illuminate\Support\Collection|\Laravel\Cashier\PaymentMethod[]
      */
     public function paymentMethods($parameters = [], $type = 'card')
@@ -259,7 +259,7 @@ trait ManagesPaymentMethods
     /**
      * Deletes the entity's payment methods of the given type.
      *
-     * @param String $type
+     * @param string $type
      * @return void
      */
     public function deletePaymentMethods($type = 'card')
