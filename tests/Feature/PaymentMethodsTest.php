@@ -85,7 +85,9 @@ class PaymentMethodsTest extends FeatureTestCase
 
         $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);
         $this->assertEquals('visa', $paymentMethod->card->brand);
+        $this->assertEquals('card', $user->card_brand);
         $this->assertEquals('4242', $paymentMethod->card->last4);
+        $this->assertEquals('4242', $user->card_last_four);
     }
 
     public function test_legacy_we_can_retrieve_an_old_default_source_as_a_default_payment_method()
@@ -141,7 +143,7 @@ class PaymentMethodsTest extends FeatureTestCase
 
         $user = $user->updateDefaultPaymentMethodFromStripe();
 
-        $this->assertEquals('visa', $user->card_brand);
+        $this->assertEquals('card', $user->card_brand);
         $this->assertEquals('4242', $user->card_last_four);
     }
 
