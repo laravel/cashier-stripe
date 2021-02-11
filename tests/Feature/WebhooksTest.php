@@ -66,7 +66,7 @@ class WebhooksTest extends FeatureTestCase
                     'id' => 'sub_foo',
                     'customer' => 'cus_foo',
                     'cancel_at_period_end' => false,
-                    'quantity' => 5,
+                    'quantity' => 10,
                     'items' => [
                         'data' => [[
                             'id' => 'bar',
@@ -84,7 +84,7 @@ class WebhooksTest extends FeatureTestCase
             'user_id' => $user->id,
             'stripe_id' => 'sub_foo',
             'stripe_status' => 'active',
-            'quantity' => 5,
+            'quantity' => 10,
         ]);
 
         $this->assertDatabaseHas('subscription_items', [
