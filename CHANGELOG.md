@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.8.0...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.8.1...12.x)
+
+
+## [v12.8.1 (2021-02-16)](https://github.com/laravel/cashier/compare/v12.8.0...v12.8.1)
+
+### Fixed
+- Fix removing tax rates ([#1059](https://github.com/laravel/cashier-stripe/pull/1059))
 
 
 ## [v12.8.0 (2021-02-09)](https://github.com/laravel/cashier/compare/v12.7.1...v12.8.0)
