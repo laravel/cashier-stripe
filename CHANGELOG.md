@@ -1,6 +1,31 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.7.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.8.1...master)
+
+
+## [v12.8.1 (2021-02-16)](https://github.com/laravel/cashier/compare/v12.8.0...v12.8.1)
+
+### Fixed
+- Fix removing tax rates ([#1059](https://github.com/laravel/cashier-stripe/pull/1059))
+
+
+## [v12.8.0 (2021-02-09)](https://github.com/laravel/cashier/compare/v12.7.1...v12.8.0)
+
+### Added
+- Metered billing ([#1048](https://github.com/laravel/cashier-stripe/pull/1048))
+
+### Changed
+- Allow Stripe dashboard subscriptions ([#1058](https://github.com/laravel/cashier-stripe/pull/1058))
+
+### Fixed
+- Fix return type for invoice line items ([#1053](https://github.com/laravel/cashier-stripe/pull/1053))
+
+
+## [v12.7.1 (2021-02-04)](https://github.com/laravel/cashier/compare/v12.7.0...v12.7.1)
+
+### Fixed
+- Fix tax rates for subscription checkouts ([#1050](https://github.com/laravel/cashier-stripe/pull/1050))
+>>>>>>> 12.x
 
 
 ## [v12.7.0 (2021-02-02)](https://github.com/laravel/cashier/compare/v12.6.3...v12.7.0)

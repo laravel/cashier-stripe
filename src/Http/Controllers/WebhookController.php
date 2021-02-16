@@ -75,12 +75,15 @@ class WebhookController extends Controller
                     $trialEndsAt = null;
                 }
 
+                $firstItem = $data['items']['data'][0];
+                $isSinglePlan = count($data['items']['data']) === 1;
+
                 $subscription = $user->subscriptions()->create([
-                    'name' => $data['metadata']['name'],
+                    'name' => $data['metadata']['name'] ?? $this->newSubscriptionName($payload),
                     'stripe_id' => $data['id'],
                     'stripe_status' => $data['status'],
-                    'stripe_plan' =>  $data['plan']['id'] ?? null,
-                    'quantity' => $data['quantity'],
+                    'stripe_plan' => $isSinglePlan ? $firstItem['plan']['id'] : null,
+                    'quantity' => $isSinglePlan && isset($firstItem['quantity']) ? $firstItem['quantity'] : null,
                     'trial_ends_at' => $trialEndsAt,
                     'ends_at' => null,
                 ]);
@@ -89,13 +92,24 @@ class WebhookController extends Controller
                     $subscription->items()->create([
                         'stripe_id' => $item['id'],
                         'stripe_plan' => $item['plan']['id'],
-                        'quantity' => $item['quantity'],
+                        'quantity' => $item['quantity'] ?? null,
                     ]);
                 }
             }
         }
 
         return $this->successMethod();
+    }
+
+    /**
+     * Determines the name that should be used when new subscriptions are created from the Stripe dashboard.
+     *
+     * @param  array  $payload
+     * @return string
+     */
+    protected function newSubscriptionName(array $payload)
+    {
+        return 'default';
     }
 
     /**
@@ -122,11 +136,14 @@ class WebhookController extends Controller
                     return;
                 }
 
+                $firstItem = $data['items']['data'][0];
+                $isSinglePlan = count($data['items']['data']) === 1;
+
                 // Plan...
-                $subscription->stripe_plan = $data['plan']['id'] ?? null;
+                $subscription->stripe_plan = $isSinglePlan ? $firstItem['plan']['id'] : null;
 
                 // Quantity...
-                $subscription->quantity = $data['quantity'];
+                $subscription->quantity = $isSinglePlan && isset($firstItem['quantity']) ? $firstItem['quantity'] : null;
 
                 // Trial ending date...
                 if (isset($data['trial_end'])) {
@@ -166,7 +183,7 @@ class WebhookController extends Controller
                             'stripe_id' => $item['id'],
                         ], [
                             'stripe_plan' => $item['plan']['id'],
-                            'quantity' => $item['quantity'],
+                            'quantity' => $item['quantity'] ?? null,
                         ]);
                     }
 

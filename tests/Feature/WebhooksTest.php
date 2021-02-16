@@ -54,6 +54,46 @@ class WebhooksTest extends FeatureTestCase
         static::deleteStripeResource(new Product(static::$productId));
     }
 
+    public function test_subscriptions_are_created()
+    {
+        $user = $this->createCustomer('subscriptions_are_updated', ['stripe_id' => 'cus_foo']);
+
+        $this->postJson('stripe/webhook', [
+            'id' => 'foo',
+            'type' => 'customer.subscription.created',
+            'data' => [
+                'object' => [
+                    'id' => 'sub_foo',
+                    'customer' => 'cus_foo',
+                    'cancel_at_period_end' => false,
+                    'quantity' => 10,
+                    'items' => [
+                        'data' => [[
+                            'id' => 'bar',
+                            'plan' => ['id' => 'plan_foo'],
+                            'quantity' => 10,
+                        ]],
+                    ],
+                    'status' => 'active',
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'name' => 'default',
+            'user_id' => $user->id,
+            'stripe_id' => 'sub_foo',
+            'stripe_status' => 'active',
+            'quantity' => 10,
+        ]);
+
+        $this->assertDatabaseHas('subscription_items', [
+            'stripe_id' => 'bar',
+            'stripe_plan' => 'plan_foo',
+            'quantity' => 10,
+        ]);
+    }
+
     public function test_subscriptions_are_updated()
     {
         $user = $this->createCustomer('subscriptions_are_updated', ['stripe_id' => 'cus_foo']);
@@ -79,12 +119,11 @@ class WebhooksTest extends FeatureTestCase
                     'id' => $subscription->stripe_id,
                     'customer' => 'cus_foo',
                     'cancel_at_period_end' => false,
-                    'quantity' => 5,
                     'items' => [
                         'data' => [[
                             'id' => 'bar',
                             'plan' => ['id' => 'plan_foo'],
-                            'quantity' => 10,
+                            'quantity' => 5,
                         ]],
                     ],
                 ],
@@ -102,7 +141,7 @@ class WebhooksTest extends FeatureTestCase
             'subscription_id' => $subscription->id,
             'stripe_id' => 'bar',
             'stripe_plan' => 'plan_foo',
-            'quantity' => 10,
+            'quantity' => 5,
         ]);
 
         $this->assertDatabaseMissing('subscription_items', [
@@ -126,7 +165,13 @@ class WebhooksTest extends FeatureTestCase
                     'id' => $subscription->stripe_id,
                     'customer' => $user->stripe_id,
                     'cancel_at_period_end' => false,
-                    'quantity' => 1,
+                    'items' => [
+                        'data' => [[
+                            'id' => $subscription->items()->first()->stripe_id,
+                            'plan' => ['id' => static::$planId],
+                            'quantity' => 1,
+                        ]],
+                    ],
                 ],
             ],
         ])->assertOk();
