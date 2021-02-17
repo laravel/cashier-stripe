@@ -246,7 +246,7 @@ trait ManagesPaymentMethods
         } elseif ($source instanceof StripeBankAccount) {
             $this->card_brand = 'Bank Account';
             $this->card_last_four = $source->last4;
-        } elseif ($source instanceof StripeSource) {
+        } elseif ($source instanceof StripeSource && $source->card) {
             $this->card_brand = $source->card->brand;
             $this->card_last_four = $source->card->last4;
         }
