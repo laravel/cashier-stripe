@@ -9,6 +9,7 @@ use Stripe\Card as StripeCard;
 use Stripe\Customer as StripeCustomer;
 use Stripe\PaymentMethod as StripePaymentMethod;
 use Stripe\SetupIntent as StripeSetupIntent;
+use Stripe\Source as StripeSource;
 
 trait ManagesPaymentMethods
 {
@@ -232,7 +233,7 @@ trait ManagesPaymentMethods
     /**
      * Fills the model's properties with the source from Stripe.
      *
-     * @param  \Stripe\Card|\Stripe\BankAccount|null  $source
+     * @param  \Stripe\Card|\Stripe\BankAccount|\Stripe\Source|null  $source
      * @return $this
      *
      * @deprecated Will be removed in a future Cashier update. You should use the new payment methods API instead.
@@ -245,6 +246,9 @@ trait ManagesPaymentMethods
         } elseif ($source instanceof StripeBankAccount) {
             $this->card_brand = 'Bank Account';
             $this->card_last_four = $source->last4;
+        } elseif ($source instanceof StripeSource) {
+            $this->card_brand = $source->card->brand;
+            $this->card_last_four = $source->card->last4;
         }
 
         return $this;
