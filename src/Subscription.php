@@ -577,18 +577,27 @@ class Subscription extends Model
     }
 
     /**
-     * Force the trial to end immediately.
-     * Similar to skipTrial(), however this method immediately updates the Stripe subscription.
-     *
-     * This method must be combined with swap, resume, etc.
+     * Force the subscription's trial to end immediately.
      *
      * @return $this
      */
     public function endTrial()
     {
-        $this->setStripeSubscriptionTrialEnd('now');
+        if (is_null($this->trial_ends_at)) {
+            return $this;
+        }
 
-        return tap($this->skipTrial())->save();
+        $subscription = $this->asStripeSubscription();
+
+        $subscription->trial_end = 'now';
+
+        $subscription->save();
+
+        $this->trial_ends_at = null;
+
+        $this->save();
+
+        return $this;
     }
 
     /**
@@ -603,28 +612,17 @@ class Subscription extends Model
             throw new InvalidArgumentException("Extending a subscription's trial requires a date in the future.");
         }
 
-        $this->setStripeSubscriptionTrialEnd($date->getTimestamp());
+        $subscription = $this->asStripeSubscription();
+
+        $subscription->trial_end = $date->getTimestamp();
+
+        $subscription->save();
 
         $this->trial_ends_at = $date;
 
         $this->save();
 
         return $this;
-    }
-
-    /**
-     * Sets the Stripe subscription trial end date.
-     *
-     * @param string|int $timestamp
-     * @return void
-     */
-    protected function setStripeSubscriptionTrialEnd($timestamp)
-    {
-        $subscription = $this->asStripeSubscription();
-
-        $subscription->trial_end = $timestamp;
-
-        $subscription->save();
     }
 
     /**
