@@ -602,6 +602,19 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals($subscription->asStripeSubscription()->trial_end, $trialEndsAt->getTimestamp());
     }
 
+    public function test_trials_can_be_ended()
+    {
+        $user = $this->createCustomer('trials_can_be_ended');
+
+        $subscription = $user->newSubscription('main', static::$planId)
+            ->trialDays(10)
+            ->create('pm_card_visa');
+
+        $subscription->endTrial();
+
+        $this->assertNull($subscription->trial_ends_at);
+    }
+
     public function test_applying_coupons_to_existing_customers()
     {
         $user = $this->createCustomer('applying_coupons_to_existing_customers');
