@@ -586,17 +586,9 @@ class Subscription extends Model
      */
     public function endTrial()
     {
-        $subscription = $this->asStripeSubscription();
+        $this->setStripeSubscriptionTrialEnd('now');
 
-        $subscription->trial_end = 'now';
-
-        $subscription->save();
-
-        $this->trial_ends_at = null;
-
-        $this->save();
-
-        return $this;
+        return tap($this->skipTrial())->save();
     }
 
     /**
@@ -611,17 +603,28 @@ class Subscription extends Model
             throw new InvalidArgumentException("Extending a subscription's trial requires a date in the future.");
         }
 
-        $subscription = $this->asStripeSubscription();
-
-        $subscription->trial_end = $date->getTimestamp();
-
-        $subscription->save();
+        $this->setStripeSubscriptionTrialEnd($date->getTimestamp());
 
         $this->trial_ends_at = $date;
 
         $this->save();
 
         return $this;
+    }
+
+    /**
+     * Sets the Stripe subscription trial end date.
+     *
+     * @param string|int $timestamp
+     * @return void
+     */
+    protected function setStripeSubscriptionTrialEnd($timestamp)
+    {
+        $subscription = $this->asStripeSubscription();
+
+        $subscription->trial_end = $timestamp;
+
+        $subscription->save();
     }
 
     /**
