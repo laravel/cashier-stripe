@@ -91,7 +91,7 @@ class MeteredBillingTest extends FeatureTestCase
     {
         $user = $this->createCustomer('report_usage_for_metered_price');
 
-        $subscription = $user->newSubscription('main', [])
+        $subscription = $user->newSubscription('main')
             ->meteredPlan(static::$meteredPrice)
             ->create('pm_card_visa');
 
@@ -155,7 +155,7 @@ class MeteredBillingTest extends FeatureTestCase
     {
         $user = $this->createCustomer('swap_metered_price_to_different_price');
 
-        $subscription = $user->newSubscription('main', [])
+        $subscription = $user->newSubscription('main')
             ->meteredPlan(static::$meteredPrice)
             ->create('pm_card_visa');
 
@@ -177,7 +177,7 @@ class MeteredBillingTest extends FeatureTestCase
     {
         $user = $this->createCustomer('swap_metered_price_to_different_price_with_a_multi_plan_subscription');
 
-        $subscription = $user->newSubscription('main', [])
+        $subscription = $user->newSubscription('main')
             ->meteredPlan(static::$meteredPrice)
             ->create('pm_card_visa');
 
@@ -220,7 +220,7 @@ class MeteredBillingTest extends FeatureTestCase
     {
         $user = $this->createCustomer('cancel_metered_subscription');
 
-        $subscription = $user->newSubscription('main', [])
+        $subscription = $user->newSubscription('main')
             ->meteredPlan(static::$meteredPrice)
             ->create('pm_card_visa');
 
@@ -237,7 +237,7 @@ class MeteredBillingTest extends FeatureTestCase
     {
         $user = $this->createCustomer('cancel_metered_subscription_immediately');
 
-        $subscription = $user->newSubscription('main', [])
+        $subscription = $user->newSubscription('main')
             ->meteredPlan(static::$meteredPrice)
             ->create('pm_card_visa');
 
