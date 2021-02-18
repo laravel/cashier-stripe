@@ -578,7 +578,7 @@ class Subscription extends Model
 
     /**
      * Force the trial to end immediately.
-     * Similar to skipTrial(), however this method cannot be combined with swap, resume, etc. and immediately updates the Stripe subscription.
+     * Similar to skipTrial(), however this method immediately updates the Stripe subscription.
      *
      * This method must be combined with swap, resume, etc.
      *
