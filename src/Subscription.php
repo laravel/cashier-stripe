@@ -577,6 +577,30 @@ class Subscription extends Model
     }
 
     /**
+     * Force the subscription's trial to end immediately.
+     *
+     * @return $this
+     */
+    public function endTrial()
+    {
+        if (is_null($this->trial_ends_at)) {
+            return $this;
+        }
+
+        $subscription = $this->asStripeSubscription();
+
+        $subscription->trial_end = 'now';
+
+        $subscription->save();
+
+        $this->trial_ends_at = null;
+
+        $this->save();
+
+        return $this;
+    }
+
+    /**
      * Extend an existing subscription's trial period.
      *
      * @param  \Carbon\CarbonInterface  $date
