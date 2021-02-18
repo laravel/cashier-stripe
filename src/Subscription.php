@@ -577,6 +577,29 @@ class Subscription extends Model
     }
 
     /**
+     * Force the trial to end immediately.
+     * Similar to skipTrial(), however this method cannot be combined with swap, resume, etc. and immediately updates the Stripe subscription.
+     *
+     * This method must be combined with swap, resume, etc.
+     *
+     * @return $this
+     */
+    public function endTrial()
+    {
+        $subscription = $this->asStripeSubscription();
+
+        $subscription->trial_end = 'now';
+
+        $subscription->save();
+
+        $this->trial_ends_at = null;
+
+        $this->save();
+
+        return $this;
+    }
+
+    /**
      * Extend an existing subscription's trial period.
      *
      * @param  \Carbon\CarbonInterface  $date
