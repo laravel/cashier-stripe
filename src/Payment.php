@@ -76,7 +76,6 @@ class Payment
         return $this->paymentIntent->status === StripePaymentIntent::STATUS_REQUIRES_ACTION;
     }
 
-
     /**
      * Determine if the payment needs to be confirmed.
      *
