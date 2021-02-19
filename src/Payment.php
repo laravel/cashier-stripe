@@ -117,6 +117,16 @@ class Payment
     }
 
     /**
+     * Determine if the payment is processing.
+     *
+     * @return bool
+     */
+    public function isProcessing()
+    {
+        return $this->paymentIntent->status === StripePaymentIntent::STATUS_PROCESSING;
+    }
+
+    /**
      * Validate if the payment intent was successful and throw an exception if not.
      *
      * @return void
