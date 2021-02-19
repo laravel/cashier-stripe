@@ -1066,7 +1066,7 @@ class Subscription extends Model
     {
         $stripeSubscription = $this->asStripeSubscription();
 
-        $stripeSubscription->default_tax_rates = $this->user->taxRates() ?: '';
+        $stripeSubscription->default_tax_rates = $this->user->taxRates() ?: null;
 
         $stripeSubscription->proration_behavior = $this->prorateBehavior();
 
@@ -1075,7 +1075,7 @@ class Subscription extends Model
         foreach ($this->items as $item) {
             $stripeSubscriptionItem = $item->asStripeSubscriptionItem();
 
-            $stripeSubscriptionItem->tax_rates = $this->getPlanTaxRatesForPayload($item->stripe_plan) ?: '';
+            $stripeSubscriptionItem->tax_rates = $this->getPlanTaxRatesForPayload($item->stripe_plan) ?: null;
 
             $stripeSubscriptionItem->proration_behavior = $this->prorateBehavior();
 
