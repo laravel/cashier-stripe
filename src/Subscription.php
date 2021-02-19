@@ -91,7 +91,7 @@ class Subscription extends Model
      */
     public function items()
     {
-        return $this->hasMany(SubscriptionItem::class);
+        return $this->hasMany(Cashier::$subscriptionItemModel);
     }
 
     /**
