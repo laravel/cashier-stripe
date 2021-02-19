@@ -87,6 +87,16 @@ class Payment
     }
 
     /**
+     * Determine if the payment needs to be captured.
+     *
+     * @return bool
+     */
+    public function requiresCapture()
+    {
+        return $this->paymentIntent->status === StripePaymentIntent::STATUS_REQUIRES_CAPTURE;
+    }
+
+    /**
      * Determine if the payment was cancelled.
      *
      * @return bool
