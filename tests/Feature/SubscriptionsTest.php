@@ -559,6 +559,22 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($subscription->onTrial());
     }
 
+    /** @group FOO */
+    public function test_trial_on_swap_is_skipped_when_explicitly_asked_to()
+    {
+        $user = $this->createCustomer('trial_on_swap_is_skipped_when_explicitly_asked_to');
+
+        $subscription = $user->newSubscription('main', static::$planId)
+            ->trialDays(5)
+            ->create('pm_card_visa');
+
+        $this->assertTrue($subscription->onTrial());
+
+        $subscription = $subscription->skipTrial()->swapAndInvoice(static::$otherPlanId);
+
+        $this->assertFalse($subscription->onTrial());
+    }
+
     public function test_no_prorate_on_subscription_create()
     {
         $user = $this->createCustomer('no_prorate_on_subscription_create');
