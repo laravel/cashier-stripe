@@ -1,7 +1,7 @@
 <button
     id="checkout-{{ $sessionId }}"
     role="link"
-    style="{{ ! isset($style) && ! isset($class) ? 'background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em' : ''; }}"
+    @isset($style) style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em {{ $style }}" @endisset
     @isset($class) class="{{ $class }}" @endisset
 >
     {{ $label }}
