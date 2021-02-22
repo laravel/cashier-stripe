@@ -544,6 +544,21 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals(0, $user->upcomingInvoice()->rawTotal());
     }
 
+    public function test_trial_remains_when_customer_is_invoiced_immediately_on_swap()
+    {
+        $user = $this->createCustomer('trial_remains_when_customer_is_invoiced_immediately_on_swap');
+
+        $subscription = $user->newSubscription('main', static::$planId)
+            ->trialDays(5)
+            ->create('pm_card_visa');
+
+        $this->assertTrue($subscription->onTrial());
+
+        $subscription = $subscription->swapAndInvoice(static::$otherPlanId);
+
+        $this->assertTrue($subscription->onTrial());
+    }
+
     public function test_no_prorate_on_subscription_create()
     {
         $user = $this->createCustomer('no_prorate_on_subscription_create');
