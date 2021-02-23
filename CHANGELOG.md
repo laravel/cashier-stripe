@@ -1,6 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.9.0...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.9.1...12.x)
+
+
+## [v12.9.1 (2021-02-23)](https://github.com/laravel/cashier/compare/v12.9.0...v12.9.1)
+
+### Changed
+- Allow model swapping ([#1067](https://github.com/laravel/cashier-stripe/pull/1067))
+
+### Fixed
+- Fix styles overwriting checkout button when class is set ([#1070](https://github.com/laravel/cashier-stripe/pull/1070))
 
 
 ## [v12.9.0 (2021-02-19)](https://github.com/laravel/cashier/compare/v12.8.1...v12.9.0)
