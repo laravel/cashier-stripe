@@ -1,6 +1,24 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.8.1...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.9.1...master)
+
+
+## [v12.9.1 (2021-02-23)](https://github.com/laravel/cashier/compare/v12.9.0...v12.9.1)
+
+### Changed
+- Allow model swapping ([#1067](https://github.com/laravel/cashier-stripe/pull/1067))
+
+### Fixed
+- Fix styles overwriting checkout button when class is set ([#1070](https://github.com/laravel/cashier-stripe/pull/1070))
+
+
+## [v12.9.0 (2021-02-19)](https://github.com/laravel/cashier/compare/v12.8.1...v12.9.0)
+
+### Added
+- Add `endTrial` method ([#1062](https://github.com/laravel/cashier-stripe/pull/1062))
+
+### Fixed
+- Fix removing tax rates ([d803ae5](https://github.com/laravel/cashier-stripe/commit/d803ae57ae20ee1e38ff8bf47484dfada7eef79d))
 
 
 ## [v12.8.1 (2021-02-16)](https://github.com/laravel/cashier/compare/v12.8.0...v12.8.1)

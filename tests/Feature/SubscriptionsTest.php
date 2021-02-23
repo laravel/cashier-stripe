@@ -544,6 +544,37 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals(0, $user->upcomingInvoice()->rawTotal());
     }
 
+    public function test_trial_remains_when_customer_is_invoiced_immediately_on_swap()
+    {
+        $user = $this->createCustomer('trial_remains_when_customer_is_invoiced_immediately_on_swap');
+
+        $subscription = $user->newSubscription('main', static::$planId)
+            ->trialDays(5)
+            ->create('pm_card_visa');
+
+        $this->assertTrue($subscription->onTrial());
+
+        $subscription = $subscription->swapAndInvoice(static::$otherPlanId);
+
+        $this->assertTrue($subscription->onTrial());
+    }
+
+    /** @group FOO */
+    public function test_trial_on_swap_is_skipped_when_explicitly_asked_to()
+    {
+        $user = $this->createCustomer('trial_on_swap_is_skipped_when_explicitly_asked_to');
+
+        $subscription = $user->newSubscription('main', static::$planId)
+            ->trialDays(5)
+            ->create('pm_card_visa');
+
+        $this->assertTrue($subscription->onTrial());
+
+        $subscription = $subscription->skipTrial()->swapAndInvoice(static::$otherPlanId);
+
+        $this->assertFalse($subscription->onTrial());
+    }
+
     public function test_no_prorate_on_subscription_create()
     {
         $user = $this->createCustomer('no_prorate_on_subscription_create');
@@ -600,6 +631,19 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertTrue($trialEndsAt->equalTo($subscription->trial_ends_at));
         $this->assertEquals($subscription->asStripeSubscription()->trial_end, $trialEndsAt->getTimestamp());
+    }
+
+    public function test_trials_can_be_ended()
+    {
+        $user = $this->createCustomer('trials_can_be_ended');
+
+        $subscription = $user->newSubscription('main', static::$planId)
+            ->trialDays(10)
+            ->create('pm_card_visa');
+
+        $subscription->endTrial();
+
+        $this->assertNull($subscription->trial_ends_at);
     }
 
     public function test_applying_coupons_to_existing_customers()
