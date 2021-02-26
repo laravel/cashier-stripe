@@ -32,7 +32,7 @@ trait ManagesPaymentMethods
      */
     public function hasDefaultPaymentMethod()
     {
-        return (bool) $this->card_brand;
+        return (bool) $this->pm_type;
     }
 
     /**
@@ -51,7 +51,6 @@ trait ManagesPaymentMethods
      *
      * @param  string  $type
      * @param  array  $parameters
-     * @param  string $type
      * @return \Illuminate\Support\Collection|\Laravel\Cashier\PaymentMethod[]
      */
     public function paymentMethods($type = 'card', $parameters = [])
@@ -119,8 +118,8 @@ trait ManagesPaymentMethods
         // If the payment method was the default payment method, we'll remove it manually...
         if ($stripePaymentMethod->id === $defaultPaymentMethod) {
             $this->forceFill([
-                'card_brand' => null,
-                'card_last_four' => null,
+                'pm_type' => null,
+                'pm_last_four' => null,
             ])->save();
         }
     }
@@ -208,8 +207,8 @@ trait ManagesPaymentMethods
             }
         } else {
             $this->forceFill([
-                'card_brand' => null,
-                'card_last_four' => null,
+                'pm_type' => null,
+                'pm_last_four' => null,
             ])->save();
         }
 
@@ -225,11 +224,11 @@ trait ManagesPaymentMethods
     protected function fillPaymentMethodDetails($paymentMethod)
     {
         if ($paymentMethod->type === 'card') {
-            $this->card_brand = $paymentMethod->card->brand;
-            $this->card_last_four = $paymentMethod->card->last4;
+            $this->pm_type = $paymentMethod->card->brand;
+            $this->pm_last_four = $paymentMethod->card->last4;
         } else {
-            $this->card_brand = $type = $paymentMethod->type;
-            $this->card_last_four = optional($paymentMethod)->$type->last4;
+            $this->pm_type = $type = $paymentMethod->type;
+            $this->pm_last_four = optional($paymentMethod)->$type->last4;
         }
 
         return $this;
@@ -246,11 +245,11 @@ trait ManagesPaymentMethods
     protected function fillSourceDetails($source)
     {
         if ($source instanceof StripeCard) {
-            $this->card_brand = $source->brand;
-            $this->card_last_four = $source->last4;
+            $this->pm_type = $source->brand;
+            $this->pm_last_four = $source->last4;
         } elseif ($source instanceof StripeBankAccount) {
-            $this->card_brand = 'Bank Account';
-            $this->card_last_four = $source->last4;
+            $this->pm_type = 'Bank Account';
+            $this->pm_last_four = $source->last4;
         }
 
         return $this;

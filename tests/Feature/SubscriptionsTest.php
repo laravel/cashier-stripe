@@ -559,7 +559,6 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($subscription->onTrial());
     }
 
-    /** @group FOO */
     public function test_trial_on_swap_is_skipped_when_explicitly_asked_to()
     {
         $user = $this->createCustomer('trial_on_swap_is_skipped_when_explicitly_asked_to');
