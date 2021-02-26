@@ -4,8 +4,6 @@ namespace Laravel\Cashier\Concerns;
 
 use Exception;
 use Laravel\Cashier\PaymentMethod;
-use Stripe\BankAccount as StripeBankAccount;
-use Stripe\Card as StripeCard;
 use Stripe\Customer as StripeCustomer;
 use Stripe\PaymentMethod as StripePaymentMethod;
 use Stripe\SetupIntent as StripeSetupIntent;
@@ -127,7 +125,7 @@ trait ManagesPaymentMethods
     /**
      * Get the default payment method for the customer.
      *
-     * @return \Laravel\Cashier\PaymentMethod|\Stripe\Card|\Stripe\BankAccount|null
+     * @return \Laravel\Cashier\PaymentMethod|null
      */
     public function defaultPaymentMethod()
     {
@@ -139,16 +137,12 @@ trait ManagesPaymentMethods
             'id' => $this->stripe_id,
             'expand' => [
                 'invoice_settings.default_payment_method',
-                'default_source',
             ],
         ], $this->stripeOptions());
 
         if ($customer->invoice_settings->default_payment_method) {
             return new PaymentMethod($this, $customer->invoice_settings->default_payment_method);
         }
-
-        // If we can't find a payment method, try to return a legacy source...
-        return $customer->default_source;
     }
 
     /**
@@ -197,14 +191,10 @@ trait ManagesPaymentMethods
     {
         $defaultPaymentMethod = $this->defaultPaymentMethod();
 
-        if ($defaultPaymentMethod) {
-            if ($defaultPaymentMethod instanceof PaymentMethod) {
-                $this->fillPaymentMethodDetails(
-                    $defaultPaymentMethod->asStripePaymentMethod()
-                )->save();
-            } else {
-                $this->fillSourceDetails($defaultPaymentMethod)->save();
-            }
+        if ($defaultPaymentMethod && $defaultPaymentMethod instanceof PaymentMethod) {
+            $this->fillPaymentMethodDetails(
+                $defaultPaymentMethod->asStripePaymentMethod()
+            )->save();
         } else {
             $this->forceFill([
                 'pm_type' => null,
@@ -229,27 +219,6 @@ trait ManagesPaymentMethods
         } else {
             $this->pm_type = $type = $paymentMethod->type;
             $this->pm_last_four = optional($paymentMethod)->$type->last4;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Fills the model's properties with the source from Stripe.
-     *
-     * @param  \Stripe\Card|\Stripe\BankAccount|null  $source
-     * @return $this
-     *
-     * @deprecated Will be removed in a future Cashier update. You should use the new payment methods API instead.
-     */
-    protected function fillSourceDetails($source)
-    {
-        if ($source instanceof StripeCard) {
-            $this->pm_type = $source->brand;
-            $this->pm_last_four = $source->last4;
-        } elseif ($source instanceof StripeBankAccount) {
-            $this->pm_type = 'Bank Account';
-            $this->pm_last_four = $source->last4;
         }
 
         return $this;
