@@ -22,7 +22,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Determine if the entity has a Stripe customer ID.
+     * Determine if the customer has a Stripe customer ID.
      *
      * @return bool
      */
@@ -32,7 +32,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Determine if the entity has a Stripe customer ID and throw an exception if not.
+     * Determine if the customer has a Stripe customer ID and throw an exception if not.
      *
      * @return void
      *
@@ -128,7 +128,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Apply a coupon to the billable entity.
+     * Apply a coupon to the customer.
      *
      * @param  string  $coupon
      * @return void
@@ -145,7 +145,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the Stripe supported currency used by the entity.
+     * Get the Stripe supported currency used by the customer.
      *
      * @return string
      */

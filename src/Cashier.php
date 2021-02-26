@@ -67,7 +67,7 @@ class Cashier
     public static $subscriptionItemModel = SubscriptionItem::class;
 
     /**
-     * Get the billable entity instance by Stripe ID.
+     * Get the customer instance by Stripe ID.
      *
      * @param  string  $stripeId
      * @return \Laravel\Cashier\Billable|null
