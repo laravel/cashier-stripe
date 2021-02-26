@@ -146,7 +146,7 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Determine if the entity has a valid subscription on the given plan.
+     * Determine if the customer has a valid subscription on the given plan.
      *
      * @param  string  $plan
      * @return bool

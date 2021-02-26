@@ -47,7 +47,7 @@ trait ManagesPaymentMethods
     }
 
     /**
-     * Get a collection of the entity's payment methods of the given type.
+     * Get a collection of the customer's payment methods of the given type.
      *
      * @param  string  $type
      * @param  array  $parameters
@@ -125,7 +125,7 @@ trait ManagesPaymentMethods
     }
 
     /**
-     * Get the default payment method for the entity.
+     * Get the default payment method for the customer.
      *
      * @return \Laravel\Cashier\PaymentMethod|\Stripe\Card|\Stripe\BankAccount|null
      */
@@ -256,7 +256,7 @@ trait ManagesPaymentMethods
     }
 
     /**
-     * Deletes the entity's payment methods of the given type.
+     * Deletes the customer's payment methods of the given type.
      *
      * @param  string  $type
      * @return void

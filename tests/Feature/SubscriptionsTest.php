@@ -255,7 +255,7 @@ class SubscriptionsTest extends FeatureTestCase
             // Assert that the payment needs a valid payment method.
             $this->assertTrue($e->payment->requiresPaymentMethod());
 
-            // Assert subscription was added to the billable entity.
+            // Assert subscription was added to the customer.
             $this->assertInstanceOf(Subscription::class, $subscription = $user->subscription('main'));
 
             // Assert subscription is incomplete.
@@ -275,7 +275,7 @@ class SubscriptionsTest extends FeatureTestCase
             // Assert that the payment needs an extra action.
             $this->assertTrue($e->payment->requiresAction());
 
-            // Assert subscription was added to the billable entity.
+            // Assert subscription was added to the customer.
             $this->assertInstanceOf(Subscription::class, $subscription = $user->subscription('main'));
 
             // Assert subscription is incomplete.
