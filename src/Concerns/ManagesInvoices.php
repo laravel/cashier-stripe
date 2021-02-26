@@ -58,7 +58,7 @@ trait ManagesInvoices
     }
 
     /**
-     * Invoice the billable entity outside of the regular billing cycle.
+     * Invoice the customer outside of the regular billing cycle.
      *
      * @param  array  $options
      * @return \Laravel\Cashier\Invoice|bool
@@ -98,7 +98,7 @@ trait ManagesInvoices
     }
 
     /**
-     * Get the entity's upcoming invoice.
+     * Get the customer's upcoming invoice.
      *
      * @return \Laravel\Cashier\Invoice|null
      */
@@ -178,7 +178,7 @@ trait ManagesInvoices
     }
 
     /**
-     * Get a collection of the entity's invoices.
+     * Get a collection of the customer's invoices.
      *
      * @param  bool  $includePending
      * @param  array  $parameters
@@ -214,7 +214,7 @@ trait ManagesInvoices
     }
 
     /**
-     * Get an array of the entity's invoices.
+     * Get an array of the customer's invoices.
      *
      * @param  array  $parameters
      * @return \Illuminate\Support\Collection|\Laravel\Cashier\Invoice[]
