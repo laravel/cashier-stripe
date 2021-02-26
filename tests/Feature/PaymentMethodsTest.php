@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Tests\Feature;
 
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\PaymentMethod;
-use Stripe\Card as StripeCard;
 use Stripe\PaymentMethod as StripePaymentMethod;
 use Stripe\SetupIntent as StripeSetupIntent;
 use Stripe\StripeClient;
