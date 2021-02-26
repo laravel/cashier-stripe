@@ -2,10 +2,12 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\PaymentMethod;
 use Stripe\Card as StripeCard;
 use Stripe\PaymentMethod as StripePaymentMethod;
 use Stripe\SetupIntent as StripeSetupIntent;
+use Stripe\StripeClient;
 
 class PaymentMethodsTest extends FeatureTestCase
 {
@@ -30,6 +32,35 @@ class PaymentMethodsTest extends FeatureTestCase
         $this->assertEquals('4242', $paymentMethod->card->last4);
         $this->assertTrue($user->hasPaymentMethod());
         $this->assertFalse($user->hasDefaultPaymentMethod());
+    }
+
+    public function test_we_can_add_default_sepa_payment_method()
+    {
+        $user = $this->createCustomer('we_can_add_default_sepa_payment_method');
+        $user->createAsStripeCustomer();
+
+        $stripe = new StripeClient(Cashier::stripeOptions());
+
+        $paymentMethod = $stripe->paymentMethods->create([
+            'type' => 'sepa_debit',
+            'billing_details' => [
+                'name' => 'John Doe',
+                'email' => 'john@example.com',
+            ],
+            'sepa_debit' => [
+                'iban' => 'BE62510007547061',
+            ],
+        ]);
+
+        $paymentMethod = $user->updateDefaultPaymentMethod($paymentMethod);
+
+        $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);
+        $this->assertEquals('sepa_debit', $user->card_brand);
+        $this->assertEquals('7061', $user->card_last_four);
+        $this->assertEquals('sepa_debit', $paymentMethod->type);
+        $this->assertEquals('7061', $paymentMethod->sepa_debit->last4);
+        $this->assertTrue($user->hasPaymentMethod('sepa_debit'));
+        $this->assertTrue($user->hasDefaultPaymentMethod());
     }
 
     public function test_we_can_remove_payment_methods()
@@ -85,7 +116,7 @@ class PaymentMethodsTest extends FeatureTestCase
 
         $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);
         $this->assertEquals('visa', $paymentMethod->card->brand);
-        $this->assertEquals('card', $user->card_brand);
+        $this->assertEquals('visa', $user->card_brand);
         $this->assertEquals('4242', $paymentMethod->card->last4);
         $this->assertEquals('4242', $user->card_last_four);
     }
@@ -143,7 +174,7 @@ class PaymentMethodsTest extends FeatureTestCase
 
         $user = $user->updateDefaultPaymentMethodFromStripe();
 
-        $this->assertEquals('card', $user->card_brand);
+        $this->assertEquals('visa', $user->card_brand);
         $this->assertEquals('4242', $user->card_last_four);
     }
 

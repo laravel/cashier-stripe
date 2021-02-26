@@ -38,22 +38,23 @@ trait ManagesPaymentMethods
     /**
      * Determines if the customer currently has at least one payment method of the given type.
      *
-     * @param string $type
+     * @param  string  $type
      * @return bool
      */
     public function hasPaymentMethod($type = 'card')
     {
-        return $this->paymentMethods([], $type)->isNotEmpty();
+        return $this->paymentMethods($type)->isNotEmpty();
     }
 
     /**
-     * Get a collection of the entity's payment methods.
+     * Get a collection of the entity's payment methods of the given type.
      *
+     * @param  string  $type
      * @param  array  $parameters
      * @param  string $type
      * @return \Illuminate\Support\Collection|\Laravel\Cashier\PaymentMethod[]
      */
-    public function paymentMethods($parameters = [], $type = 'card')
+    public function paymentMethods($type = 'card', $parameters = [])
     {
         if (! $this->hasStripeId()) {
             return collect();
@@ -223,13 +224,12 @@ trait ManagesPaymentMethods
      */
     protected function fillPaymentMethodDetails($paymentMethod)
     {
-        $type = $paymentMethod->type;
-        $this->card_brand = $type;
-        $pmCustomAttributes = $paymentMethod->$type;
-        if (isset($pmCustomAttributes->last4)) {
-            $this->card_last_four = $pmCustomAttributes->last4;
+        if ($paymentMethod->type === 'card') {
+            $this->card_brand = $paymentMethod->card->brand;
+            $this->card_last_four = $paymentMethod->card->last4;
         } else {
-            $this->card_last_four = null;
+            $this->card_brand = $type = $paymentMethod->type;
+            $this->card_last_four = optional($paymentMethod)->$type->last4;
         }
 
         return $this;
@@ -259,12 +259,12 @@ trait ManagesPaymentMethods
     /**
      * Deletes the entity's payment methods of the given type.
      *
-     * @param string $type
+     * @param  string  $type
      * @return void
      */
     public function deletePaymentMethods($type = 'card')
     {
-        $this->paymentMethods([], $type)->each(function (PaymentMethod $paymentMethod) {
+        $this->paymentMethods($type)->each(function (PaymentMethod $paymentMethod) {
             $paymentMethod->delete();
         });
 
