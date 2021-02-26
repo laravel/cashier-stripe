@@ -32,26 +32,28 @@ trait ManagesPaymentMethods
      */
     public function hasDefaultPaymentMethod()
     {
-        return (bool) $this->card_brand;
+        return (bool) $this->pm_type;
     }
 
     /**
-     * Determines if the customer currently has at least one payment method.
+     * Determines if the customer currently has at least one payment method of the given type.
      *
+     * @param  string  $type
      * @return bool
      */
-    public function hasPaymentMethod()
+    public function hasPaymentMethod($type = 'card')
     {
-        return $this->paymentMethods()->isNotEmpty();
+        return $this->paymentMethods($type)->isNotEmpty();
     }
 
     /**
-     * Get a collection of the entity's payment methods.
+     * Get a collection of the entity's payment methods of the given type.
      *
+     * @param  string  $type
      * @param  array  $parameters
      * @return \Illuminate\Support\Collection|\Laravel\Cashier\PaymentMethod[]
      */
-    public function paymentMethods($parameters = [])
+    public function paymentMethods($type = 'card', $parameters = [])
     {
         if (! $this->hasStripeId()) {
             return collect();
@@ -61,7 +63,7 @@ trait ManagesPaymentMethods
 
         // "type" is temporarily required by Stripe...
         $paymentMethods = StripePaymentMethod::all(
-            ['customer' => $this->stripe_id, 'type' => 'card'] + $parameters,
+            ['customer' => $this->stripe_id, 'type' => $type] + $parameters,
             $this->stripeOptions()
         );
 
@@ -116,8 +118,8 @@ trait ManagesPaymentMethods
         // If the payment method was the default payment method, we'll remove it manually...
         if ($stripePaymentMethod->id === $defaultPaymentMethod) {
             $this->forceFill([
-                'card_brand' => null,
-                'card_last_four' => null,
+                'pm_type' => null,
+                'pm_last_four' => null,
             ])->save();
         }
     }
@@ -205,8 +207,8 @@ trait ManagesPaymentMethods
             }
         } else {
             $this->forceFill([
-                'card_brand' => null,
-                'card_last_four' => null,
+                'pm_type' => null,
+                'pm_last_four' => null,
             ])->save();
         }
 
@@ -222,8 +224,11 @@ trait ManagesPaymentMethods
     protected function fillPaymentMethodDetails($paymentMethod)
     {
         if ($paymentMethod->type === 'card') {
-            $this->card_brand = $paymentMethod->card->brand;
-            $this->card_last_four = $paymentMethod->card->last4;
+            $this->pm_type = $paymentMethod->card->brand;
+            $this->pm_last_four = $paymentMethod->card->last4;
+        } else {
+            $this->pm_type = $type = $paymentMethod->type;
+            $this->pm_last_four = optional($paymentMethod)->$type->last4;
         }
 
         return $this;
@@ -240,24 +245,25 @@ trait ManagesPaymentMethods
     protected function fillSourceDetails($source)
     {
         if ($source instanceof StripeCard) {
-            $this->card_brand = $source->brand;
-            $this->card_last_four = $source->last4;
+            $this->pm_type = $source->brand;
+            $this->pm_last_four = $source->last4;
         } elseif ($source instanceof StripeBankAccount) {
-            $this->card_brand = 'Bank Account';
-            $this->card_last_four = $source->last4;
+            $this->pm_type = 'Bank Account';
+            $this->pm_last_four = $source->last4;
         }
 
         return $this;
     }
 
     /**
-     * Deletes the entity's payment methods.
+     * Deletes the entity's payment methods of the given type.
      *
+     * @param  string  $type
      * @return void
      */
-    public function deletePaymentMethods()
+    public function deletePaymentMethods($type = 'card')
     {
-        $this->paymentMethods()->each(function (PaymentMethod $paymentMethod) {
+        $this->paymentMethods($type)->each(function (PaymentMethod $paymentMethod) {
             $paymentMethod->delete();
         });
 

@@ -28,7 +28,7 @@ class CustomerTest extends TestCase
     public function test_we_can_determine_if_it_has_a_payment_method()
     {
         $user = new User;
-        $user->card_brand = 'visa';
+        $user->pm_type = 'visa';
 
         $this->assertTrue($user->hasDefaultPaymentMethod());
 
