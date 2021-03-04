@@ -52,7 +52,7 @@ class WebhookController extends Controller
             return $response;
         }
 
-        return $this->missingMethod();
+        return $this->missingMethod($payload);
     }
 
     /**
