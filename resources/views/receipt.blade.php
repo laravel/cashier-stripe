@@ -9,6 +9,7 @@
     <style>
         body {
             background: #fff none;
+            font-family: DejaVu Sans, 'sans-serif';
             font-size: 12px;
         }
 
