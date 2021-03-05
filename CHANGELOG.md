@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.9.1...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.9.2...12.x)
+
+
+## [v12.9.1 (2021-02-23)](https://github.com/laravel/cashier/compare/v12.9.1...v12.9.2)
+
+### Fixed
+- Fix missing method on WebhookController ([#1080](https://github.com/laravel/cashier-stripe/pull/1080))
+- Allow relative urls for redirect ([#1082](https://github.com/laravel/cashier-stripe/pull/1082))
 
 
 ## [v12.9.1 (2021-02-23)](https://github.com/laravel/cashier/compare/v12.9.0...v12.9.1)
