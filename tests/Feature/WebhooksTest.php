@@ -193,7 +193,7 @@ class WebhooksTest extends FeatureTestCase
             'user_id' => $user->id,
             'stripe_id' => 'sub_foo',
             'quantity' => 5,
-            'ends_at' => $cancelDate->format('Y-m-d H:i:s')
+            'ends_at' => $cancelDate->format('Y-m-d H:i:s'),
         ]);
 
         $this->assertDatabaseHas('subscription_items', [
