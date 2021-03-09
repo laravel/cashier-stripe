@@ -1,9 +1,18 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.9.2...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.9.3...12.x)
 
 
-## [v12.9.1 (2021-02-23)](https://github.com/laravel/cashier/compare/v12.9.1...v12.9.2)
+## [v12.9.3 (2021-03-09)](https://github.com/laravel/cashier/compare/v12.9.2...v12.9.3)
+
+### Changed
+- Use DejaVu Sans for receipts ([#1083](https://github.com/laravel/cashier-stripe/pull/1083))
+
+### Fixed
+- Subscription Update Webhook bugfix ([#1085](https://github.com/laravel/cashier-stripe/pull/1085), [3184afc](https://github.com/laravel/cashier-stripe/commit/3184afce07b65986d7aaa6f570b9ac44f502303c))
+
+
+## [v12.9.2 (2021-03-05)](https://github.com/laravel/cashier/compare/v12.9.1...v12.9.2)
 
 ### Fixed
 - Fix missing method on WebhookController ([#1080](https://github.com/laravel/cashier-stripe/pull/1080))
