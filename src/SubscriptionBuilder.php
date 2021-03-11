@@ -321,7 +321,7 @@ class SubscriptionBuilder
             'stripe_status' => $stripeSubscription->status,
             'stripe_plan' => $isSinglePlan ? $firstItem->plan->id : null,
             'quantity' => $isSinglePlan ? $firstItem->quantity : null,
-            'trial_ends_at' => ! $this->skipTrial ? $this->trialExpires : null,
+            'trial_ends_at' => ! $this->skipTrial && $this->trialExpires->isFuture() ? $this->trialExpires : null,
             'ends_at' => null,
         ]);
 
@@ -440,7 +440,7 @@ class SubscriptionBuilder
             return 'now';
         }
 
-        if ($this->trialExpires) {
+        if ($this->trialExpires && $this->trialExpires->isFuture()) {
             return $this->trialExpires->getTimestamp();
         }
     }
