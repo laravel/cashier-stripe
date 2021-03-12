@@ -77,6 +77,26 @@ class Payment
     }
 
     /**
+     * Determine if the payment needs to be confirmed.
+     *
+     * @return bool
+     */
+    public function requiresConfirmation()
+    {
+        return $this->paymentIntent->status === StripePaymentIntent::STATUS_REQUIRES_CONFIRMATION;
+    }
+
+    /**
+     * Determine if the payment needs to be captured.
+     *
+     * @return bool
+     */
+    public function requiresCapture()
+    {
+        return $this->paymentIntent->status === 'requires_capture';
+    }
+
+    /**
      * Determine if the payment was cancelled.
      *
      * @return bool
@@ -94,6 +114,16 @@ class Payment
     public function isSucceeded()
     {
         return $this->paymentIntent->status === StripePaymentIntent::STATUS_SUCCEEDED;
+    }
+
+    /**
+     * Determine if the payment is processing.
+     *
+     * @return bool
+     */
+    public function isProcessing()
+    {
+        return $this->paymentIntent->status === StripePaymentIntent::STATUS_PROCESSING;
     }
 
     /**
