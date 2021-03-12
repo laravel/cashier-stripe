@@ -24,8 +24,7 @@ trait PerformsCharges
      * @param  array  $options
      * @return \Laravel\Cashier\Payment
      *
-     * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
-     * @throws \Laravel\Cashier\Exceptions\PaymentFailure
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
     public function charge($amount, $paymentMethod, array $options = [])
     {

@@ -30,4 +30,46 @@ class IncompletePayment extends Exception
 
         $this->payment = $payment;
     }
+
+    /**
+     * Create a new IncompletePayment instance with a `payment_action_required` type.
+     *
+     * @param  \Laravel\Cashier\Payment  $payment
+     * @return static
+     */
+    public static function paymentMethodRequired(Payment $payment)
+    {
+        return new static(
+            $payment,
+            'The payment attempt failed because of an invalid payment method.'
+        );
+    }
+
+    /**
+     * Create a new IncompletePayment instance with a `requires_action` type.
+     *
+     * @param  \Laravel\Cashier\Payment  $payment
+     * @return static
+     */
+    public static function requiresAction(Payment $payment)
+    {
+        return new static(
+            $payment,
+            'The payment attempt failed because additional action is required before it can be completed.'
+        );
+    }
+
+    /**
+     * Create a new IncompletePayment instance with a `requires_confirmation` type.
+     *
+     * @param  \Laravel\Cashier\Payment  $payment
+     * @return static
+     */
+    public static function requiresConfirmation(Payment $payment)
+    {
+        return new static(
+            $payment,
+            'The payment attempt failed because additional it needs to be confirmed before it can be completed.'
+        );
+    }
 }

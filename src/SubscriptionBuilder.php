@@ -271,8 +271,7 @@ class SubscriptionBuilder
      * @param  array  $subscriptionOptions
      * @return \Laravel\Cashier\Subscription
      *
-     * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
-     * @throws \Laravel\Cashier\Exceptions\PaymentFailure
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
     public function add(array $customerOptions = [], array $subscriptionOptions = [])
     {
@@ -288,8 +287,7 @@ class SubscriptionBuilder
      * @return \Laravel\Cashier\Subscription
      *
      * @throws \Exception
-     * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
-     * @throws \Laravel\Cashier\Exceptions\PaymentFailure
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
     public function create($paymentMethod = null, array $customerOptions = [], array $subscriptionOptions = [])
     {

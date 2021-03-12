@@ -6,8 +6,7 @@ use Carbon\Carbon;
 use DateTime;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Exceptions\PaymentActionRequired;
-use Laravel\Cashier\Exceptions\PaymentFailure;
+use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\Tests\Fixtures\User;
@@ -250,8 +249,8 @@ class SubscriptionsTest extends FeatureTestCase
         try {
             $user->newSubscription('main', static::$planId)->create('pm_card_chargeCustomerFail');
 
-            $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
-        } catch (PaymentFailure $e) {
+            $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
+        } catch (IncompletePayment $e) {
             // Assert that the payment needs a valid payment method.
             $this->assertTrue($e->payment->requiresPaymentMethod());
 
@@ -270,8 +269,8 @@ class SubscriptionsTest extends FeatureTestCase
         try {
             $user->newSubscription('main', static::$planId)->create('pm_card_threeDSecure2Required');
 
-            $this->fail('Expected exception '.PaymentActionRequired::class.' was not thrown.');
-        } catch (PaymentActionRequired $e) {
+            $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
+        } catch (IncompletePayment $e) {
             // Assert that the payment needs an extra action.
             $this->assertTrue($e->payment->requiresAction());
 
@@ -296,8 +295,8 @@ class SubscriptionsTest extends FeatureTestCase
             // Attempt to swap and pay with a faulty card.
             $subscription = $subscription->swapAndInvoice(static::$premiumPlanId);
 
-            $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
-        } catch (PaymentFailure $e) {
+            $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
+        } catch (IncompletePayment $e) {
             // Assert that the payment needs a valid payment method.
             $this->assertTrue($e->payment->requiresPaymentMethod());
 
@@ -322,8 +321,8 @@ class SubscriptionsTest extends FeatureTestCase
             // Attempt to swap and pay with a faulty card.
             $subscription = $subscription->swapAndInvoice(static::$premiumPlanId);
 
-            $this->fail('Expected exception '.PaymentActionRequired::class.' was not thrown.');
-        } catch (PaymentActionRequired $e) {
+            $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
+        } catch (IncompletePayment $e) {
             // Assert that the payment needs an extra action.
             $this->assertTrue($e->payment->requiresAction());
 
@@ -763,8 +762,8 @@ class SubscriptionsTest extends FeatureTestCase
         try {
             $user->newSubscription('main', static::$planId)->create('pm_card_threeDSecure2Required');
 
-            $this->fail('Expected exception '.PaymentActionRequired::class.' was not thrown.');
-        } catch (PaymentActionRequired $e) {
+            $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
+        } catch (IncompletePayment $e) {
             $subscription = $user->refresh()->subscription('main');
 
             $this->assertInstanceOf(Payment::class, $payment = $subscription->latestPayment());

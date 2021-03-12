@@ -47,8 +47,7 @@ trait ManagesInvoices
      * @param  array  $invoiceOptions
      * @return \Laravel\Cashier\Invoice|bool
      *
-     * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
-     * @throws \Laravel\Cashier\Exceptions\PaymentFailure
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
     public function invoiceFor($description, $amount, array $tabOptions = [], array $invoiceOptions = [])
     {
@@ -63,8 +62,7 @@ trait ManagesInvoices
      * @param  array  $options
      * @return \Laravel\Cashier\Invoice|bool
      *
-     * @throws \Laravel\Cashier\Exceptions\PaymentActionRequired
-     * @throws \Laravel\Cashier\Exceptions\PaymentFailure
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
     public function invoice(array $options = [])
     {

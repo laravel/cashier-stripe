@@ -3,8 +3,7 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Illuminate\Support\Str;
-use Laravel\Cashier\Exceptions\PaymentActionRequired;
-use Laravel\Cashier\Exceptions\PaymentFailure;
+use Laravel\Cashier\Exceptions\IncompletePayment;
 use Stripe\Exception\CardException as StripeCardException;
 use Stripe\Plan;
 use Stripe\Product;
@@ -100,7 +99,7 @@ class PendingUpdatesTest extends FeatureTestCase
             // Attempt to swap and pay with a faulty card.
             $subscription = $subscription->errorIfPaymentFails()->swapAndInvoice(static::$premiumPlanId);
 
-            $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
+            $this->fail('Expected exception '.StripeCardException::class.' was not thrown.');
         } catch (StripeCardException $e) {
             // Assert that the plan was not swapped.
             $this->assertEquals(static::$planId, $subscription->refresh()->stripe_plan);
@@ -123,8 +122,8 @@ class PendingUpdatesTest extends FeatureTestCase
     //         // Attempt to swap and pay with a faulty card.
     //         $subscription = $subscription->pendingIfPaymentFails()->swapAndInvoice(static::$premiumPlanId);
     //
-    //         $this->fail('Expected exception '.PaymentFailure::class.' was not thrown.');
-    //     } catch (PaymentActionRequired $e) {
+    //         $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
+    //     } catch (IncompletePayment $e) {
     //         // Assert that the payment needs an extra action.
     //         $this->assertTrue($e->payment->requiresAction());
     //
