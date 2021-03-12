@@ -93,7 +93,7 @@ class Payment
      */
     public function requiresCapture()
     {
-        return $this->paymentIntent->status === 'requires_capture';
+        return $this->paymentIntent->status === StripePaymentIntent::STATUS_REQUIRES_CAPTURE;
     }
 
     /**
