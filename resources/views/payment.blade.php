@@ -51,7 +51,7 @@
                 @else
                     <div id="payment-elements" v-if="! paymentProcessed">
                         <!-- Payment Method Form -->
-                        <div v-show="requiresPaymentMethod || requiresConfirmation">
+                        <div v-show="requiresPaymentMethod">
                             <!-- Instructions -->
                             <h1 class="text-xl mb-4 text-gray-600">
                                 {{ __('Confirm your :amount payment', ['amount' => $payment->amount()]) }}
@@ -94,7 +94,7 @@
                         </div>
 
                         <!-- Confirm Payment Method Button -->
-                        <div v-show="requiresAction">
+                        <div v-show="requiresAction || requiresConfirmation">
                             <button
                                 id="card-button"
                                 class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
