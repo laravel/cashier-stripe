@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Factories;
+namespace Laravel\Cashier\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
