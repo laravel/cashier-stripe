@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use DateTimeInterface;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
@@ -16,6 +17,7 @@ class SubscriptionItem extends Model
 {
     use InteractsWithPaymentBehavior;
     use Prorates;
+    use HasFactory;
 
     /**
      * The attributes that are not mass assignable.
