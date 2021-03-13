@@ -36,4 +36,17 @@ class SubscriptionFactory extends Factory
             'ends_at' => null
         ];
     }
+
+    /**
+     * Add a plan identifier to the model
+     *
+     * @param  string  $plan
+     * @return $this
+     */
+    public function withPlan($plan)
+    {
+        return $this->state([
+            'stripe_plan' => $plan
+        ]);
+    }
 }
