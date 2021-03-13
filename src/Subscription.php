@@ -5,6 +5,7 @@ namespace Laravel\Cashier;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -19,6 +20,7 @@ class Subscription extends Model
 {
     use InteractsWithPaymentBehavior;
     use Prorates;
+    use HasFactory;
 
     /**
      * The attributes that are not mass assignable.
