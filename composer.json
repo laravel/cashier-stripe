@@ -41,7 +41,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Laravel\\Cashier\\": "src/"
+            "Laravel\\Cashier\\": "src/",
+            "Laravel\\Cashier\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
