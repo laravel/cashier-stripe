@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
-use Laravel\Cashier\Database\Factories\SubscriptionItemFactory;
 use Stripe\SubscriptionItem as StripeSubscriptionItem;
 
 /**
@@ -244,15 +243,5 @@ class SubscriptionItem extends Model
             ['id' => $this->stripe_id, 'expand' => $expand],
             $this->subscription->owner->stripeOptions()
         );
-    }
-
-    /**
-     * Create a new factory instance for the model.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
-     */
-    public static function newFactory()
-    {
-        return SubscriptionItemFactory::new();
     }
 }

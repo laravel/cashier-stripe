@@ -11,7 +11,6 @@ use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
-use Laravel\Cashier\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use LogicException;
@@ -1164,15 +1163,5 @@ class Subscription extends Model
         return StripeSubscription::retrieve(
             ['id' => $this->stripe_id, 'expand' => $expand], $this->owner->stripeOptions()
         );
-    }
-
-    /**
-     * Create a new factory instance for the model.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
-     */
-    public static function newFactory()
-    {
-        return SubscriptionFactory::new();
     }
 }

@@ -33,15 +33,4 @@ class User extends Model
     {
         return $this->planTaxRates;
     }
-
-    /**
-     * Get a new factory instance for the model.
-     *
-     * @param  mixed  $parameters
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
-     */
-    public static function factory(...$parameters)
-    {
-
-    }
 }
