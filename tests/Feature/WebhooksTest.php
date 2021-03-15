@@ -5,7 +5,7 @@ namespace Laravel\Cashier\Tests\Feature;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
-use Laravel\Cashier\Exceptions\PaymentActionRequired;
+use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Notifications\ConfirmPayment;
 use Stripe\Plan;
 use Stripe\Product;
@@ -290,8 +290,8 @@ class WebhooksTest extends FeatureTestCase
         try {
             $user->newSubscription('main', static::$planId)->create('pm_card_threeDSecure2Required');
 
-            $this->fail('Expected exception '.PaymentActionRequired::class.' was not thrown.');
-        } catch (PaymentActionRequired $exception) {
+            $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
+        } catch (IncompletePayment $exception) {
             Notification::fake();
 
             $this->postJson('stripe/webhook', [

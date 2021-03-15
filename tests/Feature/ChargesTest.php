@@ -2,7 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
-use Laravel\Cashier\Exceptions\PaymentActionRequired;
+use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Payment;
 
 class ChargesTest extends FeatureTestCase
@@ -63,8 +63,8 @@ class ChargesTest extends FeatureTestCase
         try {
             $user->charge(1000, 'pm_card_threeDSecure2Required');
 
-            $this->fail('Expected exception '.PaymentActionRequired::class.' was not thrown.');
-        } catch (PaymentActionRequired $e) {
+            $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
+        } catch (IncompletePayment $e) {
             // Assert that the payment needs an extra action.
             $this->assertTrue($e->payment->requiresAction());
 
