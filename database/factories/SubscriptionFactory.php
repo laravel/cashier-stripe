@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Database\Factories;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Subscription;
@@ -63,6 +64,20 @@ class SubscriptionFactory extends Factory
     }
 
     /**
+     * Mark the subscription as being within a trial period.
+     *
+     * @param  \DateTimeInterface  $trialEndsAt
+     * @return $this
+     */
+    public function trialing(DateTimeInterface $trialEndsAt = null)
+    {
+        return $this->state([
+            'stripe_status' => StripeSubscription::STATUS_TRIALING,
+            'trial_ends_at' => $trialEndsAt,
+        ]);
+    }
+
+    /**
      * Mark the subscription as canceled.
      *
      * @return $this
@@ -107,18 +122,6 @@ class SubscriptionFactory extends Factory
     {
         return $this->state([
             'stripe_status' => StripeSubscription::STATUS_PAST_DUE,
-        ]);
-    }
-
-    /**
-     * Mark the subscription as being in trial mode.
-     *
-     * @return $this
-     */
-    public function trial()
-    {
-        return $this->state([
-            'stripe_status' => StripeSubscription::STATUS_TRIALING,
         ]);
     }
 
