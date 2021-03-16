@@ -57,7 +57,7 @@ class Payment
     }
 
     /**
-     * Capture a payment that have been hold for the customer.
+     * Capture a payment that is being held for the customer.
      *
      * @param  array  $options
      * @return \Stripe\PaymentIntent
