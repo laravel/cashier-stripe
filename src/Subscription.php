@@ -82,7 +82,7 @@ class Subscription extends Model
      */
     public function owner()
     {
-        $model = config('cashier.model');
+        $model = Cashier::$customerModel;
 
         return $this->belongsTo($model, (new $model)->getForeignKey());
     }

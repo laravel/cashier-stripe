@@ -217,7 +217,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the default Stripe API options for the current Billable model.
+     * Get the default Stripe API options for the current customer model.
      *
      * @param  array  $options
      * @return array

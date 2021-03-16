@@ -53,6 +53,13 @@ class Cashier
     public static $deactivatePastDue = true;
 
     /**
+     * The default customer model class name.
+     *
+     * @var string
+     */
+    public static $customerModel = 'App\\Models\\User';
+
+    /**
      * The subscription model class name.
      *
      * @var string
@@ -67,7 +74,7 @@ class Cashier
     public static $subscriptionItemModel = SubscriptionItem::class;
 
     /**
-     * Get the customer instance by Stripe ID.
+     * Get the customer instance by its Stripe ID.
      *
      * @param  string  $stripeId
      * @return \Laravel\Cashier\Billable|null
@@ -78,9 +85,7 @@ class Cashier
             return;
         }
 
-        $model = config('cashier.model');
-
-        return (new $model)->where('stripe_id', $stripeId)->first();
+        return (new static::$customerModel)->where('stripe_id', $stripeId)->first();
     }
 
     /**
@@ -166,6 +171,17 @@ class Cashier
         static::$deactivatePastDue = false;
 
         return new static;
+    }
+
+    /**
+     * Set the customer model class name.
+     *
+     * @param  string  $customerModel
+     * @return void
+     */
+    public static function useCustomerModel($customerModel)
+    {
+        static::$customerModel = $customerModel;
     }
 
     /**
