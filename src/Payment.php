@@ -57,6 +57,17 @@ class Payment
     }
 
     /**
+     * Capture a payment that have been hold for the customer.
+     *
+     * @param  array  $options
+     * @return \Stripe\PaymentIntent
+     */
+    public function capture(array $options = [])
+    {
+        return $this->paymentIntent->capture($options, Cashier::stripeOptions());
+    }
+
+    /**
      * Determine if the payment needs a valid payment method.
      *
      * @return bool
