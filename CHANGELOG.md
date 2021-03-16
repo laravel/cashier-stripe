@@ -1,6 +1,17 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.9.2...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.10.0...master)
+
+
+## [v12.10.0 (2021-03-16)](https://github.com/laravel/cashier/compare/v12.9.3...v12.10.0)
+
+### Added
+- Added new payment status helper methods ([#1068](https://github.com/laravel/cashier-stripe/pull/1068))
+- Add capture method ([#1099](https://github.com/laravel/cashier-stripe/pull/1099))
+
+### Changed
+- Update description on receipt ([#1098](https://github.com/laravel/cashier-stripe/pull/1098))
+- Update payment page ([#1094](https://github.com/laravel/cashier-stripe/pull/1094))
 
 
 ## [v12.9.3 (2021-03-09)](https://github.com/laravel/cashier/compare/v12.9.2...v12.9.3)
