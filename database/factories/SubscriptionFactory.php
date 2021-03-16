@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Database\Factories;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Subscription;
 use Stripe\Subscription as StripeSubscription;
 
@@ -24,7 +25,7 @@ class SubscriptionFactory extends Factory
      */
     public function definition()
     {
-        $model = config('cashier.model');
+        $model = Cashier::$customerModel;
 
         return [
             (new $model)->getForeignKey() => ($model)::factory(),
