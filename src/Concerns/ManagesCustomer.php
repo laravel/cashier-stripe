@@ -161,28 +161,30 @@ trait ManagesCustomer
      * Get the Stripe billing portal for this customer.
      *
      * @param  string|null  $returnUrl
+     * @param  array  $options
      * @return string
      */
-    public function billingPortalUrl($returnUrl = null)
+    public function billingPortalUrl($returnUrl = null, array $options = [])
     {
         $this->assertCustomerExists();
 
-        return StripeBillingPortalSession::create([
+        return StripeBillingPortalSession::create(array_merge([
             'customer' => $this->stripeId(),
             'return_url' => $returnUrl ?? route('home'),
-        ], $this->stripeOptions())['url'];
+        ], $options), $this->stripeOptions())['url'];
     }
 
     /**
      * Generate a redirect response to the customer's Stripe billing portal.
      *
      * @param  string|null  $returnUrl
+     * @param  array  $options
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function redirectToBillingPortal($returnUrl = null)
+    public function redirectToBillingPortal($returnUrl = null, array $options = [])
     {
         return new RedirectResponse(
-            $this->billingPortalUrl($returnUrl)
+            $this->billingPortalUrl($returnUrl, $options)
         );
     }
 
