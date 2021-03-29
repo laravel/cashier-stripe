@@ -559,7 +559,6 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($subscription->onTrial());
     }
 
-    /** @group FOO */
     public function test_trial_on_swap_is_skipped_when_explicitly_asked_to()
     {
         $user = $this->createCustomer('trial_on_swap_is_skipped_when_explicitly_asked_to');
@@ -831,5 +830,18 @@ class SubscriptionsTest extends FeatureTestCase
         ]);
 
         $this->assertTrue($user->refresh()->subscribed());
+    }
+
+    public function test_subscriptions_can_be_cancelled_at_a_specific_time()
+    {
+        $user = $this->createCustomer('subscriptions_can_be_cancelled_at_a_specific_time');
+
+        $subscription = $user->newSubscription('main', static::$planId)->create('pm_card_visa');
+
+        $subscription = $subscription->cancelAt($endsAt = now()->addMonths(3));
+
+        $this->assertTrue($subscription->active());
+        $this->assertSame($endsAt->timestamp, $subscription->ends_at->timestamp);
+        $this->assertSame($endsAt->timestamp, $subscription->asStripeSubscription()->cancel_at);
     }
 }

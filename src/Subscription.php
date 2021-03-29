@@ -916,6 +916,35 @@ class Subscription extends Model
     }
 
     /**
+     * Cancel the subscription at a specific moment in time.
+     *
+     * @param  \DateTimeInterface|int  $endsAt
+     * @return $this
+     */
+    public function cancelAt($endsAt)
+    {
+        if ($endsAt instanceof DateTimeInterface) {
+            $endsAt = $endsAt->getTimestamp();
+        }
+
+        $subscription = $this->asStripeSubscription();
+
+        $subscription->proration_behavior = $this->prorateBehavior();
+
+        $subscription->cancel_at = $endsAt;
+
+        $subscription = $subscription->save();
+
+        $this->stripe_status = $subscription->status;
+
+        $this->ends_at = Carbon::createFromTimestamp($subscription->cancel_at);
+
+        $this->save();
+
+        return $this;
+    }
+
+    /**
      * Cancel the subscription immediately without invoicing.
      *
      * @return $this
