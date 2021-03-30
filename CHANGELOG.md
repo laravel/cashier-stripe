@@ -3,6 +3,11 @@
 ## [Unreleased](https://github.com/laravel/cashier/compare/v12.10.0...master)
 
 
+## [v12.11.0 (2021-03-30)](https://github.com/laravel/cashier/compare/v12.10.0...v12.11.0)
+
+### Added
+- Implement `cancelAt` method ([#1106](https://github.com/laravel/cashier-stripe/pull/1106))
+
 ## [v12.10.0 (2021-03-16)](https://github.com/laravel/cashier/compare/v12.9.3...v12.10.0)
 
 ### Added
