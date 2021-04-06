@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 use Laravel\Cashier\Exceptions\IncompletePayment;
+use Stripe\PaymentIntent;
 use Stripe\PaymentIntent as StripePaymentIntent;
 
 class Payment implements Arrayable, Jsonable, JsonSerializable
@@ -160,10 +161,17 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     /**
      * The Stripe PaymentIntent instance.
      *
+     * @param  array  $expand
      * @return \Stripe\PaymentIntent
      */
-    public function asStripePaymentIntent()
+    public function asStripePaymentIntent(array $expand = [])
     {
+        if ($expand) {
+            return PaymentIntent::retrieve(
+                ['id' => $this->paymentIntent->id, 'expand' => $expand], Cashier::stripeOptions()
+            );
+        }
+
         return $this->paymentIntent;
     }
 
