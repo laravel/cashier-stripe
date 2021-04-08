@@ -1062,13 +1062,15 @@ class Subscription extends Model
     /**
      * Get the latest invoice for the subscription.
      *
-     * @return \Laravel\Cashier\Invoice
+     * @return \Laravel\Cashier\Invoice|null
      */
     public function latestInvoice()
     {
         $stripeSubscription = $this->asStripeSubscription(['latest_invoice']);
 
-        return new Invoice($this->owner, $stripeSubscription->latest_invoice);
+        if ($stripeSubscription->latest_invoice) {
+            return new Invoice($this->owner, $stripeSubscription->latest_invoice);
+        }
     }
 
     /**
@@ -1142,13 +1144,13 @@ class Subscription extends Model
      */
     public function latestPayment()
     {
-        $paymentIntent = $this->asStripeSubscription(['latest_invoice.payment_intent'])
-            ->latest_invoice
-            ->payment_intent;
+        $subscription = $this->asStripeSubscription(['latest_invoice.payment_intent']);
 
-        return $paymentIntent
-            ? new Payment($paymentIntent)
-            : null;
+        if ($invoice = $subscription->latest_invoice) {
+            return $invoice->payment_intent
+                ? new Payment($invoice->payment_intent)
+                : null;
+        }
     }
 
     /**
