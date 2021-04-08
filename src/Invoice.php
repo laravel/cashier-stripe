@@ -189,6 +189,18 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Get the coupon name applied to the invoice.
+     *
+     * @return string|null
+     */
+    public function couponName()
+    {
+        if (isset($this->invoice->discount)) {
+            return $this->invoice->discount->coupon->name ?: $this->invoice->discount->coupon->id;
+        }
+    }
+
+    /**
      * Determine if the discount is a percentage.
      *
      * @return bool
