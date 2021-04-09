@@ -24,98 +24,104 @@
                 <span class="ml-3">@{{ errorMessage }}</span>
             </p>
 
-            <p class="flex items-center bg-green-100 border border-green-200 px-5 py-4 rounded-lg text-green-700" v-if="paymentProcessed && successMessage">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="flex-shrink-0 w-6 h-6">
-                    <circle cx="12" cy="12" r="10" class="fill-current text-green-300"/>
-                    <path class="fill-current text-green-500" d="M10 14.59l6.3-6.3a1 1 0 0 1 1.4 1.42l-7 7a1 1 0 0 1-1.4 0l-3-3a1 1 0 0 1 1.4-1.42l2.3 2.3z"/>
-                </svg>
-
-                <span class="ml-3">@{{ successMessage }}</span>
-            </p>
-
             <div class="bg-white rounded-lg shadow-xl p-4 sm:p-6 mt-4">
-                @if ($payment->isSucceeded())
+                <div v-if="paymentIntent.status === '{{ Stripe\PaymentIntent::STATUS_SUCCEEDED }}'">
                     <h1 class="text-xl mb-4 text-gray-600">
-                        {{ __('Payment Successful') }}
+                        Payment Successful
                     </h1>
 
                     <p class="mb-6">
-                        {{ __('This payment was already successfully confirmed.') }}
+                        This payment was successfully confirmed.
                     </p>
-                @elseif ($payment->isCancelled())
+                </div>
+
+                <div v-else-if="paymentIntent.status === '{{ Stripe\PaymentIntent::STATUS_CANCELED }}'">
                     <h1 class="text-xl mb-4 text-gray-600">
-                        {{ __('Payment Cancelled') }}
+                        Payment Cancelled
                     </h1>
 
-                    <p class="mb-6">{{ __('This payment was cancelled.') }}</p>
-                @else
-                    <div id="payment-elements" v-if="! paymentProcessed">
-                        <!-- Payment Method Form -->
-                        <div v-show="requiresPaymentMethod">
-                            <!-- Instructions -->
-                            <h1 class="text-xl mb-4 text-gray-600">
-                                {{ __('Confirm your :amount payment', ['amount' => $payment->amount()]) }}
-                            </h1>
+                    <p class="mb-6">
+                        This payment was cancelled.
+                    </p>
+                </div>
 
-                            <p class="mb-6">
-                                {{ __('Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.') }}
-                            </p>
+                <div v-else>
+                    <!-- Payment Method Form -->
+                    <div v-if="paymentIntent.status === 'requires_payment_method'">
+                        <!-- Instructions -->
+                        <h1 class="text-xl mb-4 text-gray-600">
+                            Confirm your {{ $payment->amount() }} payment
+                        </h1>
 
-                            <!-- Name -->
-                            <label for="cardholder-name" class="inline-block text-sm text-gray-700 font-semibold mb-2">
-                                {{ __('Full name') }}
-                            </label>
+                        <p class="mb-6">
+                            Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.
+                        </p>
 
-                            <input
-                                id="cardholder-name"
-                                type="text" placeholder="{{ __('Jane Doe') }}"
-                                required
-                                class="inline-block bg-gray-100 border border-gray-300 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
-                                v-model="name"
-                            />
+                        <!-- Name -->
+                        <label for="name" class="inline-block text-sm text-gray-700 font-semibold mb-2">
+                            Full name
+                        </label>
 
-                            <!-- Card -->
-                            <label for="card-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">
-                                {{ __('Card') }}
-                            </label>
+                        <input
+                            id="name"
+                            type="text" placeholder="Jane Doe"
+                            required
+                            class="inline-block bg-gray-100 border border-gray-300 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
+                            v-model="name"
+                        />
 
-                            <div id="card-element" class="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6"></div>
+                        <!-- E-mail Address -->
+                        <label for="email" class="inline-block text-sm text-gray-700 font-semibold mb-2">
+                            E-mail Address
+                        </label>
 
-                            <!-- Pay Button -->
-                            <button
-                                id="card-button"
-                                class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
-                                :class="{ 'bg-blue-400': paymentProcessing, 'bg-blue-600': ! paymentProcessing }"
-                                @click="addPaymentMethod"
-                                :disabled="paymentProcessing"
-                            >
-                                {{ __('Pay :amount', ['amount' => $payment->amount()]) }}
-                            </button>
-                        </div>
+                        <input
+                            id="email"
+                            type="text" placeholder="jane@example.com"
+                            required
+                            class="inline-block bg-gray-100 border border-gray-300 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
+                            v-model="email"
+                        />
 
-                        <!-- Confirm Payment Method Button -->
-                        <div v-show="requiresAction || requiresConfirmation">
-                            <button
-                                id="card-button"
-                                class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
-                                :class="{ 'bg-blue-400': paymentProcessing, 'bg-blue-600': ! paymentProcessing }"
-                                @click="confirmPaymentMethod"
-                                :disabled="paymentProcessing"
-                            >
-                                {{ __('Confirm your :amount payment', ['amount' => $payment->amount()]) }}
-                            </button>
-                        </div>
+                        <!-- Stripe Payment Element -->
+                        <label for="payment-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">
+                            Payment
+                        </label>
+
+                        <div id="payment-element" class="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6"></div>
+
+                        <!-- Pay Button -->
+                        <button
+                            class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
+                            :class="{ 'bg-blue-400': isPaymentProcessing, 'bg-blue-600': ! isPaymentProcessing }"
+                            @click="addPaymentMethod"
+                            :disabled="isPaymentProcessing"
+                        >
+                            Pay {{ $payment->amount() }}
+                        </button>
                     </div>
-                @endif
+
+                    <!-- Confirm Payment Method Button -->
+                    <div v-else-if="paymentIntent.status === 'requires_action' || paymentIntent.status === 'requires_confirmation'">
+                        <button
+                            class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
+                            :class="{ 'bg-blue-400': isPaymentProcessing, 'bg-blue-600': ! isPaymentProcessing }"
+                            @click="confirmPaymentMethod"
+                            :disabled="isPaymentProcessing"
+                        >
+                            Confirm your {{ $payment->amount() }} payment
+                        </button>
+                    </div>
+                </div>
 
                 <button @click="goBack" ref="goBackButton" data-redirect="{{ $redirect }}"
                    class="inline-block w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-center text-gray-600 rounded-lg">
-                    {{ __('Go back') }}
+                    Go back
                 </button>
             </div>
 
             <p class="text-center text-gray-500 text-sm mt-4 pb-4">
-                © {{ date('Y') }} {{ config('app.name') }}. {{ __('All rights reserved.') }}
+                © {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
             </p>
         </div>
     </div>
@@ -123,102 +129,93 @@
     <script>
         window.stripe = Stripe('{{ $stripeKey }}');
 
-        var app = new Vue({
+        new Vue({
             el: '#app',
 
-            data: {
-                name: '',
-                cardElement: null,
-                paymentProcessing: false,
-                paymentProcessed: false,
-                requiresPaymentMethod: @json($payment->requiresPaymentMethod()),
-                requiresAction: @json($payment->requiresAction()),
-                requiresConfirmation: @json($payment->requiresConfirmation()),
-                successMessage: '',
-                errorMessage: ''
+            data() {
+                return {
+                    paymentIntent: {!! $payment->asStripePaymentIntent()->toJSON() !!},
+                    name: '',
+                    email: '',
+                    paymentElement: null,
+                    isPaymentProcessing: false,
+                    errorMessage: ''
+                }
             },
 
-            @if (! $payment->isSucceeded() && ! $payment->isCancelled() && ! $payment->requiresAction())
-                mounted: function () {
-                    this.configureStripe();
-                },
-            @endif
+            mounted: function () {
+                if (this.paymentIntent.status !== 'requires_payment_method') {
+                    return;
+                }
+
+                const elements = stripe.elements();
+
+                if (this.paymentIntent.payment_method_types.includes('sepa_debit')) {
+                    this.paymentElement = elements.create('iban', {
+                        supportedCountries: ['SEPA']
+                    });
+                    this.paymentElement.mount('#payment-element');
+                } else {
+                    this.paymentElement = elements.create('card');
+                    this.paymentElement.mount('#payment-element');
+                }
+            },
 
             methods: {
                 addPaymentMethod: function () {
-                    var self = this;
-
-                    this.paymentProcessing = true;
-                    this.paymentProcessed = false;
-                    this.successMessage = '';
+                    this.isPaymentProcessing = true;
                     this.errorMessage = '';
 
-                    stripe.confirmCardPayment(
-                        '{{ $payment->clientSecret() }}', {
-                            payment_method: {
-                                card: this.cardElement,
-                                billing_details: { name: this.name }
+                    if (this.paymentIntent.payment_method_types.includes('sepa_debit')) {
+                        stripe.confirmSepaDebitPayment(
+                            '{{ $payment->clientSecret() }}', {
+                                payment_method: {
+                                    sepa_debit: this.paymentElement,
+                                    billing_details: { name: this.name, email: this.email }
+                                }
                             }
-                        }
-                    ).then(function (result) {
-                        self.paymentProcessing = false;
-
-                        if (result.error) {
-                            if (result.error.code === '{{ Stripe\ErrorObject::CODE_PARAMETER_INVALID_EMPTY }}' &&
-                                result.error.param === 'payment_method_data[billing_details][name]') {
-                                self.errorMessage = '{{ __('Please provide your name.') }}';
-                            } else {
-                                self.errorMessage = result.error.message;
+                        ).then(result => this.confirmCallback(result));
+                    } else {
+                        stripe.confirmCardPayment(
+                            '{{ $payment->clientSecret() }}', {
+                                payment_method: {
+                                    card: this.paymentElement,
+                                    billing_details: { name: this.name }
+                                }
                             }
-                        } else {
-                            self.paymentProcessed = true;
-
-                            self.successMessage = '{{ __('The payment was successful.') }}';
-                        }
-                    });
+                        ).then(result => this.confirmCallback(result));
+                    }
                 },
 
                 confirmPaymentMethod: function () {
-                    var self = this;
-
-                    this.paymentProcessing = true;
-                    this.paymentProcessed = false;
-                    this.successMessage = '';
+                    this.isPaymentProcessing = true;
                     this.errorMessage = '';
 
-                    stripe.confirmCardPayment(
-                        '{{ $payment->clientSecret() }}', {
-                            payment_method: '{{ $payment->payment_method }}'
-                        }
-                    ).then(function (result) {
-                        self.paymentProcessing = false;
+                    if (this.paymentIntent.payment_method_types.includes('sepa_debit')) {
+                        stripe.confirmSepaDebitPayment('{{ $payment->clientSecret() }}')
+                            .then(result => this.confirmCallback(result));
+                    } else {
+                        stripe.confirmCardPayment('{{ $payment->clientSecret() }}')
+                            .then(result => this.confirmCallback(result));
+                    }
+                },
 
-                        if (result.error) {
-                            self.errorMessage = result.error.message;
+                confirmCallback: function (result) {
+                    var self = this;
 
-                            if (result.error.code === '{{ Stripe\ErrorObject::CODE_PAYMENT_INTENT_AUTHENTICATION_FAILURE }}') {
-                                self.requestPaymentMethod();
-                            }
+                    self.isPaymentProcessing = false;
+
+                    if (result.error) {
+                        if (result.error.code === '{{ Stripe\ErrorObject::CODE_PARAMETER_INVALID_EMPTY }}') {
+                            self.errorMessage = 'Please provide your name and e-mail address.';
                         } else {
-                            self.paymentProcessed = true;
-
-                            self.successMessage = '{{ __('The payment was successful.') }}';
+                            self.errorMessage = result.error.message;
                         }
-                    });
-                },
 
-                requestPaymentMethod: function () {
-                    this.configureStripe();
-
-                    this.requiresPaymentMethod = true;
-                    this.requiresAction = false;
-                },
-
-                configureStripe: function () {
-                    const elements = stripe.elements();
-
-                    this.cardElement = elements.create('card');
-                    this.cardElement.mount('#card-element');
+                        self.paymentIntent = result.error.payment_intent;
+                    } else {
+                        self.paymentIntent = result.paymentIntent;
+                    }
                 },
 
                 goBack: function () {
@@ -226,10 +223,13 @@
                     var button = this.$refs.goBackButton;
                     var redirect = new URL(button.dataset.redirect);
 
-                    if (self.successMessage || self.errorMessage) {
-                        redirect.searchParams.append('message', self.successMessage ? self.successMessage : self.errorMessage);
-                        redirect.searchParams.append('success', !! self.successMessage);
+                    if (self.errorMessage) {
+                        redirect.searchParams.append('message', self.errorMessage);
                     }
+
+                    redirect.searchParams.append(
+                        'success', self.paymentIntent.status === '{{ Stripe\PaymentIntent::STATUS_SUCCEEDED }}'
+                    );
 
                     window.location.href = redirect;
                 },

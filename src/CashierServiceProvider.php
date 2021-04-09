@@ -103,7 +103,6 @@ class CashierServiceProvider extends ServiceProvider
      */
     protected function registerResources()
     {
-        $this->loadJsonTranslationsFrom(__DIR__.'/../resources/lang');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cashier');
     }
 
