@@ -30,8 +30,8 @@ class PaymentController extends Controller
     {
         return view('cashier::payment', [
             'stripeKey' => config('cashier.key'),
-            'payment' => new Payment(
-                StripePaymentIntent::retrieve($id, Cashier::stripeOptions())
+            'payment' => new Payment(StripePaymentIntent::retrieve(
+                ['id' => $id, 'expand' => ['payment_method']], Cashier::stripeOptions())
             ),
             'redirect' => url(request('redirect', '/')),
         ]);
