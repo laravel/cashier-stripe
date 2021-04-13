@@ -2,10 +2,10 @@
 
 namespace Laravel\Cashier;
 
-use Laravel\Cashier\Exceptions\IncompletePayment;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
+use Laravel\Cashier\Exceptions\IncompletePayment;
 use Stripe\PaymentIntent as StripePaymentIntent;
 
 class Payment implements Arrayable, Jsonable, JsonSerializable
