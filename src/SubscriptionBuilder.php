@@ -308,6 +308,25 @@ class SubscriptionBuilder
             $this->owner->stripeOptions()
         );
 
+        $subscription = $this->createSubscription($stripeSubscription);
+
+        if ($subscription->hasIncompletePayment()) {
+            (new Payment(
+                $stripeSubscription->latest_invoice->payment_intent
+            ))->validate();
+        }
+
+        return $subscription;
+    }
+
+    /**
+     * Create the Eloquent Subscription.
+     *
+     * @param  \Stripe\Subscription  $stripeSubscription
+     * @return \Laravel\Cashier\Subscription
+     */
+    protected function createSubscription(StripeSubscription $stripeSubscription)
+    {
         /** @var \Stripe\SubscriptionItem $firstItem */
         $firstItem = $stripeSubscription->items->first();
         $isSinglePlan = $stripeSubscription->items->count() === 1;
@@ -330,12 +349,6 @@ class SubscriptionBuilder
                 'stripe_plan' => $item->plan->id,
                 'quantity' => $item->quantity,
             ]);
-        }
-
-        if ($subscription->hasIncompletePayment()) {
-            (new Payment(
-                $stripeSubscription->latest_invoice->payment_intent
-            ))->validate();
         }
 
         return $subscription;

@@ -194,9 +194,9 @@
                         <tr>
                             <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
                                 @if ($invoice->discountIsPercentage())
-                                    {{ $invoice->coupon() }} ({{ $invoice->percentOff() }}% Off)
+                                    {{ $invoice->couponName() }} ({{ $invoice->percentOff() }}% Off)
                                 @else
-                                    {{ $invoice->coupon() }} ({{ $invoice->amountOff() }} Off)
+                                    {{ $invoice->couponName() }} ({{ $invoice->amountOff() }} Off)
                                 @endif
                             </td>
 

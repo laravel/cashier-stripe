@@ -1,6 +1,20 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.10.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.12.0...master)
+
+
+## [v12.12.0 (2021-04-13)](https://github.com/laravel/cashier/compare/v12.11.0...v12.12.0)
+
+### Added
+- Implement object serialization ([#1116](https://github.com/laravel/cashier-stripe/pull/1116))
+
+### Changed
+- Replace `symfony/intl` dependency ([#1114](https://github.com/laravel/cashier-stripe/pull/1114))
+- Extract creating subscription to a separate method ([#1124](https://github.com/laravel/cashier-stripe/pull/1124))
+
+### Fixed
+- Fix `latest_invoice` retrieval ([#1115](https://github.com/laravel/cashier-stripe/pull/1115))
+- Fix coupon label on receipts ([#1118](https://github.com/laravel/cashier-stripe/pull/1118))
 
 
 ## [v12.11.0 (2021-03-30)](https://github.com/laravel/cashier/compare/v12.10.0...v12.11.0)

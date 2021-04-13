@@ -3,10 +3,13 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use JsonSerializable;
 use Stripe\InvoiceLineItem as StripeInvoiceLineItem;
 use Stripe\TaxRate as StripeTaxRate;
 
-class InvoiceLineItem
+class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 {
     /**
      * The Cashier Invoice instance.
@@ -226,6 +229,37 @@ class InvoiceLineItem
     public function asStripeInvoiceLineItem()
     {
         return $this->item;
+    }
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->asStripeInvoiceLineItem()->toArray();
+    }
+
+    /**
+     * Convert the object to its JSON representation.
+     *
+     * @param  int  $options
+     * @return string
+     */
+    public function toJson($options = 0)
+    {
+        return json_encode($this->jsonSerialize(), $options);
+    }
+
+    /**
+     * Convert the object into something JSON serializable.
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 
     /**
