@@ -480,6 +480,22 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertSame($tomorrow, $user->trialEndsAt());
     }
 
+    public function test_user_with_subscription_can_return_generic_trial_end_date()
+    {
+        $user = $this->createCustomer('creating_subscription_without_trial');
+        $user->trial_ends_at = $tomorrow = Carbon::tomorrow();
+
+        $user->newSubscription('main', static::$planId)
+            ->create('pm_card_visa');
+
+        $subscription = $user->subscription('main');
+
+        $this->assertTrue($user->onGenericTrial());
+        $this->assertTrue($user->onTrial());
+        $this->assertFalse($subscription->onTrial());
+        $this->assertSame($tomorrow, $user->trialEndsAt());
+    }
+
     public function test_creating_subscription_with_explicit_trial()
     {
         $user = $this->createCustomer('creating_subscription_with_explicit_trial');
