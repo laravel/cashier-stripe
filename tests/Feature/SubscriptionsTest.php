@@ -488,8 +488,11 @@ class SubscriptionsTest extends FeatureTestCase
         $user->newSubscription('main', static::$planId)
             ->create('pm_card_visa');
 
+        $subscription = $user->subscription('main');
+
         $this->assertTrue($user->onGenericTrial());
         $this->assertTrue($user->onTrial());
+        $this->assertFalse($subscription->onTrial());
         $this->assertSame($tomorrow, $user->trialEndsAt());
     }
 
