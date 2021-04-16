@@ -55,7 +55,7 @@
                 &nbsp;
             </td>
 
-            <!-- Organization Name / Image -->
+            <!-- Vendor Name / Image -->
             <td align="right">
                 <strong>{{ $header ?? $vendor }}</strong>
             </td>
@@ -65,7 +65,7 @@
                 Receipt
             </td>
 
-            <!-- Organization Name / Date -->
+            <!-- Customer Name / Invoice Date -->
             <td>
                 <br><br>
                 <strong>To:</strong> {{ $owner->stripeEmail() ?: $owner->name }}
@@ -74,7 +74,7 @@
             </td>
         </tr>
         <tr valign="top">
-            <!-- Organization Details -->
+            <!-- Vendor Details -->
             <td style="font-size:9px;">
                 {{ $vendor }}<br>
 
