@@ -55,28 +55,19 @@
                 &nbsp;
             </td>
 
-            <!-- Organization Name / Image -->
+            <!-- Account Name / Header Image -->
             <td align="right">
-                <strong>{{ $header ?? $vendor }}</strong>
+                <strong>{{ $header ?? $vendor ?? $invoice->account_name }}</strong>
             </td>
         </tr>
         <tr valign="top">
-            <td style="font-size: 28px; color: #ccc;">
-                Receipt
-            </td>
-
-            <!-- Organization Name / Date -->
-            <td>
-                <br><br>
-                <strong>To:</strong> {{ $owner->stripeEmail() ?: $owner->name }}
-                <br>
-                <strong>Date:</strong> {{ $invoice->date()->toFormattedDateString() }}
-            </td>
-        </tr>
-        <tr valign="top">
-            <!-- Organization Details -->
+            <!-- Account Details -->
             <td style="font-size:9px;">
-                {{ $vendor }}<br>
+                <span style="font-size: 28px; color: #ccc;">
+                    Receipt
+                </span><br><br>
+
+                <strong>{{ $vendor ?? $invoice->account_name }}</strong><br>
 
                 @if (isset($street))
                     {{ $street }}<br>
@@ -90,17 +81,62 @@
                     <strong>T</strong> {{ $phone }}<br>
                 @endif
 
-                @if (isset($vendorVat))
-                    {{ $vendorVat }}<br>
+                @if (isset($url))
+                    <a href="{{ $url }}">{{ $url }}</a><br>
                 @endif
 
-                @if (isset($url))
-                    <a href="{{ $url }}">{{ $url }}</a>
+                @if (isset($vendorTaxId))
+                    {{ $vendorTaxId }}<br>
+                @else
+                    @foreach ($invoice->accountTaxIds() as $taxId)
+                        {{ $taxId->value }}<br>
+                    @endforeach
                 @endif
+
+                <br><br>
+
+                Billed to:<br><br>
+
+                <strong>{{ $invoice->customer_name ?? $invoice->customer_email }}</strong><br>
+
+                @if ($address = $invoice->customer_address)
+                    @if ($address->line1)
+                        {{ $address->line1 }}<br>
+                    @endif
+
+                    @if ($address->line2)
+                        {{ $address->line2 }}<br>
+                    @endif
+
+                    @if ($address->state)
+                        {{ $address->state }}<br>
+                    @endif
+
+                    @if ($address->postal_code || $address->city)
+                        {{ implode('', [$address->postal_code, $address->city]) }}<br>
+                    @endif
+
+                    @if ($address->country)
+                        {{ $address->country }}<br>
+                    @endif
+                @endif
+
+                @if ($invoice->customer_name)
+                    <strong>E</strong> {{ $invoice->customer_email }}<br>
+                @endif
+
+                @if ($invoice->customer_phone)
+                    <strong>T</strong> {{ $invoice->customer_phone }}<br>
+                @endif
+
+                @foreach ($invoice->customerTaxIds() as $taxId)
+                    {{ $taxId->value }}<br>
+                @endforeach
             </td>
             <td>
                 <!-- Invoice Info -->
                 <p>
+                    <strong>Date:</strong> {{ $invoice->date()->toFormattedDateString() }}<br>
                     <strong>Product:</strong> {{ $product }}<br>
                     <strong>Invoice Number:</strong> {{ $id ?? $invoice->number }}<br>
                 </p>

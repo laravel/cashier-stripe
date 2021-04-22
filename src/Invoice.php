@@ -375,6 +375,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
             $this->invoice = StripeInvoice::retrieve([
                 'id' => $this->invoice->id,
                 'expand' => [
+                    'account_tax_ids',
                     'lines.data.tax_amounts.tax_rate',
                     'total_tax_amounts.tax_rate',
                 ],
@@ -400,6 +401,26 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     protected function formatAmount($amount)
     {
         return Cashier::formatAmount($amount, $this->invoice->currency);
+    }
+
+    /**
+     * Return the Tax Ids of the account.
+     *
+     * @return \Stripe\TaxId[]
+     */
+    public function accountTaxIds()
+    {
+        return $this->invoice->account_tax_ids ?? [];
+    }
+
+    /**
+     * Return the Tax Ids of the customer.
+     *
+     * @return \Stripe\TaxId[]
+     */
+    public function customerTaxIds()
+    {
+        return $this->invoice->customer_tax_ids ?? [];
     }
 
     /**

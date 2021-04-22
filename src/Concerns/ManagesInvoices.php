@@ -127,7 +127,7 @@ trait ManagesInvoices
 
         try {
             $stripeInvoice = StripeInvoice::retrieve(
-                $id, $this->stripeOptions()
+                ['id' => $id, 'expand' => ['account_tax_ids']], $this->stripeOptions()
             );
         } catch (Exception $exception) {
             //
