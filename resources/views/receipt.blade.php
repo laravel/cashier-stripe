@@ -61,12 +61,12 @@
             </td>
         </tr>
         <tr valign="top">
-            <!-- Account Details -->
             <td style="font-size:9px;">
                 <span style="font-size: 28px; color: #ccc;">
                     Receipt
                 </span><br><br>
 
+                <!-- Account Details -->
                 <strong>{{ $vendor ?? $invoice->account_name }}</strong><br>
 
                 @if (isset($street))
@@ -95,6 +95,7 @@
 
                 <br><br>
 
+                <!-- Customer Details -->
                 Billed to:<br><br>
 
                 <strong>{{ $invoice->customer_name ?? $invoice->customer_email }}</strong><br>
