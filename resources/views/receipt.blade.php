@@ -48,6 +48,7 @@
     </style>
 </head>
 <body>
+
 <div class="container">
     <table style="margin-left: auto; margin-right: auto;" width="550">
         <tr>
@@ -67,38 +68,42 @@
                 </span><br><br>
 
                 <!-- Account Details -->
-                <strong>{{ $vendor ?? $invoice->account_name }}</strong><br>
+                {{ $vendor ?? $invoice->account_name }}<br>
 
-                @if (isset($street))
+                @isset($street)
                     {{ $street }}<br>
-                @endif
+                @endisset
 
-                @if (isset($location))
+                @isset($location)
                     {{ $location }}<br>
-                @endif
+                @endisset
 
-                @if (isset($phone))
-                    <strong>T</strong> {{ $phone }}<br>
-                @endif
+                @isset($phone)
+                    {{ $phone }}<br>
+                @endisset
 
-                @if (isset($url))
+                @isset($email)
+                    {{ $email }}<br>
+                @endisset
+
+                @isset($url)
                     <a href="{{ $url }}">{{ $url }}</a><br>
-                @endif
+                @endisset
 
-                @if (isset($vendorTaxId))
-                    {{ $vendorTaxId }}<br>
+                @isset($vendorVat)
+                    {{ $vendorVat }}<br>
                 @else
                     @foreach ($invoice->accountTaxIds() as $taxId)
                         {{ $taxId->value }}<br>
                     @endforeach
-                @endif
+                @endisset
 
                 <br><br>
 
                 <!-- Customer Details -->
-                Billed to:<br><br>
+                <strong>Bill to:</strong><br>
 
-                <strong>{{ $invoice->customer_name ?? $invoice->customer_email }}</strong><br>
+                {{ $invoice->customer_name ?? $invoice->customer_email }}<br>
 
                 @if ($address = $invoice->customer_address)
                     @if ($address->line1)
@@ -109,12 +114,12 @@
                         {{ $address->line2 }}<br>
                     @endif
 
-                    @if ($address->state)
-                        {{ $address->state }}<br>
+                    @if ($address->city)
+                        {{ $address->city }}<br>
                     @endif
 
-                    @if ($address->postal_code || $address->city)
-                        {{ implode('', [$address->postal_code, $address->city]) }}<br>
+                    @if ($address->state || $address->postal_code)
+                        {{ implode(' ', [$address->state, $address->postal_code]) }}<br>
                     @endif
 
                     @if ($address->country)
@@ -122,12 +127,12 @@
                     @endif
                 @endif
 
-                @if ($invoice->customer_name)
-                    <strong>E</strong> {{ $invoice->customer_email }}<br>
+                @if ($invoice->customer_phone)
+                    {{ $invoice->customer_phone }}<br>
                 @endif
 
-                @if ($invoice->customer_phone)
-                    <strong>T</strong> {{ $invoice->customer_phone }}<br>
+                @if ($invoice->customer_name)
+                    {{ $invoice->customer_email }}<br>
                 @endif
 
                 @foreach ($invoice->customerTaxIds() as $taxId)
@@ -137,10 +142,25 @@
             <td>
                 <!-- Invoice Info -->
                 <p>
+                    @isset ($product)
+                        <strong>Product:</strong> {{ $product }}<br>
+                    @endisset
+
                     <strong>Date:</strong> {{ $invoice->date()->toFormattedDateString() }}<br>
-                    <strong>Product:</strong> {{ $product }}<br>
+
+                    @if ($dueDate = $invoice->dueDate())
+                        <strong>Due date:</strong> {{ $dueDate->toFormattedDateString() }}<br>
+                    @endif
+
                     <strong>Invoice Number:</strong> {{ $id ?? $invoice->number }}<br>
                 </p>
+
+                <!-- Memo / Description -->
+                @if ($invoice->description)
+                    <p>
+                        {{ $invoice->description }}
+                    </p>
+                @endif
 
                 <!-- Extra / VAT Information -->
                 @if (isset($vat))
@@ -289,5 +309,6 @@
         </tr>
     </table>
 </div>
+
 </body>
 </html>

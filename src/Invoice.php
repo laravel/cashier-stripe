@@ -66,16 +66,31 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get a Carbon date for the invoice.
+     * Get a Carbon instance for the invoicing date.
      *
      * @param  \DateTimeZone|string  $timezone
      * @return \Carbon\Carbon
      */
     public function date($timezone = null)
     {
-        $carbon = Carbon::createFromTimestampUTC($this->invoice->created ?? $this->invoice->date);
+        $carbon = Carbon::createFromTimestampUTC($this->invoice->created);
 
         return $timezone ? $carbon->setTimezone($timezone) : $carbon;
+    }
+
+    /**
+     * Get a Carbon instance for the invoice's due date.
+     *
+     * @param  \DateTimeZone|string  $timezone
+     * @return \Carbon\Carbon|null
+     */
+    public function dueDate($timezone = null)
+    {
+        if ($this->invoice->due_date) {
+            $carbon = Carbon::createFromTimestampUTC($this->invoice->due_date);
+
+            return $timezone ? $carbon->setTimezone($timezone) : $carbon;
+        }
     }
 
     /**
