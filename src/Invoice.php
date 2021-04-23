@@ -66,16 +66,31 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get a Carbon date for the invoice.
+     * Get a Carbon instance for the invoicing date.
      *
      * @param  \DateTimeZone|string  $timezone
      * @return \Carbon\Carbon
      */
     public function date($timezone = null)
     {
-        $carbon = Carbon::createFromTimestampUTC($this->invoice->created ?? $this->invoice->date);
+        $carbon = Carbon::createFromTimestampUTC($this->invoice->created);
 
         return $timezone ? $carbon->setTimezone($timezone) : $carbon;
+    }
+
+    /**
+     * Get a Carbon instance for the invoice's due date.
+     *
+     * @param  \DateTimeZone|string  $timezone
+     * @return \Carbon\Carbon|null
+     */
+    public function dueDate($timezone = null)
+    {
+        if ($this->invoice->due_date) {
+            $carbon = Carbon::createFromTimestampUTC($this->invoice->due_date);
+
+            return $timezone ? $carbon->setTimezone($timezone) : $carbon;
+        }
     }
 
     /**
@@ -375,6 +390,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
             $this->invoice = StripeInvoice::retrieve([
                 'id' => $this->invoice->id,
                 'expand' => [
+                    'account_tax_ids',
                     'lines.data.tax_amounts.tax_rate',
                     'total_tax_amounts.tax_rate',
                 ],
@@ -400,6 +416,26 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     protected function formatAmount($amount)
     {
         return Cashier::formatAmount($amount, $this->invoice->currency);
+    }
+
+    /**
+     * Return the Tax Ids of the account.
+     *
+     * @return \Stripe\TaxId[]
+     */
+    public function accountTaxIds()
+    {
+        return $this->invoice->account_tax_ids ?? [];
+    }
+
+    /**
+     * Return the Tax Ids of the customer.
+     *
+     * @return \Stripe\TaxId[]
+     */
+    public function customerTaxIds()
+    {
+        return $this->invoice->customer_tax_ids ?? [];
     }
 
     /**
