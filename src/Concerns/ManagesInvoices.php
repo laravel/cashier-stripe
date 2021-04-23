@@ -131,7 +131,7 @@ trait ManagesInvoices
             $stripeInvoice = StripeInvoice::retrieve(
                 $id, $this->stripeOptions()
             );
-        } catch (Exception $exception) {
+        } catch (StripeInvalidRequestException $exception) {
             //
         }
 
