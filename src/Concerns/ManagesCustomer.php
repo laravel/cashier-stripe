@@ -9,7 +9,7 @@ use Laravel\Cashier\Exceptions\CustomerAlreadyCreated;
 use Laravel\Cashier\Exceptions\InvalidCustomer;
 use Stripe\BillingPortal\Session as StripeBillingPortalSession;
 use Stripe\Customer as StripeCustomer;
-use Stripe\Exception\InvalidRequestException;
+use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
 
 trait ManagesCustomer
 {
@@ -212,7 +212,7 @@ trait ManagesCustomer
             return StripeCustomer::retrieveTaxId(
                 $this->stripe_id, $id, [], $this->stripeOptions()
             );
-        } catch (InvalidRequestException $exception) {
+        } catch (StripeInvalidRequestException $exception) {
             //
         }
     }
@@ -246,7 +246,7 @@ trait ManagesCustomer
 
         try {
             StripeCustomer::deleteTaxId($this->stripe_id, $id, [], $this->stripeOptions());
-        } catch (InvalidRequestException $exception) {
+        } catch (StripeInvalidRequestException $exception) {
             //
         }
     }
