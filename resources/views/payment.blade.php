@@ -189,7 +189,7 @@
                             data = {
                                 payment_method: {
                                     sepa_debit: this.paymentElement,
-                                    billing_details: {name: this.name, email: this.email}
+                                    billing_details: { name: this.name, email: this.email }
                                 }
                             };
                         }
@@ -201,7 +201,7 @@
                             data = {
                                 payment_method: {
                                     card: this.paymentElement,
-                                    billing_details: { name: this.name }
+                                    billing_details: { name: this.name, email: this.email }
                                 }
                             };
                         }
