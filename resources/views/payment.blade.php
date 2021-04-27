@@ -14,6 +14,10 @@
 <body class="font-sans text-gray-600 bg-gray-100 leading-normal p-4 h-full">
     <div id="app" class="h-full md:flex md:justify-center md:items-center">
         <div class="w-full max-w-lg">
+            <h1 class="text-4xl font-bold text-center p-4 sm:p-6 mt-4">
+                Your {{ $payment->amount() }} payment
+            </h1>
+
             <!-- Status Messages -->
             <p class="flex items-center bg-red-100 border border-red-200 px-5 py-2 rounded-lg text-red-500" v-if="errorMessage">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="flex-shrink-0 w-6 h-6">
@@ -26,19 +30,29 @@
 
             <div class="bg-white rounded-lg shadow-xl p-4 sm:p-6 mt-4">
                 <div v-if="paymentIntent.status === 'succeeded'">
-                    <h1 class="text-xl mb-4 text-gray-600">
+                    <h2 class="text-xl mb-4 text-gray-600">
                         Payment Successful
-                    </h1>
+                    </h2>
 
                     <p class="mb-6">
                         This payment was successfully confirmed.
                     </p>
                 </div>
 
+                <div v-else-if="paymentIntent.status === 'processing'">
+                    <h2 class="text-xl mb-4 text-gray-600">
+                        Payment Processing
+                    </h2>
+
+                    <p class="mb-6">
+                        This payment is currently processing. Refresh this page from time to time to see its status.
+                    </p>
+                </div>
+
                 <div v-else-if="paymentIntent.status === 'canceled'">
-                    <h1 class="text-xl mb-4 text-gray-600">
+                    <h2 class="text-xl mb-4 text-gray-600">
                         Payment Cancelled
-                    </h1>
+                    </h2>
 
                     <p class="mb-6">
                         This payment was cancelled.
@@ -49,12 +63,12 @@
                     <!-- Payment Method Form -->
                     <div v-if="paymentIntent.status === 'requires_payment_method'">
                         <!-- Instructions -->
-                        <h1 class="text-xl mb-4 text-gray-600">
-                            Confirm your {{ $payment->amount() }} payment
-                        </h1>
+                        <h2 class="text-xl mb-4 text-gray-600">
+                            Confirm Your Payment
+                        </h2>
 
                         <p class="mb-6">
-                            Extra confirmation is needed to process your payment. Please confirm your payment by filling out your payment details below.
+                            A valid payment method is needed to process your payment. Please confirm your payment by filling out your payment details below.
                         </p>
 
                         <!-- Name -->
@@ -72,7 +86,7 @@
 
                         <!-- E-mail Address -->
                         <label for="email" class="inline-block text-sm text-gray-700 font-semibold mb-2">
-                            E-mail Address
+                            E-mail address
                         </label>
 
                         <input
@@ -90,28 +104,25 @@
 
                         <div id="payment-element" class="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6"></div>
 
-                        <!-- Pay Button -->
-                        <button
-                            class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
-                            :class="{ 'bg-blue-400': isPaymentProcessing, 'bg-blue-600': ! isPaymentProcessing }"
-                            @click="addPaymentMethod"
-                            :disabled="isPaymentProcessing"
-                        >
-                            Pay {{ $payment->amount() }}
-                        </button>
+                        <p v-if="paymentIntent.payment_method_types.includes('sepa_debit')" class="text-xs text-gray-400 mb-6">
+                            By providing your payment information and confirming this payment, you authorise (A) and Stripe, our payment service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank. You agree to receive notifications for future debits up to 2 days before they occur.
+                        </p>
                     </div>
 
                     <!-- Confirm Payment Method Button -->
-                    <div v-else-if="paymentIntent.status === 'requires_action' || paymentIntent.status === 'requires_confirmation'">
-                        <button
-                            class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
-                            :class="{ 'bg-blue-400': isPaymentProcessing, 'bg-blue-600': ! isPaymentProcessing }"
-                            @click="confirmPaymentMethod"
-                            :disabled="isPaymentProcessing"
-                        >
+                    <button
+                        class="inline-block w-full px-4 py-3 mb-4 text-white rounded-lg hover:bg-blue-500"
+                        :class="{ 'bg-blue-400': isPaymentProcessing, 'bg-blue-600': ! isPaymentProcessing }"
+                        @click="confirmPaymentMethod"
+                        :disabled="isPaymentProcessing"
+                    >
+                        <span v-if="isPaymentProcessing">
+                            Processing...
+                        </span>
+                        <span v-else>
                             Confirm your {{ $payment->amount() }} payment
-                        </button>
-                    </div>
+                        </span>
+                    </button>
                 </div>
 
                 <button @click="goBack" ref="goBackButton" data-redirect="{{ $redirect }}"
@@ -135,8 +146,8 @@
             data() {
                 return {
                     paymentIntent: {!! $payment->asStripePaymentIntent()->toJSON() !!},
-                    name: '',
-                    email: '',
+                    name: '{{ optional($customer)->stripeName() }}',
+                    email: '{{ optional($customer)->stripeEmail() }}',
                     paymentElement: null,
                     isPaymentProcessing: false,
                     errorMessage: ''
@@ -160,53 +171,48 @@
                         this.paymentElement = elements.create('iban', {
                             supportedCountries: ['SEPA']
                         });
-                        this.paymentElement.mount('#payment-element');
                     } else {
                         this.paymentElement = elements.create('card');
-                        this.paymentElement.mount('#payment-element');
                     }
-                },
 
-                addPaymentMethod: function () {
-                    this.isPaymentProcessing = true;
-                    this.errorMessage = '';
-
-                    if (this.paymentIntent.payment_method_types.includes('sepa_debit')) {
-                        stripe.confirmSepaDebitPayment(
-                            '{{ $payment->clientSecret() }}', {
-                                payment_method: {
-                                    sepa_debit: this.paymentElement,
-                                    billing_details: { name: this.name, email: this.email }
-                                }
-                            }
-                        ).then(result => this.confirmCallback(result));
-                    } else {
-                        stripe.confirmCardPayment(
-                            '{{ $payment->clientSecret() }}', {
-                                payment_method: {
-                                    card: this.paymentElement,
-                                    billing_details: { name: this.name }
-                                }
-                            }
-                        ).then(result => this.confirmCallback(result));
-                    }
+                    this.paymentElement.mount('#payment-element');
                 },
 
                 confirmPaymentMethod: function () {
                     this.isPaymentProcessing = true;
                     this.errorMessage = '';
 
+                    let data = {};
+
                     if (this.paymentIntent.payment_method_types.includes('sepa_debit')) {
-                        stripe.confirmSepaDebitPayment('{{ $payment->clientSecret() }}')
+                        if (this.paymentIntent.status === 'requires_payment_method') {
+                            data = {
+                                payment_method: {
+                                    sepa_debit: this.paymentElement,
+                                    billing_details: {name: this.name, email: this.email}
+                                }
+                            };
+                        }
+
+                        stripe.confirmSepaDebitPayment('{{ $payment->clientSecret() }}', data)
                             .then(result => this.confirmCallback(result));
                     } else {
-                        stripe.confirmCardPayment('{{ $payment->clientSecret() }}')
+                        if (this.paymentIntent.status === 'requires_payment_method') {
+                            data = {
+                                payment_method: {
+                                    card: this.paymentElement,
+                                    billing_details: { name: this.name }
+                                }
+                            };
+                        }
+
+                        stripe.confirmCardPayment('{{ $payment->clientSecret() }}', data)
                             .then(result => this.confirmCallback(result));
                     }
                 },
 
                 confirmCallback: function (result) {
-                    var self = this;
+                    let self = this;
 
                     self.isPaymentProcessing = false;
 
@@ -217,18 +223,20 @@
                             self.errorMessage = result.error.message;
                         }
 
-                        self.paymentIntent = result.error.payment_intent;
+                        if (result.error.payment_intent) {
+                            this.paymentIntent = result.error.payment_intent;
 
-                        this.configureStripeElements();
+                            this.configureStripeElements();
+                        }
                     } else {
-                        self.paymentIntent = result.paymentIntent;
+                        this.paymentIntent = result.paymentIntent;
                     }
                 },
 
                 goBack: function () {
-                    var self = this;
-                    var button = this.$refs.goBackButton;
-                    var redirect = new URL(button.dataset.redirect);
+                    let self = this;
+                    let button = this.$refs.goBackButton;
+                    let redirect = new URL(button.dataset.redirect);
 
                     redirect.searchParams.append(
                         'success', self.paymentIntent.status === 'succeeded' ? 'true' : 'false'

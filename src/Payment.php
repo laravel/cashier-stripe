@@ -19,6 +19,13 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     protected $paymentIntent;
 
     /**
+     * The related customer instance.
+     *
+     * @var \Laravel\Cashier\Billable
+     */
+    protected $customer;
+
+    /**
      * Create a new Payment instance.
      *
      * @param  \Stripe\PaymentIntent  $paymentIntent
@@ -156,6 +163,20 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
         } elseif ($this->requiresConfirmation()) {
             throw IncompletePayment::requiresConfirmation($this);
         }
+    }
+
+    /**
+     * Retrieve the related customer for the payment intent if one exists.
+     *
+     * @return \Laravel\Cashier\Billable|null
+     */
+    public function customer()
+    {
+        if ($this->customer) {
+            return $this->customer;
+        }
+
+        return $this->customer = Cashier::findBillable($this->paymentIntent->customer);
     }
 
     /**

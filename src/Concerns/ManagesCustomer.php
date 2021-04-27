@@ -61,6 +61,10 @@ trait ManagesCustomer
             throw CustomerAlreadyCreated::exists($this);
         }
 
+        if (! array_key_exists('name', $options) && $name = $this->stripeName()) {
+            $options['name'] = $name;
+        }
+
         if (! array_key_exists('email', $options) && $email = $this->stripeEmail()) {
             $options['email'] = $email;
         }
@@ -120,6 +124,16 @@ trait ManagesCustomer
         return StripeCustomer::retrieve(
             ['id' => $this->stripe_id, 'expand' => $expand], $this->stripeOptions()
         );
+    }
+
+    /**
+     * Get the name used to create the customer in Stripe.
+     *
+     * @return string|null
+     */
+    public function stripeName()
+    {
+        return $this->name;
     }
 
     /**
