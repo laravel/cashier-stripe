@@ -27,11 +27,14 @@ class PaymentController extends Controller
      */
     public function show($id)
     {
+        $payment = new Payment(Cashier::stripe()->paymentIntents->retrieve(
+            $id, ['expand' => ['payment_method']])
+        );
+
         return view('cashier::payment', [
             'stripeKey' => config('cashier.key'),
-            'payment' => new Payment(Cashier::stripe()->paymentIntents->retrieve(
-                $id, ['expand' => ['payment_method']])
-            ),
+            'payment' => $payment,
+            'customer' => $payment->customer(),
             'redirect' => url(request('redirect', '/')),
         ]);
     }
