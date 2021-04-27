@@ -25,7 +25,7 @@
             </p>
 
             <div class="bg-white rounded-lg shadow-xl p-4 sm:p-6 mt-4">
-                <div v-if="paymentIntent.status === '{{ Stripe\PaymentIntent::STATUS_SUCCEEDED }}'">
+                <div v-if="paymentIntent.status === 'succeeded'">
                     <h1 class="text-xl mb-4 text-gray-600">
                         Payment Successful
                     </h1>
@@ -35,7 +35,7 @@
                     </p>
                 </div>
 
-                <div v-else-if="paymentIntent.status === '{{ Stripe\PaymentIntent::STATUS_CANCELED }}'">
+                <div v-else-if="paymentIntent.status === 'canceled'">
                     <h1 class="text-xl mb-4 text-gray-600">
                         Payment Cancelled
                     </h1>
@@ -144,24 +144,29 @@
             },
 
             mounted: function () {
-                if (this.paymentIntent.status !== 'requires_payment_method') {
-                    return;
-                }
-
-                const elements = stripe.elements();
-
-                if (this.paymentIntent.payment_method_types.includes('sepa_debit')) {
-                    this.paymentElement = elements.create('iban', {
-                        supportedCountries: ['SEPA']
-                    });
-                    this.paymentElement.mount('#payment-element');
-                } else {
-                    this.paymentElement = elements.create('card');
-                    this.paymentElement.mount('#payment-element');
-                }
+                this.configureStripeElements();
             },
 
             methods: {
+                configureStripeElements: function () {
+                    // Stripe Elements are only needed when a payment method is required.
+                    if (this.paymentIntent.status !== 'requires_payment_method') {
+                        return;
+                    }
+
+                    const elements = stripe.elements();
+
+                    if (this.paymentIntent.payment_method_types.includes('sepa_debit')) {
+                        this.paymentElement = elements.create('iban', {
+                            supportedCountries: ['SEPA']
+                        });
+                        this.paymentElement.mount('#payment-element');
+                    } else {
+                        this.paymentElement = elements.create('card');
+                        this.paymentElement.mount('#payment-element');
+                    }
+                },
+
                 addPaymentMethod: function () {
                     this.isPaymentProcessing = true;
                     this.errorMessage = '';
@@ -213,6 +218,8 @@
                         }
 
                         self.paymentIntent = result.error.payment_intent;
+
+                        this.configureStripeElements();
                     } else {
                         self.paymentIntent = result.paymentIntent;
                     }
@@ -223,13 +230,13 @@
                     var button = this.$refs.goBackButton;
                     var redirect = new URL(button.dataset.redirect);
 
+                    redirect.searchParams.append(
+                        'success', self.paymentIntent.status === 'succeeded' ? 'true' : 'false'
+                    );
+
                     if (self.errorMessage) {
                         redirect.searchParams.append('message', self.errorMessage);
                     }
-
-                    redirect.searchParams.append(
-                        'success', self.paymentIntent.status === '{{ Stripe\PaymentIntent::STATUS_SUCCEEDED }}'
-                    );
 
                     window.location.href = redirect;
                 },
