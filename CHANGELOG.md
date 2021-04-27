@@ -1,6 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.12.0...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.13.0...12.x)
+
+
+## [v12.13.0 (2021-04-27)](https://github.com/laravel/cashier/compare/v12.12.0...v12.13.0)
+
+### Added
+- Add methods for managing TaxIDs ([#1137](https://github.com/laravel/cashier-stripe/pull/1137))
+
+### Fixed
+- Fix receipt comments ([#1131](https://github.com/laravel/cashier-stripe/pull/1131))
 
 
 ## [v12.12.0 (2021-04-13)](https://github.com/laravel/cashier/compare/v12.11.0...v12.12.0)
