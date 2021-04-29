@@ -165,50 +165,50 @@
                         return;
                     }
 
+                    let self = this;
+
                     const elements = stripe.elements();
 
                     if (this.paymentIntent.payment_method_types.includes('sepa_debit')) {
-                        this.paymentElement = elements.create('iban', {
+                        self.paymentElement = elements.create('iban', {
                             supportedCountries: ['SEPA']
                         });
                     } else {
-                        this.paymentElement = elements.create('card');
+                        self.paymentElement = elements.create('card');
                     }
 
-                    this.paymentElement.mount('#payment-element');
+                    self.paymentElement.mount('#payment-element');
                 },
 
                 confirmPaymentMethod: function () {
-                    this.isPaymentProcessing = true;
-                    this.errorMessage = '';
+                    let self = this;
 
-                    let data = {};
+                    self.isPaymentProcessing = true;
+                    self.errorMessage = '';
+
+                    const secret = '{{ $payment->clientSecret() }}';
+                    let data = {
+                        payment_method: {
+                            billing_details: { name: this.name, email: this.email }
+                        }
+                    };
+                    let paymentPromise;
 
                     if (this.paymentIntent.payment_method_types.includes('sepa_debit')) {
                         if (this.paymentIntent.status === 'requires_payment_method') {
-                            data = {
-                                payment_method: {
-                                    sepa_debit: this.paymentElement,
-                                    billing_details: { name: this.name, email: this.email }
-                                }
-                            };
+                            data.payment_method.sepa_debit = this.paymentElement;
                         }
 
-                        stripe.confirmSepaDebitPayment('{{ $payment->clientSecret() }}', data)
-                            .then(result => this.confirmCallback(result));
+                        paymentPromise = stripe.confirmSepaDebitPayment(secret, data);
                     } else {
                         if (this.paymentIntent.status === 'requires_payment_method') {
-                            data = {
-                                payment_method: {
-                                    card: this.paymentElement,
-                                    billing_details: { name: this.name, email: this.email }
-                                }
-                            };
+                            data.payment_method.card = this.paymentElement;
                         }
 
-                        stripe.confirmCardPayment('{{ $payment->clientSecret() }}', data)
-                            .then(result => this.confirmCallback(result));
+                        paymentPromise = stripe.confirmCardPayment(secret, data);
                     }
+
+                    paymentPromise.then(result => this.confirmCallback(result));
                 },
 
                 confirmCallback: function (result) {
@@ -235,8 +235,9 @@
 
                 goBack: function () {
                     let self = this;
-                    let button = this.$refs.goBackButton;
-                    let redirect = new URL(button.dataset.redirect);
+
+                    const button = this.$refs.goBackButton;
+                    const redirect = new URL(button.dataset.redirect);
 
                     redirect.searchParams.append(
                         'success', self.paymentIntent.status === 'succeeded' ? 'true' : 'false'
