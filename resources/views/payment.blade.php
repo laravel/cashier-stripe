@@ -71,7 +71,7 @@
                             A valid payment method is needed to process your payment. Please confirm your payment by filling out your payment details below.
                         </p>
 
-                        <div>
+                        <div v-if="paymentMethods.length > 1">
                             <!-- Name -->
                             <label for="paymentMethod" class="inline-block text-sm text-gray-700 font-semibold mb-2">
                                 Payment Method
@@ -86,8 +86,9 @@
                                 v-model="paymentMethod"
                                 @change="configureStripeElements"
                             >
-                                <option value="card">Card</option>
-                                <option value="sepa_debit">SEPA Debit</option>
+                                <option v-for="option in paymentMethods" v-bind:value="option.value">
+                                    @{{ option.text }}
+                                </option>
                             </select>
                         </div>
 
@@ -119,7 +120,7 @@
 
                         <!-- Stripe Payment Element -->
                         <label for="payment-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">
-                            Payment
+                            Payment details
                         </label>
 
                         <div id="payment-element" class="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6"></div>
@@ -168,18 +169,38 @@
                     paymentIntent: {!! $payment->asStripePaymentIntent()->toJSON() !!},
                     name: '{{ optional($customer)->stripeName() }}',
                     email: '{{ optional($customer)->stripeEmail() }}',
-                    paymentMethod: '{{ $payment->payment_method_types[0] }}',
+                    paymentMethod: '',
                     paymentElement: null,
                     isPaymentProcessing: false,
-                    errorMessage: ''
+                    errorMessage: '',
+                    paymentMethods: []
                 }
             },
 
             mounted: function () {
+                this.configurePaymentIntent(this.paymentIntent);
                 this.configureStripeElements();
             },
 
             methods: {
+                configurePaymentIntent: function (paymentIntent) {
+                    let self = this;
+
+                    // Set the payment intent object...
+                    self.paymentIntent = paymentIntent;
+
+                    // Set the allowed payment methods based on the payment method options of the intent...
+                    const paymentMethodOptions = Object.keys(self.paymentIntent.payment_method_options);
+
+                    self.paymentMethods = [
+                        { text: 'Card', value: 'card' },
+                        { text: 'SEPA Debit', value: 'sepa_debit' }
+                    ].filter(paymentMethod => paymentMethodOptions.includes(paymentMethod.value));
+
+                    // Set the default payment method...
+                    self.paymentMethod = ((self.paymentIntent || {}).payment_method || {}).type ?? paymentMethodOptions[0];
+                },
+
                 configureStripeElements: function () {
                     // Stripe Elements are only needed when a payment method is required.
                     if (this.paymentIntent.status !== 'requires_payment_method') {
@@ -188,6 +209,7 @@
 
                     let self = this;
 
+                    // Create the Stripe element based on the currently selected payment method...
                     const elements = stripe.elements();
 
                     if (self.paymentMethod === 'card') {
@@ -197,6 +219,9 @@
                             supportedCountries: ['SEPA']
                         });
                     }
+
+                    // Clear the payment element first, otherwise Stripe Elements will emit a warning...
+                    document.getElementById("payment-element").innerHTML = "";
 
                     self.paymentElement.mount('#payment-element');
                 },
@@ -245,12 +270,12 @@
                         }
 
                         if (result.error.payment_intent) {
-                            this.paymentIntent = result.error.payment_intent;
+                            this.configurePaymentIntent(result.error.payment_intent);
 
                             this.configureStripeElements();
                         }
                     } else {
-                        this.paymentIntent = result.paymentIntent;
+                        this.configurePaymentIntent(result.paymentIntent);
                     }
                 },
 
