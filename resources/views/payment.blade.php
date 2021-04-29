@@ -71,6 +71,26 @@
                             A valid payment method is needed to process your payment. Please confirm your payment by filling out your payment details below.
                         </p>
 
+                        <div>
+                            <!-- Name -->
+                            <label for="paymentMethod" class="inline-block text-sm text-gray-700 font-semibold mb-2">
+                                Payment Method
+                            </label>
+
+                            <p class="text-sm mb-3">Please select the payment method which you'd like to use.</p>
+
+                            <select
+                                id="paymentMethod"
+                                required
+                                class="inline-block bg-gray-100 border border-gray-300 rounded-lg w-full px-4 py-3 mb-3 focus:outline-none"
+                                v-model="paymentMethod"
+                                @change="configureStripeElements"
+                            >
+                                <option value="card">Card</option>
+                                <option value="sepa_debit">SEPA Debit</option>
+                            </select>
+                        </div>
+
                         <!-- Name -->
                         <label for="name" class="inline-block text-sm text-gray-700 font-semibold mb-2">
                             Full name
@@ -104,7 +124,7 @@
 
                         <div id="payment-element" class="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6"></div>
 
-                        <p v-if="paymentIntent.payment_method_types.includes('sepa_debit')" class="text-xs text-gray-400 mb-6">
+                        <p v-if="paymentMethod === 'sepa_debit'" class="text-xs text-gray-400 mb-6">
                             By providing your payment information and confirming this payment, you authorise (A) and Stripe, our payment service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank. You agree to receive notifications for future debits up to 2 days before they occur.
                         </p>
                     </div>
@@ -148,6 +168,7 @@
                     paymentIntent: {!! $payment->asStripePaymentIntent()->toJSON() !!},
                     name: '{{ optional($customer)->stripeName() }}',
                     email: '{{ optional($customer)->stripeEmail() }}',
+                    paymentMethod: '{{ $payment->payment_method_types[0] }}',
                     paymentElement: null,
                     isPaymentProcessing: false,
                     errorMessage: ''
@@ -169,12 +190,12 @@
 
                     const elements = stripe.elements();
 
-                    if (this.paymentIntent.payment_method_types.includes('sepa_debit')) {
+                    if (self.paymentMethod === 'card') {
+                        self.paymentElement = elements.create('card');
+                    } else if (self.paymentMethod === 'sepa_debit') {
                         self.paymentElement = elements.create('iban', {
                             supportedCountries: ['SEPA']
                         });
-                    } else {
-                        self.paymentElement = elements.create('card');
                     }
 
                     self.paymentElement.mount('#payment-element');
@@ -194,18 +215,18 @@
                     };
                     let paymentPromise;
 
-                    if (this.paymentIntent.payment_method_types.includes('sepa_debit')) {
-                        if (this.paymentIntent.status === 'requires_payment_method') {
-                            data.payment_method.sepa_debit = this.paymentElement;
-                        }
-
-                        paymentPromise = stripe.confirmSepaDebitPayment(secret, data);
-                    } else {
+                    if (self.paymentMethod === 'card') {
                         if (this.paymentIntent.status === 'requires_payment_method') {
                             data.payment_method.card = this.paymentElement;
                         }
 
                         paymentPromise = stripe.confirmCardPayment(secret, data);
+                    } else if (self.paymentMethod === 'sepa_debit') {
+                        if (this.paymentIntent.status === 'requires_payment_method') {
+                            data.payment_method.sepa_debit = this.paymentElement;
+                        }
+
+                        paymentPromise = stripe.confirmSepaDebitPayment(secret, data);
                     }
 
                     paymentPromise.then(result => this.confirmCallback(result));
