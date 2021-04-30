@@ -128,6 +128,19 @@
                         <p v-if="paymentMethod === 'sepa_debit'" class="text-xs text-gray-400 mb-6">
                             By providing your payment information and confirming this payment, you authorise (A) and Stripe, our payment service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank. You agree to receive notifications for future debits up to 2 days before they occur.
                         </p>
+
+                        <!-- Remember Payment Method -->
+                        <label for="remember" class="inline-block text-sm text-gray-700 mb-6">
+                            <input
+                                id="remember"
+                                type="checkbox"
+                                required
+                                class="inline-block mr-1 focus:outline-none"
+                                v-model="remember"
+                            />
+
+                            Remember payment method for future usage
+                        </label>
                     </div>
 
                     <!-- Confirm Payment Method Button -->
@@ -169,6 +182,7 @@
                     paymentIntent: @json($payment->asStripePaymentIntent()->toArray()),
                     name: '{{ optional($customer)->stripeName() }}',
                     email: '{{ optional($customer)->stripeEmail() }}',
+                    remember: false,
                     paymentMethod: '',
                     paymentElement: null,
                     isPaymentProcessing: false,
@@ -237,6 +251,7 @@
 
                     const secret = '{{ $payment->clientSecret() }}';
                     let data = {
+                        setup_future_usage: self.remember ? 'off_session' : null,
                         payment_method: {
                             billing_details: { name: this.name, email: this.email }
                         }
