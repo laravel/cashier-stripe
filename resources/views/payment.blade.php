@@ -72,7 +72,7 @@
                         </p>
 
                         <div v-if="paymentMethods.length > 1">
-                            <!-- Name -->
+                            <!-- Payment Method -->
                             <label for="paymentMethod" class="inline-block text-sm text-gray-700 font-semibold mb-2">
                                 Payment Method
                             </label>
@@ -166,7 +166,7 @@
 
             data() {
                 return {
-                    paymentIntent: {!! $payment->asStripePaymentIntent()->toJSON() !!},
+                    paymentIntent: @json($payment->asStripePaymentIntent()->toArray()),
                     name: '{{ optional($customer)->stripeName() }}',
                     email: '{{ optional($customer)->stripeEmail() }}',
                     paymentMethod: '',
@@ -189,16 +189,19 @@
                     // Set the payment intent object...
                     self.paymentIntent = paymentIntent;
 
-                    // Set the allowed payment methods based on the payment method options of the intent...
-                    const paymentMethodOptions = Object.keys(self.paymentIntent.payment_method_options);
+                    // Set the allowed payment methods based on the payment method types of the intent...
+                    const paymentMethodTypes = self.paymentIntent.payment_method_types;
 
                     self.paymentMethods = [
                         { text: 'Card', value: 'card' },
                         { text: 'SEPA Debit', value: 'sepa_debit' }
-                    ].filter(paymentMethod => paymentMethodOptions.includes(paymentMethod.value));
+                    ].filter(paymentMethod => paymentMethodTypes.includes(paymentMethod.value));
 
-                    // Set the default payment method...
-                    self.paymentMethod = ((self.paymentIntent || {}).payment_method || {}).type ?? paymentMethodOptions[0];
+                    // If the previously set payment method isn't available anymore,
+                    // update it to either the current one or the first available one...
+                    if (! self.paymentMethod || ! paymentMethodTypes.includes(self.paymentMethod)) {
+                        self.paymentMethod = ((self.paymentIntent || {}).payment_method || {}).type ?? paymentMethodTypes[0];
+                    }
                 },
 
                 configureStripeElements: function () {
