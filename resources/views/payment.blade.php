@@ -15,7 +15,7 @@
     <div id="app" class="h-full md:flex md:justify-center md:items-center">
         <div class="w-full max-w-lg">
             <h1 class="text-4xl font-bold text-center p-4 sm:p-6 mt-4">
-                Your {{ $payment->amount() }} payment
+                Your {{ $amount }} payment
             </h1>
 
             <!-- Status Messages -->
@@ -61,7 +61,7 @@
 
                 <div v-else>
                     <!-- Payment Method Form -->
-                    <div v-if="paymentIntent.status === 'requires_payment_method'">
+                    <div v-if="paymentIntent.status === 'requires_payment_method'" class="mb-3">
                         <!-- Instructions -->
                         <h2 class="text-xl mb-4 text-gray-600">
                             Confirm Your Payment
@@ -71,13 +71,15 @@
                             A valid payment method is needed to process your payment. Please confirm your payment by filling out your payment details below.
                         </p>
 
-                        <div v-if="paymentMethods.length > 1">
-                            <!-- Payment Method -->
-                            <label for="paymentMethod" class="inline-block text-sm text-gray-700 font-semibold mb-2">
-                                Payment Method
-                            </label>
+                        <!-- Payment Method -->
+                        <label for="paymentMethod" class="inline-block text-sm text-gray-700 font-semibold mb-2">
+                            Payment Method
+                        </label>
 
-                            <p class="text-sm mb-3">Please select the payment method which you'd like to use.</p>
+                        <div v-if="paymentMethods.length > 1">
+                            <p class="text-sm mb-3">
+                                Please select the payment method which you'd like to use.
+                            </p>
 
                             <select
                                 id="paymentMethod"
@@ -86,10 +88,15 @@
                                 v-model="paymentMethod"
                                 @change="configureStripeElements"
                             >
-                                <option v-for="option in paymentMethods" v-bind:value="option.value">
+                                <option v-for="option in paymentMethods" v-bind:value="option.type">
                                     @{{ option.text }}
                                 </option>
                             </select>
+                        </div>
+                        <div v-else>
+                            <p class="text-sm mb-3">
+                                Your payment will be processed by @{{ paymentMethodTitle }}.
+                            </p>
                         </div>
 
                         <!-- Name -->
@@ -118,29 +125,31 @@
                             v-model="email"
                         />
 
-                        <!-- Stripe Payment Element -->
-                        <label for="payment-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">
-                            Payment details
-                        </label>
+                        <div v-if="paymentElement !== null">
+                            <!-- Stripe Payment Element -->
+                            <label for="payment-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">
+                                Payment details
+                            </label>
 
-                        <div id="payment-element" class="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6"></div>
+                            <div id="payment-element" ref="paymentElement" class="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6"></div>
 
-                        <p v-if="paymentMethod === 'sepa_debit'" class="text-xs text-gray-400 mb-6">
-                            By providing your payment information and confirming this payment, you authorise (A) and Stripe, our payment service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank. You agree to receive notifications for future debits up to 2 days before they occur.
-                        </p>
+                            <p v-if="paymentMethod.type === 'sepa_debit'" class="text-xs text-gray-400 mb-6">
+                                By providing your payment information and confirming this payment, you authorise (A) and Stripe, our payment service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank. You agree to receive notifications for future debits up to 2 days before they occur.
+                            </p>
 
-                        <!-- Remember Payment Method -->
-                        <label for="remember" class="inline-block text-sm text-gray-700 mb-6">
-                            <input
-                                id="remember"
-                                type="checkbox"
-                                required
-                                class="inline-block mr-1 focus:outline-none"
-                                v-model="remember"
-                            />
+                            <!-- Remember Payment Method -->
+                            <label for="remember" class="inline-block text-sm text-gray-700 mb-6">
+                                <input
+                                    id="remember"
+                                    type="checkbox"
+                                    required
+                                    class="inline-block mr-1 focus:outline-none"
+                                    v-model="remember"
+                                />
 
-                            Remember payment method for future usage
-                        </label>
+                                Remember payment method for future usage
+                            </label>
+                        </div>
                     </div>
 
                     <!-- Confirm Payment Method Button -->
@@ -154,7 +163,7 @@
                             Processing...
                         </span>
                         <span v-else>
-                            Confirm your {{ $payment->amount() }} payment
+                            Confirm your {{ $amount }} payment
                         </span>
                     </button>
                 </div>
@@ -179,14 +188,14 @@
 
             data() {
                 return {
-                    paymentIntent: @json($payment->asStripePaymentIntent()->toArray()),
+                    paymentIntent: @json($paymentIntent),
                     name: '{{ optional($customer)->stripeName() }}',
                     email: '{{ optional($customer)->stripeEmail() }}',
                     remember: false,
-                    paymentMethod: '',
+                    paymentMethod: '{{ $paymentMethod }}',
                     paymentElement: null,
                     isPaymentProcessing: false,
-                    errorMessage: '',
+                    errorMessage: '{{ $errorMessage }}',
                     paymentMethods: []
                 }
             },
@@ -196,25 +205,38 @@
                 this.configureStripeElements();
             },
 
+            computed: {
+                paymentMethodTitle: function () {
+                    if (this.paymentMethod === '') {
+                        return '';
+                    }
+
+                    return this.paymentMethods.filter(paymentMethod => {
+                        return paymentMethod.type === this.paymentMethod
+                    })[0].text ?? '';
+                }
+            },
+
             methods: {
                 configurePaymentIntent: function (paymentIntent) {
-                    let self = this;
-
                     // Set the payment intent object...
-                    self.paymentIntent = paymentIntent;
+                    this.paymentIntent = paymentIntent;
 
                     // Set the allowed payment methods based on the payment method types of the intent...
-                    const paymentMethodTypes = self.paymentIntent.payment_method_types;
+                    const paymentMethodTypes = this.paymentIntent.payment_method_types;
 
-                    self.paymentMethods = [
-                        { text: 'Card', value: 'card' },
-                        { text: 'SEPA Debit', value: 'sepa_debit' }
-                    ].filter(paymentMethod => paymentMethodTypes.includes(paymentMethod.value));
+                    this.paymentMethods = [
+                        { text: 'Card', type: 'card' },
+                        { text: 'Alipay', type: 'alipay' },
+                        { text: 'BECS Direct Debit', type: 'au_becs_debit' },
+                        { text: 'Bancontact', type: 'bancontact' },
+                        { text: 'SEPA Debit', type: 'sepa_debit' }
+                    ].filter(paymentMethod => paymentMethodTypes.includes(paymentMethod.type));
 
                     // If the previously set payment method isn't available anymore,
                     // update it to either the current one or the first available one...
-                    if (! self.paymentMethod || ! paymentMethodTypes.includes(self.paymentMethod)) {
-                        self.paymentMethod = ((self.paymentIntent || {}).payment_method || {}).type ?? paymentMethodTypes[0];
+                    if (! this.paymentMethod || ! paymentMethodTypes.includes(this.paymentMethod)) {
+                        this.paymentMethod = ((this.paymentIntent || {}).payment_method || {}).type ?? paymentMethodTypes[0];
                     }
                 },
 
@@ -224,47 +246,70 @@
                         return;
                     }
 
-                    let self = this;
-
                     // Create the Stripe element based on the currently selected payment method...
                     const elements = stripe.elements();
 
-                    if (self.paymentMethod === 'card') {
-                        self.paymentElement = elements.create('card');
-                    } else if (self.paymentMethod === 'sepa_debit') {
-                        self.paymentElement = elements.create('iban', {
+                    if (this.paymentMethod === 'card') {
+                        this.paymentElement = elements.create('card');
+                    } else if (this.paymentMethod === 'au_becs_debit') {
+                        this.paymentElement = elements.create('auBankAccount');
+                    }  else if (this.paymentMethod === 'sepa_debit') {
+                        this.paymentElement = elements.create('iban', {
                             supportedCountries: ['SEPA']
                         });
+                    } else {
+                        this.paymentElement = null;
                     }
 
-                    // Clear the payment element first, otherwise Stripe Elements will emit a warning...
-                    document.getElementById("payment-element").innerHTML = "";
+                    if (this.paymentElement) {
+                        this.$nextTick(() => {
+                            // Clear the payment element first, otherwise Stripe Elements will emit a warning...
+                            document.getElementById("payment-element").innerHTML = "";
 
-                    self.paymentElement.mount('#payment-element');
+                            this.paymentElement.mount('#payment-element');
+                        })
+                    }
                 },
 
                 confirmPaymentMethod: function () {
-                    let self = this;
+                    this.isPaymentProcessing = true;
+                    this.errorMessage = '';
 
-                    self.isPaymentProcessing = true;
-                    self.errorMessage = '';
-
-                    const secret = '{{ $payment->clientSecret() }}';
+                    const secret = this.paymentIntent.client_secret;
+                    const redirectMethods = ['alipay', 'bancontact'];
                     let data = {
-                        setup_future_usage: self.remember ? 'off_session' : null,
+                        setup_future_usage: ! redirectMethods.includes(this.paymentMethod) && this.remember
+                            ? 'off_session'
+                            : null,
                         payment_method: {
                             billing_details: { name: this.name, email: this.email }
                         }
                     };
                     let paymentPromise;
 
-                    if (self.paymentMethod === 'card') {
+                    // Set a return url to redirect the user back to the payment
+                    // page after handling the off session payment confirmation.
+                    if (redirectMethods.includes(this.paymentMethod)) {
+                        data.return_url = '{{ route('cashier.payment', $paymentIntent['id']).'?redirect='.$redirect }}';
+                    }
+
+                    if (this.paymentMethod === 'card') {
                         if (this.paymentIntent.status === 'requires_payment_method') {
                             data.payment_method.card = this.paymentElement;
                         }
 
                         paymentPromise = stripe.confirmCardPayment(secret, data);
-                    } else if (self.paymentMethod === 'sepa_debit') {
+                    } else if (this.paymentMethod === 'alipay') {
+                        paymentPromise = stripe.confirmAlipayPayment(secret, data);
+                    } else if (this.paymentMethod === 'au_becs_debit') {
+                        if (this.paymentIntent.status === 'requires_payment_method') {
+                            data.payment_method.au_becs_debit = this.paymentElement;
+                        }
+
+                        paymentPromise = stripe.confirmAuBecsDebitPayment(secret, data);
+                    }  else if (this.paymentMethod === 'bancontact') {
+                        paymentPromise = stripe.confirmBancontactPayment(secret, data);
+                    } else if (this.paymentMethod === 'sepa_debit') {
                         if (this.paymentIntent.status === 'requires_payment_method') {
                             data.payment_method.sepa_debit = this.paymentElement;
                         }
@@ -276,15 +321,13 @@
                 },
 
                 confirmCallback: function (result) {
-                    let self = this;
-
-                    self.isPaymentProcessing = false;
+                    this.isPaymentProcessing = false;
 
                     if (result.error) {
                         if (result.error.code === '{{ Stripe\ErrorObject::CODE_PARAMETER_INVALID_EMPTY }}') {
-                            self.errorMessage = 'Please provide your name and e-mail address.';
+                            this.errorMessage = 'Please provide your name and e-mail address.';
                         } else {
-                            self.errorMessage = result.error.message;
+                            this.errorMessage = result.error.message;
                         }
 
                         if (result.error.payment_intent) {
@@ -298,17 +341,15 @@
                 },
 
                 goBack: function () {
-                    let self = this;
-
                     const button = this.$refs.goBackButton;
                     const redirect = new URL(button.dataset.redirect);
 
                     redirect.searchParams.append(
-                        'success', self.paymentIntent.status === 'succeeded' ? 'true' : 'false'
+                        'success', this.paymentIntent.status === 'succeeded' ? 'true' : 'false'
                     );
 
-                    if (self.errorMessage) {
-                        redirect.searchParams.append('message', self.errorMessage);
+                    if (this.errorMessage) {
+                        redirect.searchParams.append('message', this.errorMessage);
                     }
 
                     window.location.href = redirect;
