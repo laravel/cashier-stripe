@@ -169,11 +169,13 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
             return 0;
         }
 
-        if ($this->discountIsPercentage()) {
-            return (int) round($this->invoice->subtotal * ($this->percentOff() / 100));
+        $total = 0;
+
+        foreach ($this->invoice->total_discount_amounts as $discount) {
+            $total += $discount->amount;
         }
 
-        return $this->rawAmountOff();
+        return (int) $total;
     }
 
     /**
