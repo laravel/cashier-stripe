@@ -8,6 +8,7 @@ use Laravel\Cashier\Invoice;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Tests\TestCase;
 use Mockery as m;
+use stdClass;
 use Stripe\Coupon;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Discount;
@@ -194,10 +195,12 @@ class InvoiceTest extends TestCase
         $discount = new Discount();
         $discount->coupon = $coupon;
 
+        $discountAmount = new stdClass();
+        $discountAmount->amount = 50;
+
         $stripeInvoice = new StripeInvoice();
+        $stripeInvoice->total_discount_amounts = [$discountAmount];
         $stripeInvoice->customer = 'foo';
-        $stripeInvoice->subtotal = 450;
-        $stripeInvoice->total = 500;
         $stripeInvoice->discount = $discount;
 
         $user = new User();
@@ -206,6 +209,7 @@ class InvoiceTest extends TestCase
         $invoice = new Invoice($user, $stripeInvoice);
 
         $this->assertTrue($invoice->hasDiscount());
+        $this->assertSame(50, $invoice->rawDiscount());
     }
 
     public function test_it_can_return_its_tax()
