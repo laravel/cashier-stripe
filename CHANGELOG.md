@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.13.0...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.13.1...12.x)
+
+
+## [v12.13.1 (2021-05-11)](https://github.com/laravel/cashier/compare/v12.13.0...v12.13.1)
+
+### Fixed
+- Fix discount calculation ([#1144](https://github.com/laravel/cashier-stripe/pull/1144))
 
 
 ## [v12.13.0 (2021-04-27)](https://github.com/laravel/cashier/compare/v12.12.0...v12.13.0)
