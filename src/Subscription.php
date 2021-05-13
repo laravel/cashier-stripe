@@ -659,10 +659,10 @@ class Subscription extends Model
             $this->parseSwapPlans($plans)
         );
 
-        return $this->upcomingInvoice([
+        return $this->upcomingInvoice(array_merge([
             'subscription_items' => $items->values()->all(),
             'subscription_trial_end' => $this->onTrial() ? $this->trial_ends_at->getTimestamp() : 'now',
-        ]);
+        ], $options));
     }
 
     /**
