@@ -869,7 +869,7 @@ class SubscriptionsTest extends FeatureTestCase
         $subscription = $user->newSubscription('main', static::$planId)
             ->create('pm_card_visa');
 
-        $invoice = $subscription->previewInvoice(static::$otherPlanId);
+        $invoice = $subscription->previewUpcomingInvoice(static::$otherPlanId);
 
         $this->assertSame('draft', $invoice->status);
         $this->assertSame(1000, $invoice->total);
