@@ -627,13 +627,24 @@ class Subscription extends Model
         return $this;
     }
 
+    /**
+     * Fetches upcoming invoice for this subscription
+     *
+     * @return \Laravel\Cashier\Invoice|null
+     */
+    public function upcomingInvoice($options = [])
+    {
+        return $this->owner->upcomingInvoice(array_merge([
+            'subscription' => $this->stripe_id,
+        ], $options));
+    }
 
     /**
      * Previews upcoming invoice with new stripe plans
      *
      * @param  string|array  $plans
      * @param  array  $options
-     * @return \Stripe\Invoice
+     * @return \Laravel\Cashier\Invoice|null
      */
     public function previewUpcomingInvoice($plans, $options = [])
     {
@@ -647,11 +658,10 @@ class Subscription extends Model
             $this->parseSwapPlans($plans)
         );
 
-        return StripeInvoice::upcoming(array_merge([
-            'subscription' => $this->stripe_id,
+        return $this->upcomingInvoice([
             'subscription_items' => $items->values()->all(),
-            'subscription_trial_end' => $this->onTrial() ? $this->trial_ends_at->getTimestamp() : 'now'
-        ], $options), $this->owner->stripeOptions());
+            'subscription_trial_end' => $this->onTrial() ? $this->trial_ends_at->getTimestamp() : 'now',
+        ]);
     }
 
     /**

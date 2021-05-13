@@ -100,7 +100,7 @@ trait ManagesInvoices
      *
      * @return \Laravel\Cashier\Invoice|null
      */
-    public function upcomingInvoice()
+    public function upcomingInvoice($options = [])
     {
         if (! $this->hasStripeId()) {
             return;
