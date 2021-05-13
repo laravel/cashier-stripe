@@ -1037,7 +1037,7 @@ class Subscription extends Model
      */
     public function pending()
     {
-        return $this->asStripeSubscription()->pending_update !== null;
+        return ! is_null($this->asStripeSubscription()->pending_update);
     }
 
     /**
@@ -1069,7 +1069,7 @@ class Subscription extends Model
      */
     public function latestInvoice()
     {
-        $stripeSubscription = $this->asStripeSubscription(['latest_invoice']);
+        $stripeSubscription = $this->asStripeSubscription(['latest_invoice.discounts']);
 
         if ($stripeSubscription->latest_invoice) {
             return new Invoice($this->owner, $stripeSubscription->latest_invoice);

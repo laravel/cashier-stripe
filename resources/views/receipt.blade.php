@@ -246,6 +246,7 @@
                         </tr>
                     @endif
 
+
                     <!-- Display The Discount -->
                     @if ($invoice->hasDiscount())
                         <tr>

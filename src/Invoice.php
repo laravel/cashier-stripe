@@ -154,17 +154,27 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Determine if the invoice has a discount.
+     * Determine if the invoice has one or more discounts applied.
      *
      * @return bool
      */
     public function hasDiscount()
     {
-        return $this->rawDiscount() > 0;
+        return count($this->invoice->discounts) > 0;
     }
 
     /**
-     * Get the discount amount.
+     * Get all of the discount objects from the Stripe invoice.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function discounts()
+    {
+        return Collection::make($this->invoice->discounts)->mapInto(Discount::class);
+    }
+
+    /**
+     * Get the total discount amount.
      *
      * @return string
      */
@@ -174,7 +184,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get the raw discount amount.
+     * Get the raw total discount amount.
      *
      * @return int
      */
@@ -191,78 +201,6 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
         }
 
         return (int) $total;
-    }
-
-    /**
-     * Get the coupon code applied to the invoice.
-     *
-     * @return string|null
-     */
-    public function coupon()
-    {
-        if (isset($this->invoice->discount)) {
-            return $this->invoice->discount->coupon->id;
-        }
-    }
-
-    /**
-     * Get the coupon name applied to the invoice.
-     *
-     * @return string|null
-     */
-    public function couponName()
-    {
-        if (isset($this->invoice->discount)) {
-            return $this->invoice->discount->coupon->name ?: $this->invoice->discount->coupon->id;
-        }
-    }
-
-    /**
-     * Determine if the discount is a percentage.
-     *
-     * @return bool
-     */
-    public function discountIsPercentage()
-    {
-        return isset($this->invoice->discount) && isset($this->invoice->discount->coupon->percent_off);
-    }
-
-    /**
-     * Get the discount percentage for the invoice.
-     *
-     * @return int
-     */
-    public function percentOff()
-    {
-        if ($this->coupon()) {
-            return $this->invoice->discount->coupon->percent_off;
-        }
-
-        return 0;
-    }
-
-    /**
-     * Get the discount amount for the invoice.
-     *
-     * @return string
-     */
-    public function amountOff()
-    {
-        return $this->formatAmount($this->rawAmountOff());
-    }
-
-    /**
-     * Get the raw discount amount for the invoice.
-     *
-     * @return int
-     */
-    public function rawAmountOff()
-    {
-        if (isset($this->invoice->discount->coupon->amount_off)) {
-            return $this->invoice->discount->coupon->amount_off;
-        }
-
-        return 0;
     }
 
     /**
