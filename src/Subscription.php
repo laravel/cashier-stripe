@@ -15,6 +15,7 @@ use Laravel\Cashier\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use LogicException;
+use Stripe\Invoice as StripeInvoice;
 use Stripe\Subscription as StripeSubscription;
 
 class Subscription extends Model
@@ -624,6 +625,33 @@ class Subscription extends Model
         $this->save();
 
         return $this;
+    }
+
+
+    /**
+     * Previews upcoming invoice with new stripe plans
+     *
+     * @param  string|array  $plans
+     * @param  array  $options
+     * @return \Stripe\Invoice
+     */
+    public function previewUpcomingInvoice($plans, $options = [])
+    {
+        if (empty($plans = (array) $plans)) {
+            throw new InvalidArgumentException('Please provide at least one plan when swapping.');
+        }
+
+        $this->guardAgainstIncomplete();
+
+        $items = $this->mergeItemsThatShouldBeDeletedDuringSwap(
+            $this->parseSwapPlans($plans)
+        );
+
+        return StripeInvoice::upcoming(array_merge([
+            'subscription' => $this->stripe_id,
+            'subscription_items' => $items->values()->all(),
+            'subscription_trial_end' => $this->onTrial() ? $this->trial_ends_at->getTimestamp() : 'now'
+        ], $options), $this->owner->stripeOptions());
     }
 
     /**
