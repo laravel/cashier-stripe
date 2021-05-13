@@ -98,6 +98,7 @@ trait ManagesInvoices
     /**
      * Get the customer's upcoming invoice.
      *
+     * @param  array  $options
      * @return \Laravel\Cashier\Invoice|null
      */
     public function upcomingInvoice($options = [])

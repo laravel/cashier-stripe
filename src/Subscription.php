@@ -630,6 +630,7 @@ class Subscription extends Model
     /**
      * Fetches upcoming invoice for this subscription
      *
+     * @param  array  $options
      * @return \Laravel\Cashier\Invoice|null
      */
     public function upcomingInvoice($options = [])
