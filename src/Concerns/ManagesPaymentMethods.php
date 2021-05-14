@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Concerns;
 
 use Exception;
+use Illuminate\Support\Collection;
 use Laravel\Cashier\PaymentMethod;
 use Stripe\Customer as StripeCustomer;
 use Stripe\PaymentMethod as StripePaymentMethod;
@@ -54,7 +55,7 @@ trait ManagesPaymentMethods
     public function paymentMethods($type = 'card', $parameters = [])
     {
         if (! $this->hasStripeId()) {
-            return collect();
+            return new Collection();
         }
 
         $parameters = array_merge(['limit' => 24], $parameters);
@@ -65,7 +66,7 @@ trait ManagesPaymentMethods
             $this->stripeOptions()
         );
 
-        return collect($paymentMethods->data)->map(function ($paymentMethod) {
+        return Collection::make($paymentMethods->data)->map(function ($paymentMethod) {
             return new PaymentMethod($this, $paymentMethod);
         });
     }

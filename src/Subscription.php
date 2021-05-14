@@ -714,7 +714,7 @@ class Subscription extends Model
     {
         $isSinglePlanSwap = $this->hasSinglePlan() && count($plans) === 1;
 
-        return collect($plans)->mapWithKeys(function ($options, $plan) use ($isSinglePlanSwap) {
+        return Collection::make($plans)->mapWithKeys(function ($options, $plan) use ($isSinglePlanSwap) {
             $plan = is_string($options) ? $options : $plan;
 
             $options = is_string($options) ? [] : $options;

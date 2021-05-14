@@ -107,13 +107,7 @@ trait ManagesInvoices
         }
 
         try {
-            $stripeInvoice = StripeInvoice::upcoming(
-<<<<<<< Updated upstream
-                ['customer' => $this->stripe_id, 'expand' => ['account_tax_ids']], $this->stripeOptions()
-=======
-                ['customer' => $this->stripe_id, 'expand' => ['discounts']], $this->stripeOptions()
->>>>>>> Stashed changes
-            );
+            $stripeInvoice = StripeInvoice::upcoming(['customer' => $this->stripe_id], $this->stripeOptions());
 
             return new Invoice($this, $stripeInvoice);
         } catch (StripeInvalidRequestException $exception) {
@@ -132,13 +126,7 @@ trait ManagesInvoices
         $stripeInvoice = null;
 
         try {
-            $stripeInvoice = StripeInvoice::retrieve(
-<<<<<<< Updated upstream
-                ['id' => $id, 'expand' => ['account_tax_ids']], $this->stripeOptions()
-=======
-                ['id' => $id, 'expand' => ['discounts']], $this->stripeOptions()
->>>>>>> Stashed changes
-            );
+            $stripeInvoice = StripeInvoice::retrieve($id, $this->stripeOptions());
         } catch (StripeInvalidRequestException $exception) {
             //
         }
@@ -195,7 +183,7 @@ trait ManagesInvoices
     public function invoices($includePending = false, $parameters = [])
     {
         if (! $this->hasStripeId()) {
-            return collect();
+            return new Collection();
         }
 
         $invoices = [];
@@ -203,7 +191,7 @@ trait ManagesInvoices
         $parameters = array_merge(['limit' => 24], $parameters);
 
         $stripeInvoices = StripeInvoice::all(
-            ['customer' => $this->stripe_id, 'expand' => ['data.discounts']] + $parameters,
+            ['customer' => $this->stripe_id] + $parameters,
             $this->stripeOptions()
         );
 

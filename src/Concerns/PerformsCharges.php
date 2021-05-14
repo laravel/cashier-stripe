@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Concerns;
 
+use Illuminate\Support\Collection;
 use Laravel\Cashier\Checkout;
 use Laravel\Cashier\Payment;
 use Stripe\PaymentIntent as StripePaymentIntent;
@@ -76,7 +77,7 @@ trait PerformsCharges
      */
     public function checkout($items, array $sessionOptions = [], array $customerOptions = [])
     {
-        $items = collect((array) $items)->map(function ($item, $key) {
+        $items = Collection::make((array) $items)->map(function ($item, $key) {
             if (is_string($key)) {
                 return ['price' => $key, 'quantity' => $item];
             }

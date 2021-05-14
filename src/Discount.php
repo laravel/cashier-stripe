@@ -10,7 +10,7 @@ use Stripe\Discount as StripeDiscount;
 class Discount implements Arrayable, Jsonable, JsonSerializable
 {
     /**
-     * The Stripe PaymentIntent instance.
+     * The Stripe Discount instance.
      *
      * @var \Stripe\Discount
      */
@@ -28,76 +28,13 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get the coupon code applied to the discount.
+     * Get the coupon applied to the discount.
      *
-     * @return string
+     * @return \Laravel\Cashier\Coupon
      */
     public function coupon()
     {
-        return $this->discount->coupon->id;
-    }
-
-    /**
-     * Get the coupon name applied to the discount.
-     *
-     * @return string
-     */
-    public function couponName()
-    {
-        return $this->discount->coupon->name ?: $this->discount->coupon->id;
-    }
-
-    /**
-     * Determine if the discount is a percentage.
-     *
-     * @return bool
-     */
-    public function discountIsPercentage()
-    {
-        return ! is_null($this->discount->coupon->percent_off);
-    }
-
-    /**
-     * Get the discount percentage for the invoice.
-     *
-     * @return float|null
-     */
-    public function percentOff()
-    {
-        return $this->discount->coupon->percent_off;
-    }
-
-    /**
-     * Get the amount off for the discount.
-     *
-     * @return string|null
-     */
-    public function amountOff()
-    {
-        if (! is_null($this->discount->coupon->amount_off)) {
-            return $this->formatAmount($this->rawAmountOff());
-        }
-    }
-
-    /**
-     * Get the raw amount off for the discount.
-     *
-     * @return int|null
-     */
-    public function rawAmountOff()
-    {
-        return $this->discount->coupon->amount_off;
-    }
-
-    /**
-     * Format the given amount into a displayable currency.
-     *
-     * @param  int  $amount
-     * @return string
-     */
-    protected function formatAmount($amount)
-    {
-        return Cashier::formatAmount($amount, $this->discount->coupon->currency);
+        return new Coupon($this->discount->coupon);
     }
 
     /**
@@ -142,7 +79,7 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Dynamically get values from the Stripe Discount.
+     * Dynamically get values from the Stripe object.
      *
      * @param  string  $key
      * @return mixed
