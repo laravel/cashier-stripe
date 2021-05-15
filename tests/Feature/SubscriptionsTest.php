@@ -199,7 +199,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals('$10.00', $invoice->total());
         $this->assertFalse($invoice->hasDiscount());
         $this->assertFalse($invoice->hasStartingBalance());
-        $this->assertNull($invoice->coupon());
+        $this->assertEmpty($invoice->discounts());
         $this->assertInstanceOf(Carbon::class, $invoice->date());
     }
 
@@ -395,10 +395,12 @@ class SubscriptionsTest extends FeatureTestCase
         // Invoice Tests
         $invoice = $user->invoices()[0];
 
+        $coupon = $invoice->discounts()[0]->coupon();
+
         $this->assertTrue($invoice->hasDiscount());
         $this->assertEquals('$5.00', $invoice->total());
-        $this->assertEquals('$5.00', $invoice->amountOff());
-        $this->assertFalse($invoice->discountIsPercentage());
+        $this->assertEquals('$5.00', $coupon->amountOff());
+        $this->assertFalse($coupon->isPercentage());
     }
 
     public function test_creating_subscription_with_an_anchored_billing_cycle()

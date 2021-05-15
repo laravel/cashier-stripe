@@ -1069,7 +1069,7 @@ class Subscription extends Model
      */
     public function latestInvoice()
     {
-        $stripeSubscription = $this->asStripeSubscription(['latest_invoice.discounts']);
+        $stripeSubscription = $this->asStripeSubscription(['latest_invoice']);
 
         if ($stripeSubscription->latest_invoice) {
             return new Invoice($this->owner, $stripeSubscription->latest_invoice);

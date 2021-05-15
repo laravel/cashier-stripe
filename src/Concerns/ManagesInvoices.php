@@ -80,7 +80,7 @@ trait ManagesInvoices
                 $stripeInvoice = $stripeInvoice->sendInvoice();
             }
 
-            return $this->findInvoice($stripeInvoice->id);
+            return new Invoice($this, $stripeInvoice);
         } catch (StripeInvalidRequestException $exception) {
             return false;
         } catch (StripeCardException $exception) {
