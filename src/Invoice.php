@@ -54,6 +54,13 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     protected $discounts;
 
     /**
+     * Indicate if the Stripe Object was refreshed with extra data.
+     *
+     * @var bool
+     */
+    protected $refreshed = false;
+
+    /**
      * Create a new invoice instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $owner
@@ -374,9 +381,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     protected function refreshWithExpandedData()
     {
-        static $refreshed = false;
-
-        if ($refreshed) {
+        if ($this->refreshed) {
             return;
         }
 
@@ -405,7 +410,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
             ], $this->owner->stripeOptions());
         }
 
-        $refreshed = true;
+        $this->refreshed = true;
     }
 
     /**
