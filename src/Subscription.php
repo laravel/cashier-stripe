@@ -527,7 +527,7 @@ class Subscription extends Model
      * @param  string|null  $plan
      * @return \Illuminate\Support\Collection
      */
-    public function usageRecords($options = [], $plan = null)
+    public function usageRecords(array $options = [], $plan = null)
     {
         if (! $plan) {
             $this->guardAgainstMultiplePlans();
@@ -543,7 +543,7 @@ class Subscription extends Model
      * @param  array  $options
      * @return \Illuminate\Support\Collection
      */
-    public function usageRecordsFor($plan, $options = [])
+    public function usageRecordsFor($plan, array $options = [])
     {
         return $this->usageRecords($options, $plan);
     }
@@ -635,7 +635,7 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function swap($plans, $options = [])
+    public function swap($plans, array $options = [])
     {
         if (empty($plans = (array) $plans)) {
             throw new InvalidArgumentException('Please provide at least one plan when swapping.');
@@ -695,7 +695,7 @@ class Subscription extends Model
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function swapAndInvoice($plans, $options = [])
+    public function swapAndInvoice($plans, array $options = [])
     {
         $this->alwaysInvoice();
 
@@ -794,7 +794,7 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function addPlan($plan, $quantity = 1, $options = [])
+    public function addPlan($plan, $quantity = 1, array $options = [])
     {
         $this->guardAgainstIncomplete();
 
@@ -841,7 +841,7 @@ class Subscription extends Model
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function addPlanAndInvoice($plan, $quantity = 1, $options = [])
+    public function addPlanAndInvoice($plan, $quantity = 1, array $options = [])
     {
         $this->alwaysInvoice();
 
