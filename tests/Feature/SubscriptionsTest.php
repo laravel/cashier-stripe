@@ -242,6 +242,62 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertSame(3, $subscription->asStripeSubscription()->quantity);
     }
 
+    public function test_declined_card_during_new_quantity()
+    {
+        $user = $this->createCustomer('declined_card_during_new_quantity');
+
+        $subscription = $user->newSubscription('main', static::$planId)
+            ->quantity(5)
+            ->create('pm_card_visa');
+
+        // Set a faulty card as the customer's default payment method.
+        $user->updateDefaultPaymentMethod('pm_card_chargeCustomerFail');
+
+        try {
+            // Attempt to increment quantity and pay with a faulty card.
+            $subscription = $subscription->incrementAndInvoice(3);
+
+            $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
+        } catch (IncompletePayment $e) {
+            // Assert that the payment needs a valid payment method.
+            $this->assertTrue($e->payment->requiresPaymentMethod());
+
+            // Assert that the quantity was updated anyway.
+            $this->assertEquals(8, $subscription->refresh()->quantity);
+
+            // Assert subscription is past due.
+            $this->assertTrue($subscription->pastDue());
+        }
+    }
+
+    public function test_declined_card_during_new_quantity_for_specific_plan()
+    {
+        $user = $this->createCustomer('declined_card_during_new_quantity_for_specific_plan');
+
+        $subscription = $user->newSubscription('main', static::$planId)
+            ->quantity(5, static::$planId)
+            ->create('pm_card_visa');
+
+        // Set a faulty card as the customer's default payment method.
+        $user->updateDefaultPaymentMethod('pm_card_chargeCustomerFail');
+
+        try {
+            // Attempt to increment quantity and pay with a faulty card.
+            $subscription = $subscription->incrementAndInvoice(3);
+
+            $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
+        } catch (IncompletePayment $e) {
+            // Assert that the payment needs a valid payment method.
+            $this->assertTrue($e->payment->requiresPaymentMethod());
+
+            // Assert that the quantity was updated anyway.
+            $this->assertEquals(8, $subscription->refresh()->quantity);
+
+            // Assert subscription is past due.
+            $this->assertTrue($subscription->pastDue());
+        }
+    }
+
     public function test_declined_card_during_subscribing_results_in_an_exception()
     {
         $user = $this->createCustomer('declined_card_during_subscribing_results_in_an_exception');

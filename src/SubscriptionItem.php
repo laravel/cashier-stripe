@@ -106,24 +106,28 @@ class SubscriptionItem extends Model
     {
         $this->subscription->guardAgainstIncomplete();
 
-        $stripeSubscriptionItem = $this->asStripeSubscriptionItem();
+        $stripeSubscriptionItem = $this->updateStripeSubscriptionItem([
+            'payment_behavior' => $this->paymentBehavior(),
+            'proration_behavior' => $this->prorateBehavior(),
+            'quantity' => $quantity,
+            'expand' => ['subscription.latest_invoice.payment_intent'],
+        ]);
 
-        $stripeSubscriptionItem->quantity = $quantity;
-
-        $stripeSubscriptionItem->payment_behavior = $this->paymentBehavior();
-
-        $stripeSubscriptionItem->proration_behavior = $this->prorateBehavior();
-
-        $stripeSubscriptionItem->save();
-
-        $this->quantity = $quantity;
-
-        $this->save();
+        $this->fill([
+            'quantity' => $quantity,
+        ])->save();
 
         if ($this->subscription->hasSinglePlan()) {
-            $this->subscription->quantity = $quantity;
+            $this->subscription->fill([
+                'stripe_status' => $stripeSubscriptionItem->subscription->status,
+                'quantity' => $quantity,
+            ])->save();
+        }
 
-            $this->subscription->save();
+        if ($this->subscription->hasIncompletePayment()) {
+            (new Payment(
+                $stripeSubscriptionItem->subscription->latest_invoice->payment_intent
+            ))->validate();
         }
 
         return $this;
