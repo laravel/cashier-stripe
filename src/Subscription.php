@@ -764,7 +764,7 @@ class Subscription extends Model
      * @param  array  $options
      * @return array
      */
-    protected function getSwapOptions(Collection $items, $options)
+    protected function getSwapOptions(Collection $items, array $options = [])
     {
         $payload = [
             'items' => $items->values()->all(),
@@ -1078,6 +1078,55 @@ class Subscription extends Model
         if ($stripeSubscription->latest_invoice) {
             return new Invoice($this->owner, $stripeSubscription->latest_invoice);
         }
+    }
+
+    /**
+     * Fetches upcoming invoice for this subscription.
+     *
+     * @param  array  $options
+     * @return \Laravel\Cashier\Invoice|null
+     */
+    public function upcomingInvoice(array $options = [])
+    {
+        return $this->owner->upcomingInvoice(array_merge([
+            'subscription' => $this->stripe_id,
+        ], $options));
+    }
+
+    /**
+     * Preview the upcoming invoice with new Stripe plans.
+     *
+     * @param  string|array  $plans
+     * @param  array  $options
+     * @return \Laravel\Cashier\Invoice|null
+     */
+    public function previewInvoice($plans, array $options = [])
+    {
+        if (empty($plans = (array) $plans)) {
+            throw new InvalidArgumentException('Please provide at least one plan when swapping.');
+        }
+
+        $this->guardAgainstIncomplete();
+
+        $items = $this->mergeItemsThatShouldBeDeletedDuringSwap(
+            $this->parseSwapPlans($plans)
+        );
+
+        $swapOptions = Collection::make($this->getSwapOptions($items))
+            ->only([
+                'billing_cycle_anchor',
+                'cancel_at_period_end',
+                'items',
+                'proration_behavior',
+                'trial_end',
+            ])
+            ->mapWithKeys(function ($value, $key) {
+                return ["subscription_$key" => $value];
+            })
+            ->merge($options)
+            ->all();
+
+        return $this->upcomingInvoice($swapOptions);
     }
 
     /**

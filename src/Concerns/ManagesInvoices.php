@@ -98,16 +98,19 @@ trait ManagesInvoices
     /**
      * Get the customer's upcoming invoice.
      *
+     * @param  array  $options
      * @return \Laravel\Cashier\Invoice|null
      */
-    public function upcomingInvoice()
+    public function upcomingInvoice(array $options = [])
     {
         if (! $this->hasStripeId()) {
             return;
         }
 
         try {
-            $stripeInvoice = StripeInvoice::upcoming(['customer' => $this->stripe_id], $this->stripeOptions());
+            $stripeInvoice = StripeInvoice::upcoming(array_merge([
+                'customer' => $this->stripe_id,
+            ], $options), $this->stripeOptions());
 
             return new Invoice($this, $stripeInvoice);
         } catch (StripeInvalidRequestException $exception) {
