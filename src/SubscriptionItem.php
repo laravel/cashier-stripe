@@ -138,7 +138,7 @@ class SubscriptionItem extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function swap($plan, $options = [])
+    public function swap($plan, array $options = [])
     {
         $this->subscription->guardAgainstIncomplete();
 
@@ -181,7 +181,7 @@ class SubscriptionItem extends Model
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function swapAndInvoice($plan, $options = [])
+    public function swapAndInvoice($plan, array $options = [])
     {
         $this->alwaysInvoice();
 
