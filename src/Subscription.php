@@ -632,7 +632,7 @@ class Subscription extends Model
      * @param  array  $options
      * @return \Laravel\Cashier\Invoice|null
      */
-    public function upcomingInvoice($options = [])
+    public function upcomingInvoice(array $options = [])
     {
         return $this->owner->upcomingInvoice(array_merge([
             'subscription' => $this->stripe_id,
@@ -646,7 +646,7 @@ class Subscription extends Model
      * @param  array  $options
      * @return \Laravel\Cashier\Invoice|null
      */
-    public function previewUpcomingInvoice($plans, $options = [])
+    public function previewUpcomingInvoice($plans, array $options = [])
     {
         if (empty($plans = (array) $plans)) {
             throw new InvalidArgumentException('Please provide at least one plan when swapping.');
