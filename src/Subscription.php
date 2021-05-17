@@ -475,17 +475,23 @@ class Subscription extends Model
 
         $this->guardAgainstMultiplePlans();
 
-        $stripeSubscription = $this->asStripeSubscription();
+        $stripeSubscription = $this->updateStripeSubscription([
+            'payment_behavior' => $this->paymentBehavior(),
+            'proration_behavior' => $this->prorateBehavior(),
+            'quantity' => $quantity,
+            'expand' => ['latest_invoice.payment_intent'],
+        ]);
 
-        $stripeSubscription->quantity = $quantity;
-        $stripeSubscription->payment_behavior = $this->paymentBehavior();
-        $stripeSubscription->proration_behavior = $this->prorateBehavior();
+        $this->fill([
+            'stripe_status' => $stripeSubscription->status,
+            'quantity' => $quantity,
+        ])->save();
 
-        $stripeSubscription->save();
-
-        $this->quantity = $quantity;
-
-        $this->save();
+        if ($this->hasIncompletePayment()) {
+            (new Payment(
+                $stripeSubscription->latest_invoice->payment_intent
+            ))->validate();
+        }
 
         return $this;
     }
