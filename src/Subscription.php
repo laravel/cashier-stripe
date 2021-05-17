@@ -1088,7 +1088,7 @@ class Subscription extends Model
     }
 
     /**
-     * Previews the upcoming invoice with new Stripe plans.
+     * Preview the upcoming invoice with new Stripe plans.
      *
      * @param  string|array  $plans
      * @param  array  $options
