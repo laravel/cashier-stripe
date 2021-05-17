@@ -590,11 +590,10 @@ class Subscription extends Model
             return $this;
         }
 
-        $subscription = $this->asStripeSubscription();
-
-        $subscription->trial_end = 'now';
-
-        $subscription->save();
+        $this->updateStripeSubscription([
+            'trial_end' => 'now',
+            'proration_behavior' => $this->prorateBehavior(),
+        ]);
 
         $this->trial_ends_at = null;
 
@@ -615,11 +614,10 @@ class Subscription extends Model
             throw new InvalidArgumentException("Extending a subscription's trial requires a date in the future.");
         }
 
-        $subscription = $this->asStripeSubscription();
-
-        $subscription->trial_end = $date->getTimestamp();
-
-        $subscription->save();
+        $this->updateStripeSubscription([
+            'trial_end' => $date->getTimestamp(),
+            'proration_behavior' => $this->prorateBehavior(),
+        ]);
 
         $this->trial_ends_at = $date;
 
