@@ -15,7 +15,6 @@ use Laravel\Cashier\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use LogicException;
-use Stripe\Invoice as StripeInvoice;
 use Stripe\Subscription as StripeSubscription;
 
 class Subscription extends Model
@@ -628,7 +627,7 @@ class Subscription extends Model
     }
 
     /**
-     * Fetches upcoming invoice for this subscription
+     * Fetches upcoming invoice for this subscription.
      *
      * @param  array  $options
      * @return \Laravel\Cashier\Invoice|null
@@ -641,7 +640,7 @@ class Subscription extends Model
     }
 
     /**
-     * Previews upcoming invoice with new stripe plans
+     * Previews upcoming invoice with new stripe plans.
      *
      * @param  string|array  $plans
      * @param  array  $options

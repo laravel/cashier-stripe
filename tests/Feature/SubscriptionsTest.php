@@ -862,7 +862,6 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertSame($endsAt->timestamp, $subscription->asStripeSubscription()->cancel_at);
     }
 
-
     public function test_upcoming_invoice()
     {
         $user = $this->createCustomer('subscription_upcoming_invoice');
