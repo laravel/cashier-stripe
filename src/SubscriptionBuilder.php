@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
@@ -380,7 +381,7 @@ class SubscriptionBuilder
 
         return Checkout::create($this->owner, array_merge([
             'mode' => 'subscription',
-            'line_items' => collect($this->items)->values()->all(),
+            'line_items' => Collection::make($this->items)->values()->all(),
             'allow_promotion_codes' => $this->allowPromotionCodes,
             'discounts' => [
                 'coupon' => $this->coupon,
@@ -423,7 +424,7 @@ class SubscriptionBuilder
             'coupon' => $this->coupon,
             'expand' => ['latest_invoice.payment_intent'],
             'metadata' => $this->metadata,
-            'items' => collect($this->items)->values()->all(),
+            'items' => Collection::make($this->items)->values()->all(),
             'payment_behavior' => $this->paymentBehavior(),
             'promotion_code' => $this->promotionCode,
             'proration_behavior' => $this->prorateBehavior(),

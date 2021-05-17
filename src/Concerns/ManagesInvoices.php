@@ -107,9 +107,7 @@ trait ManagesInvoices
         }
 
         try {
-            $stripeInvoice = StripeInvoice::upcoming(
-                ['customer' => $this->stripe_id, 'expand' => ['account_tax_ids']], $this->stripeOptions()
-            );
+            $stripeInvoice = StripeInvoice::upcoming(['customer' => $this->stripe_id], $this->stripeOptions());
 
             return new Invoice($this, $stripeInvoice);
         } catch (StripeInvalidRequestException $exception) {
@@ -128,9 +126,7 @@ trait ManagesInvoices
         $stripeInvoice = null;
 
         try {
-            $stripeInvoice = StripeInvoice::retrieve(
-                ['id' => $id, 'expand' => ['account_tax_ids']], $this->stripeOptions()
-            );
+            $stripeInvoice = StripeInvoice::retrieve($id, $this->stripeOptions());
         } catch (StripeInvalidRequestException $exception) {
             //
         }
@@ -187,7 +183,7 @@ trait ManagesInvoices
     public function invoices($includePending = false, $parameters = [])
     {
         if (! $this->hasStripeId()) {
-            return collect();
+            return new Collection();
         }
 
         $invoices = [];

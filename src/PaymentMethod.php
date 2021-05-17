@@ -105,7 +105,7 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Dynamically get values from the Stripe PaymentMethod.
+     * Dynamically get values from the Stripe object.
      *
      * @param  string  $key
      * @return mixed

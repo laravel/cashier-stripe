@@ -30,7 +30,7 @@
             vertical-align: bottom;
             font-weight: bold;
             padding: 8px;
-            line-height: 20px;
+            line-height: 14px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
@@ -41,7 +41,7 @@
 
         .table td {
             padding: 8px;
-            line-height: 20px;
+            line-height: 14px;
             text-align: left;
             vertical-align: top;
         }
@@ -248,17 +248,21 @@
 
                     <!-- Display The Discount -->
                     @if ($invoice->hasDiscount())
-                        <tr>
-                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
-                                @if ($invoice->discountIsPercentage())
-                                    {{ $invoice->couponName() }} ({{ $invoice->percentOff() }}% Off)
-                                @else
-                                    {{ $invoice->couponName() }} ({{ $invoice->amountOff() }} Off)
-                                @endif
-                            </td>
+                        @foreach ($invoice->discounts() as $discount)
+                            @php($coupon = $discount->coupon())
 
-                            <td>-{{ $invoice->discount() }}</td>
-                        </tr>
+                            <tr>
+                                <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
+                                    @if ($coupon->isPercentage())
+                                        {{ $coupon->name() }} ({{ $coupon->percentOff() }}% Off)
+                                    @else
+                                        {{ $coupon->name() }} ({{ $coupon->amountOff() }} Off)
+                                    @endif
+                                </td>
+
+                                <td>-{{ $invoice->discountFor($discount) }}</td>
+                            </tr>
+                        @endforeach
                     @endif
 
                     <!-- Display The Taxes -->

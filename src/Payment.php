@@ -199,7 +199,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Dynamically get values from the Stripe PaymentIntent.
+     * Dynamically get values from the Stripe object.
      *
      * @param  string  $key
      * @return mixed

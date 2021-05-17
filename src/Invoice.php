@@ -35,7 +35,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     /**
      * The Stripe invoice line items.
      *
-     * @var \Stripe\Collection|\Stripe\InvoiceLineItem[]
+     * @var \Laravel\Cashier\InvoiceLineItem[]
      */
     protected $items;
 
@@ -45,6 +45,20 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      * @var \Laravel\Cashier\Tax[]
      */
     protected $taxes;
+
+    /**
+     * The taxes applied to the invoice.
+     *
+     * @var \Laravel\Cashier\Discount[]
+     */
+    protected $discounts;
+
+    /**
+     * Indicate if the Stripe Object was refreshed with extra data.
+     *
+     * @var bool
+     */
+    protected $refreshed = false;
 
     /**
      * Create a new invoice instance.
@@ -154,17 +168,70 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Determine if the invoice has a discount.
+     * Determine if the invoice has one or more discounts applied.
      *
      * @return bool
      */
     public function hasDiscount()
     {
-        return $this->rawDiscount() > 0;
+        if (is_null($this->invoice->discounts)) {
+            return false;
+        }
+
+        return count($this->invoice->discounts) > 0;
     }
 
     /**
-     * Get the discount amount.
+     * Get all of the discount objects from the Stripe invoice.
+     *
+     * @return \Laravel\Cashier\Discount[]
+     */
+    public function discounts()
+    {
+        if (! is_null($this->discounts)) {
+            return $this->discounts;
+        }
+
+        $this->refreshWithExpandedData();
+
+        return Collection::make($this->invoice->discounts)
+            ->mapInto(Discount::class)
+            ->all();
+    }
+
+    /**
+     * Calculate the amount for a given discount.
+     *
+     * @param  \Laravel\Cashier\Discount  $discount
+     * @return string|null
+     */
+    public function discountFor(Discount $discount)
+    {
+        if (! is_null($discountAmount = $this->rawDiscountFor($discount))) {
+            return $this->formatAmount($discountAmount->amount);
+        }
+    }
+
+    /**
+     * Calculate the raw amount for a given discount.
+     *
+     * @param  \Laravel\Cashier\Discount  $discount
+     * @return int|null
+     */
+    public function rawDiscountFor(Discount $discount)
+    {
+        return Collection::make($this->invoice->total_discount_amounts)
+            ->first(function ($discountAmount) use ($discount) {
+                if (is_string($discountAmount->discount)) {
+                    return $discountAmount->discount === $discount->id;
+                } else {
+                    return $discountAmount->discount->id === $discount->id;
+                }
+            });
+    }
+
+    /**
+     * Get the total discount amount.
      *
      * @return string
      */
@@ -174,95 +241,19 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get the raw discount amount.
+     * Get the raw total discount amount.
      *
      * @return int
      */
     public function rawDiscount()
     {
-        if (! isset($this->invoice->discount)) {
-            return 0;
-        }
-
         $total = 0;
 
-        foreach ($this->invoice->total_discount_amounts as $discount) {
+        foreach ((array) $this->invoice->total_discount_amounts as $discount) {
             $total += $discount->amount;
         }
 
         return (int) $total;
-    }
-
-    /**
-     * Get the coupon code applied to the invoice.
-     *
-     * @return string|null
-     */
-    public function coupon()
-    {
-        if (isset($this->invoice->discount)) {
-            return $this->invoice->discount->coupon->id;
-        }
-    }
-
-    /**
-     * Get the coupon name applied to the invoice.
-     *
-     * @return string|null
-     */
-    public function couponName()
-    {
-        if (isset($this->invoice->discount)) {
-            return $this->invoice->discount->coupon->name ?: $this->invoice->discount->coupon->id;
-        }
-    }
-
-    /**
-     * Determine if the discount is a percentage.
-     *
-     * @return bool
-     */
-    public function discountIsPercentage()
-    {
-        return isset($this->invoice->discount) && isset($this->invoice->discount->coupon->percent_off);
-    }
-
-    /**
-     * Get the discount percentage for the invoice.
-     *
-     * @return int
-     */
-    public function percentOff()
-    {
-        if ($this->coupon()) {
-            return $this->invoice->discount->coupon->percent_off;
-        }
-
-        return 0;
-    }
-
-    /**
-     * Get the discount amount for the invoice.
-     *
-     * @return string
-     */
-    public function amountOff()
-    {
-        return $this->formatAmount($this->rawAmountOff());
-    }
-
-    /**
-     * Get the raw discount amount for the invoice.
-     *
-     * @return int
-     */
-    public function rawAmountOff()
-    {
-        if (isset($this->invoice->discount->coupon->amount_off)) {
-            return $this->invoice->discount->coupon->amount_off;
-        }
-
-        return 0;
     }
 
     /**
@@ -284,7 +275,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     {
         $lineItems = $this->invoiceItems() + $this->subscriptions();
 
-        return collect($lineItems)->contains(function (InvoiceLineItem $item) {
+        return Collection::make($lineItems)->contains(function (InvoiceLineItem $item) {
             return $item->hasTaxRates();
         });
     }
@@ -300,9 +291,9 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
             return $this->taxes;
         }
 
-        $this->refreshWithExpandedTaxRates();
+        $this->refreshWithExpandedData();
 
-        return $this->taxes = collect($this->invoice->total_tax_amounts)
+        return $this->taxes = Collection::make($this->invoice->total_tax_amounts)
             ->sortByDesc('inclusive')
             ->map(function (object $taxAmount) {
                 return new Tax($taxAmount->amount, $this->invoice->currency, $taxAmount->tax_rate);
@@ -347,7 +338,9 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function invoiceItems()
     {
-        return $this->invoiceLineItemsByType('invoiceitem');
+        return Collection::make($this->invoiceLineItems())->filter(function (InvoiceLineItem $item) {
+            return $item->type === 'invoiceitem';
+        })->all();
     }
 
     /**
@@ -357,43 +350,49 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function subscriptions()
     {
-        return $this->invoiceLineItemsByType('subscription');
-    }
-
-    /**
-     * Get all of the invoice items by a given type.
-     *
-     * @param  string  $type
-     * @return \Laravel\Cashier\InvoiceLineItem[]
-     */
-    public function invoiceLineItemsByType($type)
-    {
-        if (is_null($this->items)) {
-            $this->refreshWithExpandedTaxRates();
-
-            $this->items = new Collection($this->invoice->lines->autoPagingIterator());
-        }
-
-        return $this->items->filter(function (StripeInvoiceLineItem $item) use ($type) {
-            return $item->type === $type;
-        })->map(function (StripeInvoiceLineItem $item) {
-            return new InvoiceLineItem($this, $item);
+        return Collection::make($this->invoiceLineItems())->filter(function (InvoiceLineItem $item) {
+            return $item->type === 'subscription';
         })->all();
     }
 
     /**
-     * Refresh the invoice with expanded TaxRate objects.
+     * Get all of the invoice items.
+     *
+     * @return \Laravel\Cashier\InvoiceLineItem[]
+     */
+    public function invoiceLineItems()
+    {
+        if (! is_null($this->items)) {
+            return $this->items;
+        }
+
+        $this->refreshWithExpandedData();
+
+        return $this->items = Collection::make($this->invoice->lines->autoPagingIterator())
+            ->map(function (StripeInvoiceLineItem $item) {
+                return new InvoiceLineItem($this, $item);
+            })->all();
+    }
+
+    /**
+     * Refresh the invoice with expanded objects.
      *
      * @return void
      */
-    protected function refreshWithExpandedTaxRates()
+    protected function refreshWithExpandedData()
     {
+        if ($this->refreshed) {
+            return;
+        }
+
         if ($this->invoice->id) {
             $this->invoice = StripeInvoice::retrieve([
                 'id' => $this->invoice->id,
                 'expand' => [
                     'account_tax_ids',
+                    'discounts',
                     'lines.data.tax_amounts.tax_rate',
+                    'total_discount_amounts.discount',
                     'total_tax_amounts.tax_rate',
                 ],
             ], $this->owner->stripeOptions());
@@ -402,11 +401,16 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
             $this->invoice = StripeInvoice::upcoming([
                 'customer' => $this->owner->stripe_id,
                 'expand' => [
+                    'account_tax_ids',
+                    'discounts',
                     'lines.data.tax_amounts.tax_rate',
+                    'total_discount_amounts.discount',
                     'total_tax_amounts.tax_rate',
                 ],
             ], $this->owner->stripeOptions());
         }
+
+        $this->refreshed = true;
     }
 
     /**
@@ -427,13 +431,15 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function accountTaxIds()
     {
+        $this->refreshWithExpandedData();
+
         return $this->invoice->account_tax_ids ?? [];
     }
 
     /**
      * Return the Tax Ids of the customer.
      *
-     * @return \Stripe\TaxId[]
+     * @return array
      */
     public function customerTaxIds()
     {
@@ -574,7 +580,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Dynamically get values from the Stripe invoice.
+     * Dynamically get values from the Stripe object.
      *
      * @param  string  $key
      * @return mixed

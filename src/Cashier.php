@@ -81,7 +81,7 @@ class Cashier
      */
     public static function findBillable($stripeId)
     {
-        if ($stripeId === null) {
+        if (is_null($stripeId)) {
             return;
         }
 
