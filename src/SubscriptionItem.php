@@ -110,7 +110,6 @@ class SubscriptionItem extends Model
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
             'quantity' => $quantity,
-            'expand' => ['subscription.latest_invoice.payment_intent'],
         ]);
 
         $this->fill([
@@ -125,9 +124,7 @@ class SubscriptionItem extends Model
         }
 
         if ($this->subscription->hasIncompletePayment()) {
-            (new Payment(
-                $stripeSubscriptionItem->subscription->latest_invoice->payment_intent
-            ))->validate();
+            optional($this->subscription->latestPayment())->validate();
         }
 
         return $this;
@@ -152,7 +149,6 @@ class SubscriptionItem extends Model
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
             'tax_rates' => $this->subscription->getPlanTaxRatesForPayload($plan),
-            'expand' => ['subscription.latest_invoice.payment_intent'],
         ], $options));
 
         $this->fill([
@@ -168,9 +164,7 @@ class SubscriptionItem extends Model
         }
 
         if ($this->subscription->hasIncompletePayment()) {
-            (new Payment(
-                $stripeSubscriptionItem->subscription->latest_invoice->payment_intent
-            ))->validate();
+            optional($this->subscription->latestPayment())->validate();
         }
 
         return $this;
