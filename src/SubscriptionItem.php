@@ -110,7 +110,6 @@ class SubscriptionItem extends Model
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
             'quantity' => $quantity,
-            'expand' => ['subscription.latest_invoice.payment_intent'],
         ]);
 
         $this->fill([
@@ -125,9 +124,7 @@ class SubscriptionItem extends Model
         }
 
         if ($this->subscription->hasIncompletePayment()) {
-            (new Payment(
-                $stripeSubscriptionItem->subscription->latest_invoice->payment_intent
-            ))->validate();
+            optional($this->subscription->latestPayment())->validate();
         }
 
         return $this;
@@ -146,30 +143,28 @@ class SubscriptionItem extends Model
     {
         $this->subscription->guardAgainstIncomplete();
 
-        $options = array_merge([
+        $stripeSubscriptionItem = $this->updateStripeSubscriptionItem(array_merge([
             'plan' => $plan,
             'quantity' => $this->quantity,
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
             'tax_rates' => $this->subscription->getPlanTaxRatesForPayload($plan),
-        ], $options);
-
-        $item = StripeSubscriptionItem::update(
-            $this->stripe_id,
-            $options,
-            $this->subscription->owner->stripeOptions()
-        );
+        ], $options));
 
         $this->fill([
             'stripe_plan' => $plan,
-            'quantity' => $item->quantity,
+            'quantity' => $stripeSubscriptionItem->quantity,
         ])->save();
 
         if ($this->subscription->hasSinglePlan()) {
             $this->subscription->fill([
                 'stripe_plan' => $plan,
-                'quantity' => $item->quantity,
+                'quantity' => $stripeSubscriptionItem->quantity,
             ])->save();
+        }
+
+        if ($this->subscription->hasIncompletePayment()) {
+            optional($this->subscription->latestPayment())->validate();
         }
 
         return $this;
