@@ -54,7 +54,7 @@ class SubscriptionBuilder
     /**
      * The date on which the billing cycle should be anchored.
      *
-     * @var int|null
+     * @var int|null|string
      */
     protected $billingCycleAnchor = null;
 
@@ -199,7 +199,7 @@ class SubscriptionBuilder
     /**
      * Change the billing cycle anchor on a plan creation.
      *
-     * @param  \DateTimeInterface|int  $date
+     * @param  \DateTimeInterface|int|string  $date
      * @return $this
      */
     public function anchorBillingCycleOn($date)
