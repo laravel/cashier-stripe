@@ -32,14 +32,14 @@ class PaymentController extends Controller
         $payment = new Payment(StripePaymentIntent::retrieve(
             ['id' => $id, 'expand' => ['payment_method']], Cashier::stripeOptions())
         );
-
+// dd($payment->toArray());
         return view('cashier::payment', [
             'stripeKey' => config('cashier.key'),
             'amount' => $payment->amount(),
             'paymentIntent' => Arr::only($payment->asStripePaymentIntent()->toArray(), [
                 'id', 'status', 'payment_method_types', 'client_secret',
             ]),
-            'paymentMethod' => request('source_type', ''),
+            'paymentMethod' => request('source_type', optional($payment->payment_method)->type),
             'errorMessage' => request('redirect_status') === 'failed'
                 ? 'Something went wrong when trying to confirm the payment. Please try again.'
                 : '',
