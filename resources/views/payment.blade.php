@@ -76,7 +76,7 @@
                             Payment Method
                         </label>
 
-                        <div v-if="paymentMethods.length > 1">
+                        <div v-if="paymentMethodOptions.length > 1">
                             <p class="text-sm mb-3">
                                 Please select the payment method which you'd like to use.
                             </p>
@@ -88,7 +88,7 @@
                                 v-model="paymentMethod"
                                 @change="configureStripeElements"
                             >
-                                <option v-for="option in paymentMethods" v-bind:value="option.type">
+                                <option v-for="option in paymentMethodOptions" v-bind:value="option">
                                     @{{ option.text }}
                                 </option>
                             </select>
@@ -133,12 +133,12 @@
 
                             <div id="payment-element" ref="paymentElement" class="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6"></div>
 
-                            <p v-if="['ideal', 'sepa_debit'].includes(paymentMethod)" class="text-xs text-gray-400 mb-6">
+                            <p v-if="['ideal', 'sepa_debit'].includes(paymentMethod.type)" class="text-xs text-gray-400 mb-6">
                                 By providing your payment information and confirming this payment, you authorise (A) and Stripe, our payment service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank. You agree to receive notifications for future debits up to 2 days before they occur.
                             </p>
 
                             <!-- Remember Payment Method -->
-                            <label v-if="! redirectMethods.includes(paymentMethod)" for="remember" class="inline-block text-sm text-gray-700 mb-6">
+                            <label v-if="! paymentMethod.redirects" for="remember" class="inline-block text-sm text-gray-700 mb-6">
                                 <input
                                     id="remember"
                                     type="checkbox"
@@ -189,64 +189,57 @@
             data() {
                 return {
                     paymentIntent: @json($paymentIntent),
+                    paymentMethods: [
+                        { text: 'Card', type: 'card', redirects: false },
+                        { text: 'Alipay', type: 'alipay', redirects: true },
+                        { text: 'BECS Direct Debit', type: 'au_becs_debit', redirects: false },
+                        { text: 'Bancontact', type: 'bancontact', redirects: true },
+                        { text: 'EPS', type: 'eps', redirects: true },
+                        { text: 'Giropay', type: 'giropay', redirects: true },
+                        { text: 'iDEAL', type: 'ideal', redirects: true },
+                        { text: 'SEPA Debit', type: 'sepa_debit', redirects: false }
+                    ],
+                    paymentMethodOptions: [],
+                    paymentMethod: null,
                     name: '{{ optional($customer)->stripeName() }}',
                     email: '{{ optional($customer)->stripeEmail() }}',
                     remember: false,
-                    redirectMethods: [
-                        'alipay',
-                        'bancontact',
-                        'eps',
-                        'giropay',
-                        'ideal'
-                    ],
-                    paymentMethod: '{{ $paymentMethod }}',
                     paymentElement: null,
                     isPaymentProcessing: false,
-                    errorMessage: '{{ $errorMessage }}',
-                    paymentMethods: []
+                    errorMessage: '{{ $errorMessage }}'
                 }
             },
 
             mounted: function () {
-                this.configurePaymentIntent(this.paymentIntent);
+                this.configurePayment(this.paymentIntent);
                 this.configureStripeElements();
             },
 
             computed: {
                 paymentMethodTitle: function () {
-                    if (this.paymentMethod === '' || this.paymentMethods.length < 1) {
-                        return '';
-                    }
-
-                    return this.paymentMethods.filter(paymentMethod => {
-                        return paymentMethod.type === this.paymentMethod
-                    })[0].text ?? '';
+                    return this.paymentMethod ? this.paymentMethod.title : '';
                 }
             },
 
             methods: {
-                configurePaymentIntent: function (paymentIntent) {
+                configurePayment: function (paymentIntent) {
                     // Set the payment intent object...
                     this.paymentIntent = paymentIntent;
 
                     // Set the allowed payment methods based on the payment method types of the intent...
                     const paymentMethodTypes = this.paymentIntent.payment_method_types;
-
-                    this.paymentMethods = [
-                        { text: 'Card', type: 'card' },
-                        { text: 'Alipay', type: 'alipay' },
-                        { text: 'BECS Direct Debit', type: 'au_becs_debit' },
-                        { text: 'Bancontact', type: 'bancontact' },
-                        { text: 'EPS', type: 'eps' },
-                        { text: 'Giropay', type: 'giropay' },
-                        { text: 'iDEAL', type: 'ideal' },
-                        { text: 'SEPA Debit', type: 'sepa_debit' }
-                    ].filter(paymentMethod => paymentMethodTypes.includes(paymentMethod.type));
+                    this.paymentMethodOptions = this.paymentMethods.filter(
+                        paymentMethod => paymentMethodTypes.includes(paymentMethod.type)
+                    );
 
                     // If the previously set payment method isn't available anymore,
                     // update it to either the current one or the first available one...
-                    if (! this.paymentMethod || ! paymentMethodTypes.includes(this.paymentMethod)) {
-                        this.paymentMethod = ((this.paymentIntent || {}).payment_method || {}).type ?? paymentMethodTypes[0];
+                    if (this.paymentMethod === null || ! paymentMethodTypes.includes(this.paymentMethod.type)) {
+                        const type = ((this.paymentIntent || {}).payment_method || {}).type ?? paymentMethodTypes[0];
+
+                        this.paymentMethod = this.paymentMethodOptions.filter(
+                            paymentMethod => paymentMethod.type === type
+                        )[0];
                     }
                 },
 
@@ -259,15 +252,15 @@
                     // Create the Stripe element based on the currently selected payment method...
                     const elements = stripe.elements();
 
-                    if (this.paymentMethod === 'card') {
+                    if (this.paymentMethod.type === 'card') {
                         this.paymentElement = elements.create('card');
-                    } else if (this.paymentMethod === 'au_becs_debit') {
+                    } else if (this.paymentMethod.type === 'au_becs_debit') {
                         this.paymentElement = elements.create('auBankAccount');
-                    } else if (this.paymentMethod === 'eps') {
+                    } else if (this.paymentMethod.type === 'eps') {
                         this.paymentElement = elements.create('epsBank');
-                    } else if (this.paymentMethod === 'ideal') {
+                    } else if (this.paymentMethod.type === 'ideal') {
                         this.paymentElement = elements.create('idealBank');
-                    }  else if (this.paymentMethod === 'sepa_debit') {
+                    }  else if (this.paymentMethod.type === 'sepa_debit') {
                         this.paymentElement = elements.create('iban', {
                             supportedCountries: ['SEPA']
                         });
@@ -291,7 +284,7 @@
 
                     const secret = this.paymentIntent.client_secret;
                     let data = {
-                        setup_future_usage: ! this.redirectMethods.includes(this.paymentMethod) && this.remember
+                        setup_future_usage: ! this.paymentMethod.redirects && this.remember
                             ? 'off_session'
                             : null,
                         payment_method: {
@@ -302,41 +295,41 @@
 
                     // Set a return url to redirect the user back to the payment
                     // page after handling the off session payment confirmation.
-                    if (this.redirectMethods.includes(this.paymentMethod)) {
+                    if (this.paymentMethod.redirects) {
                         data.return_url = '{{ route('cashier.payment', $paymentIntent['id']).'?redirect='.$redirect }}';
                     }
 
-                    if (this.paymentMethod === 'card') {
+                    if (this.paymentMethod.type === 'card') {
                         if (this.paymentIntent.status === 'requires_payment_method') {
                             data.payment_method.card = this.paymentElement;
                         }
 
                         paymentPromise = stripe.confirmCardPayment(secret, data);
-                    } else if (this.paymentMethod === 'alipay') {
+                    } else if (this.paymentMethod.type === 'alipay') {
                         paymentPromise = stripe.confirmAlipayPayment(secret, data);
-                    } else if (this.paymentMethod === 'au_becs_debit') {
+                    } else if (this.paymentMethod.type === 'au_becs_debit') {
                         if (this.paymentIntent.status === 'requires_payment_method') {
                             data.payment_method.au_becs_debit = this.paymentElement;
                         }
 
                         paymentPromise = stripe.confirmAuBecsDebitPayment(secret, data);
-                    }  else if (this.paymentMethod === 'bancontact') {
+                    }  else if (this.paymentMethod.type === 'bancontact') {
                         paymentPromise = stripe.confirmBancontactPayment(secret, data);
-                    } else if (this.paymentMethod === 'eps') {
+                    } else if (this.paymentMethod.type === 'eps') {
                         if (this.paymentIntent.status === 'requires_payment_method') {
                             data.payment_method.eps = this.paymentElement;
                         }
 
                         paymentPromise = stripe.confirmEpsPayment(secret, data);
-                    }  else if (this.paymentMethod === 'giropay') {
+                    }  else if (this.paymentMethod.type === 'giropay') {
                         paymentPromise = stripe.confirmGiropayPayment(secret, data);
-                    } else if (this.paymentMethod === 'ideal') {
+                    } else if (this.paymentMethod.type === 'ideal') {
                         if (this.paymentIntent.status === 'requires_payment_method') {
                             data.payment_method.ideal = this.paymentElement;
                         }
 
                         paymentPromise = stripe.confirmIdealPayment(secret, data);
-                    } else if (this.paymentMethod === 'sepa_debit') {
+                    } else if (this.paymentMethod.type === 'sepa_debit') {
                         if (this.paymentIntent.status === 'requires_payment_method') {
                             data.payment_method.sepa_debit = this.paymentElement;
                         }
@@ -358,12 +351,12 @@
                         }
 
                         if (result.error.payment_intent) {
-                            this.configurePaymentIntent(result.error.payment_intent);
+                            this.configurePayment(result.error.payment_intent);
 
                             this.configureStripeElements();
                         }
                     } else {
-                        this.configurePaymentIntent(result.paymentIntent);
+                        this.configurePayment(result.paymentIntent);
                     }
                 },
 
