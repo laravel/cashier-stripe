@@ -190,21 +190,27 @@
                 return {
                     paymentIntent: @json($paymentIntent),
                     paymentMethods: [
-                        { text: 'Card', type: 'card', redirects: false },
+                        { text: 'Card', type: 'card', redirects: false, element: 'card' },
                         { text: 'Alipay', type: 'alipay', redirects: true },
-                        { text: 'BECS Direct Debit', type: 'au_becs_debit', redirects: false },
+                        { text: 'BECS Direct Debit', type: 'au_becs_debit', redirects: false, element: 'auBankAccount' },
                         { text: 'Bancontact', type: 'bancontact', redirects: true },
-                        { text: 'EPS', type: 'eps', redirects: true },
+                        { text: 'EPS', type: 'eps', redirects: true, element: 'epsBank' },
                         { text: 'Giropay', type: 'giropay', redirects: true },
-                        { text: 'iDEAL', type: 'ideal', redirects: true },
-                        { text: 'SEPA Debit', type: 'sepa_debit', redirects: false }
+                        { text: 'iDEAL', type: 'ideal', redirects: true, element: 'idealBank' },
+                        {
+                            text: 'SEPA Debit',
+                            type: 'sepa_debit',
+                            redirects: false,
+                            element: 'iban',
+                            options: { supportedCountries: ['SEPA'] }
+                        }
                     ],
                     paymentMethodOptions: [],
                     paymentMethod: null,
                     name: '{{ optional($customer)->stripeName() }}',
                     email: '{{ optional($customer)->stripeEmail() }}',
-                    remember: false,
                     paymentElement: null,
+                    remember: false,
                     isPaymentProcessing: false,
                     errorMessage: '{{ $errorMessage }}'
                 }
@@ -250,21 +256,13 @@
                     }
 
                     // Create the Stripe element based on the currently selected payment method...
-                    const elements = stripe.elements();
+                    if (this.paymentMethod.element) {
+                        const elements = stripe.elements();
 
-                    if (this.paymentMethod.type === 'card') {
-                        this.paymentElement = elements.create('card');
-                    } else if (this.paymentMethod.type === 'au_becs_debit') {
-                        this.paymentElement = elements.create('auBankAccount');
-                    } else if (this.paymentMethod.type === 'eps') {
-                        this.paymentElement = elements.create('epsBank');
-                    } else if (this.paymentMethod.type === 'ideal') {
-                        this.paymentElement = elements.create('idealBank');
-                    }  else if (this.paymentMethod.type === 'sepa_debit') {
-                        this.paymentElement = elements.create('iban', {
-                            supportedCountries: ['SEPA']
-                        });
-                    } else {
+                        this.paymentElement = elements.create(
+                            this.paymentMethod.element, this.paymentMethod.options ?? {}
+                        );
+                    }  else {
                         this.paymentElement = null;
                     }
 
