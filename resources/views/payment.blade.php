@@ -241,7 +241,9 @@
                     // If the previously set payment method isn't available anymore,
                     // update it to either the current one or the first available one...
                     if (this.paymentMethod === null || ! paymentMethodTypes.includes(this.paymentMethod.type)) {
-                        const type = ((this.paymentIntent || {}).payment_method || {}).type ?? paymentMethodTypes[0];
+                        const type = this.paymentMethod === null
+                            ? ('{{ $paymentMethod }}' ? '{{ $paymentMethod }}' : paymentMethodTypes[0])
+                            : (((this.paymentIntent || {}).payment_method || {}).type ?? paymentMethodTypes[0]);
 
                         this.paymentMethod = this.paymentMethodOptions.filter(
                             paymentMethod => paymentMethod.type === type

@@ -38,7 +38,7 @@ class PaymentController extends Controller
             'paymentIntent' => Arr::only($payment->asStripePaymentIntent()->toArray(), [
                 'id', 'status', 'payment_method_types', 'client_secret',
             ]),
-            'paymentMethod' => request('source_type', optional($payment->payment_method)->type),
+            'paymentMethod' => (string) request('source_type', optional($payment->payment_method)->type),
             'errorMessage' => request('redirect_status') === 'failed'
                 ? 'Something went wrong when trying to confirm the payment. Please try again.'
                 : '',
