@@ -84,4 +84,17 @@ class InvoicesTest extends FeatureTestCase
 
         $otherUser->findInvoiceOrFail($invoice->id);
     }
+
+    /** @group FOO */
+    public function test_customer_can_be_invoiced_with_quantity()
+    {
+        $user = $this->createCustomer('customer_can_be_invoiced');
+        $user->createAsStripeCustomer();
+        $user->updateDefaultPaymentMethod('pm_card_visa');
+
+        $response = $user->invoiceFor('Laracon', 1000, ['quantity' => 5]);
+
+        $this->assertInstanceOf(Invoice::class, $response);
+        $this->assertEquals(5000, $response->total);
+    }
 }
