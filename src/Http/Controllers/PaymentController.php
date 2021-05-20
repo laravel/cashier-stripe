@@ -32,7 +32,7 @@ class PaymentController extends Controller
         $payment = new Payment(StripePaymentIntent::retrieve(
             ['id' => $id, 'expand' => ['payment_method']], Cashier::stripeOptions())
         );
-// dd($payment->toArray());
+        // dd($payment->toArray());
         return view('cashier::payment', [
             'stripeKey' => config('cashier.key'),
             'amount' => $payment->amount(),
