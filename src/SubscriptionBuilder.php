@@ -75,9 +75,9 @@ class SubscriptionBuilder
     /**
      * Determines if user redeemable promotion codes are available in Stripe Checkout.
      *
-     * @var bool
+     * @var bool|null
      */
-    protected $allowPromotionCodes = false;
+    protected $allowPromotionCodes;
 
     /**
      * The metadata to apply to the subscription.
@@ -386,7 +386,7 @@ class SubscriptionBuilder
             'line_items' => collect($this->items)->values()->all(),
             'allow_promotion_codes' => $this->allowPromotionCodes,
             'discounts' => [
-                'coupon' => $this->coupon,
+                ['coupon' => $this->coupon],
             ],
             'subscription_data' => [
                 'default_tax_rates' => $this->getTaxRatesForPayload(),
