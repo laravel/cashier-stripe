@@ -381,19 +381,21 @@ class SubscriptionBuilder
             $trialEnd = null;
         }
 
-        return Checkout::create($this->owner, array_merge([
+        return Checkout::create($this->owner, array_filter(array_merge([
             'mode' => 'subscription',
             'line_items' => collect($this->items)->values()->all(),
             'allow_promotion_codes' => $this->allowPromotionCodes,
             'discounts' => [
-                'coupon' => $this->coupon,
+                [
+                    'coupon' => $this->coupon,
+                ],
             ],
             'subscription_data' => [
                 'default_tax_rates' => $this->getTaxRatesForPayload(),
                 'trial_end' => $trialEnd ? $trialEnd->getTimestamp() : null,
                 'metadata' => array_merge($this->metadata, ['name' => $this->name]),
             ],
-        ], $sessionOptions), $customerOptions);
+        ], $sessionOptions)), $customerOptions);
     }
 
     /**
