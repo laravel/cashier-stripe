@@ -76,7 +76,7 @@
                             Payment Method
                         </label>
 
-                        <div v-if="paymentMethodOptions.length > 1">
+                        <div v-if="paymentMethods.length > 1">
                             <p class="text-sm mb-3">
                                 Please select the payment method which you'd like to use.
                             </p>
@@ -88,7 +88,7 @@
                                 v-model="paymentMethod"
                                 @change="configureStripeElements"
                             >
-                                <option v-for="option in paymentMethodOptions" v-bind:value="option">
+                                <option v-for="option in paymentMethods" v-bind:value="option">
                                     @{{ option.text }}
                                 </option>
                             </select>
@@ -138,7 +138,7 @@
                             </p>
 
                             <!-- Remember Payment Method -->
-                            <label v-if="! paymentMethod.redirects" for="remember" class="inline-block text-sm text-gray-700 mb-6">
+                            <label v-if="paymentMethod.remember" for="remember" class="inline-block text-sm text-gray-700 mb-6">
                                 <input
                                     id="remember"
                                     type="checkbox"
@@ -189,23 +189,7 @@
             data() {
                 return {
                     paymentIntent: @json($paymentIntent),
-                    paymentMethods: [
-                        { text: 'Card', type: 'card', redirects: false, element: 'card' },
-                        { text: 'Alipay', type: 'alipay', redirects: true },
-                        { text: 'BECS Direct Debit', type: 'au_becs_debit', redirects: false, element: 'auBankAccount' },
-                        { text: 'Bancontact', type: 'bancontact', redirects: true },
-                        { text: 'EPS', type: 'eps', redirects: true, element: 'epsBank' },
-                        { text: 'Giropay', type: 'giropay', redirects: true },
-                        { text: 'iDEAL', type: 'ideal', redirects: true, element: 'idealBank' },
-                        {
-                            text: 'SEPA Debit',
-                            type: 'sepa_debit',
-                            redirects: false,
-                            element: 'iban',
-                            options: { supportedCountries: ['SEPA'] }
-                        }
-                    ],
-                    paymentMethodOptions: [],
+                    paymentMethods: [],
                     paymentMethod: null,
                     name: '{{ optional($customer)->stripeName() }}',
                     email: '{{ optional($customer)->stripeEmail() }}',
@@ -233,8 +217,24 @@
                     this.paymentIntent = paymentIntent;
 
                     // Set the allowed payment methods based on the payment method types of the intent...
-                    const paymentMethodTypes = this.paymentIntent.payment_method_types;
-                    this.paymentMethodOptions = this.paymentMethods.filter(
+                    const paymentMethodTypes = paymentIntent.payment_method_types;
+                    this.paymentMethods = [
+                        { text: 'Card', type: 'card', remember: true, redirects: false, element: 'card' },
+                        { text: 'Alipay', type: 'alipay', remember: false, redirects: true },
+                        { text: 'BECS Direct Debit', type: 'au_becs_debit', remember: true, redirects: false, element: 'auBankAccount' },
+                        { text: 'Bancontact', type: 'bancontact', remember: true, redirects: true },
+                        { text: 'EPS', type: 'eps', remember: false, redirects: true, element: 'epsBank' },
+                        { text: 'Giropay', type: 'giropay', remember: false, redirects: true },
+                        { text: 'iDEAL', type: 'ideal', remember: true, redirects: true, element: 'idealBank' },
+                        {
+                            text: 'SEPA Debit',
+                            type: 'sepa_debit',
+                            remember: true,
+                            redirects: false,
+                            element: 'iban',
+                            options: { supportedCountries: ['SEPA'] }
+                        }
+                    ].filter(
                         paymentMethod => paymentMethodTypes.includes(paymentMethod.type)
                     );
 
@@ -245,9 +245,11 @@
                             ? ('{{ $paymentMethod }}' ? '{{ $paymentMethod }}' : paymentMethodTypes[0])
                             : (((this.paymentIntent || {}).payment_method || {}).type ?? paymentMethodTypes[0]);
 
-                        this.paymentMethod = this.paymentMethodOptions.filter(
+                        this.paymentMethod = this.paymentMethods.filter(
                             paymentMethod => paymentMethod.type === type
                         )[0];
+
+                        console.log(this.paymentMethod);
                     }
                 },
 
@@ -284,7 +286,7 @@
 
                     const secret = this.paymentIntent.client_secret;
                     let data = {
-                        setup_future_usage: ! this.paymentMethod.redirects && this.remember
+                        setup_future_usage: this.paymentMethod.remember && this.remember
                             ? 'off_session'
                             : null,
                         payment_method: {
