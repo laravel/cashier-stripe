@@ -85,7 +85,6 @@ class InvoicesTest extends FeatureTestCase
         $otherUser->findInvoiceOrFail($invoice->id);
     }
 
-    /** @group FOO */
     public function test_customer_can_be_invoiced_with_quantity()
     {
         $user = $this->createCustomer('customer_can_be_invoiced');

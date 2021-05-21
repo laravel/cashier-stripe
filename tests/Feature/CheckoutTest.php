@@ -2,8 +2,10 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
+use Illuminate\Support\Str;
 use Laravel\Cashier\Checkout;
 use Stripe\Checkout\Session as StripeCheckoutSession;
+use Stripe\Coupon;
 use Stripe\Price as StripePrice;
 use Stripe\TaxRate;
 
@@ -87,5 +89,26 @@ class CheckoutTest extends FeatureTestCase
         $this->assertInstanceOf(Checkout::class, $checkout);
         $this->assertInstanceOf(StripeCheckoutSession::class, $session = $checkout->asStripeCheckoutSession());
         $this->assertTrue($session->allow_promotion_codes);
+        $this->assertSame(1815, $session->amount_total);
+
+        $coupon = Coupon::create([
+            'id' => 'coupon-'.Str::random(10),
+            'duration' => 'repeating',
+            'amount_off' => 500,
+            'duration_in_months' => 3,
+            'currency' => 'USD',
+        ]);
+
+        $checkout = $user->newSubscription('default', $price->id)
+            ->withCoupon($coupon->id)
+            ->checkout([
+                'success_url' => 'http://example.com',
+                'cancel_url' => 'http://example.com',
+            ]);
+
+        $this->assertInstanceOf(Checkout::class, $checkout);
+        $this->assertInstanceOf(StripeCheckoutSession::class, $session = $checkout->asStripeCheckoutSession());
+        $this->assertNull($session->allow_promotion_codes);
+        $this->assertSame(1210, $session->amount_total);
     }
 }
