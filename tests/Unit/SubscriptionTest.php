@@ -105,7 +105,7 @@ class SubscriptionTest extends TestCase
 
         $this->expectException(SubscriptionUpdateFailure::class);
 
-        $subscription->swap('premium_plan');
+        $subscription->swap('premium_price');
     }
 
     public function test_incomplete_subscriptions_cannot_update_their_quantity()

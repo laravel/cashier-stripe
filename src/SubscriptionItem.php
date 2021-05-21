@@ -131,34 +131,34 @@ class SubscriptionItem extends Model
     }
 
     /**
-     * Swap the subscription item to a new Stripe plan.
+     * Swap the subscription item to a new Stripe price.
      *
-     * @param  string  $plan
+     * @param  string  $price
      * @param  array  $options
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function swap($plan, array $options = [])
+    public function swap($price, array $options = [])
     {
         $this->subscription->guardAgainstIncomplete();
 
         $stripeSubscriptionItem = $this->updateStripeSubscriptionItem(array_merge([
-            'plan' => $plan,
+            'price' => $price,
             'quantity' => $this->quantity,
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
-            'tax_rates' => $this->subscription->getPlanTaxRatesForPayload($plan),
+            'tax_rates' => $this->subscription->getPlanTaxRatesForPayload($price),
         ], $options));
 
         $this->fill([
-            'stripe_plan' => $plan,
+            'stripe_plan' => $price,
             'quantity' => $stripeSubscriptionItem->quantity,
         ])->save();
 
         if ($this->subscription->hasSinglePlan()) {
             $this->subscription->fill([
-                'stripe_plan' => $plan,
+                'stripe_plan' => $price,
                 'quantity' => $stripeSubscriptionItem->quantity,
             ])->save();
         }
@@ -171,20 +171,20 @@ class SubscriptionItem extends Model
     }
 
     /**
-     * Swap the subscription item to a new Stripe plan, and invoice immediately.
+     * Swap the subscription item to a new Stripe price, and invoice immediately.
      *
-     * @param  string  $plan
+     * @param  string  $price
      * @param  array  $options
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function swapAndInvoice($plan, array $options = [])
+    public function swapAndInvoice($price, array $options = [])
     {
         $this->alwaysInvoice();
 
-        return $this->swap($plan, $options);
+        return $this->swap($price, $options);
     }
 
     /**

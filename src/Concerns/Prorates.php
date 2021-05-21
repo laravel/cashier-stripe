@@ -5,14 +5,14 @@ namespace Laravel\Cashier\Concerns;
 trait Prorates
 {
     /**
-     * Indicates if the plan change should be prorated.
+     * Indicates if the price change should be prorated.
      *
      * @var string
      */
     protected $prorationBehavior = 'create_prorations';
 
     /**
-     * Indicate that the plan change should not be prorated.
+     * Indicate that the price change should not be prorated.
      *
      * @return $this
      */
@@ -24,7 +24,7 @@ trait Prorates
     }
 
     /**
-     * Indicate that the plan change should be prorated.
+     * Indicate that the price change should be prorated.
      *
      * @return $this
      */
@@ -36,7 +36,7 @@ trait Prorates
     }
 
     /**
-     * Indicate that the plan change should always be invoiced.
+     * Indicate that the price change should always be invoiced.
      *
      * @return $this
      */

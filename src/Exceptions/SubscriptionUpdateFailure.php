@@ -24,13 +24,13 @@ class SubscriptionUpdateFailure extends Exception
      * Create a new SubscriptionUpdateFailure instance.
      *
      * @param  \Laravel\Cashier\Subscription  $subscription
-     * @param  string  $plan
+     * @param  string  $price
      * @return static
      */
-    public static function duplicatePlan(Subscription $subscription, $plan)
+    public static function duplicatePlan(Subscription $subscription, $price)
     {
         return new static(
-            "The plan \"$plan\" is already attached to subscription \"{$subscription->stripe_id}\"."
+            "The price \"$price\" is already attached to subscription \"{$subscription->stripe_id}\"."
         );
     }
 
@@ -43,7 +43,7 @@ class SubscriptionUpdateFailure extends Exception
     public static function cannotDeleteLastPlan(Subscription $subscription)
     {
         return new static(
-            "The plan on subscription \"{$subscription->stripe_id}\" cannot be removed because it is the last one."
+            "The price on subscription \"{$subscription->stripe_id}\" cannot be removed because it is the last one."
         );
     }
 }

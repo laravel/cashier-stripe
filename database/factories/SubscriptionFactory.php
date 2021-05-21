@@ -40,15 +40,15 @@ class SubscriptionFactory extends Factory
     }
 
     /**
-     * Add a plan identifier to the model.
+     * Add a price identifier to the model.
      *
-     * @param  string  $plan
+     * @param  string  $price
      * @return $this
      */
-    public function withPlan($plan)
+    public function withPrice($price)
     {
         return $this->state([
-            'stripe_plan' => $plan,
+            'stripe_plan' => $price,
         ]);
     }
 

@@ -3,10 +3,8 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Exception;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Stripe\Exception\InvalidRequestException;
-use Stripe\Plan;
 use Stripe\Price;
 use Stripe\Product;
 
@@ -36,13 +34,11 @@ class MeteredBillingTest extends FeatureTestCase
     {
         parent::setUpBeforeClass();
 
-        static::$productId = static::$stripePrefix.'product-1'.Str::random(10);
-
-        Product::create([
+        static::$productId = Product::create([
             'id' => static::$productId,
             'name' => 'Laravel Cashier Test Product',
             'type' => 'service',
-        ]);
+        ])->id;
 
         static::$meteredPrice = Price::create([
             'nickname' => 'Monthly Metered $1 per unit',
@@ -81,9 +77,6 @@ class MeteredBillingTest extends FeatureTestCase
     {
         parent::tearDownAfterClass();
 
-        static::deleteStripeResource(new Plan(static::$meteredPrice));
-        static::deleteStripeResource(new Plan(static::$otherMeteredPrice));
-        static::deleteStripeResource(new Plan(static::$licensedPrice));
         static::deleteStripeResource(new Product(static::$productId));
     }
 
@@ -117,9 +110,9 @@ class MeteredBillingTest extends FeatureTestCase
         }
     }
 
-    public function test_reporting_usage_for_multi_plan_subscriptions()
+    public function test_reporting_usage_for_multiprice_subscriptions()
     {
-        $user = $this->createCustomer('reporting_usage_for_multi_plan_subscriptions');
+        $user = $this->createCustomer('reporting_usage_for_multiprice_subscriptions');
 
         $subscription = $user->newSubscription('main', [static::$licensedPrice])
             ->meteredPlan(static::$meteredPrice)
@@ -134,7 +127,7 @@ class MeteredBillingTest extends FeatureTestCase
             $this->assertInstanceOf(InvalidArgumentException::class, $e);
 
             $this->assertSame(
-                'This method requires a plan argument since the subscription has multiple plans.', $e->getMessage()
+                'This method requires a price argument since the subscription has multiple prices.', $e->getMessage()
             );
         }
 
@@ -173,9 +166,9 @@ class MeteredBillingTest extends FeatureTestCase
         $this->assertSame(1, $subscription->quantity);
     }
 
-    public function test_swap_metered_price_to_different_price_with_a_multi_plan_subscription()
+    public function test_swap_metered_price_to_different_price_with_a_multiprice_subscription()
     {
-        $user = $this->createCustomer('swap_metered_price_to_different_price_with_a_multi_plan_subscription');
+        $user = $this->createCustomer('swap_metered_price_to_different_price_with_a_multiprice_subscription');
 
         $subscription = $user->newSubscription('main')
             ->meteredPlan(static::$meteredPrice)
