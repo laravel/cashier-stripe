@@ -76,9 +76,9 @@ class SubscriptionBuilder
     /**
      * Determines if user redeemable promotion codes are available in Stripe Checkout.
      *
-     * @var bool
+     * @var bool|null
      */
-    protected $allowPromotionCodes = false;
+    protected $allowPromotionCodes;
 
     /**
      * The metadata to apply to the subscription.
@@ -372,7 +372,8 @@ class SubscriptionBuilder
             // Checkout Sessions are active for 24 hours after their creation and within that time frame the customer
             // can complete the payment at any time. Stripe requires the trial end at least 48 hours in the future
             // so that there is still at least a one day trial if your customer pays at the end of the 24 hours.
-            $minimumTrialPeriod = Carbon::now()->addHours(48);
+            // We also add 10 seconds of extra time to account for any delay with an API request onto Stripe.
+            $minimumTrialPeriod = Carbon::now()->addHours(48)->addSeconds(10);
 
             $trialEnd = $this->trialExpires->gt($minimumTrialPeriod) ? $this->trialExpires : $minimumTrialPeriod;
         } else {
@@ -384,7 +385,7 @@ class SubscriptionBuilder
             'line_items' => Collection::make($this->items)->values()->all(),
             'allow_promotion_codes' => $this->allowPromotionCodes,
             'discounts' => [
-                'coupon' => $this->coupon,
+                ['coupon' => $this->coupon],
             ],
             'subscription_data' => [
                 'default_tax_rates' => $this->getTaxRatesForPayload(),
