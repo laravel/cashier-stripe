@@ -57,7 +57,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable
             'payment_method_types' => ['card'],
         ], $sessionOptions), Cashier::stripeOptions());
 
-        return new static($customer, $session);
+        return new static($owner, $session);
     }
 
     /**
