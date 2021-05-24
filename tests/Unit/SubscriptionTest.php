@@ -128,7 +128,7 @@ class SubscriptionTest extends TestCase
 
     public function test_we_can_check_if_it_has_a_single_price()
     {
-        $subscription = new Subscription(['stripe_plan' => 'foo']);
+        $subscription = new Subscription(['stripe_price' => 'foo']);
 
         $this->assertTrue($subscription->hasSinglePrice());
         $this->assertFalse($subscription->hasMultiplePrices());
@@ -136,7 +136,7 @@ class SubscriptionTest extends TestCase
 
     public function test_we_can_check_if_it_has_multiple_prices()
     {
-        $subscription = new Subscription(['stripe_plan' => null]);
+        $subscription = new Subscription(['stripe_price' => null]);
 
         $this->assertTrue($subscription->hasMultiplePrices());
         $this->assertFalse($subscription->hasSinglePrice());

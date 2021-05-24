@@ -87,7 +87,7 @@ class WebhooksTest extends FeatureTestCase
 
         $this->assertDatabaseHas('subscription_items', [
             'stripe_id' => 'bar',
-            'stripe_plan' => 'price_foo',
+            'stripe_price' => 'price_foo',
             'quantity' => 10,
         ]);
     }
@@ -99,13 +99,13 @@ class WebhooksTest extends FeatureTestCase
         $subscription = $user->subscriptions()->create([
             'name' => 'main',
             'stripe_id' => 'sub_foo',
-            'stripe_plan' => 'price_foo',
+            'stripe_price' => 'price_foo',
             'stripe_status' => Subscription::STATUS_ACTIVE,
         ]);
 
         $item = $subscription->items()->create([
             'stripe_id' => 'it_foo',
-            'stripe_plan' => 'price_bar',
+            'stripe_price' => 'price_bar',
             'quantity' => 1,
         ]);
 
@@ -138,7 +138,7 @@ class WebhooksTest extends FeatureTestCase
         $this->assertDatabaseHas('subscription_items', [
             'subscription_id' => $subscription->id,
             'stripe_id' => 'bar',
-            'stripe_plan' => 'price_foo',
+            'stripe_price' => 'price_foo',
             'quantity' => 5,
         ]);
 
@@ -155,13 +155,13 @@ class WebhooksTest extends FeatureTestCase
         $subscription = $user->subscriptions()->create([
             'name' => 'main',
             'stripe_id' => 'sub_foo',
-            'stripe_plan' => 'price_foo',
+            'stripe_price' => 'price_foo',
             'stripe_status' => Subscription::STATUS_ACTIVE,
         ]);
 
         $item = $subscription->items()->create([
             'stripe_id' => 'it_foo',
-            'stripe_plan' => 'price_bar',
+            'stripe_price' => 'price_bar',
             'quantity' => 1,
         ]);
 
@@ -196,7 +196,7 @@ class WebhooksTest extends FeatureTestCase
         $this->assertDatabaseHas('subscription_items', [
             'subscription_id' => $subscription->id,
             'stripe_id' => 'bar',
-            'stripe_plan' => 'price_foo',
+            'stripe_price' => 'price_foo',
             'quantity' => 5,
         ]);
 

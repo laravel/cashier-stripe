@@ -116,12 +116,12 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         $premiumItem = $subscription->findItemOrFail(self::$premiumPriceId);
 
         $this->assertCount(3, $subscription->items);
-        $this->assertSame(self::$priceId, $item->stripe_plan);
+        $this->assertSame(self::$priceId, $item->stripe_price);
         $this->assertSame(10, $item->quantity);
-        $this->assertSame(self::$otherPriceId, $otherItem->stripe_plan);
+        $this->assertSame(self::$otherPriceId, $otherItem->stripe_price);
         $this->assertSame(1, $otherItem->quantity);
         $this->assertSame(self::$taxRateId, Arr::first($otherItem->asStripeSubscriptionItem()->tax_rates)->id);
-        $this->assertSame(self::$premiumPriceId, $premiumItem->stripe_plan);
+        $this->assertSame(self::$premiumPriceId, $premiumItem->stripe_price);
         $this->assertSame(5, $premiumItem->quantity);
     }
 
@@ -140,9 +140,9 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         $otherItem = $subscription->findItemOrFail(self::$otherPriceId);
 
         $this->assertCount(2, $subscription->items);
-        $this->assertSame(self::$priceId, $item->stripe_plan);
+        $this->assertSame(self::$priceId, $item->stripe_price);
         $this->assertSame(1, $item->quantity);
-        $this->assertSame(self::$otherPriceId, $otherItem->stripe_plan);
+        $this->assertSame(self::$otherPriceId, $otherItem->stripe_price);
         $this->assertSame(5, $otherItem->quantity);
     }
 
@@ -255,7 +255,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
         $subscription = $subscription->swap([static::$otherPriceId, static::$premiumPriceId => ['quantity' => 3]]);
 
-        $prices = $subscription->items()->pluck('stripe_plan');
+        $prices = $subscription->items()->pluck('stripe_price');
 
         $this->assertCount(2, $prices);
         $this->assertContains(self::$otherPriceId, $prices);
@@ -277,8 +277,8 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         $subscription->refresh();
 
         $this->assertCount(1, $subscription->items);
-        $this->assertSame(self::$otherPriceId, $subscription->stripe_plan);
-        $this->assertSame(self::$otherPriceId, $item->stripe_plan);
+        $this->assertSame(self::$otherPriceId, $subscription->stripe_price);
+        $this->assertSame(self::$otherPriceId, $item->stripe_price);
         $this->assertSame(3, $item->quantity);
     }
 
@@ -334,14 +334,14 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         $subscription = $user->subscriptions()->create([
             'name' => 'main',
             'stripe_id' => 'sub_foo',
-            'stripe_plan' => self::$priceId,
+            'stripe_price' => self::$priceId,
             'quantity' => 1,
             'stripe_status' => Subscription::STATUS_ACTIVE,
         ]);
 
         $subscription->items()->create([
             'stripe_id' => 'it_foo',
-            'stripe_plan' => self::$priceId,
+            'stripe_price' => self::$priceId,
             'quantity' => 1,
         ]);
 
@@ -358,13 +358,13 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
     {
         $subscription = $this->createSubscriptionWithSinglePrice($user);
 
-        $subscription->stripe_plan = null;
+        $subscription->stripe_price = null;
         $subscription->quantity = null;
         $subscription->save();
 
         $subscription->items()->create([
             'stripe_id' => 'it_foo',
-            'stripe_plan' => self::$otherPriceId,
+            'stripe_price' => self::$otherPriceId,
             'quantity' => 1,
         ]);
 

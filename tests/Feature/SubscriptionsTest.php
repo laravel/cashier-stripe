@@ -187,7 +187,7 @@ class SubscriptionsTest extends FeatureTestCase
         // Swap Price and invoice immediately.
         $subscription->swapAndInvoice(static::$otherPriceId);
 
-        $this->assertEquals(static::$otherPriceId, $subscription->stripe_plan);
+        $this->assertEquals(static::$otherPriceId, $subscription->stripe_price);
 
         // Invoice Tests
         $invoice = $user->invoices()[1];
@@ -353,7 +353,7 @@ class SubscriptionsTest extends FeatureTestCase
             $this->assertTrue($e->payment->requiresPaymentMethod());
 
             // Assert that the price was swapped anyway.
-            $this->assertEquals(static::$premiumPriceId, $subscription->refresh()->stripe_plan);
+            $this->assertEquals(static::$premiumPriceId, $subscription->refresh()->stripe_price);
 
             // Assert subscription is past due.
             $this->assertTrue($subscription->pastDue());
@@ -379,7 +379,7 @@ class SubscriptionsTest extends FeatureTestCase
             $this->assertTrue($e->payment->requiresAction());
 
             // Assert that the price was swapped anyway.
-            $this->assertEquals(static::$premiumPriceId, $subscription->refresh()->stripe_plan);
+            $this->assertEquals(static::$premiumPriceId, $subscription->refresh()->stripe_price);
 
             // Assert subscription is past due.
             $this->assertTrue($subscription->pastDue());
@@ -399,7 +399,7 @@ class SubscriptionsTest extends FeatureTestCase
         $subscription = $subscription->swap(static::$priceId);
 
         // Assert that the price was swapped anyway.
-        $this->assertEquals(static::$priceId, $subscription->refresh()->stripe_plan);
+        $this->assertEquals(static::$priceId, $subscription->refresh()->stripe_price);
 
         // Assert subscription is still active.
         $this->assertTrue($subscription->active());
@@ -418,7 +418,7 @@ class SubscriptionsTest extends FeatureTestCase
         $subscription = $subscription->swap(static::$priceId);
 
         // Assert that the price was swapped anyway.
-        $this->assertEquals(static::$priceId, $subscription->refresh()->stripe_plan);
+        $this->assertEquals(static::$priceId, $subscription->refresh()->stripe_price);
 
         // Assert subscription is still active.
         $this->assertTrue($subscription->active());
@@ -654,12 +654,12 @@ class SubscriptionsTest extends FeatureTestCase
             'billing_cycle_anchor' => Carbon::now()->addDays(5)->startOfDay()->unix(),
         ]);
 
-        $this->assertEquals(static::$priceId, $subscription->stripe_plan);
+        $this->assertEquals(static::$priceId, $subscription->stripe_price);
         $this->assertTrue($subscription->active());
 
         $subscription = $subscription->swap(self::$otherPriceId);
 
-        $this->assertEquals(static::$otherPriceId, $subscription->stripe_plan);
+        $this->assertEquals(static::$otherPriceId, $subscription->stripe_price);
         $this->assertTrue($subscription->active());
     }
 
@@ -674,14 +674,14 @@ class SubscriptionsTest extends FeatureTestCase
             'billing_cycle_anchor' => Carbon::now()->addDays(5)->startOfDay()->unix(),
         ]);
 
-        $this->assertEquals(static::$priceId, $subscription->stripe_plan);
+        $this->assertEquals(static::$priceId, $subscription->stripe_price);
         $this->assertCount(0, $user->invoices());
         $this->assertSame(Invoice::STATUS_DRAFT, $user->upcomingInvoice()->status);
         $this->assertTrue($subscription->active());
 
         $subscription = $subscription->swapAndInvoice(self::$otherPriceId);
 
-        $this->assertEquals(static::$otherPriceId, $subscription->stripe_plan);
+        $this->assertEquals(static::$otherPriceId, $subscription->stripe_price);
         $this->assertCount(0, $user->invoices());
         $this->assertSame(Invoice::STATUS_DRAFT, $user->upcomingInvoice()->status);
         $this->assertTrue($subscription->active());
@@ -736,7 +736,7 @@ class SubscriptionsTest extends FeatureTestCase
             'name' => 'yearly',
             'stripe_id' => 'xxxx',
             'stripe_status' => StripeSubscription::STATUS_INCOMPLETE,
-            'stripe_plan' => 'stripe-yearly',
+            'stripe_price' => 'stripe-yearly',
             'quantity' => 1,
             'trial_ends_at' => null,
             'ends_at' => null,
@@ -874,7 +874,7 @@ class SubscriptionsTest extends FeatureTestCase
             'name' => 'default',
             'stripe_id' => 'sub_xxx',
             'stripe_status' => 'active',
-            'stripe_plan' => 'price_xxx',
+            'stripe_price' => 'price_xxx',
             'quantity' => 1,
             'trial_ends_at' => null,
             'ends_at' => null,
@@ -892,7 +892,7 @@ class SubscriptionsTest extends FeatureTestCase
             'name' => 'default',
             'stripe_id' => 'sub_xxx',
             'stripe_status' => 'active',
-            'stripe_plan' => 'price_xxx',
+            'stripe_price' => 'price_xxx',
             'quantity' => 1,
             'trial_ends_at' => null,
             'ends_at' => null,

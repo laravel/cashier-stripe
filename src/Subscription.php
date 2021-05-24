@@ -104,7 +104,7 @@ class Subscription extends Model
      */
     public function hasMultiplePrices()
     {
-        return is_null($this->stripe_plan);
+        return is_null($this->stripe_price);
     }
 
     /**
@@ -127,11 +127,11 @@ class Subscription extends Model
     {
         if ($this->hasMultiplePrices()) {
             return $this->items->contains(function (SubscriptionItem $item) use ($price) {
-                return $item->stripe_plan === $price;
+                return $item->stripe_price === $price;
             });
         }
 
-        return $this->stripe_plan === $price;
+        return $this->stripe_price === $price;
     }
 
     /**
@@ -144,7 +144,7 @@ class Subscription extends Model
      */
     public function findItemOrFail($price)
     {
-        return $this->items()->where('stripe_plan', $price)->firstOrFail();
+        return $this->items()->where('stripe_price', $price)->firstOrFail();
     }
 
     /**
@@ -510,7 +510,7 @@ class Subscription extends Model
             $this->guardAgainstMultiplePrices();
         }
 
-        return $this->findItemOrFail($price ?? $this->stripe_plan)->reportUsage($quantity, $timestamp);
+        return $this->findItemOrFail($price ?? $this->stripe_price)->reportUsage($quantity, $timestamp);
     }
 
     /**
@@ -539,7 +539,7 @@ class Subscription extends Model
             $this->guardAgainstMultiplePrices();
         }
 
-        return $this->findItemOrFail($price ?? $this->stripe_plan)->usageRecords($options);
+        return $this->findItemOrFail($price ?? $this->stripe_price)->usageRecords($options);
     }
 
     /**
@@ -663,7 +663,7 @@ class Subscription extends Model
 
         $this->fill([
             'stripe_status' => $stripeSubscription->status,
-            'stripe_plan' => $isSinglePrice ? $firstItem->price->id : null,
+            'stripe_price' => $isSinglePrice ? $firstItem->price->id : null,
             'quantity' => $isSinglePrice ? $firstItem->quantity : null,
             'ends_at' => null,
         ])->save();
@@ -672,13 +672,13 @@ class Subscription extends Model
             $this->items()->updateOrCreate([
                 'stripe_id' => $item->id,
             ], [
-                'stripe_plan' => $item->price->id,
+                'stripe_price' => $item->price->id,
                 'quantity' => $item->quantity,
             ]);
         }
 
         // Delete items that aren't attached to the subscription anymore...
-        $this->items()->whereNotIn('stripe_plan', $items->pluck('price')->filter())->delete();
+        $this->items()->whereNotIn('stripe_price', $items->pluck('price')->filter())->delete();
 
         $this->unsetRelation('items');
 
@@ -804,7 +804,7 @@ class Subscription extends Model
     {
         $this->guardAgainstIncomplete();
 
-        if ($this->items->contains('stripe_plan', $price)) {
+        if ($this->items->contains('stripe_price', $price)) {
             throw SubscriptionUpdateFailure::duplicatePrice($this, $price);
         }
 
@@ -820,7 +820,7 @@ class Subscription extends Model
 
         $this->items()->create([
             'stripe_id' => $item->id,
-            'stripe_plan' => $price,
+            'stripe_price' => $price,
             'quantity' => $quantity,
         ]);
 
@@ -828,7 +828,7 @@ class Subscription extends Model
 
         if ($this->hasSinglePrice()) {
             $this->fill([
-                'stripe_plan' => null,
+                'stripe_price' => null,
                 'quantity' => null,
             ])->save();
         }
@@ -875,7 +875,7 @@ class Subscription extends Model
             'proration_behavior' => $this->prorateBehavior(),
         ]));
 
-        $this->items()->where('stripe_plan', $price)->delete();
+        $this->items()->where('stripe_price', $price)->delete();
 
         $this->unsetRelation('items');
 
@@ -883,7 +883,7 @@ class Subscription extends Model
             $item = $this->items()->first();
 
             $this->fill([
-                'stripe_plan' => $item->stripe_plan,
+                'stripe_price' => $item->stripe_price,
                 'quantity' => $item->quantity,
             ])->save();
         }
@@ -1147,7 +1147,7 @@ class Subscription extends Model
         foreach ($this->items as $item) {
             $stripeSubscriptionItem = $item->asStripeSubscriptionItem();
 
-            $stripeSubscriptionItem->tax_rates = $this->getPriceTaxRatesForPayload($item->stripe_plan) ?: null;
+            $stripeSubscriptionItem->tax_rates = $this->getPriceTaxRatesForPayload($item->stripe_price) ?: null;
 
             $stripeSubscriptionItem->proration_behavior = $this->prorateBehavior();
 

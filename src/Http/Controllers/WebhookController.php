@@ -82,7 +82,7 @@ class WebhookController extends Controller
                     'name' => $data['metadata']['name'] ?? $this->newSubscriptionName($payload),
                     'stripe_id' => $data['id'],
                     'stripe_status' => $data['status'],
-                    'stripe_plan' => $isSinglePrice ? $firstItem['price']['id'] : null,
+                    'stripe_price' => $isSinglePrice ? $firstItem['price']['id'] : null,
                     'quantity' => $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null,
                     'trial_ends_at' => $trialEndsAt,
                     'ends_at' => null,
@@ -91,7 +91,7 @@ class WebhookController extends Controller
                 foreach ($data['items']['data'] as $item) {
                     $subscription->items()->create([
                         'stripe_id' => $item['id'],
-                        'stripe_plan' => $item['price']['id'],
+                        'stripe_price' => $item['price']['id'],
                         'quantity' => $item['quantity'] ?? null,
                     ]);
                 }
@@ -140,7 +140,7 @@ class WebhookController extends Controller
                 $isSinglePrice = count($data['items']['data']) === 1;
 
                 // Price...
-                $subscription->stripe_plan = $isSinglePrice ? $firstItem['price']['id'] : null;
+                $subscription->stripe_price = $isSinglePrice ? $firstItem['price']['id'] : null;
 
                 // Quantity...
                 $subscription->quantity = $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null;
@@ -184,13 +184,13 @@ class WebhookController extends Controller
                         $subscription->items()->updateOrCreate([
                             'stripe_id' => $item['id'],
                         ], [
-                            'stripe_plan' => $item['price']['id'],
+                            'stripe_price' => $item['price']['id'],
                             'quantity' => $item['quantity'] ?? null,
                         ]);
                     }
 
                     // Delete items that aren't attached to the subscription anymore...
-                    $subscription->items()->whereNotIn('stripe_plan', $prices)->delete();
+                    $subscription->items()->whereNotIn('stripe_price', $prices)->delete();
                 }
             });
         }

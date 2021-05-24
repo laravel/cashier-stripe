@@ -337,7 +337,7 @@ class SubscriptionBuilder
             'name' => $this->name,
             'stripe_id' => $stripeSubscription->id,
             'stripe_status' => $stripeSubscription->status,
-            'stripe_plan' => $isSinglePrice ? $firstItem->price->id : null,
+            'stripe_price' => $isSinglePrice ? $firstItem->price->id : null,
             'quantity' => $isSinglePrice ? $firstItem->quantity : null,
             'trial_ends_at' => ! $this->skipTrial ? $this->trialExpires : null,
             'ends_at' => null,
@@ -347,7 +347,7 @@ class SubscriptionBuilder
         foreach ($stripeSubscription->items as $item) {
             $subscription->items()->create([
                 'stripe_id' => $item->id,
-                'stripe_plan' => $item->price->id,
+                'stripe_price' => $item->price->id,
                 'quantity' => $item->quantity,
             ]);
         }

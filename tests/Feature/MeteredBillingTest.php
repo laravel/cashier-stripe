@@ -152,17 +152,17 @@ class MeteredBillingTest extends FeatureTestCase
             ->meteredPrice(static::$meteredPrice)
             ->create('pm_card_visa');
 
-        $this->assertSame(static::$meteredPrice, $subscription->stripe_plan);
+        $this->assertSame(static::$meteredPrice, $subscription->stripe_price);
         $this->assertNull($subscription->quantity);
 
         $subscription = $subscription->swap(static::$otherMeteredPrice);
 
-        $this->assertSame(static::$otherMeteredPrice, $subscription->stripe_plan);
+        $this->assertSame(static::$otherMeteredPrice, $subscription->stripe_price);
         $this->assertNull($subscription->quantity);
 
         $subscription = $subscription->swap(static::$licensedPrice);
 
-        $this->assertSame(static::$licensedPrice, $subscription->stripe_plan);
+        $this->assertSame(static::$licensedPrice, $subscription->stripe_price);
         $this->assertSame(1, $subscription->quantity);
     }
 
@@ -174,7 +174,7 @@ class MeteredBillingTest extends FeatureTestCase
             ->meteredPrice(static::$meteredPrice)
             ->create('pm_card_visa');
 
-        $this->assertSame(static::$meteredPrice, $subscription->stripe_plan);
+        $this->assertSame(static::$meteredPrice, $subscription->stripe_price);
         $this->assertNull($subscription->quantity);
 
         $subscription = $subscription->swap([static::$meteredPrice, static::$otherMeteredPrice]);
@@ -183,29 +183,29 @@ class MeteredBillingTest extends FeatureTestCase
         $otherItem = $subscription->findItemOrFail(self::$otherMeteredPrice);
 
         $this->assertCount(2, $subscription->items);
-        $this->assertNull($subscription->stripe_plan);
+        $this->assertNull($subscription->stripe_price);
         $this->assertNull($subscription->quantity);
-        $this->assertSame(self::$meteredPrice, $item->stripe_plan);
+        $this->assertSame(self::$meteredPrice, $item->stripe_price);
         $this->assertNull($item->quantity);
-        $this->assertSame(self::$otherMeteredPrice, $otherItem->stripe_plan);
+        $this->assertSame(self::$otherMeteredPrice, $otherItem->stripe_price);
         $this->assertNull($otherItem->quantity);
 
         $subscription = $subscription->swap(static::$otherMeteredPrice);
 
         $this->assertCount(1, $subscription->items);
-        $this->assertSame(self::$otherMeteredPrice, $subscription->stripe_plan);
+        $this->assertSame(self::$otherMeteredPrice, $subscription->stripe_price);
         $this->assertNull($subscription->quantity);
 
         $subscription = $subscription->swap(static::$licensedPrice);
 
         $this->assertCount(1, $subscription->items);
-        $this->assertSame(self::$licensedPrice, $subscription->stripe_plan);
+        $this->assertSame(self::$licensedPrice, $subscription->stripe_price);
         $this->assertSame(1, $subscription->quantity);
 
         $subscription = $subscription->swap([static::$licensedPrice, static::$meteredPrice]);
 
         $this->assertCount(2, $subscription->items);
-        $this->assertNull($subscription->stripe_plan);
+        $this->assertNull($subscription->stripe_price);
         $this->assertNull($subscription->quantity);
     }
 

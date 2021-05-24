@@ -32,7 +32,7 @@ class SubscriptionFactory extends Factory
             'name' => $this->faker->title,
             'stripe_id' => 'sub_'.Str::random(40),
             'stripe_status' => StripeSubscription::STATUS_ACTIVE,
-            'stripe_plan' => null,
+            'stripe_price' => null,
             'quantity' => null,
             'trial_ends_at' => null,
             'ends_at' => null,
@@ -48,7 +48,7 @@ class SubscriptionFactory extends Factory
     public function withPrice($price)
     {
         return $this->state([
-            'stripe_plan' => $price,
+            'stripe_price' => $price,
         ]);
     }
 

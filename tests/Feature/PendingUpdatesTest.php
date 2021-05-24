@@ -99,7 +99,7 @@ class PendingUpdatesTest extends FeatureTestCase
             $this->fail('Expected exception '.StripeCardException::class.' was not thrown.');
         } catch (StripeCardException $e) {
             // Assert that the price was not swapped.
-            $this->assertEquals(static::$priceId, $subscription->refresh()->stripe_plan);
+            $this->assertEquals(static::$priceId, $subscription->refresh()->stripe_price);
 
             // Assert subscription is active.
             $this->assertTrue($subscription->active());
@@ -125,7 +125,7 @@ class PendingUpdatesTest extends FeatureTestCase
     //         $this->assertTrue($e->payment->requiresAction());
     //
     //         // Assert that the price was not swapped.
-    //         $this->assertEquals(static::$priceId, $subscription->refresh()->stripe_plan);
+    //         $this->assertEquals(static::$priceId, $subscription->refresh()->stripe_price);
     //
     //         // Assert subscription is active.
     //         $this->assertTrue($subscription->active());
