@@ -102,7 +102,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function hasMultiplePlans()
+    public function hasMultiplePrices()
     {
         return is_null($this->stripe_plan);
     }
@@ -112,9 +112,9 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function hasSinglePlan()
+    public function hasSinglePrice()
     {
-        return ! $this->hasMultiplePlans();
+        return ! $this->hasMultiplePrices();
     }
 
     /**
@@ -123,9 +123,9 @@ class Subscription extends Model
      * @param  string  $price
      * @return bool
      */
-    public function hasPlan($price)
+    public function hasPrice($price)
     {
-        if ($this->hasMultiplePlans()) {
+        if ($this->hasMultiplePrices()) {
             return $this->items->contains(function (SubscriptionItem $item) use ($price) {
                 return $item->stripe_plan === $price;
             });
@@ -406,7 +406,7 @@ class Subscription extends Model
             return $this->refresh();
         }
 
-        $this->guardAgainstMultiplePlans();
+        $this->guardAgainstMultiplePrices();
 
         return $this->updateQuantity($this->quantity + $count, $price);
     }
@@ -449,7 +449,7 @@ class Subscription extends Model
             return $this->refresh();
         }
 
-        $this->guardAgainstMultiplePlans();
+        $this->guardAgainstMultiplePrices();
 
         return $this->updateQuantity(max(1, $this->quantity - $count), $price);
     }
@@ -473,7 +473,7 @@ class Subscription extends Model
             return $this->refresh();
         }
 
-        $this->guardAgainstMultiplePlans();
+        $this->guardAgainstMultiplePrices();
 
         $stripeSubscription = $this->updateStripeSubscription([
             'payment_behavior' => $this->paymentBehavior(),
@@ -507,7 +507,7 @@ class Subscription extends Model
     public function reportUsage($quantity = 1, $timestamp = null, $price = null)
     {
         if (! $price) {
-            $this->guardAgainstMultiplePlans();
+            $this->guardAgainstMultiplePrices();
         }
 
         return $this->findItemOrFail($price ?? $this->stripe_plan)->reportUsage($quantity, $timestamp);
@@ -536,7 +536,7 @@ class Subscription extends Model
     public function usageRecords(array $options = [], $price = null)
     {
         if (! $price) {
-            $this->guardAgainstMultiplePlans();
+            $this->guardAgainstMultiplePrices();
         }
 
         return $this->findItemOrFail($price ?? $this->stripe_plan)->usageRecords($options);
@@ -650,7 +650,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         $items = $this->mergeItemsThatShouldBeDeletedDuringSwap(
-            $this->parseSwapPlans($prices)
+            $this->parseSwapPrices($prices)
         );
 
         $stripeSubscription = StripeSubscription::update(
@@ -714,9 +714,9 @@ class Subscription extends Model
      * @param  array  $prices
      * @return \Illuminate\Support\Collection
      */
-    protected function parseSwapPlans(array $prices)
+    protected function parseSwapPrices(array $prices)
     {
-        $isSinglePriceSwap = $this->hasSinglePlan() && count($prices) === 1;
+        $isSinglePriceSwap = $this->hasSinglePrice() && count($prices) === 1;
 
         return Collection::make($prices)->mapWithKeys(function ($options, $price) use ($isSinglePriceSwap) {
             $price = is_string($options) ? $options : $price;
@@ -726,7 +726,7 @@ class Subscription extends Model
             return [$price => array_merge([
                 'price' => $price,
                 'quantity' => $isSinglePriceSwap ? $this->quantity : null,
-                'tax_rates' => $this->getPlanTaxRatesForPayload($price),
+                'tax_rates' => $this->getPriceTaxRatesForPayload($price),
             ], $options)];
         });
     }
@@ -800,12 +800,12 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function addPlan($price, $quantity = 1, array $options = [])
+    public function addPrice($price, $quantity = 1, array $options = [])
     {
         $this->guardAgainstIncomplete();
 
         if ($this->items->contains('stripe_plan', $price)) {
-            throw SubscriptionUpdateFailure::duplicatePlan($this, $price);
+            throw SubscriptionUpdateFailure::duplicatePrice($this, $price);
         }
 
         $subscription = $this->asStripeSubscription();
@@ -813,7 +813,7 @@ class Subscription extends Model
         $item = $subscription->items->create(array_merge([
             'price' => $price,
             'quantity' => $quantity,
-            'tax_rates' => $this->getPlanTaxRatesForPayload($price),
+            'tax_rates' => $this->getPriceTaxRatesForPayload($price),
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
         ], $options));
@@ -826,7 +826,7 @@ class Subscription extends Model
 
         $this->unsetRelation('items');
 
-        if ($this->hasSinglePlan()) {
+        if ($this->hasSinglePrice()) {
             $this->fill([
                 'stripe_plan' => null,
                 'quantity' => null,
@@ -847,11 +847,11 @@ class Subscription extends Model
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function addPlanAndInvoice($price, $quantity = 1, array $options = [])
+    public function addPriceAndInvoice($price, $quantity = 1, array $options = [])
     {
         $this->alwaysInvoice();
 
-        return $this->addPlan($price, $quantity, $options);
+        return $this->addPrice($price, $quantity, $options);
     }
 
     /**
@@ -862,16 +862,16 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function removePlan($price)
+    public function removePrice($price)
     {
-        if ($this->hasSinglePlan()) {
-            throw SubscriptionUpdateFailure::cannotDeleteLastPlan($this);
+        if ($this->hasSinglePrice()) {
+            throw SubscriptionUpdateFailure::cannotDeleteLastPrice($this);
         }
 
         $stripeItem = $this->findItemOrFail($price)->asStripeSubscriptionItem();
 
         $stripeItem->delete(array_filter([
-            'clear_usage' => $stripeItem->plan->usage_type === 'metered' ? true : null,
+            'clear_usage' => $stripeItem->price->recurring->usage_type === 'metered' ? true : null,
             'proration_behavior' => $this->prorateBehavior(),
         ]));
 
@@ -1109,7 +1109,7 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         $items = $this->mergeItemsThatShouldBeDeletedDuringSwap(
-            $this->parseSwapPlans($prices)
+            $this->parseSwapPrices($prices)
         );
 
         $swapOptions = Collection::make($this->getSwapOptions($items))
@@ -1147,7 +1147,7 @@ class Subscription extends Model
         foreach ($this->items as $item) {
             $stripeSubscriptionItem = $item->asStripeSubscriptionItem();
 
-            $stripeSubscriptionItem->tax_rates = $this->getPlanTaxRatesForPayload($item->stripe_plan) ?: null;
+            $stripeSubscriptionItem->tax_rates = $this->getPriceTaxRatesForPayload($item->stripe_plan) ?: null;
 
             $stripeSubscriptionItem->proration_behavior = $this->prorateBehavior();
 
@@ -1161,9 +1161,9 @@ class Subscription extends Model
      * @param  string  $price
      * @return array|null
      */
-    public function getPlanTaxRatesForPayload($price)
+    public function getPriceTaxRatesForPayload($price)
     {
-        if ($taxRates = $this->owner->planTaxRates()) {
+        if ($taxRates = $this->owner->priceTaxRates()) {
             return $taxRates[$price] ?? null;
         }
     }
@@ -1215,9 +1215,9 @@ class Subscription extends Model
      *
      * @throws \InvalidArgumentException
      */
-    public function guardAgainstMultiplePlans()
+    public function guardAgainstMultiplePrices()
     {
-        if ($this->hasMultiplePlans()) {
+        if ($this->hasMultiplePrices()) {
             throw new InvalidArgumentException(
                 'This method requires a price argument since the subscription has multiple prices.'
             );

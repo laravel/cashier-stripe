@@ -104,12 +104,12 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         $user->priceTaxRates = [self::$otherPriceId => [self::$taxRateId]];
 
         $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])
-            ->plan(self::$premiumPriceId, 5)
+            ->price(self::$premiumPriceId, 5)
             ->quantity(10, self::$priceId)
             ->create('pm_card_visa');
 
         $this->assertTrue($user->subscribed('main', self::$priceId));
-        $this->assertTrue($user->onPlan(self::$priceId));
+        $this->assertTrue($user->onPrice(self::$priceId));
 
         $item = $subscription->findItemOrFail(self::$priceId);
         $otherItem = $subscription->findItemOrFail(self::$otherPriceId);
@@ -131,10 +131,10 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
         $subscription = $user->newSubscription('main', self::$priceId)->create('pm_card_visa');
 
-        $subscription->addPlan(self::$otherPriceId, 5);
+        $subscription->addPrice(self::$otherPriceId, 5);
 
-        $this->assertTrue($user->onPlan(self::$priceId));
-        $this->assertFalse($user->onPlan(self::$premiumPriceId));
+        $this->assertTrue($user->onPrice(self::$priceId));
+        $this->assertFalse($user->onPrice(self::$premiumPriceId));
 
         $item = $subscription->findItemOrFail(self::$priceId);
         $otherItem = $subscription->findItemOrFail(self::$otherPriceId);
@@ -154,7 +154,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
         $this->assertCount(2, $subscription->items);
 
-        $subscription->removePlan(self::$priceId);
+        $subscription->removePrice(self::$priceId);
 
         $this->assertCount(1, $subscription->items);
     }
@@ -167,7 +167,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
         $this->expectException(SubscriptionUpdateFailure::class);
 
-        $subscription->removePlan(self::$priceId);
+        $subscription->removePrice(self::$priceId);
     }
 
     public function test_multiprice_subscriptions_can_be_resumed()
@@ -290,18 +290,18 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
         $this->assertEquals(2000, ($invoice = $user->invoices()->first())->rawTotal());
 
-        $subscription->noProrate()->addPlan(self::$otherPriceId);
+        $subscription->noProrate()->addPrice(self::$otherPriceId);
 
         // Assert that no new invoice was created because of no prorating.
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);
 
-        $subscription->addPlanAndInvoice(self::$priceId);
+        $subscription->addPriceAndInvoice(self::$priceId);
 
         // Assert that a new invoice was created because of no prorating.
         $this->assertEquals(1000, ($invoice = $user->invoices()->first())->rawTotal());
         $this->assertEquals(4000, $user->upcomingInvoice()->rawTotal());
 
-        $subscription->noProrate()->removePlan(self::$premiumPriceId);
+        $subscription->noProrate()->removePrice(self::$premiumPriceId);
 
         // Assert that no new invoice was created because of no prorating.
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);

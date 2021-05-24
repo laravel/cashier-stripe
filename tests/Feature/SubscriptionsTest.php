@@ -133,9 +133,9 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertSame($metadata, $subscription->asStripeSubscription()->metadata->toArray());
 
         $this->assertTrue($user->subscribed('main'));
-        $this->assertTrue($user->subscribedToPlan(static::$priceId, 'main'));
-        $this->assertFalse($user->subscribedToPlan(static::$priceId, 'something'));
-        $this->assertFalse($user->subscribedToPlan(static::$otherPriceId, 'main'));
+        $this->assertTrue($user->subscribedToPrice(static::$priceId, 'main'));
+        $this->assertFalse($user->subscribedToPrice(static::$priceId, 'something'));
+        $this->assertFalse($user->subscribedToPrice(static::$otherPriceId, 'main'));
         $this->assertTrue($user->subscribed('main', static::$priceId));
         $this->assertFalse($user->subscribed('main', static::$otherPriceId));
         $this->assertTrue($user->subscription('main')->active());

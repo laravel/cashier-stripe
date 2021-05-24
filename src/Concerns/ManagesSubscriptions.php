@@ -39,7 +39,7 @@ trait ManagesSubscriptions
             return false;
         }
 
-        return ! $price || $subscription->hasPlan($price);
+        return ! $price || $subscription->hasPrice($price);
     }
 
     /**
@@ -86,7 +86,7 @@ trait ManagesSubscriptions
             return false;
         }
 
-        return ! $price || $subscription->hasPlan($price);
+        return ! $price || $subscription->hasPrice($price);
     }
 
     /**
@@ -132,7 +132,7 @@ trait ManagesSubscriptions
      * @param  string  $name
      * @return bool
      */
-    public function subscribedToPlan($prices, $name = 'default')
+    public function subscribedToPrice($prices, $name = 'default')
     {
         $subscription = $this->subscription($name);
 
@@ -141,7 +141,7 @@ trait ManagesSubscriptions
         }
 
         foreach ((array) $prices as $price) {
-            if ($subscription->hasPlan($price)) {
+            if ($subscription->hasPrice($price)) {
                 return true;
             }
         }
@@ -155,10 +155,10 @@ trait ManagesSubscriptions
      * @param  string  $price
      * @return bool
      */
-    public function onPlan($price)
+    public function onPrice($price)
     {
         return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($price) {
-            return $subscription->valid() && $subscription->hasPlan($price);
+            return $subscription->valid() && $subscription->hasPrice($price);
         }));
     }
 
@@ -177,7 +177,7 @@ trait ManagesSubscriptions
      *
      * @return array
      */
-    public function planTaxRates()
+    public function priceTaxRates()
     {
         return [];
     }

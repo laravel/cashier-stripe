@@ -116,7 +116,7 @@ class SubscriptionItem extends Model
             'quantity' => $quantity,
         ])->save();
 
-        if ($this->subscription->hasSinglePlan()) {
+        if ($this->subscription->hasSinglePrice()) {
             $this->subscription->fill([
                 'stripe_status' => $stripeSubscriptionItem->subscription->status,
                 'quantity' => $quantity,
@@ -148,7 +148,7 @@ class SubscriptionItem extends Model
             'quantity' => $this->quantity,
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
-            'tax_rates' => $this->subscription->getPlanTaxRatesForPayload($price),
+            'tax_rates' => $this->subscription->getPriceTaxRatesForPayload($price),
         ], $options));
 
         $this->fill([
@@ -156,7 +156,7 @@ class SubscriptionItem extends Model
             'quantity' => $stripeSubscriptionItem->quantity,
         ])->save();
 
-        if ($this->subscription->hasSinglePlan()) {
+        if ($this->subscription->hasSinglePrice()) {
             $this->subscription->fill([
                 'stripe_plan' => $price,
                 'quantity' => $stripeSubscriptionItem->quantity,

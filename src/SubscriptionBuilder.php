@@ -101,7 +101,7 @@ class SubscriptionBuilder
         $this->owner = $owner;
 
         foreach ((array) $prices as $price) {
-            $this->plan($price);
+            $this->price($price);
         }
     }
 
@@ -112,14 +112,14 @@ class SubscriptionBuilder
      * @param  int|null  $quantity
      * @return $this
      */
-    public function plan($price, $quantity = 1)
+    public function price($price, $quantity = 1)
     {
         $options = [
             'price' => $price,
             'quantity' => $quantity,
         ];
 
-        if ($taxRates = $this->getPlanTaxRatesForPayload($price)) {
+        if ($taxRates = $this->getPriceTaxRatesForPayload($price)) {
             $options['tax_rates'] = $taxRates;
         }
 
@@ -134,9 +134,9 @@ class SubscriptionBuilder
      * @param  string  $price
      * @return $this
      */
-    public function meteredPlan($price)
+    public function meteredPrice($price)
     {
-        return $this->plan($price, null);
+        return $this->price($price, null);
     }
 
     /**
@@ -156,7 +156,7 @@ class SubscriptionBuilder
             $price = Arr::first($this->items)['price'];
         }
 
-        return $this->plan($price, $quantity);
+        return $this->price($price, $quantity);
     }
 
     /**
@@ -474,9 +474,9 @@ class SubscriptionBuilder
      * @param  string  $price
      * @return array|null
      */
-    protected function getPlanTaxRatesForPayload($price)
+    protected function getPriceTaxRatesForPayload($price)
     {
-        if ($taxRates = $this->owner->planTaxRates()) {
+        if ($taxRates = $this->owner->priceTaxRates()) {
             return $taxRates[$price] ?? null;
         }
     }

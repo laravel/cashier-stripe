@@ -85,7 +85,7 @@ class MeteredBillingTest extends FeatureTestCase
         $user = $this->createCustomer('report_usage_for_metered_price');
 
         $subscription = $user->newSubscription('main')
-            ->meteredPlan(static::$meteredPrice)
+            ->meteredPrice(static::$meteredPrice)
             ->create('pm_card_visa');
 
         $subscription->reportUsage(5);
@@ -115,8 +115,8 @@ class MeteredBillingTest extends FeatureTestCase
         $user = $this->createCustomer('reporting_usage_for_multiprice_subscriptions');
 
         $subscription = $user->newSubscription('main', [static::$licensedPrice])
-            ->meteredPlan(static::$meteredPrice)
-            ->meteredPlan(static::$otherMeteredPrice)
+            ->meteredPrice(static::$meteredPrice)
+            ->meteredPrice(static::$otherMeteredPrice)
             ->create('pm_card_visa');
 
         $this->assertSame($subscription->items->count(), 3);
@@ -149,7 +149,7 @@ class MeteredBillingTest extends FeatureTestCase
         $user = $this->createCustomer('swap_metered_price_to_different_price');
 
         $subscription = $user->newSubscription('main')
-            ->meteredPlan(static::$meteredPrice)
+            ->meteredPrice(static::$meteredPrice)
             ->create('pm_card_visa');
 
         $this->assertSame(static::$meteredPrice, $subscription->stripe_plan);
@@ -171,7 +171,7 @@ class MeteredBillingTest extends FeatureTestCase
         $user = $this->createCustomer('swap_metered_price_to_different_price_with_a_multiprice_subscription');
 
         $subscription = $user->newSubscription('main')
-            ->meteredPlan(static::$meteredPrice)
+            ->meteredPrice(static::$meteredPrice)
             ->create('pm_card_visa');
 
         $this->assertSame(static::$meteredPrice, $subscription->stripe_plan);
@@ -214,7 +214,7 @@ class MeteredBillingTest extends FeatureTestCase
         $user = $this->createCustomer('cancel_metered_subscription');
 
         $subscription = $user->newSubscription('main')
-            ->meteredPlan(static::$meteredPrice)
+            ->meteredPrice(static::$meteredPrice)
             ->create('pm_card_visa');
 
         $subscription->reportUsage(10);
@@ -231,7 +231,7 @@ class MeteredBillingTest extends FeatureTestCase
         $user = $this->createCustomer('cancel_metered_subscription_immediately');
 
         $subscription = $user->newSubscription('main')
-            ->meteredPlan(static::$meteredPrice)
+            ->meteredPrice(static::$meteredPrice)
             ->create('pm_card_visa');
 
         $subscription->reportUsage(10);

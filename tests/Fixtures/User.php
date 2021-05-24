@@ -29,7 +29,7 @@ class User extends Model
      *
      * @return array
      */
-    public function planTaxRates()
+    public function priceTaxRates()
     {
         return $this->priceTaxRates;
     }
