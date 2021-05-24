@@ -4,9 +4,7 @@ namespace Laravel\Cashier\Tests\Feature;
 
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\PaymentMethod;
-use Stripe\PaymentMethod as StripePaymentMethod;
 use Stripe\SetupIntent as StripeSetupIntent;
-use Stripe\StripeClient;
 
 class PaymentMethodsTest extends FeatureTestCase
 {
@@ -38,9 +36,7 @@ class PaymentMethodsTest extends FeatureTestCase
         $user = $this->createCustomer('we_can_add_default_sepa_payment_method');
         $user->createAsStripeCustomer();
 
-        $stripe = new StripeClient(Cashier::stripeOptions());
-
-        $paymentMethod = $stripe->paymentMethods->create([
+        $paymentMethod = Cashier::stripe()->paymentMethods->create([
             'type' => 'sepa_debit',
             'billing_details' => [
                 'name' => 'John Doe',
@@ -125,10 +121,10 @@ class PaymentMethodsTest extends FeatureTestCase
         $user = $this->createCustomer('we_can_retrieve_all_payment_methods');
         $customer = $user->createAsStripeCustomer();
 
-        $paymentMethod = StripePaymentMethod::retrieve('pm_card_visa', $user->stripeOptions());
+        $paymentMethod = Cashier::stripe()->paymentMethods->retrieve('pm_card_visa');
         $paymentMethod->attach(['customer' => $customer->id]);
 
-        $paymentMethod = StripePaymentMethod::retrieve('pm_card_mastercard', $user->stripeOptions());
+        $paymentMethod = Cashier::stripe()->paymentMethods->retrieve('pm_card_mastercard');
         $paymentMethod->attach(['customer' => $customer->id]);
 
         $paymentMethods = $user->paymentMethods();
@@ -143,7 +139,7 @@ class PaymentMethodsTest extends FeatureTestCase
         $user = $this->createCustomer('we_can_sync_the_payment_method_from_stripe');
         $customer = $user->createAsStripeCustomer();
 
-        $paymentMethod = StripePaymentMethod::retrieve('pm_card_visa', $user->stripeOptions());
+        $paymentMethod = Cashier::stripe()->paymentMethods->retrieve('pm_card_visa');
         $paymentMethod->attach(['customer' => $customer->id]);
 
         $customer->invoice_settings = ['default_payment_method' => $paymentMethod->id];
@@ -166,10 +162,10 @@ class PaymentMethodsTest extends FeatureTestCase
         $user = $this->createCustomer('we_delete_all_payment_methods');
         $customer = $user->createAsStripeCustomer();
 
-        $paymentMethod = StripePaymentMethod::retrieve('pm_card_visa', $user->stripeOptions());
+        $paymentMethod = Cashier::stripe()->paymentMethods->retrieve('pm_card_visa');
         $paymentMethod->attach(['customer' => $customer->id]);
 
-        $paymentMethod = StripePaymentMethod::retrieve('pm_card_mastercard', $user->stripeOptions());
+        $paymentMethod = Cashier::stripe()->paymentMethods->retrieve('pm_card_mastercard');
         $paymentMethod->attach(['customer' => $customer->id]);
 
         $paymentMethods = $user->paymentMethods();

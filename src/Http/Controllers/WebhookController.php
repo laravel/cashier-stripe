@@ -13,7 +13,6 @@ use Laravel\Cashier\Events\WebhookReceived;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
-use Stripe\PaymentIntent as StripePaymentIntent;
 use Stripe\Subscription as StripeSubscription;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -270,9 +269,8 @@ class WebhookController extends Controller
 
         if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
             if (in_array(Notifiable::class, class_uses_recursive($user))) {
-                $payment = new Payment(StripePaymentIntent::retrieve(
-                    $payload['data']['object']['payment_intent'],
-                    $user->stripeOptions()
+                $payment = new Payment(Cashier::stripe()->paymentIntents->retrieve(
+                    $payload['data']['object']['payment_intent']
                 ));
 
                 $user->notify(new $notification($payment));

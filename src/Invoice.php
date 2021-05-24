@@ -386,8 +386,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
         }
 
         if ($this->invoice->id) {
-            $this->invoice = StripeInvoice::retrieve([
-                'id' => $this->invoice->id,
+            $this->invoice = Cashier::stripe()->invoices->retrieve($this->invoice->id, [
                 'expand' => [
                     'account_tax_ids',
                     'discounts',
@@ -395,10 +394,10 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
                     'total_discount_amounts.discount',
                     'total_tax_amounts.tax_rate',
                 ],
-            ], $this->owner->stripeOptions());
+            ]);
         } else {
             // If no invoice ID is present then assume this is the customer's upcoming invoice...
-            $this->invoice = StripeInvoice::upcoming([
+            $this->invoice = Cashier::stripe()->invoices->upcoming([
                 'customer' => $this->owner->stripe_id,
                 'expand' => [
                     'account_tax_ids',
@@ -407,7 +406,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
                     'total_discount_amounts.discount',
                     'total_tax_amounts.tax_rate',
                 ],
-            ], $this->owner->stripeOptions());
+            ]);
         }
 
         $this->refreshed = true;
@@ -454,7 +453,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function finalize(array $options = [])
     {
-        $this->invoice = $this->invoice->finalizeInvoice($options, $this->owner->stripeOptions());
+        $this->invoice = $this->invoice->finalizeInvoice($options);
 
         return $this;
     }
@@ -467,7 +466,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function pay(array $options = [])
     {
-        $this->invoice = $this->invoice->pay($options, $this->owner->stripeOptions());
+        $this->invoice = $this->invoice->pay($options);
 
         return $this;
     }
@@ -480,7 +479,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function send(array $options = [])
     {
-        $this->invoice = $this->invoice->sendInvoice($options, $this->owner->stripeOptions());
+        $this->invoice = $this->invoice->sendInvoice($options);
 
         return $this;
     }
@@ -493,7 +492,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function void(array $options = [])
     {
-        $this->invoice = $this->invoice->voidInvoice($options, $this->owner->stripeOptions());
+        $this->invoice = $this->invoice->voidInvoice($options);
 
         return $this;
     }
@@ -506,7 +505,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function markUncollectible(array $options = [])
     {
-        $this->invoice = $this->invoice->markUncollectible($options, $this->owner->stripeOptions());
+        $this->invoice = $this->invoice->markUncollectible($options);
 
         return $this;
     }
@@ -519,7 +518,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function delete(array $options = [])
     {
-        $this->invoice = $this->invoice->delete($options, $this->owner->stripeOptions());
+        $this->invoice = $this->invoice->delete($options);
 
         return $this;
     }

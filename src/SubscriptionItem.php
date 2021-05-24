@@ -198,11 +198,11 @@ class SubscriptionItem extends Model
     {
         $timestamp = $timestamp instanceof DateTimeInterface ? $timestamp->getTimestamp() : $timestamp;
 
-        return StripeSubscriptionItem::createUsageRecord($this->stripe_id, [
+        return $this->subscription->owner->stripe()->subscriptionItems->createUsageRecord($this->stripe_id, [
             'quantity' => $quantity,
             'action' => $timestamp ? 'set' : 'increment',
             'timestamp' => $timestamp ?? time(),
-        ], $this->subscription->owner->stripeOptions());
+        ]);
     }
 
     /**
@@ -213,8 +213,8 @@ class SubscriptionItem extends Model
      */
     public function usageRecords($options = [])
     {
-        return new Collection(StripeSubscriptionItem::allUsageRecordSummaries(
-            $this->stripe_id, $options, $this->subscription->owner->stripeOptions()
+        return new Collection($this->subscription->owner->stripe()->subscriptionItems->allUsageRecordSummaries(
+            $this->stripe_id, $options
         )->data);
     }
 
@@ -226,8 +226,8 @@ class SubscriptionItem extends Model
      */
     public function updateStripeSubscriptionItem(array $options = [])
     {
-        return StripeSubscriptionItem::update(
-            $this->stripe_id, $options, $this->subscription->owner->stripeOptions()
+        return $this->subscription->owner->stripe()->subscriptionItems->update(
+            $this->stripe_id, $options
         );
     }
 
@@ -239,9 +239,8 @@ class SubscriptionItem extends Model
      */
     public function asStripeSubscriptionItem(array $expand = [])
     {
-        return StripeSubscriptionItem::retrieve(
-            ['id' => $this->stripe_id, 'expand' => $expand],
-            $this->subscription->owner->stripeOptions()
+        return $this->subscription->owner->stripe()->subscriptionItems->retrieve(
+            $this->stripe_id, ['expand' => $expand]
         );
     }
 

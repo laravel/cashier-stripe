@@ -20,7 +20,7 @@ class SubscriptionBuilder
     /**
      * The model that is subscribing.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var \Laravel\Cashier\Billable|\Illuminate\Database\Eloquent\Model
      */
     protected $owner;
 
@@ -298,15 +298,8 @@ class SubscriptionBuilder
 
         $customer = $this->getStripeCustomer($paymentMethod, $customerOptions);
 
-        $payload = array_merge(
-            ['customer' => $customer->id],
-            $this->buildPayload(),
-            $subscriptionOptions
-        );
-
-        $stripeSubscription = StripeSubscription::create(
-            $payload,
-            $this->owner->stripeOptions()
+        $stripeSubscription = $customer->subscriptions->create(
+            array_merge($this->buildPayload(), $subscriptionOptions)
         );
 
         $subscription = $this->createSubscription($stripeSubscription);

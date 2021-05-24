@@ -5,8 +5,6 @@ namespace Laravel\Cashier\Concerns;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Checkout;
 use Laravel\Cashier\Payment;
-use Stripe\PaymentIntent as StripePaymentIntent;
-use Stripe\Refund as StripeRefund;
 
 trait PerformsCharges
 {
@@ -43,7 +41,7 @@ trait PerformsCharges
         }
 
         $payment = new Payment(
-            StripePaymentIntent::create($options, $this->stripeOptions())
+            $this->stripe()->paymentIntents->create($options)
         );
 
         $payment->validate();
@@ -60,9 +58,8 @@ trait PerformsCharges
      */
     public function refund($paymentIntent, array $options = [])
     {
-        return StripeRefund::create(
-            ['payment_intent' => $paymentIntent] + $options,
-            $this->stripeOptions()
+        return $this->stripe()->refunds->create(
+            ['payment_intent' => $paymentIntent] + $options
         );
     }
 

@@ -6,7 +6,6 @@ use Illuminate\Routing\Controller;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Http\Middleware\VerifyRedirectUrl;
 use Laravel\Cashier\Payment;
-use Stripe\PaymentIntent as StripePaymentIntent;
 
 class PaymentController extends Controller
 {
@@ -30,9 +29,7 @@ class PaymentController extends Controller
     {
         return view('cashier::payment', [
             'stripeKey' => config('cashier.key'),
-            'payment' => new Payment(
-                StripePaymentIntent::retrieve($id, Cashier::stripeOptions())
-            ),
+            'payment' => new Payment(Cashier::stripe()->paymentIntents->retrieve($id)),
             'redirect' => url(request('redirect', '/')),
         ]);
     }

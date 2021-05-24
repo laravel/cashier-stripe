@@ -5,9 +5,7 @@ namespace Laravel\Cashier\Concerns;
 use Exception;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\PaymentMethod;
-use Stripe\Customer as StripeCustomer;
 use Stripe\PaymentMethod as StripePaymentMethod;
-use Stripe\SetupIntent as StripeSetupIntent;
 
 trait ManagesPaymentMethods
 {
@@ -19,9 +17,7 @@ trait ManagesPaymentMethods
      */
     public function createSetupIntent(array $options = [])
     {
-        return StripeSetupIntent::create(
-            $options, $this->stripeOptions()
-        );
+        return $this->stripe()->setupIntents->create($options);
     }
 
     /**
@@ -61,9 +57,8 @@ trait ManagesPaymentMethods
         $parameters = array_merge(['limit' => 24], $parameters);
 
         // "type" is temporarily required by Stripe...
-        $paymentMethods = StripePaymentMethod::all(
-            ['customer' => $this->stripe_id, 'type' => $type] + $parameters,
-            $this->stripeOptions()
+        $paymentMethods = $this->stripe()->paymentMethods->all(
+            ['customer' => $this->stripe_id, 'type' => $type] + $parameters
         );
 
         return Collection::make($paymentMethods->data)->map(function ($paymentMethod) {
@@ -85,7 +80,7 @@ trait ManagesPaymentMethods
 
         if ($stripePaymentMethod->customer !== $this->stripe_id) {
             $stripePaymentMethod = $stripePaymentMethod->attach(
-                ['customer' => $this->stripe_id], $this->stripeOptions()
+                ['customer' => $this->stripe_id]
             );
         }
 
@@ -112,7 +107,7 @@ trait ManagesPaymentMethods
 
         $defaultPaymentMethod = $customer->invoice_settings->default_payment_method;
 
-        $stripePaymentMethod->detach(null, $this->stripeOptions());
+        $stripePaymentMethod->detach();
 
         // If the payment method was the default payment method, we'll remove it manually...
         if ($stripePaymentMethod->id === $defaultPaymentMethod) {
@@ -134,12 +129,7 @@ trait ManagesPaymentMethods
             return;
         }
 
-        $customer = StripeCustomer::retrieve([
-            'id' => $this->stripe_id,
-            'expand' => [
-                'invoice_settings.default_payment_method',
-            ],
-        ], $this->stripeOptions());
+        $customer = $this->asStripeCustomer(['invoice_settings.default_payment_method']);
 
         if ($customer->invoice_settings->default_payment_method) {
             return new PaymentMethod($this, $customer->invoice_settings->default_payment_method);
@@ -169,9 +159,9 @@ trait ManagesPaymentMethods
 
         $paymentMethod = $this->addPaymentMethod($stripePaymentMethod);
 
-        $customer->invoice_settings = ['default_payment_method' => $paymentMethod->id];
-
-        $customer->save($this->stripeOptions());
+        $this->updateStripeCustomer([
+            'invoice_settings' => ['default_payment_method' => $paymentMethod->id],
+        ]);
 
         // Next we will get the default payment method for this user so we can update the
         // payment method details on the record in the database. This will allow us to
@@ -271,8 +261,6 @@ trait ManagesPaymentMethods
             return $paymentMethod;
         }
 
-        return StripePaymentMethod::retrieve(
-            $paymentMethod, $this->stripeOptions()
-        );
+        return $this->stripe()->paymentMethods->retrieve($paymentMethod);
     }
 }
