@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
-use Illuminate\Support\Str;
 use Laravel\Cashier\Checkout;
 use Stripe\Checkout\Session as StripeCheckoutSession;
 use Stripe\Coupon;
@@ -92,7 +91,6 @@ class CheckoutTest extends FeatureTestCase
         $this->assertSame(1815, $session->amount_total);
 
         $coupon = Coupon::create([
-            'id' => 'coupon-'.Str::random(10),
             'duration' => 'repeating',
             'amount_off' => 500,
             'duration_in_months' => 3,

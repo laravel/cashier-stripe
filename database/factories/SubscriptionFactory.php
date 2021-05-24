@@ -32,7 +32,7 @@ class SubscriptionFactory extends Factory
             'name' => $this->faker->title,
             'stripe_id' => 'sub_'.Str::random(40),
             'stripe_status' => StripeSubscription::STATUS_ACTIVE,
-            'stripe_plan' => null,
+            'stripe_price' => null,
             'quantity' => null,
             'trial_ends_at' => null,
             'ends_at' => null,
@@ -40,15 +40,15 @@ class SubscriptionFactory extends Factory
     }
 
     /**
-     * Add a plan identifier to the model.
+     * Add a price identifier to the model.
      *
-     * @param  string  $plan
+     * @param  string  $price
      * @return $this
      */
-    public function withPlan($plan)
+    public function withPrice($price)
     {
         return $this->state([
-            'stripe_plan' => $plan,
+            'stripe_price' => $price,
         ]);
     }
 

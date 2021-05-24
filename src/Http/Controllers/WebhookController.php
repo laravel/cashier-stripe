@@ -76,14 +76,14 @@ class WebhookController extends Controller
                 }
 
                 $firstItem = $data['items']['data'][0];
-                $isSinglePlan = count($data['items']['data']) === 1;
+                $isSinglePrice = count($data['items']['data']) === 1;
 
                 $subscription = $user->subscriptions()->create([
                     'name' => $data['metadata']['name'] ?? $this->newSubscriptionName($payload),
                     'stripe_id' => $data['id'],
                     'stripe_status' => $data['status'],
-                    'stripe_plan' => $isSinglePlan ? $firstItem['plan']['id'] : null,
-                    'quantity' => $isSinglePlan && isset($firstItem['quantity']) ? $firstItem['quantity'] : null,
+                    'stripe_price' => $isSinglePrice ? $firstItem['price']['id'] : null,
+                    'quantity' => $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null,
                     'trial_ends_at' => $trialEndsAt,
                     'ends_at' => null,
                 ]);
@@ -91,7 +91,7 @@ class WebhookController extends Controller
                 foreach ($data['items']['data'] as $item) {
                     $subscription->items()->create([
                         'stripe_id' => $item['id'],
-                        'stripe_plan' => $item['plan']['id'],
+                        'stripe_price' => $item['price']['id'],
                         'quantity' => $item['quantity'] ?? null,
                     ]);
                 }
@@ -137,13 +137,13 @@ class WebhookController extends Controller
                 }
 
                 $firstItem = $data['items']['data'][0];
-                $isSinglePlan = count($data['items']['data']) === 1;
+                $isSinglePrice = count($data['items']['data']) === 1;
 
-                // Plan...
-                $subscription->stripe_plan = $isSinglePlan ? $firstItem['plan']['id'] : null;
+                // Price...
+                $subscription->stripe_price = $isSinglePrice ? $firstItem['price']['id'] : null;
 
                 // Quantity...
-                $subscription->quantity = $isSinglePlan && isset($firstItem['quantity']) ? $firstItem['quantity'] : null;
+                $subscription->quantity = $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null;
 
                 // Trial ending date...
                 if (isset($data['trial_end'])) {
@@ -176,21 +176,21 @@ class WebhookController extends Controller
 
                 // Update subscription items...
                 if (isset($data['items'])) {
-                    $plans = [];
+                    $prices = [];
 
                     foreach ($data['items']['data'] as $item) {
-                        $plans[] = $item['plan']['id'];
+                        $prices[] = $item['price']['id'];
 
                         $subscription->items()->updateOrCreate([
                             'stripe_id' => $item['id'],
                         ], [
-                            'stripe_plan' => $item['plan']['id'],
+                            'stripe_price' => $item['price']['id'],
                             'quantity' => $item['quantity'] ?? null,
                         ]);
                     }
 
                     // Delete items that aren't attached to the subscription anymore...
-                    $subscription->items()->whereNotIn('stripe_plan', $plans)->delete();
+                    $subscription->items()->whereNotIn('stripe_price', $prices)->delete();
                 }
             });
         }

@@ -32,7 +32,7 @@ class SubscriptionBuilder
     protected $name;
 
     /**
-     * The name of the plan being subscribed to.
+     * The prices the customer is being subscribed to.
      *
      * @var array
      */
@@ -92,71 +92,71 @@ class SubscriptionBuilder
      *
      * @param  mixed  $owner
      * @param  string  $name
-     * @param  string|string[]  $plans
+     * @param  string|string[]  $prices
      * @return void
      */
-    public function __construct($owner, $name, $plans = [])
+    public function __construct($owner, $name, $prices = [])
     {
         $this->name = $name;
         $this->owner = $owner;
 
-        foreach ((array) $plans as $plan) {
-            $this->plan($plan);
+        foreach ((array) $prices as $price) {
+            $this->price($price);
         }
     }
 
     /**
-     * Set a plan on the subscription builder.
+     * Set a price on the subscription builder.
      *
-     * @param  string  $plan
+     * @param  string  $price
      * @param  int|null  $quantity
      * @return $this
      */
-    public function plan($plan, $quantity = 1)
+    public function price($price, $quantity = 1)
     {
         $options = [
-            'price' => $plan,
+            'price' => $price,
             'quantity' => $quantity,
         ];
 
-        if ($taxRates = $this->getPlanTaxRatesForPayload($plan)) {
+        if ($taxRates = $this->getPriceTaxRatesForPayload($price)) {
             $options['tax_rates'] = $taxRates;
         }
 
-        $this->items[$plan] = $options;
+        $this->items[$price] = $options;
 
         return $this;
     }
 
     /**
-     * Set a metered plan on the subscription builder.
+     * Set a metered price on the subscription builder.
      *
-     * @param  string  $plan
+     * @param  string  $price
      * @return $this
      */
-    public function meteredPlan($plan)
+    public function meteredPrice($price)
     {
-        return $this->plan($plan, null);
+        return $this->price($price, null);
     }
 
     /**
      * Specify the quantity of a subscription item.
      *
      * @param  int|null  $quantity
-     * @param  string|null  $plan
+     * @param  string|null  $price
      * @return $this
      */
-    public function quantity($quantity, $plan = null)
+    public function quantity($quantity, $price = null)
     {
-        if (is_null($plan)) {
+        if (is_null($price)) {
             if (count($this->items) > 1) {
-                throw new InvalidArgumentException('Plan is required when creating multi-plan subscriptions.');
+                throw new InvalidArgumentException('Price is required when creating multi-price subscriptions.');
             }
 
-            $plan = Arr::first($this->items)['price'];
+            $price = Arr::first($this->items)['price'];
         }
 
-        return $this->plan($plan, $quantity);
+        return $this->price($price, $quantity);
     }
 
     /**
@@ -198,7 +198,7 @@ class SubscriptionBuilder
     }
 
     /**
-     * Change the billing cycle anchor on a plan creation.
+     * Change the billing cycle anchor on a subscription creation.
      *
      * @param  \DateTimeInterface|int  $date
      * @return $this
@@ -293,7 +293,7 @@ class SubscriptionBuilder
     public function create($paymentMethod = null, array $customerOptions = [], array $subscriptionOptions = [])
     {
         if (empty($this->items)) {
-            throw new Exception('At least one plan is required when starting subscriptions.');
+            throw new Exception('At least one price is required when starting subscriptions.');
         }
 
         $customer = $this->getStripeCustomer($paymentMethod, $customerOptions);
@@ -330,15 +330,15 @@ class SubscriptionBuilder
     {
         /** @var \Stripe\SubscriptionItem $firstItem */
         $firstItem = $stripeSubscription->items->first();
-        $isSinglePlan = $stripeSubscription->items->count() === 1;
+        $isSinglePrice = $stripeSubscription->items->count() === 1;
 
         /** @var \Laravel\Cashier\Subscription $subscription */
         $subscription = $this->owner->subscriptions()->create([
             'name' => $this->name,
             'stripe_id' => $stripeSubscription->id,
             'stripe_status' => $stripeSubscription->status,
-            'stripe_plan' => $isSinglePlan ? $firstItem->plan->id : null,
-            'quantity' => $isSinglePlan ? $firstItem->quantity : null,
+            'stripe_price' => $isSinglePrice ? $firstItem->price->id : null,
+            'quantity' => $isSinglePrice ? $firstItem->quantity : null,
             'trial_ends_at' => ! $this->skipTrial ? $this->trialExpires : null,
             'ends_at' => null,
         ]);
@@ -347,7 +347,7 @@ class SubscriptionBuilder
         foreach ($stripeSubscription->items as $item) {
             $subscription->items()->create([
                 'stripe_id' => $item->id,
-                'stripe_plan' => $item->plan->id,
+                'stripe_price' => $item->price->id,
                 'quantity' => $item->quantity,
             ]);
         }
@@ -365,7 +365,7 @@ class SubscriptionBuilder
     public function checkout(array $sessionOptions = [], array $customerOptions = [])
     {
         if (empty($this->items)) {
-            throw new Exception('At least one plan is required when starting subscriptions.');
+            throw new Exception('At least one price is required when starting subscriptions.');
         }
 
         if (! $this->skipTrial && $this->trialExpires) {
@@ -469,15 +469,15 @@ class SubscriptionBuilder
     }
 
     /**
-     * Get the plan tax rates for the Stripe payload.
+     * Get the price tax rates for the Stripe payload.
      *
-     * @param  string  $plan
+     * @param  string  $price
      * @return array|null
      */
-    protected function getPlanTaxRatesForPayload($plan)
+    protected function getPriceTaxRatesForPayload($price)
     {
-        if ($taxRates = $this->owner->planTaxRates()) {
-            return $taxRates[$plan] ?? null;
+        if ($taxRates = $this->owner->priceTaxRates()) {
+            return $taxRates[$price] ?? null;
         }
     }
 }

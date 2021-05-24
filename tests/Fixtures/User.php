@@ -12,7 +12,7 @@ class User extends Model
 
     public $taxRates = [];
 
-    public $planTaxRates = [];
+    public $priceTaxRates = [];
 
     /**
      * Get the tax rates to apply to the subscription.
@@ -29,8 +29,8 @@ class User extends Model
      *
      * @return array
      */
-    public function planTaxRates()
+    public function priceTaxRates()
     {
-        return $this->planTaxRates;
+        return $this->priceTaxRates;
     }
 }
