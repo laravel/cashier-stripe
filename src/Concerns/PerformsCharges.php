@@ -86,7 +86,7 @@ trait PerformsCharges
                 $item['quantity'] = $item['quantity'] ?? 1;
 
                 return $item;
-            })->values()->all()
+            })->values()->all(),
         ]);
 
         return Checkout::create($this, array_merge($payload, $sessionOptions), $customerOptions);

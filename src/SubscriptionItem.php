@@ -9,7 +9,6 @@ use Illuminate\Support\Collection;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionItemFactory;
-use Stripe\SubscriptionItem as StripeSubscriptionItem;
 
 /**
  * @property \Laravel\Cashier\Subscription|null $subscription
