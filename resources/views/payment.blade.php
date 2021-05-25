@@ -89,7 +89,7 @@
                                 @change="configureStripeElements"
                             >
                                 <option v-for="option in paymentMethods" v-bind:value="option">
-                                    @{{ option.text }}
+                                    @{{ option.title }}
                                 </option>
                             </select>
                         </div>
@@ -125,20 +125,18 @@
                             v-model="email"
                         />
 
-                        <div v-if="paymentElement !== null">
+                        <div v-if="paymentElement">
                             <!-- Stripe Payment Element -->
                             <label for="payment-element" class="inline-block text-sm text-gray-700 font-semibold mb-2">
                                 Payment details
                             </label>
 
                             <div id="payment-element" ref="paymentElement" class="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6"></div>
+                        </div>
 
-                            <p v-if="['ideal', 'sepa_debit'].includes(paymentMethod.type)" class="text-xs text-gray-400 mb-6">
-                                By providing your payment information and confirming this payment, you authorise (A) and Stripe, our payment service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank. You agree to receive notifications for future debits up to 2 days before they occur.
-                            </p>
-
+                        <div v-if="(paymentMethod || {}).remember">
                             <!-- Remember Payment Method -->
-                            <label v-if="paymentMethod.remember" for="remember" class="inline-block text-sm text-gray-700 mb-6">
+                            <label for="remember" class="inline-block text-sm text-gray-700 mb-2">
                                 <input
                                     id="remember"
                                     type="checkbox"
@@ -149,6 +147,10 @@
 
                                 Remember payment method for future usage
                             </label>
+
+                            <p v-if="['bancontact', 'ideal', 'sepa_debit'].includes(paymentMethod.type)" class="text-xs text-gray-400 mb-6">
+                                By providing your payment information and confirming this payment, you authorise (A) and Stripe, our payment service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank. You agree to receive notifications for future debits up to 2 days before they occur.
+                            </p>
                         </div>
                     </div>
 
@@ -218,23 +220,26 @@
 
                     // Set the allowed payment methods based on the payment method types of the intent...
                     const paymentMethodTypes = paymentIntent.payment_method_types;
+
                     this.paymentMethods = [
-                        { text: 'Card', type: 'card', remember: true, redirects: false, element: 'card' },
-                        { text: 'Alipay', type: 'alipay', remember: false, redirects: true },
-                        { text: 'BECS Direct Debit', type: 'au_becs_debit', remember: true, redirects: false, element: 'auBankAccount' },
-                        { text: 'Bancontact', type: 'bancontact', remember: true, redirects: true },
-                        { text: 'EPS', type: 'eps', remember: false, redirects: true, element: 'epsBank' },
-                        { text: 'Giropay', type: 'giropay', remember: false, redirects: true },
-                        { text: 'iDEAL', type: 'ideal', remember: true, redirects: true, element: 'idealBank' },
+                        { title: 'Card', type: 'card', remember: true, redirects: false, element: 'card' },
+                        { title: 'Alipay', type: 'alipay' },
+                        { title: 'BECS Direct Debit', type: 'au_becs_debit', remember: true, redirects: false, element: 'auBankAccount' },
+                        { title: 'Bancontact', type: 'bancontact', remember: true },
+                        { title: 'EPS', type: 'eps', element: 'epsBank' },
+                        { title: 'Giropay', type: 'giropay' },
+                        { title: 'iDEAL', type: 'ideal', remember: true, element: 'idealBank' },
                         {
-                            text: 'SEPA Debit',
+                            title: 'SEPA Debit',
                             type: 'sepa_debit',
                             remember: true,
                             redirects: false,
                             element: 'iban',
                             options: { supportedCountries: ['SEPA'] }
                         }
-                    ].filter(
+                    ].map(paymentMethod => {
+                        return { remember: false, redirects: true, ...paymentMethod }
+                    }).filter(
                         paymentMethod => paymentMethodTypes.includes(paymentMethod.type)
                     );
 
@@ -248,8 +253,6 @@
                         this.paymentMethod = this.paymentMethods.filter(
                             paymentMethod => paymentMethod.type === type
                         )[0];
-
-                        console.log(this.paymentMethod);
                     }
                 },
 
