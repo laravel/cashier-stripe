@@ -1,6 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.13.1...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.14.0...master)
+
+
+## [v12.14.0 (2021-05-25)](https://github.com/laravel/cashier/compare/v12.13.1...v12.14.0)
+
+### Added
+- Support prorations while extending trials ([#1151](https://github.com/laravel/cashier-stripe/pull/1151))
+- Add extra methods to invoice object ([#1167](https://github.com/laravel/cashier-stripe/pull/1167))
+
+### Fixed
+- Add extra 10 seconds of trial time for checkout session ([#1160](https://github.com/laravel/cashier-stripe/pull/1160))
+- Fix adding invoice item with quantities ([#1161](https://github.com/laravel/cashier-stripe/pull/1161))
+- Fix coupons with Stripe Checkout sessions ([#1165](https://github.com/laravel/cashier-stripe/pull/1165))
+- Fix checkout owner ([7bbfe23](https://github.com/laravel/cashier-stripe/commit/7bbfe234c5f1657eee1223f9aee73b03bdef9894))
 
 
 ## [v12.13.1 (2021-05-11)](https://github.com/laravel/cashier/compare/v12.13.0...v12.13.1)
