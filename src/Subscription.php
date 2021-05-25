@@ -816,7 +816,7 @@ class Subscription extends Model
             throw SubscriptionUpdateFailure::duplicatePrice($this, $price);
         }
 
-        $item = $this->owner->stripe()->subscriptionsItems->create(array_merge([
+        $item = $this->owner->stripe()->subscriptionItems->create(array_merge([
             'subscription' => $this->stripe_id,
             'price' => $price,
             'quantity' => $quantity,
