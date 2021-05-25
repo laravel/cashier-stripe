@@ -47,6 +47,7 @@ class PendingUpdatesTest extends FeatureTestCase
         ])->id;
 
         static::$otherPriceId = self::stripe()->prices->create([
+            'product' => static::$productId,
             'nickname' => 'Monthly $10 Other',
             'currency' => 'USD',
             'recurring' => [

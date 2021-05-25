@@ -875,9 +875,9 @@ class Subscription extends Model
             throw SubscriptionUpdateFailure::cannotDeleteLastPrice($this);
         }
 
-        $stripeItem = $this->findItemOrFail($price);
+        $stripeItem = $this->findItemOrFail($price)->asStripeSubscriptionItem();
 
-        $this->owner->stripe()->subscriptionItems->delete($stripeItem->stripe_id, array_filter([
+        $stripeItem->delete(array_filter([
             'clear_usage' => $stripeItem->price->recurring->usage_type === 'metered' ? true : null,
             'proration_behavior' => $this->prorateBehavior(),
         ]));
