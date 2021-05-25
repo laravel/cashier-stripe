@@ -12,14 +12,6 @@ abstract class FeatureTestCase extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        // Delay consecutive tests to prevent Stripe rate limiting issues.
-        sleep(2);
-
-        parent::setUp();
-    }
-
     protected function defineDatabaseMigrations()
     {
         $this->loadLaravelMigrations();
