@@ -5,8 +5,6 @@ namespace Laravel\Cashier\Tests\Feature;
 use Exception;
 use InvalidArgumentException;
 use Stripe\Exception\InvalidRequestException;
-use Stripe\Price;
-use Stripe\Product;
 
 class MeteredBillingTest extends FeatureTestCase
 {
@@ -34,13 +32,13 @@ class MeteredBillingTest extends FeatureTestCase
     {
         parent::setUpBeforeClass();
 
-        static::$productId = Product::create([
-            'id' => static::$productId,
+        static::$productId = self::stripe()->products->create([
             'name' => 'Laravel Cashier Test Product',
             'type' => 'service',
         ])->id;
 
-        static::$meteredPrice = Price::create([
+        static::$meteredPrice = self::stripe()->prices->create([
+            'product' => static::$productId,
             'nickname' => 'Monthly Metered $1 per unit',
             'currency' => 'USD',
             'recurring' => [
@@ -48,10 +46,10 @@ class MeteredBillingTest extends FeatureTestCase
                 'usage_type' => 'metered',
             ],
             'unit_amount' => 100,
-            'product' => static::$productId,
         ])->id;
 
-        static::$otherMeteredPrice = Price::create([
+        static::$otherMeteredPrice = self::stripe()->prices->create([
+            'product' => static::$productId,
             'nickname' => 'Monthly Metered $2 per unit',
             'currency' => 'USD',
             'recurring' => [
@@ -59,25 +57,17 @@ class MeteredBillingTest extends FeatureTestCase
                 'usage_type' => 'metered',
             ],
             'unit_amount' => 200,
-            'product' => static::$productId,
         ])->id;
 
-        static::$licensedPrice = Price::create([
+        static::$licensedPrice = self::stripe()->prices->create([
+            'product' => static::$productId,
             'nickname' => 'Monthly $10 Licensed',
             'currency' => 'USD',
             'recurring' => [
                 'interval' => 'month',
             ],
             'unit_amount' => 1000,
-            'product' => static::$productId,
         ])->id;
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        parent::tearDownAfterClass();
-
-        static::deleteStripeResource(new Product(static::$productId));
     }
 
     public function test_report_usage_for_metered_price()
@@ -87,6 +77,8 @@ class MeteredBillingTest extends FeatureTestCase
         $subscription = $user->newSubscription('main')
             ->meteredPrice(static::$meteredPrice)
             ->create('pm_card_visa');
+
+        sleep(1);
 
         $subscription->reportUsage(5);
 

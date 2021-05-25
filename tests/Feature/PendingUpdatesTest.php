@@ -2,10 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
-use Laravel\Cashier\Exceptions\IncompletePayment;
 use Stripe\Exception\CardException as StripeCardException;
-use Stripe\Price;
-use Stripe\Product;
 
 class PendingUpdatesTest extends FeatureTestCase
 {
@@ -33,14 +30,13 @@ class PendingUpdatesTest extends FeatureTestCase
     {
         parent::setUpBeforeClass();
 
-        static::$productId = Product::create([
-            'id' => static::$productId,
+        static::$productId = self::stripe()->products->create([
             'name' => 'Laravel Cashier Test Product',
             'type' => 'service',
         ])->id;
 
-        static::$priceId = Price::create([
-            'id' => static::$priceId,
+        static::$priceId = self::stripe()->prices->create([
+            'product' => static::$productId,
             'nickname' => 'Monthly $10',
             'currency' => 'USD',
             'recurring' => [
@@ -48,11 +44,10 @@ class PendingUpdatesTest extends FeatureTestCase
             ],
             'billing_scheme' => 'per_unit',
             'unit_amount' => 1000,
-            'product' => static::$productId,
         ])->id;
 
-        static::$otherPriceId = Price::create([
-            'id' => static::$otherPriceId,
+        static::$otherPriceId = self::stripe()->prices->create([
+            'product' => static::$productId,
             'nickname' => 'Monthly $10 Other',
             'currency' => 'USD',
             'recurring' => [
@@ -60,11 +55,10 @@ class PendingUpdatesTest extends FeatureTestCase
             ],
             'billing_scheme' => 'per_unit',
             'unit_amount' => 1000,
-            'product' => static::$productId,
         ])->id;
 
-        static::$premiumPriceId = Price::create([
-            'id' => static::$premiumPriceId,
+        static::$premiumPriceId = self::stripe()->prices->create([
+            'product' => static::$productId,
             'nickname' => 'Monthly $20 Premium',
             'currency' => 'USD',
             'recurring' => [
@@ -72,15 +66,7 @@ class PendingUpdatesTest extends FeatureTestCase
             ],
             'billing_scheme' => 'per_unit',
             'unit_amount' => 2000,
-            'product' => static::$productId,
         ])->id;
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        parent::tearDownAfterClass();
-
-        static::deleteStripeResource(new Product(static::$productId));
     }
 
     public function test_subscription_can_error_if_incomplete()

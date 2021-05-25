@@ -2,48 +2,24 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Tests\TestCase;
-use Stripe\ApiResource;
-use Stripe\Exception\InvalidRequestException;
-use Stripe\Stripe;
+use Stripe\StripeClient;
 
 abstract class FeatureTestCase extends TestCase
 {
-    /**
-     * @var string
-     */
-    protected static $stripePrefix = 'cashier-test-';
+    use RefreshDatabase;
 
-    public static function setUpBeforeClass(): void
+    protected function defineDatabaseMigrations()
     {
-        parent::setUpBeforeClass();
-
-        Stripe::setApiKey(getenv('STRIPE_SECRET'));
-    }
-
-    protected function setUp(): void
-    {
-        // Delay consecutive tests to prevent Stripe rate limiting issues.
-        sleep(2);
-
-        parent::setUp();
-
-        Eloquent::unguard();
-
         $this->loadLaravelMigrations();
-
-        $this->artisan('migrate')->run();
     }
 
-    protected static function deleteStripeResource(ApiResource $resource)
+    protected static function stripe(array $options = []): StripeClient
     {
-        try {
-            $resource->delete();
-        } catch (InvalidRequestException $e) {
-            //
-        }
+        return Cashier::stripe(array_merge(['api_key' => getenv('STRIPE_SECRET')], $options));
     }
 
     protected function createCustomer($description = 'taylor', array $options = []): User

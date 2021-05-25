@@ -5,8 +5,6 @@ namespace Laravel\Cashier\Concerns;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Checkout;
 use Laravel\Cashier\Payment;
-use Stripe\PaymentIntent as StripePaymentIntent;
-use Stripe\Refund as StripeRefund;
 
 trait PerformsCharges
 {
@@ -15,7 +13,7 @@ trait PerformsCharges
      *
      * @var bool
      */
-    protected $allowPromotionCodes = false;
+    protected $allowPromotionCodes;
 
     /**
      * Make a "one off" charge on the customer for the given amount.
@@ -43,7 +41,7 @@ trait PerformsCharges
         }
 
         $payment = new Payment(
-            StripePaymentIntent::create($options, $this->stripeOptions())
+            $this->stripe()->paymentIntents->create($options)
         );
 
         $payment->validate();
@@ -60,9 +58,8 @@ trait PerformsCharges
      */
     public function refund($paymentIntent, array $options = [])
     {
-        return StripeRefund::create(
-            ['payment_intent' => $paymentIntent] + $options,
-            $this->stripeOptions()
+        return $this->stripe()->refunds->create(
+            ['payment_intent' => $paymentIntent] + $options
         );
     }
 
@@ -77,22 +74,22 @@ trait PerformsCharges
      */
     public function checkout($items, array $sessionOptions = [], array $customerOptions = [])
     {
-        $items = Collection::make((array) $items)->map(function ($item, $key) {
-            if (is_string($key)) {
-                return ['price' => $key, 'quantity' => $item];
-            }
-
-            $item = is_string($item) ? ['price' => $item] : $item;
-
-            $item['quantity'] = $item['quantity'] ?? 1;
-
-            return $item;
-        })->values()->all();
-
-        return Checkout::create($this, array_merge([
+        $payload = array_filter([
             'allow_promotion_codes' => $this->allowPromotionCodes,
-            'line_items' => $items,
-        ], $sessionOptions), $customerOptions);
+            'line_items' => Collection::make((array) $items)->map(function ($item, $key) {
+                if (is_string($key)) {
+                    return ['price' => $key, 'quantity' => $item];
+                }
+
+                $item = is_string($item) ? ['price' => $item] : $item;
+
+                $item['quantity'] = $item['quantity'] ?? 1;
+
+                return $item;
+            })->values()->all(),
+        ]);
+
+        return Checkout::create($this, array_merge($payload, $sessionOptions), $customerOptions);
     }
 
     /**

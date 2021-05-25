@@ -7,6 +7,7 @@ use Money\Currency;
 use Money\Formatter\IntlMoneyFormatter;
 use Money\Money;
 use NumberFormatter;
+use Stripe\StripeClient;
 
 class Cashier
 {
@@ -89,17 +90,17 @@ class Cashier
     }
 
     /**
-     * Get the default Stripe API options.
+     * Get the Stripe SDK client.
      *
      * @param  array  $options
-     * @return array
+     * @return \Stripe\StripeClient
      */
-    public static function stripeOptions(array $options = [])
+    public static function stripe(array $options = [])
     {
-        return array_merge([
-            'api_key' => config('cashier.secret'),
+        return new StripeClient(array_merge([
+            'api_key' => $options['api_key'] ?? config('cashier.secret'),
             'stripe_version' => static::STRIPE_VERSION,
-        ], $options);
+        ], $options));
     }
 
     /**

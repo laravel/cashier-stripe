@@ -3,10 +3,6 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Laravel\Cashier\Checkout;
-use Stripe\Checkout\Session as StripeCheckoutSession;
-use Stripe\Coupon;
-use Stripe\Price as StripePrice;
-use Stripe\TaxRate;
 
 class CheckoutTest extends FeatureTestCase
 {
@@ -14,7 +10,7 @@ class CheckoutTest extends FeatureTestCase
     {
         $user = $this->createCustomer('customers_can_start_a_product_checkout_session');
 
-        $shirtPrice = StripePrice::create([
+        $shirtPrice = self::stripe()->prices->create([
             'currency' => 'USD',
             'product_data' => [
                 'name' => 'T-shirt',
@@ -22,7 +18,7 @@ class CheckoutTest extends FeatureTestCase
             'unit_amount' => 1500,
         ]);
 
-        $carPrice = StripePrice::create([
+        $carPrice = self::stripe()->prices->create([
             'currency' => 'USD',
             'product_data' => [
                 'name' => 'Car',
@@ -38,7 +34,6 @@ class CheckoutTest extends FeatureTestCase
         ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
-        $this->assertInstanceOf(StripeCheckoutSession::class, $checkout->asStripeCheckoutSession());
     }
 
     public function test_customers_can_start_a_one_off_charge_checkout_session()
@@ -51,14 +46,13 @@ class CheckoutTest extends FeatureTestCase
         ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
-        $this->assertInstanceOf(StripeCheckoutSession::class, $checkout->asStripeCheckoutSession());
     }
 
     public function test_customers_can_start_a_subscription_checkout_session()
     {
         $user = $this->createCustomer('customers_can_start_a_subscription_checkout_session');
 
-        $price = StripePrice::create([
+        $price = self::stripe()->prices->create([
             'currency' => 'USD',
             'product_data' => [
                 'name' => 'Forge',
@@ -68,7 +62,7 @@ class CheckoutTest extends FeatureTestCase
             'unit_amount' => 1500,
         ]);
 
-        $taxRate = TaxRate::create([
+        $taxRate = self::stripe()->taxRates->create([
             'display_name' => 'VAT',
             'description' => 'VAT Belgium',
             'jurisdiction' => 'BE',
@@ -86,11 +80,10 @@ class CheckoutTest extends FeatureTestCase
             ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
-        $this->assertInstanceOf(StripeCheckoutSession::class, $session = $checkout->asStripeCheckoutSession());
-        $this->assertTrue($session->allow_promotion_codes);
-        $this->assertSame(1815, $session->amount_total);
+        $this->assertTrue($checkout->allow_promotion_codes);
+        $this->assertSame(1815, $checkout->amount_total);
 
-        $coupon = Coupon::create([
+        $coupon = self::stripe()->coupons->create([
             'duration' => 'repeating',
             'amount_off' => 500,
             'duration_in_months' => 3,
@@ -105,8 +98,7 @@ class CheckoutTest extends FeatureTestCase
             ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
-        $this->assertInstanceOf(StripeCheckoutSession::class, $session = $checkout->asStripeCheckoutSession());
-        $this->assertNull($session->allow_promotion_codes);
-        $this->assertSame(1210, $session->amount_total);
+        $this->assertNull($checkout->allow_promotion_codes);
+        $this->assertSame(1210, $checkout->amount_total);
     }
 }

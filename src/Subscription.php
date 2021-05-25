@@ -17,6 +17,9 @@ use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use LogicException;
 use Stripe\Subscription as StripeSubscription;
 
+/**
+ * @property \Laravel\Cashier\Billable|\Illuminate\Database\Eloquent\Model $owner
+ */
 class Subscription extends Model
 {
     use HasFactory;
@@ -653,8 +656,8 @@ class Subscription extends Model
             $this->parseSwapPrices($prices)
         );
 
-        $stripeSubscription = StripeSubscription::update(
-            $this->stripe_id, $this->getSwapOptions($items, $options), $this->owner->stripeOptions()
+        $stripeSubscription = $this->owner->stripe()->subscriptions->update(
+            $this->stripe_id, $this->getSwapOptions($items, $options)
         );
 
         /** @var \Stripe\SubscriptionItem $firstItem */
@@ -723,11 +726,16 @@ class Subscription extends Model
 
             $options = is_string($options) ? [] : $options;
 
-            return [$price => array_merge([
+            $payload = [
                 'price' => $price,
-                'quantity' => $isSinglePriceSwap ? $this->quantity : null,
                 'tax_rates' => $this->getPriceTaxRatesForPayload($price),
-            ], $options)];
+            ];
+
+            if ($isSinglePriceSwap && ! is_null($this->quantity)) {
+                $payload['quantity'] = $this->quantity;
+            }
+
+            return [$price => array_merge($payload, $options)];
         });
     }
 
@@ -808,9 +816,8 @@ class Subscription extends Model
             throw SubscriptionUpdateFailure::duplicatePrice($this, $price);
         }
 
-        $subscription = $this->asStripeSubscription();
-
-        $item = $subscription->items->create(array_merge([
+        $item = $this->owner->stripe()->subscriptionItems->create(array_merge([
+            'subscription' => $this->stripe_id,
             'price' => $price,
             'quantity' => $quantity,
             'tax_rates' => $this->getPriceTaxRatesForPayload($price),
@@ -898,13 +905,11 @@ class Subscription extends Model
      */
     public function cancel()
     {
-        $subscription = $this->asStripeSubscription();
+        $stripeSubscription = $this->updateStripeSubscription([
+            'cancel_at_period_end' => true,
+        ]);
 
-        $subscription->cancel_at_period_end = true;
-
-        $subscription = $subscription->save();
-
-        $this->stripe_status = $subscription->status;
+        $this->stripe_status = $stripeSubscription->status;
 
         // If the user was on trial, we will set the grace period to end when the trial
         // would have ended. Otherwise, we'll retrieve the end of the billing period
@@ -913,7 +918,7 @@ class Subscription extends Model
             $this->ends_at = $this->trial_ends_at;
         } else {
             $this->ends_at = Carbon::createFromTimestamp(
-                $subscription->current_period_end
+                $stripeSubscription->current_period_end
             );
         }
 
@@ -934,17 +939,14 @@ class Subscription extends Model
             $endsAt = $endsAt->getTimestamp();
         }
 
-        $subscription = $this->asStripeSubscription();
+        $stripeSubscription = $this->updateStripeSubscription([
+            'cancel_at' => $endsAt,
+            'proration_behavior' => $this->prorateBehavior(),
+        ]);
 
-        $subscription->proration_behavior = $this->prorateBehavior();
+        $this->stripe_status = $stripeSubscription->status;
 
-        $subscription->cancel_at = $endsAt;
-
-        $subscription = $subscription->save();
-
-        $this->stripe_status = $subscription->status;
-
-        $this->ends_at = Carbon::createFromTimestamp($subscription->cancel_at);
+        $this->ends_at = Carbon::createFromTimestamp($stripeSubscription->cancel_at);
 
         $this->save();
 
@@ -958,7 +960,7 @@ class Subscription extends Model
      */
     public function cancelNow()
     {
-        $this->asStripeSubscription()->cancel([
+        $this->owner->stripe()->subscriptions->cancel($this->stripe_id, [
             'prorate' => $this->prorateBehavior() === 'create_prorations',
         ]);
 
@@ -974,7 +976,7 @@ class Subscription extends Model
      */
     public function cancelNowAndInvoice()
     {
-        $this->asStripeSubscription()->cancel([
+        $this->owner->stripe()->subscriptions->cancel($this->stripe_id, [
             'invoice_now' => true,
             'prorate' => $this->prorateBehavior() === 'create_prorations',
         ]);
@@ -1011,23 +1013,16 @@ class Subscription extends Model
             throw new LogicException('Unable to resume subscription that is not within grace period.');
         }
 
-        $subscription = $this->asStripeSubscription();
-
-        $subscription->cancel_at_period_end = false;
-
-        if ($this->onTrial()) {
-            $subscription->trial_end = $this->trial_ends_at->getTimestamp();
-        } else {
-            $subscription->trial_end = 'now';
-        }
-
-        $subscription = $subscription->save();
+        $stripeSubscription = $this->updateStripeSubscription([
+            'cancel_at_period_end' => false,
+            'trial_end' => $this->onTrial() ? $this->trial_ends_at->getTimestamp() : 'now',
+        ]);
 
         // Finally, we will remove the ending timestamp from the user's record in the
         // local database to indicate that the subscription is active again and is
         // no longer "cancelled". Then we will save this record in the database.
         $this->fill([
-            'stripe_status' => $subscription->status,
+            'stripe_status' => $stripeSubscription->status,
             'ends_at' => null,
         ])->save();
 
@@ -1136,22 +1131,16 @@ class Subscription extends Model
      */
     public function syncTaxRates()
     {
-        $stripeSubscription = $this->asStripeSubscription();
-
-        $stripeSubscription->default_tax_rates = $this->user->taxRates() ?: null;
-
-        $stripeSubscription->proration_behavior = $this->prorateBehavior();
-
-        $stripeSubscription->save();
+        $this->updateStripeSubscription([
+            'default_tax_rates' => $this->user->taxRates() ?: null,
+            'proration_behavior' => $this->prorateBehavior(),
+        ]);
 
         foreach ($this->items as $item) {
-            $stripeSubscriptionItem = $item->asStripeSubscriptionItem();
-
-            $stripeSubscriptionItem->tax_rates = $this->getPriceTaxRatesForPayload($item->stripe_price) ?: null;
-
-            $stripeSubscriptionItem->proration_behavior = $this->prorateBehavior();
-
-            $stripeSubscriptionItem->save();
+            $item->updateStripeSubscriptionItem([
+                'tax_rates' => $this->getPriceTaxRatesForPayload($item->stripe_price) ?: null,
+                'proration_behavior' => $this->prorateBehavior(),
+            ]);
         }
     }
 
@@ -1232,8 +1221,8 @@ class Subscription extends Model
      */
     public function updateStripeSubscription(array $options = [])
     {
-        return StripeSubscription::update(
-            $this->stripe_id, $options, $this->owner->stripeOptions()
+        return $this->owner->stripe()->subscriptions->update(
+            $this->stripe_id, $options
         );
     }
 
@@ -1245,8 +1234,8 @@ class Subscription extends Model
      */
     public function asStripeSubscription(array $expand = [])
     {
-        return StripeSubscription::retrieve(
-            ['id' => $this->stripe_id, 'expand' => $expand], $this->owner->stripeOptions()
+        return $this->owner->stripe()->subscriptions->retrieve(
+            $this->stripe_id, ['expand' => $expand]
         );
     }
 

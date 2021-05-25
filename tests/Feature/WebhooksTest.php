@@ -6,9 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Notifications\ConfirmPayment;
-use Stripe\Price;
-use Stripe\Product;
-use Stripe\Subscription;
+use Stripe\Subscription as StripeSubscription;
 
 class WebhooksTest extends FeatureTestCase
 {
@@ -26,14 +24,13 @@ class WebhooksTest extends FeatureTestCase
     {
         parent::setUpBeforeClass();
 
-        static::$productId = Product::create([
-            'id' => static::$productId,
+        static::$productId = self::stripe()->products->create([
             'name' => 'Laravel Cashier Test Product',
             'type' => 'service',
         ])->id;
 
-        static::$priceId = Price::create([
-            'id' => static::$priceId,
+        static::$priceId = self::stripe()->prices->create([
+            'product' => static::$productId,
             'nickname' => 'Monthly $10',
             'currency' => 'USD',
             'recurring' => [
@@ -41,15 +38,7 @@ class WebhooksTest extends FeatureTestCase
             ],
             'billing_scheme' => 'per_unit',
             'unit_amount' => 1000,
-            'product' => static::$productId,
         ])->id;
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        parent::tearDownAfterClass();
-
-        static::deleteStripeResource(new Product(static::$productId));
     }
 
     public function test_subscriptions_are_created()
@@ -100,7 +89,7 @@ class WebhooksTest extends FeatureTestCase
             'name' => 'main',
             'stripe_id' => 'sub_foo',
             'stripe_price' => 'price_foo',
-            'stripe_status' => Subscription::STATUS_ACTIVE,
+            'stripe_status' => StripeSubscription::STATUS_ACTIVE,
         ]);
 
         $item = $subscription->items()->create([
@@ -156,7 +145,7 @@ class WebhooksTest extends FeatureTestCase
             'name' => 'main',
             'stripe_id' => 'sub_foo',
             'stripe_price' => 'price_foo',
-            'stripe_status' => Subscription::STATUS_ACTIVE,
+            'stripe_status' => StripeSubscription::STATUS_ACTIVE,
         ]);
 
         $item = $subscription->items()->create([
@@ -270,7 +259,7 @@ class WebhooksTest extends FeatureTestCase
                 'object' => [
                     'id' => $subscription->stripe_id,
                     'customer' => $user->stripe_id,
-                    'status' => Subscription::STATUS_INCOMPLETE_EXPIRED,
+                    'status' => StripeSubscription::STATUS_INCOMPLETE_EXPIRED,
                     'quantity' => 1,
                 ],
             ],

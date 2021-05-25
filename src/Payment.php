@@ -66,7 +66,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      */
     public function capture(array $options = [])
     {
-        return $this->paymentIntent->capture($options, Cashier::stripeOptions());
+        return $this->paymentIntent->capture($options);
     }
 
     /**

@@ -20,7 +20,7 @@ class SubscriptionBuilder
     /**
      * The model that is subscribing.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var \Laravel\Cashier\Billable|\Illuminate\Database\Eloquent\Model
      */
     protected $owner;
 
@@ -76,9 +76,9 @@ class SubscriptionBuilder
     /**
      * Determines if user redeemable promotion codes are available in Stripe Checkout.
      *
-     * @var bool|null
+     * @var bool
      */
-    protected $allowPromotionCodes;
+    protected $allowPromotionCodes = false;
 
     /**
      * The metadata to apply to the subscription.
@@ -114,10 +114,11 @@ class SubscriptionBuilder
      */
     public function price($price, $quantity = 1)
     {
-        $options = [
-            'price' => $price,
-            'quantity' => $quantity,
-        ];
+        $options = ['price' => $price];
+
+        if (! is_null($quantity)) {
+            $options['quantity'] = $quantity;
+        }
 
         if ($taxRates = $this->getPriceTaxRatesForPayload($price)) {
             $options['tax_rates'] = $taxRates;
@@ -296,18 +297,13 @@ class SubscriptionBuilder
             throw new Exception('At least one price is required when starting subscriptions.');
         }
 
-        $customer = $this->getStripeCustomer($paymentMethod, $customerOptions);
+        $stripeCustomer = $this->getStripeCustomer($paymentMethod, $customerOptions);
 
-        $payload = array_merge(
-            ['customer' => $customer->id],
+        $stripeSubscription = $this->owner->stripe()->subscriptions->create(array_merge(
+            ['customer' => $stripeCustomer->id],
             $this->buildPayload(),
             $subscriptionOptions
-        );
-
-        $stripeSubscription = StripeSubscription::create(
-            $payload,
-            $this->owner->stripeOptions()
-        );
+        ));
 
         $subscription = $this->createSubscription($stripeSubscription);
 
@@ -380,19 +376,19 @@ class SubscriptionBuilder
             $trialEnd = null;
         }
 
-        return Checkout::create($this->owner, array_merge([
+        $payload = array_filter([
             'mode' => 'subscription',
             'line_items' => Collection::make($this->items)->values()->all(),
             'allow_promotion_codes' => $this->allowPromotionCodes,
-            'discounts' => [
-                ['coupon' => $this->coupon],
-            ],
-            'subscription_data' => [
+            'discounts' => $this->coupon ? [['coupon' => $this->coupon]] : null,
+            'subscription_data' => array_filter([
                 'default_tax_rates' => $this->getTaxRatesForPayload(),
                 'trial_end' => $trialEnd ? $trialEnd->getTimestamp() : null,
                 'metadata' => array_merge($this->metadata, ['name' => $this->name]),
-            ],
-        ], $sessionOptions), $customerOptions);
+            ]),
+        ]);
+
+        return Checkout::create($this->owner, array_merge($payload, $sessionOptions), $customerOptions);
     }
 
     /**
