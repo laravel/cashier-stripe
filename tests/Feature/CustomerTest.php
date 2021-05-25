@@ -18,7 +18,7 @@ class CustomerTest extends FeatureTestCase
 
     public function test_customers_can_generate_a_billing_portal_url()
     {
-        $user = $this->createCustomer('customers_in_stripe_can_be_updated');
+        $user = $this->createCustomer('customers_can_generate_a_billing_portal_url');
         $user->createAsStripeCustomer();
 
         $url = $user->billingPortalUrl('https://example.com');
@@ -28,7 +28,7 @@ class CustomerTest extends FeatureTestCase
 
     public function test_customers_can_be_redirected_to_their_billing_portal()
     {
-        $user = $this->createCustomer('customers_in_stripe_can_be_updated');
+        $user = $this->createCustomer('customers_can_be_redirected_to_their_billing_portal');
         $user->createAsStripeCustomer();
 
         $response = $user->redirectToBillingPortal('https://example.com');

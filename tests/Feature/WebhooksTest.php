@@ -54,7 +54,7 @@ class WebhooksTest extends FeatureTestCase
 
     public function test_subscriptions_are_created()
     {
-        $user = $this->createCustomer('subscriptions_are_updated', ['stripe_id' => 'cus_foo']);
+        $user = $this->createCustomer('subscriptions_are_created', ['stripe_id' => 'cus_foo']);
 
         $this->postJson('stripe/webhook', [
             'id' => 'foo',
@@ -149,7 +149,7 @@ class WebhooksTest extends FeatureTestCase
 
     public function test_subscriptions_on_update_cancel_at_date_is_correct()
     {
-        $user = $this->createCustomer('subscriptions_are_updated', ['stripe_id' => 'cus_foo']);
+        $user = $this->createCustomer('subscriptions_on_update_cancel_at_date_is_correct', ['stripe_id' => 'cus_foo']);
         $cancelDate = Carbon::now()->addMonths(6);
 
         $subscription = $user->subscriptions()->create([

@@ -213,7 +213,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
     public function test_subscription_item_quantities_can_be_incremented()
     {
-        $user = $this->createCustomer('subscription_item_quantities_can_be_updated');
+        $user = $this->createCustomer('subscription_item_quantities_can_be_incremented');
 
         $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])->create('pm_card_visa');
 
@@ -230,7 +230,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
     public function test_subscription_item_quantities_can_be_decremented()
     {
-        $user = $this->createCustomer('subscription_item_quantities_can_be_updated');
+        $user = $this->createCustomer('subscription_item_quantities_can_be_decremented');
 
         $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])
             ->quantity(5, self::$otherPriceId)

@@ -87,7 +87,7 @@ class InvoicesTest extends FeatureTestCase
 
     public function test_customer_can_be_invoiced_with_quantity()
     {
-        $user = $this->createCustomer('customer_can_be_invoiced');
+        $user = $this->createCustomer('customer_can_be_invoiced_with_quantity');
         $user->createAsStripeCustomer();
         $user->updateDefaultPaymentMethod('pm_card_visa');
 

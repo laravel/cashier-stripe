@@ -536,7 +536,7 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_user_with_subscription_can_return_generic_trial_end_date()
     {
-        $user = $this->createCustomer('creating_subscription_without_trial');
+        $user = $this->createCustomer('user_with_subscription_can_return_generic_trial_end_date');
         $user->trial_ends_at = $tomorrow = Carbon::tomorrow();
 
         $user->newSubscription('main', static::$priceId)

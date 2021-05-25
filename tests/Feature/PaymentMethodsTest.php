@@ -140,7 +140,7 @@ class PaymentMethodsTest extends FeatureTestCase
 
     public function test_we_can_sync_the_default_payment_method_from_stripe()
     {
-        $user = $this->createCustomer('we_can_sync_the_payment_method_from_stripe');
+        $user = $this->createCustomer('we_can_sync_the_default_payment_method_from_stripe');
         $customer = $user->createAsStripeCustomer();
 
         $paymentMethod = StripePaymentMethod::retrieve('pm_card_visa', $user->stripeOptions());
