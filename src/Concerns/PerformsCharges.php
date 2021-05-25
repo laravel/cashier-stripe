@@ -13,7 +13,7 @@ trait PerformsCharges
      *
      * @var bool
      */
-    protected $allowPromotionCodes = false;
+    protected $allowPromotionCodes;
 
     /**
      * Make a "one off" charge on the customer for the given amount.
@@ -74,21 +74,20 @@ trait PerformsCharges
      */
     public function checkout($items, array $sessionOptions = [], array $customerOptions = [])
     {
-        $payload = ['line_items' => Collection::make((array) $items)->map(function ($item, $key) {
-            if (is_string($key)) {
-                return ['price' => $key, 'quantity' => $item];
-            }
+        $payload = array_filter([
+            'allow_promotion_codes' => $this->allowPromotionCodes,
+            'line_items' => Collection::make((array) $items)->map(function ($item, $key) {
+                if (is_string($key)) {
+                    return ['price' => $key, 'quantity' => $item];
+                }
 
-            $item = is_string($item) ? ['price' => $item] : $item;
+                $item = is_string($item) ? ['price' => $item] : $item;
 
-            $item['quantity'] = $item['quantity'] ?? 1;
+                $item['quantity'] = $item['quantity'] ?? 1;
 
-            return $item;
-        })->values()->all()];
-
-        if ($this->allowPromotionCodes) {
-            $payload['allow_promotion_codes'] = $this->allowPromotionCodes;
-        }
+                return $item;
+            })->values()->all()
+        ]);
 
         return Checkout::create($this, array_merge($payload, $sessionOptions), $customerOptions);
     }

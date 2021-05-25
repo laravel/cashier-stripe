@@ -80,8 +80,8 @@ class CheckoutTest extends FeatureTestCase
             ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
-        $this->assertTrue($session->allow_promotion_codes);
-        $this->assertSame(1815, $session->amount_total);
+        $this->assertTrue($checkout->allow_promotion_codes);
+        $this->assertSame(1815, $checkout->amount_total);
 
         $coupon = self::stripe()->coupons->create([
             'duration' => 'repeating',
@@ -98,7 +98,7 @@ class CheckoutTest extends FeatureTestCase
             ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
-        $this->assertNull($session->allow_promotion_codes);
-        $this->assertSame(1210, $session->amount_total);
+        $this->assertNull($checkout->allow_promotion_codes);
+        $this->assertSame(1210, $checkout->amount_total);
     }
 }
