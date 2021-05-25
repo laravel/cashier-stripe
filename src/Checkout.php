@@ -49,7 +49,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable
     {
         $customer = $owner->createOrGetStripeCustomer($customerOptions);
 
-        $session = Cashier::stripe()->checkout->sessions->create(array_merge([
+        $session = $owner->stripe()->checkout->sessions->create(array_merge([
             'customer' => $customer->id,
             'mode' => 'payment',
             'success_url' => $sessionOptions['success_url'] ?? route('home').'?checkout=success',

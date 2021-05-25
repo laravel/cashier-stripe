@@ -6,10 +6,7 @@ use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use Laravel\Cashier\Tests\Fixtures\User;
-use Stripe\Price;
-use Stripe\Product;
-use Stripe\Subscription;
-use Stripe\TaxRate;
+use Stripe\Subscription as StripeSubscription;
 
 class MultipriceSubscriptionsTest extends FeatureTestCase
 {
@@ -42,13 +39,13 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
     {
         parent::setUpBeforeClass();
 
-        static::$productId = Product::create([
-            'id' => static::$productId,
+        static::$productId = self::stripe()->products->create([
             'name' => 'Laravel Cashier Test Product',
             'type' => 'service',
         ])->id;
 
-        static::$priceId = Price::create([
+        static::$priceId = self::stripe()->prices->create([
+            'product' => static::$productId,
             'nickname' => 'Monthly $10',
             'currency' => 'USD',
             'recurring' => [
@@ -56,10 +53,10 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
             ],
             'billing_scheme' => 'per_unit',
             'unit_amount' => 1000,
-            'product' => static::$productId,
         ])->id;
 
-        static::$otherPriceId = Price::create([
+        static::$otherPriceId = self::stripe()->prices->create([
+            'product' => static::$productId,
             'nickname' => 'Monthly $10 Other',
             'currency' => 'USD',
             'recurring' => [
@@ -67,10 +64,10 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
             ],
             'billing_scheme' => 'per_unit',
             'unit_amount' => 1000,
-            'product' => static::$productId,
         ])->id;
 
-        static::$premiumPriceId = Price::create([
+        static::$premiumPriceId = self::stripe()->prices->create([
+            'product' => static::$productId,
             'nickname' => 'Monthly $20 Premium',
             'currency' => 'USD',
             'recurring' => [
@@ -78,23 +75,15 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
             ],
             'billing_scheme' => 'per_unit',
             'unit_amount' => 2000,
-            'product' => static::$productId,
         ])->id;
 
-        static::$taxRateId = TaxRate::create([
+        static::$taxRateId = self::stripe()->taxRates->create([
             'display_name' => 'VAT',
             'description' => 'VAT Belgium',
             'jurisdiction' => 'BE',
             'percentage' => 21,
             'inclusive' => false,
         ])->id;
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        parent::tearDownAfterClass();
-
-        static::deleteStripeResource(new Product(static::$productId));
     }
 
     public function test_customers_can_have_multiprice_subscriptions()
@@ -331,12 +320,13 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
      */
     protected function createSubscriptionWithSinglePrice(User $user)
     {
+        /** @var \Laravel\Cashier\Subscription $subscription */
         $subscription = $user->subscriptions()->create([
             'name' => 'main',
             'stripe_id' => 'sub_foo',
             'stripe_price' => self::$priceId,
             'quantity' => 1,
-            'stripe_status' => Subscription::STATUS_ACTIVE,
+            'stripe_status' => StripeSubscription::STATUS_ACTIVE,
         ]);
 
         $subscription->items()->create([

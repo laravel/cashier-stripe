@@ -14,6 +14,8 @@ class User extends Model
 
     public $priceTaxRates = [];
 
+    protected $guarded = [];
+
     /**
      * Get the tax rates to apply to the subscription.
      *

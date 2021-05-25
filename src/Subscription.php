@@ -726,11 +726,16 @@ class Subscription extends Model
 
             $options = is_string($options) ? [] : $options;
 
-            return [$price => array_merge([
+            $payload = [
                 'price' => $price,
-                'quantity' => $isSinglePriceSwap ? $this->quantity : null,
                 'tax_rates' => $this->getPriceTaxRatesForPayload($price),
-            ], $options)];
+            ];
+
+            if ($isSinglePriceSwap && ! is_null($this->quantity)) {
+                $payload['quantity'] = $this->quantity;
+            }
+
+            return [$price => array_merge($payload, $options)];
         });
     }
 

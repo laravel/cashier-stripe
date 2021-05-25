@@ -114,10 +114,11 @@ class SubscriptionBuilder
      */
     public function price($price, $quantity = 1)
     {
-        $options = [
-            'price' => $price,
-            'quantity' => $quantity,
-        ];
+        $options = ['price' => $price];
+
+        if (! is_null($quantity)) {
+            $options['quantity'] = $quantity;
+        }
 
         if ($taxRates = $this->getPriceTaxRatesForPayload($price)) {
             $options['tax_rates'] = $taxRates;
@@ -296,11 +297,13 @@ class SubscriptionBuilder
             throw new Exception('At least one price is required when starting subscriptions.');
         }
 
-        $customer = $this->getStripeCustomer($paymentMethod, $customerOptions);
+        $stripeCustomer = $this->getStripeCustomer($paymentMethod, $customerOptions);
 
-        $stripeSubscription = $customer->subscriptions->create(
-            array_merge($this->buildPayload(), $subscriptionOptions)
-        );
+        $stripeSubscription = $this->owner->stripe()->subscriptions->create(array_merge(
+            ['customer' => $stripeCustomer->id],
+            $this->buildPayload(),
+            $subscriptionOptions
+        ));
 
         $subscription = $this->createSubscription($stripeSubscription);
 
