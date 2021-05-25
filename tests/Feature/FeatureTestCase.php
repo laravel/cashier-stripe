@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Tests\TestCase;
@@ -9,16 +10,19 @@ use Stripe\StripeClient;
 
 abstract class FeatureTestCase extends TestCase
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         // Delay consecutive tests to prevent Stripe rate limiting issues.
         sleep(2);
 
         parent::setUp();
+    }
 
+    protected function defineDatabaseMigrations()
+    {
         $this->loadLaravelMigrations();
-
-        $this->artisan('migrate')->run();
     }
 
     protected static function stripe(array $options = []): StripeClient

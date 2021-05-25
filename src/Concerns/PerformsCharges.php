@@ -74,7 +74,7 @@ trait PerformsCharges
      */
     public function checkout($items, array $sessionOptions = [], array $customerOptions = [])
     {
-        $items = Collection::make((array) $items)->map(function ($item, $key) {
+        $payload = ['line_items' => Collection::make((array) $items)->map(function ($item, $key) {
             if (is_string($key)) {
                 return ['price' => $key, 'quantity' => $item];
             }
@@ -84,12 +84,13 @@ trait PerformsCharges
             $item['quantity'] = $item['quantity'] ?? 1;
 
             return $item;
-        })->values()->all();
+        })->values()->all()];
 
-        return Checkout::create($this, array_merge([
-            'allow_promotion_codes' => $this->allowPromotionCodes,
-            'line_items' => $items,
-        ], $sessionOptions), $customerOptions);
+        if ($this->allowPromotionCodes) {
+            $payload['allow_promotion_codes'] = $this->allowPromotionCodes;
+        }
+
+        return Checkout::create($this, array_merge($payload, $sessionOptions), $customerOptions);
     }
 
     /**
