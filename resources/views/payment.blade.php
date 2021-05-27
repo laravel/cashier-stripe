@@ -191,7 +191,6 @@
             data() {
                 return {
                     paymentIntent: @json($paymentIntent),
-                    paymentMethods: [],
                     paymentMethod: null,
                     name: '{{ optional($customer)->stripeName() }}',
                     email: '{{ optional($customer)->stripeEmail() }}',
@@ -208,8 +207,25 @@
             },
 
             computed: {
-                paymentMethodTitle: function () {
+                paymentMethodTitle() {
                     return this.paymentMethod ? this.paymentMethod.title : '';
+                },
+
+                paymentMethods() {
+                    const methods = [
+                        { title: 'Card', type: 'card', remember: true, redirects: false, element: 'card' },
+                        { title: 'Alipay', type: 'alipay' },
+                        { title: 'BECS Direct Debit', type: 'au_becs_debit', remember: true, redirects: false, element: 'auBankAccount' },
+                        { title: 'Bancontact', type: 'bancontact', remember: true },
+                        { title: 'EPS', type: 'eps', element: 'epsBank' },
+                        { title: 'Giropay', type: 'giropay' },
+                        { title: 'iDEAL', type: 'ideal', remember: true, element: 'idealBank' },
+                        { title: 'SEPA Debit', type: 'sepa_debit', remember: true, redirects: false, element: 'iban', options: { supportedCountries: ['SEPA'] }}
+                    ].map(paymentMethod => {
+                        return { remember: false, redirects: true, options: {}, ...paymentMethod }
+                    })
+
+                    return methods.filter(method => this.paymentIntent.payment_method_types.includes(method.type))
                 }
             },
 
@@ -220,28 +236,6 @@
 
                     // Set the allowed payment methods based on the payment method types of the intent...
                     const paymentMethodTypes = paymentIntent.payment_method_types;
-
-                    this.paymentMethods = [
-                        { title: 'Card', type: 'card', remember: true, redirects: false, element: 'card' },
-                        { title: 'Alipay', type: 'alipay' },
-                        { title: 'BECS Direct Debit', type: 'au_becs_debit', remember: true, redirects: false, element: 'auBankAccount' },
-                        { title: 'Bancontact', type: 'bancontact', remember: true },
-                        { title: 'EPS', type: 'eps', element: 'epsBank' },
-                        { title: 'Giropay', type: 'giropay' },
-                        { title: 'iDEAL', type: 'ideal', remember: true, element: 'idealBank' },
-                        {
-                            title: 'SEPA Debit',
-                            type: 'sepa_debit',
-                            remember: true,
-                            redirects: false,
-                            element: 'iban',
-                            options: { supportedCountries: ['SEPA'] }
-                        }
-                    ].map(paymentMethod => {
-                        return { remember: false, redirects: true, ...paymentMethod }
-                    }).filter(
-                        paymentMethod => paymentMethodTypes.includes(paymentMethod.type)
-                    );
 
                     // If the previously set payment method isn't available anymore,
                     // update it to either the current one or the first available one...
