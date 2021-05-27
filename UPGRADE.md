@@ -20,9 +20,9 @@ The Stripe API version for Cashier 13.x will be `2020-08-27`. Even though Cashie
 
 Because of the upgrade to the new Stripe API version, the `taxPercentage`, `syncTaxPercentage` & `getTaxPercentageForPayload` methods were removed from Cashier. It's recommended that you upgrade to Stripe's new Tax Rates API. You can familiarize yourself with Stripe's guides on Tax Rates:
 
-Stripe migration guide: https://stripe.com/docs/billing/migration/taxes
-Tax Rates documentation: https://stripe.com/docs/billing/taxes/tax-rates
-Tax Rates on invoices: https://stripe.com/docs/billing/invoices/tax-rates
+Stripe migration guide: https://stripe.com/docs/billing/migration/taxes  
+Tax Rates documentation: https://stripe.com/docs/billing/taxes/tax-rates  
+Tax Rates on invoices: https://stripe.com/docs/billing/invoices/tax-rates  
 
 Using Tax Rates in Cashier is also documented here: https://laravel.com/docs/billing#subscription-taxes
 
