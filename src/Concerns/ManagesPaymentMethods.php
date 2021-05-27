@@ -61,7 +61,7 @@ trait ManagesPaymentMethods
 
         // "type" is temporarily required by Stripe...
         $paymentMethods = StripePaymentMethod::all(
-            ['customer' => $this->stripe_id, 'type' => 'card'] + $parameters,
+            array_merge(['customer' => $this->stripe_id, 'type' => 'card'], $parameters),
             $this->stripeOptions()
         );
 
