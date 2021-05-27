@@ -26,6 +26,69 @@ Tax Rates on invoices: https://stripe.com/docs/billing/invoices/tax-rates
 
 Using Tax Rates in Cashier is also documented here: https://laravel.com/docs/billing#subscription-taxes
 
+### Renames To Prices
+
+PR: https://github.com/laravel/cashier-stripe/pull/1166
+
+Cashier v13 comes with some substantial API breakages. To accommodate to Stripe's phasing out of the Plans API we've made the choice to complete migrate the public api to the new Prices terminology. Doing so will bring us on par with Stripe documentation and will ease the translation between Stripe docs and Cashier documentation & code.
+
+While the changes are numerous and too much to name, you can generally do the changes as a direct change of methods names like so:
+
+```php
+// Before...
+$user->newSubscription('default')->plan('price_xxx')->create($paymentMethod);
+$user->subscribedToPlan('price_xxx');
+$user->subscription()->addPlan('price_xxx');
+
+// After...
+$user->newSubscription('default')->price('price_xxx')->create($paymentMethod);
+$user->subscribedToPrice('price_xxx');
+$user->subscription()->addPrice('price_xxx');
+```
+
+All changes are mostly method renames. Additionally, to fully migrate away from the Plans terminology, the `stripe_plan` columns on the `subscriptions` and `subscription_items` tables have been renamed to `stripe_price`.  You will need to write a migration to rename these columns:
+
+```php
+Schema::table('subscriptions', function (Blueprint $table) {
+    $table->renameColumn('stripe_plan', 'stripe_price');
+});
+
+Schema::table('subscription_items', function (Blueprint $table) {
+    $table->renameColumn('stripe_plan', 'stripe_price');
+});
+```
+
+Running this migration requires you to [install the `doctrine/dbal` package](https://laravel.com/docs/migrations#renaming-columns).
+
+### Stripe SDK Introduction
+
+PR: https://github.com/laravel/cashier-stripe/pull/1169
+
+Starting with Cashier v13, we'll now use the new `StripeClient` object to do all API requests. This shouldn't have a severe impact other than exposing wrong usage of Stripe's API as this new client is more strict than the previous resource based API calls.
+
+Additionally, if you were overwriting the `stripeOptions` method in your billable model, you should now overwrite the `stripe` method instead.
+
+### Billable Model Customization Changes
+
+PR: https://github.com/laravel/cashier-stripe/pull/1100
+
+We've updated the way the billable model is set to a `Cashier::useCustomerModel($customerModel)` call to consolidate with how we do this in our other packages. The `cashier.model` config option has been removed from Cashier. If you are using a different model than `App\Models\User` you should place this call in the `boot` method of your `AppServiceProvider` class:
+
+```php
+use App\Models\Cashier\User;
+use Laravel\Cashier\Cashier;
+
+/**
+ * Bootstrap any application services.
+ *
+ * @return void
+ */
+public function boot()
+{
+    Cashier::useCustomerModel(User::class);
+}
+```
+
 ### Stripe Sources Support Removed
 
 PR: https://github.com/laravel/cashier-stripe/pull/1077
@@ -73,14 +136,43 @@ try {
 }
 ```
 
+### Cashier Receipt Changes
 
+PR: https://github.com/laravel/cashier-stripe/pull/1136
 
+Cashier receipts have been updated with additional info from the Stripe Invoice object. If you were expected that these stayed unchanged you should publish the receipt view *before* you update to the newest version:
 
+```bash
+php artisan vendor:publish --tag="cashier-migrations"
+```
 
+Please note that this will also update the`checkout.blade.php` and `payment.blade.php` views. You should remove these and only keep the `receipt.blade.php` view.
 
+Also, if you end up publishing the `receipt.blade.php` view it's important that you replace the "Discount" block for the changes introduced to the Invoice object with the new block from below:
 
+https://github.com/laravel/cashier-stripe/blob/463c5c1c7a37e8748f5f5b5b1d54bd03c8f8137a/resources/views/receipt.blade.php#L249-L266
 
+### Invoice Object Changes
 
+PR: https://github.com/laravel/cashier-stripe/pull/1147
+
+Because of introducing support for multiple discounts on receipts, some substantial changes were made to the `Invoice` class. Normally the changed methods were only used in the `receipt.blade.php` and if you weren't using these directly, upgrading without a published `receipt.blade.php` file should be an easy upgrade path. If you were using the changed methods directly we recommend you to review the linked PR from above for any changes you'll need to make.
+
+### Payment Exception Throwing
+
+PR: https://github.com/laravel/cashier-stripe/pull/1155
+
+A previous discrepancy between swapping subscriptions and increasing subscription quantities has been fixed. Previously, only the swapping of subscriptions would throw an `IncompletePayment` exception when a payment method failure occurred. This has been fixed so any use of the quantity methods on a subscription or subscription item will also throw this exception.
+
+PR: https://github.com/laravel/cashier-stripe/pull/1157
+
+Additionally, swapping prices on subscription items will now also throw an `IncompletePayment` exception when a payment method failure occurs.
+
+### Payment Page Updates
+
+PR: https://github.com/laravel/cashier-stripe/pull/1120
+
+The hosted payment page for handling payment method failures has been revamped to provide support for additional payment methods. This should be a smooth upgrade path if you haven't published the `payment.blade.php` view. One notable change that was made is that all translation support has been removed. If you were relying on this you should publish the view and re-add the translation calls yourself.
 
 
 ## Upgrading To 12.8 From 12.7
@@ -97,6 +189,7 @@ Schema::table('subscription_items', function (Blueprint $table) {
 
 Running this migration requires you to [install the `doctrine/dbal` package](https://laravel.com/docs/migrations#modifying-columns).
 
+
 ## Upgrading To 12.0 From 11.x
 
 ### Proration Changes
@@ -108,6 +201,7 @@ Cashier's proration features have been updated to make use of [all the new prora
 Although all other Cashier behavior should remain the same, there might be a slight difference in behavior if you were specifically relying on the invoice to be explicitly generated as a separate HTTP request through the invoice endpoint when using any `xAndInvoice` method. This is now accomplished in a single request using the `always_invoice` proration option. Of course, you will likely want to test your entire billing flow before deploying to production to make sure your application behaves as expected.
 
 All underlying proration logic has been updated to accommodate for the new proration logic. If you were relying directly on the `$prorate` property, this has been renamed to `$prorationBehavior`. Similarly, the `setProrate` method has been renamed to `setProrationBehavior`.
+
 
 ## Upgrading To 11.0 From 10.x
 
@@ -209,6 +303,7 @@ The exception `Laravel\Cashier\Exceptions\InvalidStripeCustomer` has been split 
 PR: https://github.com/laravel/cashier-stripe/pull/878
 
 Previously, in the default `receipt.blade.php` view, Cashier made use of the Stripe identifier of an invoice for an invoice number. This has been corrected to the proper `$invoice->number` attribute.
+
 
 ## Upgrading To 10.0 From 9.x
 
@@ -419,6 +514,7 @@ The `swap` method will no longer automatically invoice the customer. Instead, a 
 PR: https://github.com/laravel/cashier-stripe/pull/682
 
 The following methods now require that the `Billable` user has an associated Stripe customer account created by your application: `tab`, `invoice`, `upcomingInvoice`, `invoices`, `applyCoupon`. An exception will be thrown if you attempt to call these methods without first creating a Stripe customer account for the user.
+
 
 ## Upgrading To 9.3 From 9.2
 
