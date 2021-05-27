@@ -60,7 +60,7 @@ Schema::table('subscription_items', function (Blueprint $table) {
 
 Running this migration requires you to [install the `doctrine/dbal` package](https://laravel.com/docs/migrations#renaming-columns).
 
-### Stripe SDK Introduction
+### StripeClient Introduction
 
 PR: https://github.com/laravel/cashier-stripe/pull/1169
 
