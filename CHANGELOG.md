@@ -2,6 +2,34 @@
 
 ## [Unreleased](https://github.com/laravel/cashier/compare/v12.14.0...master)
 
+### Added
+- Support more payment method types ([#1074](https://github.com/laravel/cashier-stripe/pull/1074))
+- Cashier Stripe Factories ([#1096](https://github.com/laravel/cashier-stripe/pull/1096))
+- Multiple discounts on receipts ([#1147](https://github.com/laravel/cashier-stripe/pull/1147))
+- Preview upcoming invoice ([#1146](https://github.com/laravel/cashier-stripe/pull/1146))
+
+### Changed
+- Rename plans to prices ([#1166](https://github.com/laravel/cashier-stripe/pull/1166))
+- Stripe SDK refactor ([#1169](https://github.com/laravel/cashier-stripe/pull/1169))
+- Update stripe api version ([#1001](https://github.com/laravel/cashier-stripe/pull/1001))
+- Make plans optional for newSubscription ([#1066](https://github.com/laravel/cashier-stripe/pull/1066))
+- Drop PHP 7.2 support ([#1065](https://github.com/laravel/cashier-stripe/pull/1065))
+- Drop Laravel 6 & 7 support ([#1064](https://github.com/laravel/cashier-stripe/pull/1064))
+- Refactor payment exceptions ([#1095](https://github.com/laravel/cashier-stripe/pull/1095))
+- Refactor model config option ([#1100](https://github.com/laravel/cashier-stripe/pull/1100))
+- Billing portal arguments ([#1104](https://github.com/laravel/cashier-stripe/pull/1104))
+- Refactor receipts with more data from Stripe ([#1136](https://github.com/laravel/cashier-stripe/pull/1136))
+- Add array types ([#1152](https://github.com/laravel/cashier-stripe/pull/1152))
+- Throw payment exception for quantity methods ([#1155](https://github.com/laravel/cashier-stripe/pull/1155))
+- Throw payment exceptions on item swap ([#1157](https://github.com/laravel/cashier-stripe/pull/1157))
+- Payment page updates ([#1120](https://github.com/laravel/cashier-stripe/pull/1120))
+
+### Fixed
+- Fix trialEndsAt more closely represents onTrial ([#1129](https://github.com/laravel/cashier-stripe/pull/1129))
+
+### Removed
+- Remove legacy sources support ([#1077](https://github.com/laravel/cashier-stripe/pull/1077))
+
 
 ## [v12.14.0 (2021-05-25)](https://github.com/laravel/cashier/compare/v12.13.1...v12.14.0)
 
