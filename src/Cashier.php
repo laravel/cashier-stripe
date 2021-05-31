@@ -7,6 +7,7 @@ use Money\Currency;
 use Money\Formatter\IntlMoneyFormatter;
 use Money\Money;
 use NumberFormatter;
+use Stripe\Customer as StripeCustomer;
 use Stripe\StripeClient;
 
 class Cashier
@@ -77,16 +78,14 @@ class Cashier
     /**
      * Get the customer instance by its Stripe ID.
      *
-     * @param  string  $stripeId
+     * @param  \Stripe\Customer|string|null  $stripeId
      * @return \Laravel\Cashier\Billable|null
      */
     public static function findBillable($stripeId)
     {
-        if (is_null($stripeId)) {
-            return;
-        }
+        $stripeId = $stripeId instanceof StripeCustomer ? $stripeId->id : $stripeId;
 
-        return (new static::$customerModel)->where('stripe_id', $stripeId)->first();
+        return $stripeId ? (new static::$customerModel)->where('stripe_id', $stripeId)->first() : null;
     }
 
     /**
