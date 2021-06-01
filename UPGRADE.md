@@ -14,23 +14,23 @@ The following required dependency versions have been updated:
 
 PR: https://github.com/laravel/cashier-stripe/pull/905
 
-The Stripe API version for Cashier 13.x will be `2020-08-27`. Even though Cashier uses this version, it's recommended that you upgrade your own settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version as well after deploying the Cashier upgrade. If you use the Stripe SDK directly, make sure to properly test your integration after updating.
+The default Stripe API version for Cashier 13.x will be `2020-08-27`. Even though Cashier uses this version, it's recommended that you upgrade your own API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version after deploying the Cashier upgrade. If you use the Stripe SDK directly, make sure to properly test your integration after updating.
 
 #### Tax Percentage Removal
 
-Because of the upgrade to the new Stripe API version, the `taxPercentage`, `syncTaxPercentage` & `getTaxPercentageForPayload` methods were removed from Cashier. It's recommended that you upgrade to Stripe's new Tax Rates API. You can familiarize yourself with Stripe's guides on Tax Rates:
+Due to upgrading to a new Stripe API version, the `taxPercentage`, `syncTaxPercentage`, and `getTaxPercentageForPayload` methods have been removed from Cashier since they are deprecated by Stripe. We recommend that you upgrade to Stripe's new Tax Rates API. You can familiarize yourself with Tax Rates via Stripe's documentation on the topic:
 
 Stripe migration guide: https://stripe.com/docs/billing/migration/taxes  
 Tax Rates documentation: https://stripe.com/docs/billing/taxes/tax-rates  
 Tax Rates on invoices: https://stripe.com/docs/billing/invoices/tax-rates  
 
-Using Tax Rates in Cashier is also documented here: https://laravel.com/docs/billing#subscription-taxes
+Using Tax Rates with Laravel Cashier is also documented within the official Cashier documentation: https://laravel.com/docs/billing#subscription-taxes
 
-### Renames To Prices
+### Renaming "Plans" To Prices
 
 PR: https://github.com/laravel/cashier-stripe/pull/1166
 
-Cashier v13 comes with some substantial API breakages. To accommodate to Stripe's phasing out of the Plans API we've made the choice to complete migrate the public api to the new Prices terminology. Doing so will bring us on par with Stripe documentation and will ease the translation between Stripe docs and Cashier documentation & code.
+To accommodate Stripe's phasing out of the "Plans" API, we've made the choice to completely migrate Cashier's public API to use the new "Prices" terminology. Doing so will bring us on par with Stripe's own documentation and will ease the translation between Stripe's documentation and Cashier's documentation and API.
 
 While the changes are numerous and too much to name, you can generally do the changes as a direct change of methods names like so:
 
@@ -46,7 +46,9 @@ $user->subscribedToPrice('price_xxx');
 $user->subscription()->addPrice('price_xxx');
 ```
 
-All changes are mostly method renames. Additionally, to fully migrate away from the Plans terminology, the `stripe_plan` columns on the `subscriptions` and `subscription_items` tables have been renamed to `stripe_price`.  You will need to write a migration to rename these columns:
+All changes are mostly method renames.
+
+Additionally, to fully migrate away from the "Plans" terminology, the `stripe_plan` columns on the `subscriptions` and `subscription_items` tables have been renamed to `stripe_price`.  You will need to write a migration to rename these columns:
 
 ```php
 Schema::table('subscriptions', function (Blueprint $table) {
@@ -64,7 +66,7 @@ Running this migration requires you to [install the `doctrine/dbal` package](htt
 
 PR: https://github.com/laravel/cashier-stripe/pull/1169
 
-Starting with Cashier v13, we'll now use the new `StripeClient` object to do all API requests. This shouldn't have a severe impact other than exposing wrong usage of Stripe's API as this new client is more strict than the previous resource based API calls.
+Cashier now uses the new `StripeClient` object to do all API requests. This shouldn't have an impact on your application. However, improper usage of Stripe's API may cause exceptions as the new Stripe client is more strict than the previous resource based API calls.
 
 Additionally, if you were overwriting the `stripeOptions` method in your billable model, you should now overwrite the `stripe` method instead.
 
@@ -72,7 +74,7 @@ Additionally, if you were overwriting the `stripeOptions` method in your billabl
 
 PR: https://github.com/laravel/cashier-stripe/pull/1100
 
-We've updated the way the billable model is set to a `Cashier::useCustomerModel($customerModel)` call to consolidate with how we do this in our other packages. The `cashier.model` config option has been removed from Cashier. If you are using a different model than `App\Models\User` you should place this call in the `boot` method of your `AppServiceProvider` class:
+The `cashier.model` configuration option has been removed from Cashier. Instead, you should use the `Cashier::setCustomerModel($customerModel)` method. Typically, this method should be called in the `boot` method of your application's `AppServiceProvider` class:
 
 ```php
 use App\Models\Cashier\User;
@@ -93,13 +95,13 @@ public function boot()
 
 PR: https://github.com/laravel/cashier-stripe/pull/1077
 
-All support for the legacy Stripe Sources API has been removed from Cashier. If you aren't already, we recommend that you upgrade to [the Payment Methods API](https://stripe.com/docs/payments/payment-methods).
+All support for the deprecated Stripe Sources API has been removed from Cashier. If you haven't already, we recommend that you upgrade to [the Payment Methods API](https://stripe.com/docs/payments/payment-methods).
 
 ### New Payment Methods Support
 
 PR: https://github.com/laravel/cashier-stripe/pull/1074
 
-Cashier v13 comes with support for new payment methods. Because of this, the `card` columns in the database have been renamed to accommodate for all types of payment methods. You will need to write a migration to rename the billable model table's `card_brand` & `card_last_four` columns:
+Cashier v13 supports new payment methods. Because of this, the `card` columns in the database have been renamed to accommodate for all types of payment methods. You will need to write a migration to rename the billable model table's `card_brand` and `card_last_four` columns accordingly:
 
 ```php
 Schema::table('users', function (Blueprint $table) {
@@ -114,9 +116,9 @@ Running this migration requires you to [install the `doctrine/dbal` package](htt
 
 PR: https://github.com/laravel/cashier-stripe/pull/1095
 
-Payment exceptions thrown by Cashier when payment failures happen have been simplified to a single `Laravel\Cashier\Exceptions\IncompletePayment` exception. Before, you could catch an exception based on the status of the payment intent object like `PaymentActionRequired` or `PaymentFailure`. Because this status is already easily derived from the encapsulated payment intent object we've simplified to just a single exception.
+Payment exceptions thrown by Cashier on payment failures have been consolidated to a single `Laravel\Cashier\Exceptions\IncompletePayment` exception. Before, you could catch an exception based on the status of the payment intent object, such as `PaymentActionRequired` or `PaymentFailure`. However, because this status is already easily derived from the encapsulated payment intent object, we have simplified to just a single exception.
 
-You can now derive the specific status by checking the `payment` property on the exception instance:
+You can now derive the specific payment status by inspecting the `payment` property on the exception instance:
 
 ```php
 use Laravel\Cashier\Exceptions\IncompletePayment;
@@ -140,7 +142,7 @@ try {
 
 PR: https://github.com/laravel/cashier-stripe/pull/1136
 
-Cashier receipts have been updated with additional info from the Stripe Invoice object. If you were expected that these stayed unchanged you should publish the receipt view *before* you update to the newest version:
+Cashier receipts have been updated with additional information from the Stripe Invoice object. If you do not wish to receive these updates, you should publish the receipt view *before* you update to Cashier v13:
 
 ```bash
 php artisan vendor:publish --tag="cashier-migrations"
