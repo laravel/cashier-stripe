@@ -164,7 +164,7 @@ Due to introducing support for displaying multiple discounts on receipts, some s
 
 PR: https://github.com/laravel/cashier-stripe/pull/1155
 
-A previous discrepancy between swapping subscriptions and increasing subscription quantities has been fixed. Previously, only the swapping of subscriptions would throw an `IncompletePayment` exception when a payment method failure occurred. This has been fixed so any use of the quantity methods on a subscription or subscription item will also throw this exception.
+A previous discrepancy between swapping subscriptions and increasing subscription quantities has been fixed. Previously, only the swapping of subscriptions would throw an `IncompletePayment` exception when a payment method failure occurred. This has been fixed so any use of the quantity methods on a subscription or subscription item will also throw this exception when a payment failure occurs.
 
 PR: https://github.com/laravel/cashier-stripe/pull/1157
 
@@ -174,8 +174,7 @@ Additionally, swapping prices on subscription items will now also throw an `Inco
 
 PR: https://github.com/laravel/cashier-stripe/pull/1120
 
-The hosted payment page for handling payment method failures has been revamped to provide support for additional payment methods. This should be a smooth upgrade path if you haven't published the `payment.blade.php` view. One notable change that was made is that all translation support has been removed. If you were relying on this you should publish the view and re-add the translation calls yourself.
-
+The hosted payment page for handling payment method failures has been improved to provide support for additional payment methods. No changes to your application are required if you have not published the `payment.blade.php` template. However, all translation support has been removed. If you were relying on this functionality you should publish the view and re-add the appropriate calls to Laravel's translation services.
 
 ## Upgrading To 12.8 From 12.7
 
