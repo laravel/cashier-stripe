@@ -32,18 +32,38 @@ PR: https://github.com/laravel/cashier-stripe/pull/1166
 
 To accommodate Stripe's phasing out of the "Plans" API, we've made the choice to completely migrate Cashier's public API to use the new "Prices" terminology. Doing so will bring us on par with Stripe's own documentation and will ease the translation between Stripe's documentation and Cashier's documentation and API.
 
-While the changes are numerous and too much to name, you can generally do the changes as a direct change of methods names like so:
+The following methods were renamed:
 
 ```php
 // Before...
-$user->newSubscription('default')->plan('price_xxx')->create($paymentMethod);
 $user->subscribedToPlan('price_xxx');
+$user->onPlan('price_xxx');
+$user->planTaxRates();
+
+$user->newSubscription('default')->plan('price_xxx')->create($paymentMethod);
+$user->newSubscription('default')->meteredPlan('price_xxx')->create($paymentMethod);
+
+$user->subscription()->hasMultiplePlans();
+$user->subscription()->hasSinglePlan();
+$user->subscription()->hasPlan('price_xxx');
 $user->subscription()->addPlan('price_xxx');
+$user->subscription()->addPlanAndInvoice('price_xxx');
+$user->subscription()->removePlan('price_xxx');
 
 // After...
-$user->newSubscription('default')->price('price_xxx')->create($paymentMethod);
 $user->subscribedToPrice('price_xxx');
+$user->onPrice('price_xxx');
+$user->priceTaxRates();
+
+$user->newSubscription('default')->price('price_xxx')->create($paymentMethod);
+$user->newSubscription('default')->meteredPrice('price_xxx')->create($paymentMethod);
+
+$user->subscription()->hasMultiplePrices();
+$user->subscription()->hasSinglePrice();
+$user->subscription()->hasPrice('price_xxx');
 $user->subscription()->addPrice('price_xxx');
+$user->subscription()->addPriceAndInvoice('price_xxx');
+$user->subscription()->removePrice('price_xxx');
 ```
 
 All changes are mostly method renames.
