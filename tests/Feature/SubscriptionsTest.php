@@ -522,10 +522,10 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('user_with_subscription_can_return_generic_trial_end_date');
         $user->trial_ends_at = $tomorrow = Carbon::tomorrow();
 
-        $user->newSubscription('main', static::$priceId)
+        $user->newSubscription('default', static::$priceId)
             ->create('pm_card_visa');
 
-        $subscription = $user->subscription('main');
+        $subscription = $user->subscription('default');
 
         $this->assertTrue($user->onGenericTrial());
         $this->assertTrue($user->onTrial());
