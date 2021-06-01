@@ -148,9 +148,9 @@ Cashier receipts have been updated with additional information from the Stripe I
 php artisan vendor:publish --tag="cashier-migrations"
 ```
 
-Please note that this will also update the`checkout.blade.php` and `payment.blade.php` views. You should remove these and only keep the `receipt.blade.php` view.
+Please note that this command will also publish the`checkout.blade.php` and `payment.blade.php` templates. If you do not plan on customizing these published templates, you may delete them.
 
-Also, if you end up publishing the `receipt.blade.php` view it's important that you replace the "Discount" block for the changes introduced to the Invoice object with the new block from below:
+If you do decide to publish the `receipt.blade.php` template before updating Cashier, you should replace the "Discount" block within the template with the following changes that were introduced to the template:
 
 https://github.com/laravel/cashier-stripe/blob/463c5c1c7a37e8748f5f5b5b1d54bd03c8f8137a/resources/views/receipt.blade.php#L249-L266
 
@@ -158,7 +158,7 @@ https://github.com/laravel/cashier-stripe/blob/463c5c1c7a37e8748f5f5b5b1d54bd03c
 
 PR: https://github.com/laravel/cashier-stripe/pull/1147
 
-Because of introducing support for multiple discounts on receipts, some substantial changes were made to the `Invoice` class. Normally the changed methods were only used in the `receipt.blade.php` and if you weren't using these directly, upgrading without a published `receipt.blade.php` file should be an easy upgrade path. If you were using the changed methods directly we recommend you to review the linked PR from above for any changes you'll need to make.
+Due to introducing support for displaying multiple discounts on receipts, some substantial changes were made to the `Invoice` class. Normally, these changed methods were only used in the `receipt.blade.php` template. If you weren't using these methods directly and had not published the `receipt.blade.php` template, these changes should not affect your application. If you were using the changed methods directly or have previously exported the `receipt.blade.php` template, we recommend you review the PR linked above to determine any changes relevant to your application.
 
 ### Payment Exception Throwing
 
