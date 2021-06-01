@@ -165,7 +165,7 @@ PR: https://github.com/laravel/cashier-stripe/pull/1136
 Cashier receipts have been updated with additional information from the Stripe Invoice object. If you do not wish to receive these updates, you should publish the receipt view *before* you update to Cashier v13:
 
 ```bash
-php artisan vendor:publish --tag="cashier-migrations"
+php artisan vendor:publish --tag="cashier-views"
 ```
 
 Please note that this command will also publish the`checkout.blade.php` and `payment.blade.php` templates. If you do not plan on customizing these published templates, you may delete them.
