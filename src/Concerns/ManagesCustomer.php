@@ -173,11 +173,11 @@ trait ManagesCustomer
     /**
      * Sync the customer details to Stripe.
      *
-     * @return void
+     * @return \Stripe\Customer
      */
     public function syncStripeCustomerDetails()
     {
-        $this->updateStripeCustomer([
+        return $this->updateStripeCustomer([
             'name' => $this->stripeName(),
             'email' => $this->stripeEmail(),
             'phone' => $this->stripePhone(),
