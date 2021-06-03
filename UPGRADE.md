@@ -162,7 +162,9 @@ try {
 
 PR: https://github.com/laravel/cashier-stripe/pull/1136
 
-Cashier receipts have been updated with additional information from the Stripe Invoice object. If you do not wish to receive these updates, you should publish the receipt view *before* you update to Cashier v13:
+Cashier receipts have been updated with additional information from the Stripe Invoice object. These updates mostly will add more information to the receipt if you were storing this information in Stripe already. There's shouldn't be any immediate action necessary.
+
+If you do not wish to receive these design updates, you should publish the receipt view *before* you update to Cashier v13:
 
 ```bash
 php artisan vendor:publish --tag="cashier-views"
