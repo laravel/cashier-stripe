@@ -862,6 +862,35 @@ class Subscription extends Model
     }
 
     /**
+     * Add a new Stripe metered price to the subscription.
+     *
+     * @param  string  $price
+     * @param  array  $options
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function addMeteredPrice($price, array $options = [])
+    {
+        return $this->addPrice($price, null, $options);
+    }
+
+    /**
+     * Add a new Stripe metered price to the subscription, and invoice immediately.
+     *
+     * @param  string  $price
+     * @param  array  $options
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function addMeteredPriceAndInvoice($price, array $options = [])
+    {
+        return $this->addPriceAndInvoice($price, null, $options);
+    }
+
+    /**
      * Remove a Stripe price from the subscription.
      *
      * @param  string  $price
