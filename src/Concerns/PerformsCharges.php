@@ -8,12 +8,7 @@ use Laravel\Cashier\Payment;
 
 trait PerformsCharges
 {
-    /**
-     * Determines if user redeemable promotion codes are available in Stripe Checkout.
-     *
-     * @var bool
-     */
-    protected $allowPromotionCodes;
+    use AllowsCoupons;
 
     /**
      * Make a "one off" charge on the customer for the given amount.
@@ -76,6 +71,7 @@ trait PerformsCharges
     {
         $payload = array_filter([
             'allow_promotion_codes' => $this->allowPromotionCodes,
+            'discounts' => $this->checkoutDiscounts(),
             'line_items' => Collection::make((array) $items)->map(function ($item, $key) {
                 if (is_string($key)) {
                     return ['price' => $key, 'quantity' => $item];
@@ -114,17 +110,5 @@ trait PerformsCharges
             ],
             'quantity' => $quantity,
         ]], $sessionOptions, $customerOptions);
-    }
-
-    /**
-     * Enables user redeemable promotion codes.
-     *
-     * @return $this
-     */
-    public function allowPromotionCodes()
-    {
-        $this->allowPromotionCodes = true;
-
-        return $this;
     }
 }
