@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.14.0...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.14.1...12.x)
+
+
+## [v12.14.1 (2021-06-01)](https://github.com/laravel/cashier/compare/v12.14.0...v12.14.1)
+
+### Fixed
+- Fix broken `unit_amount` with `tab` ([9246063](https://github.com/laravel/cashier-stripe/commit/9246063882a09c29521e61a86e84f34cb86098c1))
 
 
 ## [v12.14.0 (2021-05-25)](https://github.com/laravel/cashier/compare/v12.13.1...v12.14.0)
