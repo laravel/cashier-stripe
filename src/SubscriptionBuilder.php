@@ -8,9 +8,9 @@ use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
-use Laravel\Cashier\Concerns\AllowsCoupons;
 use Stripe\Subscription as StripeSubscription;
 
 class SubscriptionBuilder
