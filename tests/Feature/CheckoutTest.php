@@ -36,6 +36,34 @@ class CheckoutTest extends FeatureTestCase
         $this->assertInstanceOf(Checkout::class, $checkout);
     }
 
+    public function test_customers_can_start_a_product_checkout_session_with_a_coupon_applied()
+    {
+        $user = $this->createCustomer('customers_can_start_a_product_checkout_session_with_a_coupon_applied');
+
+        $shirtPrice = self::stripe()->prices->create([
+            'currency' => 'USD',
+            'product_data' => [
+                'name' => 'T-shirt',
+            ],
+            'unit_amount' => 1500,
+        ]);
+
+        $coupon = self::stripe()->promotionCodes->create([
+            'duration' => 'repeating',
+            'amount_off' => 500,
+            'duration_in_months' => 3,
+            'currency' => 'USD',
+        ]);
+
+        $checkout = $user->withCoupon($coupon->id)
+            ->checkout($shirtPrice->id, [
+                'success_url' => 'http://example.com',
+                'cancel_url' => 'http://example.com',
+            ]);
+
+        $this->assertInstanceOf(Checkout::class, $checkout);
+    }
+
     public function test_customers_can_start_a_one_off_charge_checkout_session()
     {
         $user = $this->createCustomer('customers_can_start_a_one_off_charge_checkout_session');

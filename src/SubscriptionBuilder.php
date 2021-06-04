@@ -8,12 +8,14 @@ use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Stripe\Subscription as StripeSubscription;
 
 class SubscriptionBuilder
 {
+    use AllowsCoupons;
     use InteractsWithPaymentBehavior;
     use Prorates;
 
@@ -58,27 +60,6 @@ class SubscriptionBuilder
      * @var int|null
      */
     protected $billingCycleAnchor = null;
-
-    /**
-     * The coupon being applied to the subscription.
-     *
-     * @var string|null
-     */
-    protected $coupon;
-
-    /**
-     * The promotion code being applied to the subscription.
-     *
-     * @var string|null
-     */
-    protected $promotionCode;
-
-    /**
-     * Determines if user redeemable promotion codes are available in Stripe Checkout.
-     *
-     * @var bool
-     */
-    protected $allowPromotionCodes = false;
 
     /**
      * The metadata to apply to the subscription.
@@ -216,44 +197,6 @@ class SubscriptionBuilder
     }
 
     /**
-     * The coupon to apply to a new subscription.
-     *
-     * @param  string  $coupon
-     * @return $this
-     */
-    public function withCoupon($coupon)
-    {
-        $this->coupon = $coupon;
-
-        return $this;
-    }
-
-    /**
-     * The promotion code to apply to a new subscription.
-     *
-     * @param  string  $promotionCode
-     * @return $this
-     */
-    public function withPromotionCode($promotionCode)
-    {
-        $this->promotionCode = $promotionCode;
-
-        return $this;
-    }
-
-    /**
-     * Enables user redeemable promotion codes.
-     *
-     * @return $this
-     */
-    public function allowPromotionCodes()
-    {
-        $this->allowPromotionCodes = true;
-
-        return $this;
-    }
-
-    /**
      * The metadata to apply to a new subscription.
      *
      * @param  array  $metadata
@@ -380,7 +323,7 @@ class SubscriptionBuilder
             'mode' => 'subscription',
             'line_items' => Collection::make($this->items)->values()->all(),
             'allow_promotion_codes' => $this->allowPromotionCodes,
-            'discounts' => $this->coupon ? [['coupon' => $this->coupon]] : null,
+            'discounts' => $this->checkoutDiscounts(),
             'subscription_data' => array_filter([
                 'default_tax_rates' => $this->getTaxRatesForPayload(),
                 'trial_end' => $trialEnd ? $trialEnd->getTimestamp() : null,
@@ -418,12 +361,12 @@ class SubscriptionBuilder
     {
         $payload = array_filter([
             'billing_cycle_anchor' => $this->billingCycleAnchor,
-            'coupon' => $this->coupon,
+            'coupon' => $this->couponId,
             'expand' => ['latest_invoice.payment_intent'],
             'metadata' => $this->metadata,
             'items' => Collection::make($this->items)->values()->all(),
             'payment_behavior' => $this->paymentBehavior(),
-            'promotion_code' => $this->promotionCode,
+            'promotion_code' => $this->promotionCodeId,
             'proration_behavior' => $this->prorateBehavior(),
             'trial_end' => $this->getTrialEndForPayload(),
             'off_session' => true,
