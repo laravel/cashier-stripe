@@ -48,7 +48,7 @@ class CheckoutTest extends FeatureTestCase
             'unit_amount' => 1500,
         ]);
 
-        $coupon = self::stripe()->promotionCodes->create([
+        $coupon = self::stripe()->coupons->create([
             'duration' => 'repeating',
             'amount_off' => 500,
             'duration_in_months' => 3,
