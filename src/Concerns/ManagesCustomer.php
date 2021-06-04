@@ -68,6 +68,14 @@ trait ManagesCustomer
             $options['email'] = $email;
         }
 
+        if (! array_key_exists('phone', $options) && $phone = $this->stripePhone()) {
+            $options['phone'] = $phone;
+        }
+
+        if (! array_key_exists('address', $options) && $address = $this->stripeAddress()) {
+            $options['address'] = $address;
+        }
+
         // Here we will create the customer instance on Stripe and store the ID of the
         // user from Stripe. This ID will correspond with the Stripe user instances
         // and allow us to retrieve users from Stripe later when we need to work.
