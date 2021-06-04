@@ -124,7 +124,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the name used to create the customer in Stripe.
+     * Get the name that should be synced to Stripe.
      *
      * @return string|null
      */
@@ -134,13 +134,55 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the email address used to create the customer in Stripe.
+     * Get the email address that should be synced to Stripe.
      *
      * @return string|null
      */
     public function stripeEmail()
     {
         return $this->email;
+    }
+
+    /**
+     * Get the phone number that should be synced to Stripe.
+     *
+     * @return string|null
+     */
+    public function stripePhone()
+    {
+        return $this->phone;
+    }
+
+    /**
+     * Get the address that should be synced to Stripe.
+     *
+     * @return array|null
+     */
+    public function stripeAddress()
+    {
+        // return [
+        //     'city' => 'Little Rock',
+        //     'country' => 'US',
+        //     'line1' => '1 Main St.',
+        //     'line2' => 'Apartment 5',
+        //     'postal_code' => '72201',
+        //     'state' => 'Arkansas',
+        // ];
+    }
+
+    /**
+     * Sync the customer's information to Stripe.
+     *
+     * @return \Stripe\Customer
+     */
+    public function syncStripeCustomerDetails()
+    {
+        return $this->updateStripeCustomer([
+            'name' => $this->stripeName(),
+            'email' => $this->stripeEmail(),
+            'phone' => $this->stripePhone(),
+            'address' => $this->stripeAddress(),
+        ]);
     }
 
     /**
