@@ -9,7 +9,12 @@ class CustomerTest extends FeatureTestCase
     public function test_customers_in_stripe_can_be_updated()
     {
         $user = $this->createCustomer('customers_in_stripe_can_be_updated');
-        $user->createAsStripeCustomer();
+
+        $customer = $user->createAsStripeCustomer();
+
+        $this->assertEquals('Main Str. 1', $customer->address->line1);
+        $this->assertEquals('Little Rock', $customer->address->city);
+        $this->assertEquals('72201', $customer->address->postal_code);
 
         $customer = $user->updateStripeCustomer(['description' => 'Mohamed Said']);
 
