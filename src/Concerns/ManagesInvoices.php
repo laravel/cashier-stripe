@@ -33,7 +33,7 @@ trait ManagesInvoices
         ], $options);
 
         if (array_key_exists('quantity', $options)) {
-            $options['unit_amount'] = $amount;
+            $options['unit_amount'] = $options['unit_amount'] ?? $amount;
         } else {
             $options['amount'] = $amount;
         }
