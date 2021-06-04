@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Illuminate\Http\RedirectResponse;
+use Stripe\TaxId as StripeTaxId;
 
 class CustomerTest extends FeatureTestCase
 {
@@ -35,5 +36,31 @@ class CustomerTest extends FeatureTestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertStringStartsWith('https://billing.stripe.com/session/', $response->getTargetUrl());
+    }
+
+    public function test_customers_can_manage_tax_ids()
+    {
+        $user = $this->createCustomer('customers_can_manage_tax_ids');
+        $user->createAsStripeCustomer();
+
+        $taxId = $user->createTaxId('eu_vat', 'BE0123456789');
+
+        $this->assertSame('eu_vat', $taxId->type);
+        $this->assertSame('BE0123456789', $taxId->value);
+        $this->assertSame('BE', $taxId->country);
+
+        $taxIds = $user->taxIds();
+
+        $this->assertCount(1, $taxIds);
+        $this->assertInstanceOf(StripeTaxId::class, $taxIds->first());
+
+        $taxId = $user->findTaxId($taxId->id);
+
+        $this->assertSame('eu_vat', $taxId->type);
+        $this->assertSame('BE0123456789', $taxId->value);
+
+        $user->deleteTaxId($taxId->id);
+
+        $this->assertEmpty($user->taxIds());
     }
 }
