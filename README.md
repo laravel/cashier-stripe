@@ -1,4 +1,4 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-cashier.svg"></p>
+<p align="center"><img src="/art/logo.svg" role="presentation"></p>
 
 <p align="center">
 <a href="https://github.com/laravel/cashier/actions"><img src="https://github.com/laravel/cashier/workflows/tests/badge.svg" alt="Build Status"></a>
