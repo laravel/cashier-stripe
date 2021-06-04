@@ -124,7 +124,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the name used to to sync with Stripe.
+     * Get the name that should be synced to Stripe.
      *
      * @return string|null
      */
@@ -134,7 +134,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the email address to sync with Stripe.
+     * Get the email address that should be synced to Stripe.
      *
      * @return string|null
      */
@@ -144,7 +144,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the phone number to sync with Stripe.
+     * Get the phone number that should be synced to Stripe.
      *
      * @return string|null
      */
@@ -154,7 +154,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the address to sync with Stripe.
+     * Get the address that should be synced to Stripe.
      *
      * @return array|null
      */
@@ -163,7 +163,7 @@ trait ManagesCustomer
         // return [
         //     'city' => 'Little Rock',
         //     'country' => 'US',
-        //     'line1' => 'Main Str. 1',
+        //     'line1' => '1 Main St.',
         //     'line2' => 'Apartment 5',
         //     'postal_code' => '72201',
         //     'state' => 'Arkansas',
@@ -171,7 +171,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Sync the customer details to Stripe.
+     * Sync the customer's information to Stripe.
      *
      * @return \Stripe\Customer
      */
