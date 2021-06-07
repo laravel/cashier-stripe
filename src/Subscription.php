@@ -121,6 +121,19 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription has a specific product.
+     *
+     * @param  string  $product
+     * @return bool
+     */
+    public function hasProduct($product)
+    {
+        return $this->items->contains(function (SubscriptionItem $item) use ($product) {
+            return $item->stripe_product === $product;
+        });
+    }
+
+    /**
      * Determine if the subscription has a specific price.
      *
      * @param  string  $price
