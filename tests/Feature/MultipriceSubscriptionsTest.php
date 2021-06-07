@@ -331,6 +331,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
         $subscription->items()->create([
             'stripe_id' => 'it_foo',
+            'stripe_product' => self::$productId,
             'stripe_price' => self::$priceId,
             'quantity' => 1,
         ]);
@@ -354,6 +355,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
         $subscription->items()->create([
             'stripe_id' => 'it_foo',
+            'stripe_product' => self::$productId,
             'stripe_price' => self::$otherPriceId,
             'quantity' => 1,
         ]);

@@ -286,6 +286,7 @@ class SubscriptionBuilder
         foreach ($stripeSubscription->items as $item) {
             $subscription->items()->create([
                 'stripe_id' => $item->id,
+                'stripe_product' => $item->price->product,
                 'stripe_price' => $item->price->id,
                 'quantity' => $item->quantity,
             ]);
