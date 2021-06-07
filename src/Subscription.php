@@ -121,6 +121,19 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription has a specific product.
+     *
+     * @param  string  $product
+     * @return bool
+     */
+    public function hasProduct($product)
+    {
+        return $this->items->contains(function (SubscriptionItem $item) use ($product) {
+            return $item->stripe_product === $product;
+        });
+    }
+
+    /**
      * Determine if the subscription has a specific price.
      *
      * @param  string  $price
@@ -675,6 +688,7 @@ class Subscription extends Model
             $this->items()->updateOrCreate([
                 'stripe_id' => $item->id,
             ], [
+                'stripe_product' => $item->price->product,
                 'stripe_price' => $item->price->id,
                 'quantity' => $item->quantity,
             ]);
@@ -816,7 +830,7 @@ class Subscription extends Model
             throw SubscriptionUpdateFailure::duplicatePrice($this, $price);
         }
 
-        $item = $this->owner->stripe()->subscriptionItems->create(array_merge([
+        $stripeSubscriptionItem = $this->owner->stripe()->subscriptionItems->create(array_merge([
             'subscription' => $this->stripe_id,
             'price' => $price,
             'quantity' => $quantity,
@@ -826,8 +840,9 @@ class Subscription extends Model
         ], $options));
 
         $this->items()->create([
-            'stripe_id' => $item->id,
-            'stripe_price' => $price,
+            'stripe_id' => $stripeSubscriptionItem->id,
+            'stripe_product' => $stripeSubscriptionItem->price->product,
+            'stripe_price' => $stripeSubscriptionItem->price->id,
             'quantity' => $quantity,
         ]);
 

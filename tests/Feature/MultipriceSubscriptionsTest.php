@@ -98,6 +98,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
             ->create('pm_card_visa');
 
         $this->assertTrue($user->subscribed('main', self::$priceId));
+        $this->assertTrue($user->onProduct(self::$productId));
         $this->assertTrue($user->onPrice(self::$priceId));
 
         $item = $subscription->findItemOrFail(self::$priceId);
@@ -122,6 +123,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
         $subscription->addPrice(self::$otherPriceId, 5);
 
+        $this->assertTrue($user->onProduct(self::$productId));
         $this->assertTrue($user->onPrice(self::$priceId));
         $this->assertFalse($user->onPrice(self::$premiumPriceId));
 
@@ -331,6 +333,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
         $subscription->items()->create([
             'stripe_id' => 'it_foo',
+            'stripe_product' => self::$productId,
             'stripe_price' => self::$priceId,
             'quantity' => 1,
         ]);
@@ -354,6 +357,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
         $subscription->items()->create([
             'stripe_id' => 'it_foo',
+            'stripe_product' => self::$productId,
             'stripe_price' => self::$otherPriceId,
             'quantity' => 1,
         ]);

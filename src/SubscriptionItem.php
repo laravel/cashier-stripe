@@ -151,7 +151,8 @@ class SubscriptionItem extends Model
         ], $options));
 
         $this->fill([
-            'stripe_price' => $price,
+            'stripe_product' => $stripeSubscriptionItem->price->product,
+            'stripe_price' => $stripeSubscriptionItem->price->id,
             'quantity' => $stripeSubscriptionItem->quantity,
         ])->save();
 

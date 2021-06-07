@@ -57,7 +57,7 @@ class WebhooksTest extends FeatureTestCase
                     'items' => [
                         'data' => [[
                             'id' => 'bar',
-                            'price' => ['id' => 'price_foo'],
+                            'price' => ['id' => 'price_foo', 'product' => 'prod_bar'],
                             'quantity' => 10,
                         ]],
                     ],
@@ -76,6 +76,7 @@ class WebhooksTest extends FeatureTestCase
 
         $this->assertDatabaseHas('subscription_items', [
             'stripe_id' => 'bar',
+            'stripe_product' => 'prod_bar',
             'stripe_price' => 'price_foo',
             'quantity' => 10,
         ]);
@@ -94,6 +95,7 @@ class WebhooksTest extends FeatureTestCase
 
         $item = $subscription->items()->create([
             'stripe_id' => 'it_foo',
+            'stripe_product' => 'prod_bar',
             'stripe_price' => 'price_bar',
             'quantity' => 1,
         ]);
@@ -109,7 +111,7 @@ class WebhooksTest extends FeatureTestCase
                     'items' => [
                         'data' => [[
                             'id' => 'bar',
-                            'price' => ['id' => 'price_foo'],
+                            'price' => ['id' => 'price_foo', 'product' => 'prod_bar'],
                             'quantity' => 5,
                         ]],
                     ],
@@ -127,6 +129,7 @@ class WebhooksTest extends FeatureTestCase
         $this->assertDatabaseHas('subscription_items', [
             'subscription_id' => $subscription->id,
             'stripe_id' => 'bar',
+            'stripe_product' => 'prod_bar',
             'stripe_price' => 'price_foo',
             'quantity' => 5,
         ]);
@@ -150,6 +153,7 @@ class WebhooksTest extends FeatureTestCase
 
         $item = $subscription->items()->create([
             'stripe_id' => 'it_foo',
+            'stripe_product' => 'prod_bar',
             'stripe_price' => 'price_bar',
             'quantity' => 1,
         ]);
@@ -166,7 +170,7 @@ class WebhooksTest extends FeatureTestCase
                     'items' => [
                         'data' => [[
                             'id' => 'bar',
-                            'price' => ['id' => 'price_foo'],
+                            'price' => ['id' => 'price_foo', 'product' => 'prod_bar'],
                             'quantity' => 5,
                         ]],
                     ],
@@ -185,6 +189,7 @@ class WebhooksTest extends FeatureTestCase
         $this->assertDatabaseHas('subscription_items', [
             'subscription_id' => $subscription->id,
             'stripe_id' => 'bar',
+            'stripe_product' => 'prod_bar',
             'stripe_price' => 'price_foo',
             'quantity' => 5,
         ]);
@@ -212,7 +217,7 @@ class WebhooksTest extends FeatureTestCase
                     'items' => [
                         'data' => [[
                             'id' => $subscription->items()->first()->stripe_id,
-                            'price' => ['id' => static::$priceId],
+                            'price' => ['id' => static::$priceId, 'product' => static::$productId],
                             'quantity' => 1,
                         ]],
                     ],

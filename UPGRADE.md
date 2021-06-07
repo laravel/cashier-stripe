@@ -198,6 +198,20 @@ PR: https://github.com/laravel/cashier-stripe/pull/1120
 
 The hosted payment page for handling payment method failures has been improved to provide support for additional payment methods. No changes to your application are required if you have not published the `payment.blade.php` template. However, all translation support has been removed. If you were relying on this functionality you should publish the view and re-add the appropriate calls to Laravel's translation services.
 
+### Stripe Product Support
+
+PR: https://github.com/laravel/cashier-stripe/pull/1185
+
+Cashier Stripe v13 comes with support for checking Stripe Product identifiers. To provide support for this feature, a new `stripe_product` column should be added to the `stripe_subscriptions` table:
+
+```php
+Schema::table('subscription_items', function (Blueprint $table) {
+    $table->string('stripe_product')->nullable()->after('stripe_id');
+});
+```
+
+If you'd like to make use of the new `onProduct` & `subscribedToProduct` methods on your billable model, you should ensure the records in the `subscription_items` have their `stripe_product` column filled with the correct Product ID from Stripe.
+
 ## Upgrading To 12.8 From 12.7
 
 ### Metered Billing

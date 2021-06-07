@@ -17,6 +17,7 @@ class CreateSubscriptionItemsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('subscription_id');
             $table->string('stripe_id')->index();
+            $table->string('stripe_product');
             $table->string('stripe_price');
             $table->integer('quantity')->nullable();
             $table->timestamps();

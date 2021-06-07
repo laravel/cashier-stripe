@@ -126,6 +126,30 @@ trait ManagesSubscriptions
     }
 
     /**
+     * Determine if the Stripe model is actively subscribed to one of the given products.
+     *
+     * @param  string|string[]  $products
+     * @param  string  $name
+     * @return bool
+     */
+    public function subscribedToProduct($products, $name = 'default')
+    {
+        $subscription = $this->subscription($name);
+
+        if (! $subscription || ! $subscription->valid()) {
+            return false;
+        }
+
+        foreach ((array) $products as $product) {
+            if ($subscription->hasProduct($product)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if the Stripe model is actively subscribed to one of the given prices.
      *
      * @param  string|string[]  $prices
@@ -147,6 +171,19 @@ trait ManagesSubscriptions
         }
 
         return false;
+    }
+
+    /**
+     * Determine if the customer has a valid subscription on the given product.
+     *
+     * @param  string  $price
+     * @return bool
+     */
+    public function onProduct($price)
+    {
+        return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($price) {
+            return $subscription->valid() && $subscription->hasProduct($price);
+        }));
     }
 
     /**

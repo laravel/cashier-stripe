@@ -8,6 +8,8 @@
 - Multiple discounts on receipts ([#1147](https://github.com/laravel/cashier-stripe/pull/1147))
 - Preview upcoming invoice ([#1146](https://github.com/laravel/cashier-stripe/pull/1146))
 - Add new metered price methods ([#1177](https://github.com/laravel/cashier-stripe/pull/1177))
+- Allow customers to be synced with Stripe ([#1178](https://github.com/laravel/cashier-stripe/pull/1178), [#1183](https://github.com/laravel/cashier-stripe/pull/1183))
+- Add `stripe_product` column to `subscriptions_items` table ([#1185](https://github.com/laravel/cashier-stripe/pull/1185))
 
 ### Changed
 - Rename plans to prices ([#1166](https://github.com/laravel/cashier-stripe/pull/1166))
