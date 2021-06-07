@@ -200,6 +200,8 @@ The hosted payment page for handling payment method failures has been improved t
 
 ### Stripe Product Support
 
+PR: https://github.com/laravel/cashier-stripe/pull/1185
+
 Cashier Stripe v13 comes with support for checking Stripe Product identifiers. To provide support for this feature, a new `stripe_product` column should be added to the `stripe_subscriptions` table:
 
 ```php
@@ -207,6 +209,8 @@ Schema::table('subscription_items', function (Blueprint $table) {
     $table->string('stripe_product')->nullable()->after('stripe_id');
 });
 ```
+
+If you'd like to make use of the new `onProduct` & `subscribedToProduct` methods on the billable you should make sure the records in the `subscription_items` have their `stripe_product` column filled in with the correct Product ID from Stripe.
 
 
 ## Upgrading To 12.8 From 12.7
