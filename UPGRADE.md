@@ -210,8 +210,7 @@ Schema::table('subscription_items', function (Blueprint $table) {
 });
 ```
 
-If you'd like to make use of the new `onProduct` & `subscribedToProduct` methods on the billable you should make sure the records in the `subscription_items` have their `stripe_product` column filled in with the correct Product ID from Stripe.
-
+If you'd like to make use of the new `onProduct` & `subscribedToProduct` methods on your billable model, you should ensure the records in the `subscription_items` have their `stripe_product` column filled with the correct Product ID from Stripe.
 
 ## Upgrading To 12.8 From 12.7
 
