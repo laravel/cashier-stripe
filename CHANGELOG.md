@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/laravel/cashier/compare/v13.0.0...master)
 
+### Removed
+- Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
 
 ## [v13.0.0 (2021-06-08)](https://github.com/laravel/cashier/compare/v12.14.1...v13.0.0)
 
