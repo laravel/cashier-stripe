@@ -1,6 +1,9 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.14.1...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.0.0...13.x)
+
+
+## [v13.0.0 (2021-06-08)](https://github.com/laravel/cashier/compare/v12.14.1...v13.0.0)
 
 ### Added
 - Support more payment method types ([#1074](https://github.com/laravel/cashier-stripe/pull/1074))
