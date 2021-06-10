@@ -830,14 +830,15 @@ class Subscription extends Model
             throw SubscriptionUpdateFailure::duplicatePrice($this, $price);
         }
 
-        $stripeSubscriptionItem = $this->owner->stripe()->subscriptionItems->create(array_merge([
-            'subscription' => $this->stripe_id,
-            'price' => $price,
-            'quantity' => $quantity,
-            'tax_rates' => $this->getPriceTaxRatesForPayload($price),
-            'payment_behavior' => $this->paymentBehavior(),
-            'proration_behavior' => $this->prorateBehavior(),
-        ], $options));
+        $stripeSubscriptionItem = $this->owner->stripe()->subscriptionItems
+            ->create(array_filter(array_merge([
+                'subscription' => $this->stripe_id,
+                'price' => $price,
+                'quantity' => $quantity,
+                'tax_rates' => $this->getPriceTaxRatesForPayload($price),
+                'payment_behavior' => $this->paymentBehavior(),
+                'proration_behavior' => $this->prorateBehavior(),
+            ], $options)));
 
         $this->items()->create([
             'stripe_id' => $stripeSubscriptionItem->id,

@@ -201,6 +201,27 @@ class MeteredBillingTest extends FeatureTestCase
         $this->assertNull($subscription->quantity);
     }
 
+    public function test_add_metered_price_to_a_multiprice_subscription()
+    {
+        $user = $this->createCustomer('add_metered_price_to_a_multiprice_subscription');
+
+        $subscription = $user->newSubscription('main')
+            ->meteredPrice(static::$meteredPrice)
+            ->create('pm_card_visa');
+
+        $this->assertSame(static::$meteredPrice, $subscription->stripe_price);
+        $this->assertNull($subscription->quantity);
+
+        $subscription = $subscription->addMeteredPrice(static::$otherMeteredPrice);
+
+        $subscription->findItemOrFail(self::$meteredPrice);
+        $subscription->findItemOrFail(self::$otherMeteredPrice);
+
+        $this->assertCount(2, $subscription->items);
+        $this->assertNull($subscription->stripe_price);
+        $this->assertNull($subscription->quantity);
+    }
+
     public function test_cancel_metered_subscription()
     {
         $user = $this->createCustomer('cancel_metered_subscription');
