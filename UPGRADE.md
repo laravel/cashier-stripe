@@ -94,7 +94,7 @@ Additionally, if you were overwriting the `stripeOptions` method in your billabl
 
 PR: https://github.com/laravel/cashier-stripe/pull/1100
 
-The `cashier.model` configuration option has been removed from Cashier. Instead, you should use the `Cashier::setCustomerModel($customerModel)` method. Typically, this method should be called in the `boot` method of your application's `AppServiceProvider` class:
+The `cashier.model` configuration option has been removed from Cashier. Instead, you should use the `Cashier::useCustomerModel($customerModel)` method. Typically, this method should be called in the `boot` method of your application's `AppServiceProvider` class:
 
 ```php
 use App\Models\Cashier\User;
