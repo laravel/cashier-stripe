@@ -332,7 +332,7 @@ class SubscriptionBuilder
                 'trial_end' => $trialEnd ? $trialEnd->getTimestamp() : null,
                 'metadata' => array_merge($this->metadata, ['name' => $this->name]),
             ]),
-            'tax_id_collection' => $this->taxIdCollection,
+            'tax_id_collection' => $this->collectTaxIds,
         ]);
 
         return Checkout::create($this->owner, array_merge($payload, $sessionOptions), $customerOptions);

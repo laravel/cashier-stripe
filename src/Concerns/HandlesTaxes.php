@@ -30,7 +30,7 @@ trait HandlesTaxes
      *
      * @var bool
      */
-    protected $taxIdCollection = false;
+    protected $collectTaxIds = false;
 
     /**
      * Allow taxes to be automatically calculated by Stripe.
@@ -96,7 +96,7 @@ trait HandlesTaxes
      */
     public function collectTaxIds()
     {
-        $this->taxIdCollection = true;
+        $this->collectTaxIds = true;
 
         return $this;
     }

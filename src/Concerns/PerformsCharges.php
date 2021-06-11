@@ -85,7 +85,7 @@ trait PerformsCharges
 
                 return $item;
             })->values()->all(),
-            'tax_id_collection' => $this->taxIdCollection,
+            'tax_id_collection' => $this->collectsTaxIds,
         ]);
 
         return Checkout::create($this, array_merge($payload, $sessionOptions), $customerOptions);
