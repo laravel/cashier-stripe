@@ -69,7 +69,7 @@ trait CalculatesTaxes
     }
 
     /**
-     * Get the payload for the automatic tax calculation.
+     * Get the payload for Stripe automatic tax calculation.
      *
      * @return array|null
      */
