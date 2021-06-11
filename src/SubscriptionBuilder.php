@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
+use Laravel\Cashier\Concerns\CalculatesTaxes;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Stripe\Subscription as StripeSubscription;
@@ -16,6 +17,7 @@ use Stripe\Subscription as StripeSubscription;
 class SubscriptionBuilder
 {
     use AllowsCoupons;
+    use CalculatesTaxes;
     use InteractsWithPaymentBehavior;
     use Prorates;
 
@@ -361,6 +363,7 @@ class SubscriptionBuilder
     protected function buildPayload()
     {
         $payload = array_filter([
+            'automatic_tax' => $this->automaticTaxPayload(),
             'billing_cycle_anchor' => $this->billingCycleAnchor,
             'coupon' => $this->couponId,
             'expand' => ['latest_invoice.payment_intent'],

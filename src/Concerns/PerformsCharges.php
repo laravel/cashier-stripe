@@ -23,6 +23,7 @@ trait PerformsCharges
     public function charge($amount, $paymentMethod, array $options = [])
     {
         $options = array_merge([
+            'automatic_tax' => $this->automaticTaxPayload(),
             'confirmation_method' => 'automatic',
             'confirm' => true,
             'currency' => $this->preferredCurrency(),
@@ -71,6 +72,7 @@ trait PerformsCharges
     {
         $payload = array_filter([
             'allow_promotion_codes' => $this->allowPromotionCodes,
+            'automatic_tax' => $this->automaticTaxPayload(),
             'discounts' => $this->checkoutDiscounts(),
             'line_items' => Collection::make((array) $items)->map(function ($item, $key) {
                 if (is_string($key)) {

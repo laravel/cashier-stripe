@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier;
 
+use Laravel\Cashier\Concerns\CalculatesTaxes;
 use Laravel\Cashier\Concerns\ManagesCustomer;
 use Laravel\Cashier\Concerns\ManagesInvoices;
 use Laravel\Cashier\Concerns\ManagesPaymentMethods;
@@ -10,6 +11,7 @@ use Laravel\Cashier\Concerns\PerformsCharges;
 
 trait Billable
 {
+    use CalculatesTaxes;
     use ManagesCustomer;
     use ManagesInvoices;
     use ManagesPaymentMethods;
