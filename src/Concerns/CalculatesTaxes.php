@@ -5,7 +5,7 @@ namespace Laravel\Cashier\Concerns;
 trait CalculatesTaxes
 {
     /**
-     * Automatically calculate tax for the new subscription.
+     * Indicates if Cashier should automatically calculate tax for the new subscription.
      *
      * @var bool
      */
@@ -19,7 +19,7 @@ trait CalculatesTaxes
     protected $customerIPAddress;
 
     /**
-     * A pre-collected billing address used to estimate tax rates when performing "one-off" charges.
+     * The pre-collected billing address used to estimate tax rates when performing "one-off" charges.
      *
      * @var array
      */
@@ -69,7 +69,7 @@ trait CalculatesTaxes
     }
 
     /**
-     * Return the payload for the automatic tax calculation.
+     * Get the payload for the automatic tax calculation.
      *
      * @return array|null
      */
