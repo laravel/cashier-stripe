@@ -2,7 +2,7 @@
 
 namespace Laravel\Cashier\Concerns;
 
-trait CalculatesTaxes
+trait HandlesTaxes
 {
     /**
      * Indicates if Cashier should automatically calculate tax for the new subscription.
@@ -24,6 +24,13 @@ trait CalculatesTaxes
      * @var array
      */
     protected $estimationBillingAddress = [];
+
+    /**
+     * Indicates if Tax IDs should be collected during a Stripe Checkout session.
+     *
+     * @var bool
+     */
+    protected $collectTaxIds = false;
 
     /**
      * Allow taxes to be automatically calculated by Stripe.
@@ -80,5 +87,17 @@ trait CalculatesTaxes
             'enabled' => $this->automaticTax,
             'estimation_billing_address' => $this->estimationBillingAddress,
         ]);
+    }
+
+    /**
+     * Indicate that Tax IDs should be collected during a Stripe Checkout session.
+     *
+     * @return $this
+     */
+    public function collectTaxIds()
+    {
+        $this->collectTaxIds = true;
+
+        return $this;
     }
 }
