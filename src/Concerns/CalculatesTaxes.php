@@ -16,7 +16,7 @@ trait CalculatesTaxes
      *
      * @var string|null
      */
-    protected $customerIPAddress;
+    protected $customerIpAddress;
 
     /**
      * The pre-collected billing address used to estimate tax rates when performing "one-off" charges.
@@ -42,9 +42,9 @@ trait CalculatesTaxes
      *
      * @return $this
      */
-    public function withTaxIPAddress($ipAddress)
+    public function withTaxIpAddress($ipAddress)
     {
-        $this->customerIPAddress = $ipAddress;
+        $this->customerIpAddress = $ipAddress;
 
         return $this;
     }
@@ -76,7 +76,7 @@ trait CalculatesTaxes
     protected function automaticTaxPayload()
     {
         return array_filter([
-            'customer_ip_address' => $this->customerIPAddress,
+            'customer_ip_address' => $this->customerIpAddress,
             'enabled' => $this->automaticTax,
             'estimation_billing_address' => $this->estimationBillingAddress,
         ]);
