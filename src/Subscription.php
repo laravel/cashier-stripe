@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
-use Laravel\Cashier\Concerns\CalculatesTaxes;
+use Laravel\Cashier\Concerns\HandlesTaxes;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionFactory;
@@ -23,7 +23,7 @@ use Stripe\Subscription as StripeSubscription;
  */
 class Subscription extends Model
 {
-    use CalculatesTaxes;
+    use HandlesTaxes;
     use HasFactory;
     use InteractsWithPaymentBehavior;
     use Prorates;
