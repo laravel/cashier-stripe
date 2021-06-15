@@ -1,9 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.0.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.1.0...master)
 
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
+
+## [v13.1.0 (2021-06-15)](https://github.com/laravel/cashier/compare/v13.0.0...v13.1.0)
+
+### Added
+- Implement support for Stripe Tax ([#1190](https://github.com/laravel/cashier-stripe/pull/1190))
+- Collect Tax IDs in Checkout ([#1191](https://github.com/laravel/cashier-stripe/pull/1191))
+
+### Fixed
+- Fix adding metered plan to subscription ([#1189](https://github.com/laravel/cashier-stripe/pull/1189))
 
 
 ## [v13.0.0 (2021-06-08)](https://github.com/laravel/cashier/compare/v12.14.1...v13.0.0)

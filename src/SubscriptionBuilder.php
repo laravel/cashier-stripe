@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
+use Laravel\Cashier\Concerns\HandlesTaxes;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Stripe\Subscription as StripeSubscription;
@@ -16,6 +17,7 @@ use Stripe\Subscription as StripeSubscription;
 class SubscriptionBuilder
 {
     use AllowsCoupons;
+    use HandlesTaxes;
     use InteractsWithPaymentBehavior;
     use Prorates;
 
@@ -330,6 +332,7 @@ class SubscriptionBuilder
                 'trial_end' => $trialEnd ? $trialEnd->getTimestamp() : null,
                 'metadata' => array_merge($this->metadata, ['name' => $this->name]),
             ]),
+            'tax_id_collection' => $this->collectTaxIds,
         ]);
 
         return Checkout::create($this->owner, array_merge($payload, $sessionOptions), $customerOptions);
@@ -361,6 +364,7 @@ class SubscriptionBuilder
     protected function buildPayload()
     {
         $payload = array_filter([
+            'automatic_tax' => $this->automaticTaxPayload(),
             'billing_cycle_anchor' => $this->billingCycleAnchor,
             'coupon' => $this->couponId,
             'expand' => ['latest_invoice.payment_intent'],

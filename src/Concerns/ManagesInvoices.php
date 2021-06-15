@@ -71,7 +71,10 @@ trait ManagesInvoices
     {
         $this->assertCustomerExists();
 
-        $parameters = array_merge($options, ['customer' => $this->stripe_id]);
+        $parameters = array_merge([
+            'automatic_tax' => $this->automaticTaxPayload(),
+            'customer' => $this->stripe_id,
+        ], $options);
 
         try {
             /** @var \Stripe\Invoice $invoice */
@@ -110,10 +113,13 @@ trait ManagesInvoices
             return;
         }
 
+        $parameters = array_merge([
+            'automatic_tax' => $this->automaticTaxPayload(),
+            'customer' => $this->stripe_id,
+        ], $options);
+
         try {
-            $stripeInvoice = $this->stripe()->invoices->upcoming(array_merge([
-                'customer' => $this->stripe_id,
-            ], $options));
+            $stripeInvoice = $this->stripe()->invoices->upcoming($parameters);
 
             return new Invoice($this, $stripeInvoice);
         } catch (StripeInvalidRequestException $exception) {

@@ -14,7 +14,9 @@ The following required dependency versions have been updated:
 
 PR: https://github.com/laravel/cashier-stripe/pull/905
 
-The default Stripe API version for Cashier 13.x will be `2020-08-27`. Even though Cashier uses this version, it's recommended that you upgrade your own API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version after deploying the Cashier upgrade. If you use the Stripe SDK directly, make sure to properly test your integration after updating.
+The default Stripe API version for Cashier 13.x will be `2020-08-27`. Even though Cashier uses this version, it's recommended that you upgrade your own API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version after deploying the Cashier upgrade. Also, make sure that you update any [webhooks to your application](https://dashboard.stripe.com/webhooks) to this version. 
+
+If you use the Stripe SDK directly, make sure to properly test your integration after updating.
 
 #### Tax Percentage Removal
 
@@ -94,7 +96,7 @@ Additionally, if you were overwriting the `stripeOptions` method in your billabl
 
 PR: https://github.com/laravel/cashier-stripe/pull/1100
 
-The `cashier.model` configuration option has been removed from Cashier. Instead, you should use the `Cashier::setCustomerModel($customerModel)` method. Typically, this method should be called in the `boot` method of your application's `AppServiceProvider` class:
+The `cashier.model` configuration option has been removed from Cashier. Instead, you should use the `Cashier::useCustomerModel($customerModel)` method. Typically, this method should be called in the `boot` method of your application's `AppServiceProvider` class:
 
 ```php
 use App\Models\Cashier\User;
@@ -254,7 +256,7 @@ The following required dependency versions have been updated:
 
 PR: https://github.com/laravel/cashier-stripe/pull/905
 
-The Stripe API version for Cashier 11.x will be `2020-03-02`. Even though Cashier uses this version, it's recommended that you upgrade your own settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version as well after deploying the Cashier upgrade. If you use the Stripe SDK directly, make sure to properly test your integration after updating.
+The Stripe API version for Cashier 11.x will be `2020-03-02`. Even though Cashier uses this version, it's recommended that you upgrade your own settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version as well after deploying the Cashier upgrade. Also, make sure that you update any [webhooks to your application](https://dashboard.stripe.com/webhooks) to this version. If you use the Stripe SDK directly, make sure to properly test your integration after updating.
 
 ### Multiplan Subscriptions
 
