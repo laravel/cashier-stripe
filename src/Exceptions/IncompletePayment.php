@@ -69,7 +69,7 @@ class IncompletePayment extends Exception
     {
         return new static(
             $payment,
-            'The payment attempt failed because additional it needs to be confirmed before it can be completed.'
+            'The payment attempt failed because it needs to be confirmed before it can be completed.'
         );
     }
 }
