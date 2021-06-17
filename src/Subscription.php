@@ -1289,7 +1289,7 @@ class Subscription extends Model
      *
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
-    public static function newFactory()
+    protected static function newFactory()
     {
         return SubscriptionFactory::new();
     }
