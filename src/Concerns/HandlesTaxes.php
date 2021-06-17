@@ -8,11 +8,12 @@ trait HandlesTaxes
      * Indicates if Cashier should automatically calculate tax for the new subscription.
      *
      * @var bool
+     * @deprecated Use the new cashier.taxes config setting instead.
      */
     protected $automaticTax = false;
 
     /**
-     * The IP address of the customer used to determine tax location.
+     * The IP address of the customer used to determine the tax location.
      *
      * @var string|null
      */
@@ -36,6 +37,7 @@ trait HandlesTaxes
      * Allow taxes to be automatically calculated by Stripe.
      *
      * @return $this
+     * @deprecated Use the new cashier.taxes config setting instead.
      */
     public function withTax()
     {
@@ -45,7 +47,7 @@ trait HandlesTaxes
     }
 
     /**
-     * Set the The IP address of the customer used to determine tax location.
+     * Set the The IP address of the customer used to determine the tax location.
      *
      * @return $this
      */
@@ -84,7 +86,7 @@ trait HandlesTaxes
     {
         return array_filter([
             'customer_ip_address' => $this->customerIpAddress,
-            'enabled' => $this->automaticTax,
+            'enabled' => $this->automaticTax ?: config('cashier.taxes'),
             'estimation_billing_address' => $this->estimationBillingAddress,
         ]);
     }

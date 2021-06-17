@@ -494,6 +494,7 @@ class Subscription extends Model
         $this->guardAgainstMultiplePrices();
 
         $stripeSubscription = $this->updateStripeSubscription([
+            'automatic_tax' => $this->automaticTaxPayload(),
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
             'quantity' => $quantity,
@@ -615,6 +616,7 @@ class Subscription extends Model
         }
 
         $this->updateStripeSubscription([
+            'automatic_tax' => $this->automaticTaxPayload(),
             'trial_end' => 'now',
             'proration_behavior' => $this->prorateBehavior(),
         ]);
@@ -639,6 +641,7 @@ class Subscription extends Model
         }
 
         $this->updateStripeSubscription([
+            'automatic_tax' => $this->automaticTaxPayload(),
             'trial_end' => $date->getTimestamp(),
             'proration_behavior' => $this->prorateBehavior(),
         ]);
@@ -954,6 +957,7 @@ class Subscription extends Model
     public function cancel()
     {
         $stripeSubscription = $this->updateStripeSubscription([
+            'automatic_tax' => $this->automaticTaxPayload(),
             'cancel_at_period_end' => true,
         ]);
 
@@ -988,6 +992,7 @@ class Subscription extends Model
         }
 
         $stripeSubscription = $this->updateStripeSubscription([
+            'automatic_tax' => $this->automaticTaxPayload(),
             'cancel_at' => $endsAt,
             'proration_behavior' => $this->prorateBehavior(),
         ]);
