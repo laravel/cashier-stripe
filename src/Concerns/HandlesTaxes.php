@@ -41,6 +41,8 @@ trait HandlesTaxes
     {
         $this->automaticTax = true;
 
+        $this->collectTaxIds();
+
         return $this;
     }
 
