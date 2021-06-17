@@ -23,7 +23,6 @@ trait PerformsCharges
     public function charge($amount, $paymentMethod, array $options = [])
     {
         $options = array_merge([
-            'automatic_tax' => $this->automaticTaxPayload(),
             'confirmation_method' => 'automatic',
             'confirm' => true,
             'currency' => $this->preferredCurrency(),
@@ -63,7 +62,6 @@ trait PerformsCharges
      * Begin a new checkout session for existing prices.
      *
      * @param  array|string  $items
-     * @param  int  $quantity
      * @param  array  $sessionOptions
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout

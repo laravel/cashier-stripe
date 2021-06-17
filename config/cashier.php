@@ -74,19 +74,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Taxes
-    |--------------------------------------------------------------------------
-    |
-    | This setting allows you to define if you automatically want to calculate
-    | taxes for all your new invoices like when starting new subscriptions,
-    | swapping plans, new checkout sessions and also for one-off charges.
-    |
-    */
-
-    'taxes' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | Payment Confirmation Notification
     |--------------------------------------------------------------------------
     |
