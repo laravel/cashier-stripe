@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Concerns;
 
 use Illuminate\Support\Collection;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Checkout;
 use Laravel\Cashier\Payment;
 
@@ -83,7 +84,7 @@ trait PerformsCharges
 
                 return $item;
             })->values()->all(),
-            'tax_id_collection' => config('stripe.taxes') ?: $this->collectTaxIds,
+            'tax_id_collection' => Cashier::$calculatesTaxes ?: $this->collectTaxIds,
         ]);
 
         return Checkout::create($this, array_merge($payload, $sessionOptions), $customerOptions);

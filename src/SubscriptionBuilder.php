@@ -333,7 +333,7 @@ class SubscriptionBuilder
                 'trial_end' => $trialEnd ? $trialEnd->getTimestamp() : null,
                 'metadata' => array_merge($this->metadata, ['name' => $this->name]),
             ]),
-            'tax_id_collection' => config('stripe.taxes') ?: $this->collectTaxIds,
+            'tax_id_collection' => Cashier::$calculatesTaxes ?: $this->collectTaxIds,
         ]);
 
         return Checkout::create($this->owner, array_merge($payload, $sessionOptions), $customerOptions);
