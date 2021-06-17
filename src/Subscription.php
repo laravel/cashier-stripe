@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
-use Laravel\Cashier\Concerns\HandlesTaxes;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionFactory;
@@ -23,7 +22,6 @@ use Stripe\Subscription as StripeSubscription;
  */
 class Subscription extends Model
 {
-    use HandlesTaxes;
     use HasFactory;
     use InteractsWithPaymentBehavior;
     use Prorates;
@@ -791,7 +789,6 @@ class Subscription extends Model
     protected function getSwapOptions(Collection $items, array $options = [])
     {
         $payload = [
-            'automatic_tax' => $this->automaticTaxPayload(),
             'items' => $items->values()->all(),
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
@@ -1132,7 +1129,6 @@ class Subscription extends Model
     public function upcomingInvoice(array $options = [])
     {
         return $this->owner->upcomingInvoice(array_merge([
-            'automatic_tax' => $this->automaticTaxPayload(),
             'subscription' => $this->stripe_id,
         ], $options));
     }

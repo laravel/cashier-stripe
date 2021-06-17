@@ -323,6 +323,7 @@ class SubscriptionBuilder
         }
 
         $payload = array_filter([
+            'automatic_tax' => $this->automaticTaxPayload(),
             'mode' => 'subscription',
             'line_items' => Collection::make($this->items)->values()->all(),
             'allow_promotion_codes' => $this->allowPromotionCodes,
@@ -332,7 +333,7 @@ class SubscriptionBuilder
                 'trial_end' => $trialEnd ? $trialEnd->getTimestamp() : null,
                 'metadata' => array_merge($this->metadata, ['name' => $this->name]),
             ]),
-            'tax_id_collection' => $this->collectTaxIds,
+            'tax_id_collection' => Cashier::$calculatesTaxes ?: $this->collectTaxIds,
         ]);
 
         return Checkout::create($this->owner, array_merge($payload, $sessionOptions), $customerOptions);

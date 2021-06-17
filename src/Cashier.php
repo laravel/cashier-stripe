@@ -55,6 +55,13 @@ class Cashier
     public static $deactivatePastDue = true;
 
     /**
+     * Indicates if Cashier will automatically calculate taxes using Stripe Tax.
+     *
+     * @var bool
+     */
+    public static $calculatesTaxes = false;
+
+    /**
      * The default customer model class name.
      *
      * @var string
@@ -169,6 +176,18 @@ class Cashier
     public static function keepPastDueSubscriptionsActive()
     {
         static::$deactivatePastDue = false;
+
+        return new static;
+    }
+
+    /**
+     * Configure Cashier to automatically calculate taxes using Stripe Tax.
+     *
+     * @return static
+     */
+    public static function calculateTaxes()
+    {
+        static::$calculatesTaxes = true;
 
         return new static;
     }
