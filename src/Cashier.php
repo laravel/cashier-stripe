@@ -55,7 +55,7 @@ class Cashier
     public static $deactivatePastDue = true;
 
     /**
-     * Indicates if Cashier will automatically calculate taxes using Strip Tax.
+     * Indicates if Cashier will automatically calculate taxes using Stripe Tax.
      *
      * @var bool
      */
