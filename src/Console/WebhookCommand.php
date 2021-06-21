@@ -16,7 +16,7 @@ class WebhookCommand extends Command
     protected $signature = 'cashier:webhook
             {--disabled : Immediately disable the webhook after creation}
             {--url= : The URL endpoint for the webhook}
-            {--api_version= : The Stripe API version the webhook should use}';
+            {--api-version= : The Stripe API version the webhook should use}';
 
     /**
      * The console command description.
@@ -42,7 +42,7 @@ class WebhookCommand extends Command
                 'invoice.payment_action_required',
             ],
             'url' => $this->option('url') ?? route('cashier.webhook'),
-            'api_version' => $this->option('api_version') ?? Cashier::STRIPE_VERSION,
+            'api_version' => $this->option('api-version') ?? Cashier::STRIPE_VERSION,
         ], Cashier::stripeOptions());
 
         $this->info('The Stripe webhook was created successfully. Retrieve the webhook secret in your Stripe dashboard and define it as an environment variable.');
