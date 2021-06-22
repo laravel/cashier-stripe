@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
 use Laravel\Cashier\Invoice;
 use Laravel\Cashier\Payment;
+use LogicException;
 use Stripe\Exception\CardException as StripeCardException;
 use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
 use Stripe\Invoice as StripeInvoice;
@@ -24,6 +25,10 @@ trait ManagesInvoices
      */
     public function tab($description, $amount, array $options = [])
     {
+        if ($this->isAutomaticTaxEnabled()) {
+            throw new LogicException('For now, you cannot add invoice items in combination automatic tax calculation.');
+        }
+
         $this->assertCustomerExists();
 
         $options = array_merge([

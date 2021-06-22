@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Checkout;
 use Laravel\Cashier\Payment;
+use LogicException;
 
 trait PerformsCharges
 {
@@ -102,6 +103,10 @@ trait PerformsCharges
      */
     public function checkoutCharge($amount, $name, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
     {
+        if ($this->isAutomaticTaxEnabled()) {
+            throw new LogicException('For now, you cannot use checkout charges in combination automatic tax calculation.');
+        }
+
         return $this->checkout([[
             'price_data' => [
                 'currency' => $this->preferredCurrency(),
