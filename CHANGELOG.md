@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.14.1...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.15.0...12.x)
+
+
+## [v12.15.0 (2021-06-22)](https://github.com/laravel/cashier/compare/v12.14.1...v12.15.0)
+
+### Added
+- Implement webhook command ([#1202](https://github.com/laravel/cashier-stripe/pull/1202))
 
 
 ## [v12.14.1 (2021-06-01)](https://github.com/laravel/cashier/compare/v12.14.0...v12.14.1)
