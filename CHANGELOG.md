@@ -1,6 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.1.0...13.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.2.0...13.x)
+
+
+## [v13.2.0 (2021-06-22)](https://github.com/laravel/cashier/compare/v13.1.0...v13.2.0)
+
+### Added
+- Implement new `calculateTaxes` call ([#1198](https://github.com/laravel/cashier-stripe/pull/1198))
+- Implement webhook command ([#1202](https://github.com/laravel/cashier-stripe/pull/1202), [1d9cce8](https://github.com/laravel/cashier-stripe/commit/1d9cce83d7f39014fe2957edadfb0cc7604563fb))
+
+### Changed
+- Prevent tax calculation for one-off charges ([#1206](https://github.com/laravel/cashier-stripe/pull/1206))
+
+### Fixed
+- Use correct method visibility ([#1200](https://github.com/laravel/cashier-stripe/pull/1200))
 
 
 ## [v13.1.0 (2021-06-15)](https://github.com/laravel/cashier/compare/v13.0.0...v13.1.0)
