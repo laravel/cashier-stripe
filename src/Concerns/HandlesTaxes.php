@@ -88,9 +88,19 @@ trait HandlesTaxes
     {
         return array_filter([
             'customer_ip_address' => $this->customerIpAddress,
-            'enabled' => $this->automaticTax ?: Cashier::$calculatesTaxes,
+            'enabled' => $this->isAutomaticTaxEnabled(),
             'estimation_billing_address' => $this->estimationBillingAddress,
         ]);
+    }
+
+    /**
+     * Determine if automatic tax is enabled.
+     *
+     * @return bool
+     */
+    protected function isAutomaticTaxEnabled()
+    {
+        return $this->automaticTax ?: Cashier::$calculatesTaxes;
     }
 
     /**
