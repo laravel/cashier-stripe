@@ -94,7 +94,7 @@ trait HandlesTaxes
     }
 
     /**
-     * Determine if automatic tax is enabled or not.
+     * Determine if automatic tax is enabled.
      *
      * @return bool
      */
