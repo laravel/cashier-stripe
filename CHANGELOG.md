@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.2.0...13.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.2.1...13.x)
+
+
+## [v13.2.1 (2021-06-24)](https://github.com/laravel/cashier/compare/v13.2.0...v13.2.1)
+
+### Fixed
+- Fix collecting tax ids ([#1209](https://github.com/laravel/cashier-stripe/pull/1209))
 
 
 ## [v13.2.0 (2021-06-22)](https://github.com/laravel/cashier/compare/v13.1.0...v13.2.0)
