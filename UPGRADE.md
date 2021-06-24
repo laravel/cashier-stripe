@@ -26,7 +26,13 @@ You should also make sure your webhook operates on the same API version as Cashi
 php artisan cashier:webhook --disabled
 ```
 
-This will create a new webhook with the same Stripe API version as Cashier [in your Stripe dashboard](https://dashboard.stripe.com/webhooks). The webhook will be disabled until after you've removed the old one. To upgrade to the new webhook take the following steps:
+This will create a new webhook with the same Stripe API version as Cashier [in your Stripe dashboard](https://dashboard.stripe.com/webhooks). The webhook will be disabled until after you've removed the old one. By default, it'll make use of the `APP_URL` environment variable to set your url. If you need to use a different one you can use the `--url` flag:
+
+```bash
+php artisan cashier:webhook --disabled --url "http://example.com/stripe/webhook"
+```
+
+To enable to the new webhook take the following steps:
 
 1. If you have it enabled, disable the webhook signature on production by removing the `STRIPE_WEBHOOK_SECRET` environment variable
 2. Add any extra Stripe events your app requires to the new webhook in your Stripe dashboard
