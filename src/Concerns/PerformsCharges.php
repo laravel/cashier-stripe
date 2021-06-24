@@ -85,7 +85,9 @@ trait PerformsCharges
 
                 return $item;
             })->values()->all(),
-            'tax_id_collection' => Cashier::$calculatesTaxes ?: $this->collectTaxIds,
+            'tax_id_collection' => [
+                'enabled' => Cashier::$calculatesTaxes ?: $this->collectTaxIds,
+            ],
         ]);
 
         return Checkout::create($this, array_merge($payload, $sessionOptions), $customerOptions);
