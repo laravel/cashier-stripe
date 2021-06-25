@@ -332,6 +332,26 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Determine if the invoice will charge the customer automatically.
+     *
+     * @return bool
+     */
+    public function chargesAutomatically()
+    {
+        return $this->invoice->collection_method === StripeInvoice::COLLECTION_METHOD_CHARGE_AUTOMATICALLY;
+    }
+
+    /**
+     * Determine if the invoice will send an invoice to the customer.
+     *
+     * @return bool
+     */
+    public function sendsInvoice()
+    {
+        return $this->invoice->collection_method === StripeInvoice::COLLECTION_METHOD_SEND_INVOICE;
+    }
+
+    /**
      * Get all of the "invoice item" line items.
      *
      * @return \Laravel\Cashier\InvoiceLineItem[]

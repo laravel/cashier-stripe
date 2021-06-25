@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Tests\Feature;
 use Laravel\Cashier\Exceptions\InvalidCustomer;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
 use Laravel\Cashier\Invoice;
+use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
 use Stripe\InvoiceItem as StripeInvoiceItem;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -25,9 +26,9 @@ class InvoicesTest extends FeatureTestCase
         $user->createAsStripeCustomer();
         $user->updateDefaultPaymentMethod('pm_card_visa');
 
-        $response = $user->invoice();
+        $this->expectException(StripeInvalidRequestException::class);
 
-        $this->assertFalse($response);
+        $user->invoice();
     }
 
     public function test_customer_can_be_invoiced()
