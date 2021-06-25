@@ -1,9 +1,28 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.1.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.2.1...master)
 
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
+
+## [v13.2.1 (2021-06-24)](https://github.com/laravel/cashier/compare/v13.2.0...v13.2.1)
+
+### Fixed
+- Fix collecting tax ids ([#1209](https://github.com/laravel/cashier-stripe/pull/1209))
+
+
+## [v13.2.0 (2021-06-22)](https://github.com/laravel/cashier/compare/v13.1.0...v13.2.0)
+
+### Added
+- Implement new `calculateTaxes` call ([#1198](https://github.com/laravel/cashier-stripe/pull/1198))
+- Implement webhook command ([#1202](https://github.com/laravel/cashier-stripe/pull/1202), [1d9cce8](https://github.com/laravel/cashier-stripe/commit/1d9cce83d7f39014fe2957edadfb0cc7604563fb))
+
+### Changed
+- Prevent tax calculation for one-off charges ([#1206](https://github.com/laravel/cashier-stripe/pull/1206))
+
+### Fixed
+- Use correct method visibility ([#1200](https://github.com/laravel/cashier-stripe/pull/1200))
 
 
 ## [v13.1.0 (2021-06-15)](https://github.com/laravel/cashier/compare/v13.0.0...v13.1.0)
@@ -16,7 +35,7 @@
 - Fix adding metered plan to subscription ([#1189](https://github.com/laravel/cashier-stripe/pull/1189))
 
 
-## [v13.0.0 (2021-06-08)](https://github.com/laravel/cashier/compare/v12.14.1...v13.0.0)
+## [v13.0.0 (2021-06-08)](https://github.com/laravel/cashier/compare/v12.15.0...v13.0.0)
 
 ### Added
 - Support more payment method types ([#1074](https://github.com/laravel/cashier-stripe/pull/1074))
@@ -48,6 +67,12 @@
 
 ### Removed
 - Remove legacy sources support ([#1077](https://github.com/laravel/cashier-stripe/pull/1077))
+
+
+## [v12.15.0 (2021-06-22)](https://github.com/laravel/cashier/compare/v12.14.1...v12.15.0)
+
+### Added
+- Implement webhook command ([#1202](https://github.com/laravel/cashier-stripe/pull/1202))
 
 
 ## [v12.14.1 (2021-06-01)](https://github.com/laravel/cashier/compare/v12.14.0...v12.14.1)
@@ -170,7 +195,6 @@
 
 ### Fixed
 - Fix tax rates for subscription checkouts ([#1050](https://github.com/laravel/cashier-stripe/pull/1050))
->>>>>>> 12.x
 
 
 ## [v12.7.0 (2021-02-02)](https://github.com/laravel/cashier/compare/v12.6.3...v12.7.0)

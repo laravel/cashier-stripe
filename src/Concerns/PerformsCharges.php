@@ -3,8 +3,10 @@
 namespace Laravel\Cashier\Concerns;
 
 use Illuminate\Support\Collection;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Checkout;
 use Laravel\Cashier\Payment;
+use LogicException;
 
 trait PerformsCharges
 {
@@ -23,7 +25,6 @@ trait PerformsCharges
     public function charge($amount, $paymentMethod, array $options = [])
     {
         $options = array_merge([
-            'automatic_tax' => $this->automaticTaxPayload(),
             'confirmation_method' => 'automatic',
             'confirm' => true,
             'currency' => $this->preferredCurrency(),
@@ -63,7 +64,6 @@ trait PerformsCharges
      * Begin a new checkout session for existing prices.
      *
      * @param  array|string  $items
-     * @param  int  $quantity
      * @param  array  $sessionOptions
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
@@ -85,7 +85,9 @@ trait PerformsCharges
 
                 return $item;
             })->values()->all(),
-            'tax_id_collection' => $this->collectsTaxIds,
+            'tax_id_collection' => [
+                'enabled' => Cashier::$calculatesTaxes ?: $this->collectTaxIds,
+            ],
         ]);
 
         return Checkout::create($this, array_merge($payload, $sessionOptions), $customerOptions);
@@ -103,6 +105,10 @@ trait PerformsCharges
      */
     public function checkoutCharge($amount, $name, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
     {
+        if ($this->isAutomaticTaxEnabled()) {
+            throw new LogicException('For now, you cannot use checkout charges in combination automatic tax calculation.');
+        }
+
         return $this->checkout([[
             'price_data' => [
                 'currency' => $this->preferredCurrency(),

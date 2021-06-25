@@ -2,17 +2,20 @@
 
 namespace Laravel\Cashier\Concerns;
 
+use Laravel\Cashier\Cashier;
+
 trait HandlesTaxes
 {
     /**
      * Indicates if Cashier should automatically calculate tax for the new subscription.
      *
      * @var bool
+     * @deprecated Use the new Cashier::calculateTaxes() method instead.
      */
     protected $automaticTax = false;
 
     /**
-     * The IP address of the customer used to determine tax location.
+     * The IP address of the customer used to determine the tax location.
      *
      * @var string|null
      */
@@ -36,6 +39,7 @@ trait HandlesTaxes
      * Allow taxes to be automatically calculated by Stripe.
      *
      * @return $this
+     * @deprecated Use the new Cashier::calculateTaxes() method instead.
      */
     public function withTax()
     {
@@ -45,7 +49,7 @@ trait HandlesTaxes
     }
 
     /**
-     * Set the The IP address of the customer used to determine tax location.
+     * Set the The IP address of the customer used to determine the tax location.
      *
      * @return $this
      */
@@ -84,9 +88,19 @@ trait HandlesTaxes
     {
         return array_filter([
             'customer_ip_address' => $this->customerIpAddress,
-            'enabled' => $this->automaticTax,
+            'enabled' => $this->isAutomaticTaxEnabled(),
             'estimation_billing_address' => $this->estimationBillingAddress,
         ]);
+    }
+
+    /**
+     * Determine if automatic tax is enabled.
+     *
+     * @return bool
+     */
+    protected function isAutomaticTaxEnabled()
+    {
+        return $this->automaticTax ?: Cashier::$calculatesTaxes;
     }
 
     /**

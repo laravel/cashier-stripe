@@ -17,6 +17,7 @@
         "php": "^7.4|^8.0",
         "ext-json": "*",
         "dompdf/dompdf": "^0.8.6|^1.0.1",
+        "illuminate/console": "^8.0",
         "illuminate/contracts": "^8.0",
         "illuminate/database": "^8.0",
         "illuminate/http": "^8.0",

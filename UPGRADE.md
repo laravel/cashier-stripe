@@ -14,9 +14,34 @@ The following required dependency versions have been updated:
 
 PR: https://github.com/laravel/cashier-stripe/pull/905
 
-The default Stripe API version for Cashier 13.x will be `2020-08-27`. Even though Cashier uses this version, it's recommended that you upgrade your own API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version after deploying the Cashier upgrade. Also, make sure that you update any [webhooks to your application](https://dashboard.stripe.com/webhooks) to this version. 
+The default Stripe API version for Cashier 13.x will be `2020-08-27`. If this is the latest Stripe API version at the time that you're upgrading to this Cashier version then it's also recommended that you upgrade your own Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
 
 If you use the Stripe SDK directly, make sure to properly test your integration after updating.
+
+#### Upgrading Your Webhook
+
+You should ensure your webhook operates on the same API version as Cashier. To do so, you may use the `cashier:webhook` command from your production environment to create a new webhook that matches Cashier's Stripe API version:
+
+```bash
+php artisan cashier:webhook --disabled
+```
+
+This will create a new webhook with the same Stripe API version as Cashier [in your Stripe dashboard](https://dashboard.stripe.com/webhooks). The webhook will be immediately disabled so it doesn't interfere with your existing production application until you are ready to enable it. By default, the webhook will be created using the `APP_URL` environment variable to determine the proper URL for your application. If you need to use a different URL, you can use the `--url` flag when invoking the command:
+
+```bash
+php artisan cashier:webhook --disabled --url "http://example.com/stripe/webhook"
+```
+
+You may use the following upgrade checklist to properly enable to the new webhook:
+
+1. If you have webhook signature verification enabled, disable it on production by temporarily removing the `STRIPE_WEBHOOK_SECRET` environment variable.
+2. Add any extra Stripe events your application requires to the new webhook in your Stripe dashboard.
+3. Disable the old webhook in your Stripe dashboard.
+4. Enable the new webhook in your Stripe dashboard.
+5. Re-enable the new webhook secret by re-adding the `STRIPE_WEBHOOK_SECRET` environment variable in production with the secret from the new webhook.
+6. Remove the old webhook in your Stripe dashboard.
+
+After following this process, your new webhook will be active and ready to receive events.
 
 #### Tax Percentage Removal
 
@@ -256,7 +281,7 @@ The following required dependency versions have been updated:
 
 PR: https://github.com/laravel/cashier-stripe/pull/905
 
-The Stripe API version for Cashier 11.x will be `2020-03-02`. Even though Cashier uses this version, it's recommended that you upgrade your own settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version as well after deploying the Cashier upgrade. Also, make sure that you update any [webhooks to your application](https://dashboard.stripe.com/webhooks) to this version. If you use the Stripe SDK directly, make sure to properly test your integration after updating.
+The Stripe API version for Cashier 11.x will be `2020-03-02`. Even though Cashier uses this version, it's recommended that you upgrade your own settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this API version as well after deploying the Cashier upgrade. If you use the Stripe SDK directly, make sure to properly test your integration after updating.
 
 ### Multiplan Subscriptions
 
