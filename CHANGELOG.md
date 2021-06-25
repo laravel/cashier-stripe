@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/laravel/cashier/compare/v13.2.1...master)
 
+### Changed
+- Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
+
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
 
