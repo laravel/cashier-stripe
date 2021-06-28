@@ -65,6 +65,45 @@ trait ManagesInvoices
     }
 
     /**
+     * Add an invoice item for a specific Price ID to the customer's upcoming invoice.
+     *
+     * @param  string  $price
+     * @param  int  $quantity
+     * @param  array  $options
+     * @return \Stripe\InvoiceItem
+     */
+    public function tabPrice($price, $quantity = 1, array $options = [])
+    {
+        $this->assertCustomerExists();
+
+        $options = array_merge([
+            'customer' => $this->stripe_id,
+            'price' => $price,
+            'quantity' => $quantity,
+        ], $options);
+
+        return $this->stripe()->invoiceItems->create($options);
+    }
+
+    /**
+     * Invoice the customer for the given Price ID and generate an invoice immediately.
+     *
+     * @param  string  $price
+     * @param  int  $quantity
+     * @param  array  $tabOptions
+     * @param  array  $invoiceOptions
+     * @return \Laravel\Cashier\Invoice|bool
+     *
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
+     */
+    public function invoicePrice($price, $quantity = 1, array $tabOptions = [], array $invoiceOptions = [])
+    {
+        $this->tabPrice($price, $quantity, $tabOptions);
+
+        return $this->invoice($invoiceOptions);
+    }
+
+    /**
      * Invoice the customer outside of the regular billing cycle.
      *
      * @param  array  $options
