@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.2.1...13.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.3.0...13.x)
+
+
+## [v13.3.0 (2021-06-29)](https://github.com/laravel/cashier/compare/v13.2.1...v13.3.0)
+
+### Added
+- Add `invoicePrice` and `tabPrice` methods ([#1213](https://github.com/laravel/cashier-stripe/pull/1213))
 
 
 ## [v13.2.1 (2021-06-24)](https://github.com/laravel/cashier/compare/v13.2.0...v13.2.1)
