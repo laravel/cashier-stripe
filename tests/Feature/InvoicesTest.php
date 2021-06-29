@@ -43,6 +43,26 @@ class InvoicesTest extends FeatureTestCase
         $this->assertEquals(49900, $response->total);
     }
 
+    public function test_customer_can_be_invoiced_with_a_price()
+    {
+        $user = $this->createCustomer('customer_can_be_invoiced');
+        $user->createAsStripeCustomer();
+        $user->updateDefaultPaymentMethod('pm_card_visa');
+
+        $price = $user->stripe()->prices->create([
+            'currency' => $user->preferredCurrency(),
+            'product_data' => [
+                'name' => 'Laravel T-shirt',
+            ],
+            'unit_amount' => 499,
+        ]);
+
+        $response = $user->invoicePrice($price, 2);
+
+        $this->assertInstanceOf(Invoice::class, $response);
+        $this->assertEquals(998, $response->total);
+    }
+
     public function test_find_invoice_by_id()
     {
         $user = $this->createCustomer('find_invoice_by_id');

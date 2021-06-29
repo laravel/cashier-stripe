@@ -1,12 +1,18 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.2.1...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.3.0...master)
 
 ### Changed
 - Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
 
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
+
+## [v13.3.0 (2021-06-29)](https://github.com/laravel/cashier/compare/v13.2.1...v13.3.0)
+
+### Added
+- Add `invoicePrice` and `tabPrice` methods ([#1213](https://github.com/laravel/cashier-stripe/pull/1213))
 
 
 ## [v13.2.1 (2021-06-24)](https://github.com/laravel/cashier/compare/v13.2.0...v13.2.1)
