@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
@@ -14,7 +15,6 @@ use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
 use Stripe\Subscription as StripeSubscription;
-use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
 {
@@ -34,7 +34,7 @@ class WebhookController extends Controller
      * Handle a Stripe webhook call.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     public function handleWebhook(Request $request)
     {
@@ -58,7 +58,7 @@ class WebhookController extends Controller
      * Handle customer subscription created.
      *
      * @param  array $payload
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     protected function handleCustomerSubscriptionCreated(array $payload)
     {
@@ -116,7 +116,7 @@ class WebhookController extends Controller
      * Handle customer subscription updated.
      *
      * @param  array  $payload
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
     {
@@ -203,7 +203,7 @@ class WebhookController extends Controller
      * Handle a cancelled customer from a Stripe subscription.
      *
      * @param  array  $payload
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     protected function handleCustomerSubscriptionDeleted(array $payload)
     {
@@ -222,7 +222,7 @@ class WebhookController extends Controller
      * Handle customer updated.
      *
      * @param  array  $payload
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     protected function handleCustomerUpdated(array $payload)
     {
@@ -237,7 +237,7 @@ class WebhookController extends Controller
      * Handle deleted customer.
      *
      * @param  array  $payload
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     protected function handleCustomerDeleted(array $payload)
     {
@@ -261,7 +261,7 @@ class WebhookController extends Controller
      * Handle payment action required for invoice.
      *
      * @param  array  $payload
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     protected function handleInvoicePaymentActionRequired(array $payload)
     {
@@ -297,7 +297,7 @@ class WebhookController extends Controller
      * Handle successful calls on the controller.
      *
      * @param  array  $parameters
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     protected function successMethod($parameters = [])
     {
@@ -308,7 +308,7 @@ class WebhookController extends Controller
      * Handle calls to missing methods on the controller.
      *
      * @param  array  $parameters
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     protected function missingMethod($parameters = [])
     {
