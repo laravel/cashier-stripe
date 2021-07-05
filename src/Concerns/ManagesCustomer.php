@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Concerns;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\CustomerBalanceTransaction;
 use Laravel\Cashier\Exceptions\CustomerAlreadyCreated;
 use Laravel\Cashier\Exceptions\InvalidCustomer;
 use Stripe\Customer as StripeCustomer;
@@ -209,6 +210,75 @@ trait ManagesCustomer
     }
 
     /**
+     * Get the total balance of the customer.
+     *
+     * @return string
+     */
+    public function balance()
+    {
+        return $this->formatAmount($this->rawBalance());
+    }
+
+    /**
+     * Get the raw total balance of the customer.
+     *
+     * @return int
+     */
+    public function rawBalance()
+    {
+        if (! $this->hasStripeId()) {
+            return 0;
+        }
+
+        return $this->asStripeCustomer()->balance;
+    }
+
+    /**
+     * Return a customer's balance transactions.
+     *
+     * @param  int  $limit
+     * @param  array  $options
+     * @return \Illuminate\Support\Collection
+     */
+    public function balanceTransactions($limit = 10, array $options = [])
+    {
+        if (! $this->hasStripeId()) {
+            return new Collection();
+        }
+
+        $transactions = $this->stripe()
+            ->customers
+            ->allBalanceTransactions($this->stripe_id, array_merge(['limit' => $limit], $options));
+
+        return Collection::make($transactions->data)->map(function ($transaction) {
+            return new CustomerBalanceTransaction($this, $transaction);
+        });
+    }
+
+    /**
+     * Apply a new amount to the customer's balance.
+     *
+     * @param  int  $amount
+     * @param  string|null  $description
+     * @param  array  $options
+     * @return \Laravel\Cashier\CustomerBalanceTransaction
+     */
+    public function applyBalance($amount, $description = null, array $options = [])
+    {
+        $this->assertCustomerExists();
+
+        $transaction = $this->stripe()
+            ->customers
+            ->createBalanceTransaction($this->stripe_id, array_filter(array_merge([
+                'amount' => $amount,
+                'currency' => $this->preferredCurrency(),
+                'description' => $description,
+            ], $options)));
+
+        return new CustomerBalanceTransaction($this, $transaction);
+    }
+
+    /**
      * Get the Stripe supported currency used by the customer.
      *
      * @return string
@@ -216,6 +286,17 @@ trait ManagesCustomer
     public function preferredCurrency()
     {
         return config('cashier.currency');
+    }
+
+    /**
+     * Format the given amount into a displayable currency.
+     *
+     * @param  int  $amount
+     * @return string
+     */
+    protected function formatAmount($amount)
+    {
+        return Cashier::formatAmount($amount, $this->preferredCurrency());
     }
 
     /**
