@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Illuminate\Http\RedirectResponse;
+use Laravel\Cashier\CustomerBalanceTransaction;
 use Stripe\TaxId as StripeTaxId;
 
 class CustomerTest extends FeatureTestCase
@@ -86,5 +87,32 @@ class CustomerTest extends FeatureTestCase
         $user->deleteTaxId($taxId->id);
 
         $this->assertEmpty($user->taxIds());
+    }
+
+    public function test_customers_can_manage_their_balance()
+    {
+        $user = $this->createCustomer('customers_can_manage_their_balance');
+        $user->createAsStripeCustomer();
+
+        $this->assertSame(0, $user->rawBalance());
+
+        $transaction = $user->applyBalance(500, 'Top up Credit');
+
+        $this->assertSame(500, $user->rawBalance());
+        $this->assertSame('$5.00', $user->balance());
+        $this->assertSame(500, $transaction->rawAmount());
+        $this->assertSame('$5.00', $transaction->amount());
+        $this->assertSame(500, $transaction->rawEndingBalance());
+
+        $user->applyBalance(-200);
+
+        /** @var \Laravel\Cashier\CustomerBalanceTransaction $transaction */
+        $transaction = $user->balanceTransactions()->first();
+
+        $this->assertInstanceOf(CustomerBalanceTransaction::class, $transaction);
+        $this->assertSame(-200, $transaction->rawAmount());
+        $this->assertSame('-$2.00', $transaction->amount());
+        $this->assertSame(300, $transaction->rawEndingBalance());
+        $this->assertSame(300, $user->rawBalance());
     }
 }
