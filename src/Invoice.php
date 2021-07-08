@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
 use JsonSerializable;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
 use Stripe\Customer as StripeCustomer;
@@ -609,7 +610,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      * @param  array  $data
      * @return \Illuminate\Contracts\View\View
      */
-    public function view(array $data)
+    public function view(array $data = [])
     {
         return View::make('cashier::receipt', array_merge($data, [
             'invoice' => $this,
@@ -624,7 +625,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      * @param  array  $data
      * @return string
      */
-    public function pdf(array $data)
+    public function pdf(array $data = [])
     {
         if (! defined('DOMPDF_ENABLE_AUTOLOAD')) {
             define('DOMPDF_ENABLE_AUTOLOAD', false);
@@ -647,9 +648,10 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      * @param  array  $data
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function download(array $data)
+    public function download(array $data = [])
     {
-        $filename = $data['product'].'_'.$this->date()->month.'_'.$this->date()->year;
+        $filename = $data['product'] ?? Str::slug(config('app.name'));
+        $filename .= '_'.$this->date()->month.'_'.$this->date()->year;
 
         return $this->downloadAs($filename, $data);
     }
@@ -661,7 +663,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      * @param  array  $data
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function downloadAs($filename, array $data)
+    public function downloadAs($filename, array $data = [])
     {
         return new Response($this->pdf($data), 200, [
             'Content-Description' => 'File Transfer',
