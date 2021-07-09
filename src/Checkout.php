@@ -6,7 +6,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\View;
 use JsonSerializable;
 use Stripe\Checkout\Session;
 
@@ -60,24 +59,6 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
         ], $sessionOptions));
 
         return new static($owner, $session);
-    }
-
-    /**
-     * Get the view instance for the button.
-     *
-     * @param  string  $label
-     * @param  array  $options
-     * @return \Illuminate\Contracts\View\View
-     *
-     * @deprecated Use the redirect method instead.
-     */
-    public function button($label = 'Check out', array $options = [])
-    {
-        return View::make('cashier::checkout', array_merge([
-            'label' => $label,
-            'sessionId' => $this->session->id,
-            'stripeKey' => config('cashier.key'),
-        ], $options));
     }
 
     /**
