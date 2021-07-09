@@ -210,7 +210,7 @@ trait ManagesInvoices
      * @param  string  $filename
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function downloadInvoice($id, array $data, $filename = null)
+    public function downloadInvoice($id, array $data = [], $filename = null)
     {
         $invoice = $this->findInvoiceOrFail($id);
 
