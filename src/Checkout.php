@@ -68,6 +68,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * @param  string  $label
      * @param  array  $options
      * @return \Illuminate\Contracts\View\View
+     *
      * @deprecated Use the redirect method instead.
      */
     public function button($label = 'Check out', array $options = [])
