@@ -4,11 +4,13 @@ namespace Laravel\Cashier;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\View;
 use JsonSerializable;
 use Stripe\Checkout\Session;
 
-class Checkout implements Arrayable, Jsonable, JsonSerializable
+class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
 {
     /**
      * The Stripe model instance.
@@ -66,6 +68,8 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable
      * @param  string  $label
      * @param  array  $options
      * @return \Illuminate\Contracts\View\View
+     *
+     * @deprecated Use the redirect method instead.
      */
     public function button($label = 'Check out', array $options = [])
     {
@@ -74,6 +78,27 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable
             'sessionId' => $this->session->id,
             'stripeKey' => config('cashier.key'),
         ], $options));
+    }
+
+    /**
+     * Redirect to the checkout session.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function redirect()
+    {
+        return Redirect::to($this->session->url, 303);
+    }
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function toResponse($request)
+    {
+        return $this->redirect();
     }
 
     /**
