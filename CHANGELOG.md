@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.4.0...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.4.1...13.x)
+
+
+## [v13.4.1 (2021-07-13)](https://github.com/laravel/cashier-stripe/compare/v13.4.0...v13.4.1)
+
+### Changed
+- Implement server side Checkout redirect ([#1218](https://github.com/laravel/cashier-stripe/pull/1218))
 
 
 ## [v13.4.0 (2021-07-06)](https://github.com/laravel/cashier-stripe/compare/v13.3.0...v13.4.0)
