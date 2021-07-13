@@ -1,12 +1,18 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.4.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.4.1...master)
 
 ### Changed
 - Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
 
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
+
+## [v13.4.1 (2021-07-13)](https://github.com/laravel/cashier-stripe/compare/v13.4.0...v13.4.1)
+
+### Changed
+- Implement server side Checkout redirect ([#1218](https://github.com/laravel/cashier-stripe/pull/1218))
 
 
 ## [v13.4.0 (2021-07-06)](https://github.com/laravel/cashier-stripe/compare/v13.3.0...v13.4.0)
