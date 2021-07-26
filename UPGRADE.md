@@ -229,7 +229,7 @@ The hosted payment page for handling payment method failures has been improved t
 
 PR: https://github.com/laravel/cashier-stripe/pull/1185
 
-Cashier Stripe v13 comes with support for checking Stripe Product identifiers. To provide support for this feature, a new `stripe_product` column should be added to the `stripe_subscriptions` table:
+Cashier Stripe v13 comes with support for checking Stripe Product identifiers. To provide support for this feature, a new `stripe_product` column should be added to the `subscription_items` table:
 
 ```php
 Schema::table('subscription_items', function (Blueprint $table) {
