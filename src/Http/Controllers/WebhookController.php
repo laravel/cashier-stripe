@@ -57,7 +57,7 @@ class WebhookController extends Controller
     /**
      * Handle customer subscription created.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleCustomerSubscriptionCreated(array $payload)
