@@ -57,7 +57,7 @@ class WebhookController extends Controller
     /**
      * Handle customer subscription created.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleCustomerSubscriptionCreated(array $payload)
@@ -120,6 +120,9 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
     {
+        // Prevent issue with subscription created webhook arriving too late...
+        sleep(1);
+
         if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
             $data = $payload['data']['object'];
 
