@@ -120,6 +120,10 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
     {
+        // We delay the update of the subscription update webhook by one second to prevent
+        // an asynchronous issue with the subscription created webhook arriving too late.
+        sleep(1);
+
         if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
             $data = $payload['data']['object'];
 
