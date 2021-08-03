@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.4.1...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.4.2...13.x)
+
+
+## [v13.4.2 (2021-08-03)](https://github.com/laravel/cashier-stripe/compare/v13.4.1...v13.4.2)
+
+### Fixed
+- Fix issue with `requires_action` ([#1226](https://github.com/laravel/cashier-stripe/pull/1226))
+- Fix async issue with webhooks ([#1227](https://github.com/laravel/cashier-stripe/pull/1227))
 
 
 ## [v13.4.1 (2021-07-13)](https://github.com/laravel/cashier-stripe/compare/v13.4.0...v13.4.1)
