@@ -38,8 +38,12 @@ class WebhookController extends Controller
      */
     public function handleWebhook(Request $request)
     {
-        $payload = json_decode($request->getContent(), true);
-        $method = 'handle'.Str::studly(str_replace('.', '_', $payload['type']));
+
+        $payload = null;
+        if ($request->get('type') !== null) $payload = $request->attributes->get('type', $request)->request->all();
+        else $payload = json_decode($request->getContent(), true);
+        $type = Str::studly(str_replace('.', '_', $payload['type']));
+        $method = 'handle' . $type;
 
         WebhookReceived::dispatch($payload);
 
