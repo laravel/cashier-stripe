@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionFactory;
@@ -22,6 +23,7 @@ use Stripe\Subscription as StripeSubscription;
  */
 class Subscription extends Model
 {
+    use AllowsCoupons;
     use HasFactory;
     use InteractsWithPaymentBehavior;
     use Prorates;
@@ -788,12 +790,13 @@ class Subscription extends Model
      */
     protected function getSwapOptions(Collection $items, array $options = [])
     {
-        $payload = [
+        $payload = array_filter([
             'items' => $items->values()->all(),
             'payment_behavior' => $this->paymentBehavior(),
+            'promotion_code' => $this->promotionCodeId,
             'proration_behavior' => $this->prorateBehavior(),
             'expand' => ['latest_invoice.payment_intent'],
-        ];
+        ]);
 
         if ($payload['payment_behavior'] !== StripeSubscription::PAYMENT_BEHAVIOR_PENDING_IF_INCOMPLETE) {
             $payload['cancel_at_period_end'] = false;

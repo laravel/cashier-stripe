@@ -48,7 +48,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     protected $taxes;
 
     /**
-     * The taxes applied to the invoice.
+     * The discounts applied to the invoice.
      *
      * @var \Laravel\Cashier\Discount[]
      */
