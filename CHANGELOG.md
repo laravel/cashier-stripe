@@ -1,6 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.4.2...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.4.3...13.x)
+
+
+## [v13.4.3 (2021-08-10)](https://github.com/laravel/cashier-stripe/compare/v13.4.2...v13.4.3)
+
+### Changed
+- Allow promo codes on subscription updates ([#1230](https://github.com/laravel/cashier-stripe/pull/1230))
+
+### Fixed
+- Fix `asStripeCustomerBalanceTransaction` ([#1234](https://github.com/laravel/cashier-stripe/pull/1234))
 
 
 ## [v13.4.2 (2021-08-03)](https://github.com/laravel/cashier-stripe/compare/v13.4.1...v13.4.2)
