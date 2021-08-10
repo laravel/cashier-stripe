@@ -110,7 +110,7 @@ class CustomerBalanceTransaction
      */
     public function asStripeCustomerBalanceTransaction()
     {
-        return $this->invoice;
+        return $this->transaction;
     }
 
     /**
