@@ -97,7 +97,11 @@ class SubscriptionBuilder
      */
     public function price($price, $quantity = 1)
     {
-        $options = ['price' => $price];
+        if(is_array($price)) {
+            $options = $price;
+        } else {
+            $options = ['price' => $price];
+        }
 
         if (! is_null($quantity)) {
             $options['quantity'] = $quantity;
@@ -107,7 +111,11 @@ class SubscriptionBuilder
             $options['tax_rates'] = $taxRates;
         }
 
-        $this->items[$price] = $options;
+        if(is_array($price)) {
+            $this->items[] = $options;
+        } else {
+            $this->items[$price] = $options;
+        }
 
         return $this;
     }
