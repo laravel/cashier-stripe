@@ -236,8 +236,8 @@ class SubscriptionsTest extends FeatureTestCase
                 'recurring'   => [
                     'interval' => 'month',
                 ],
-                'unit_amount' => 1100
-            ]
+                'unit_amount' => 1100,
+            ],
         ]]);
 
         $this->assertEquals(1100, $subscription->asStripeSubscription()->items->data[0]->price->unit_amount);
@@ -461,7 +461,6 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertFalse($coupon->isPercentage());
     }
 
-
     public function test_creating_subscription_with_inline_price_data()
     {
         $user = $this->createCustomer('creating_subscription_with_inline_price_data');
@@ -475,8 +474,8 @@ class SubscriptionsTest extends FeatureTestCase
                 'recurring'   => [
                     'interval' => 'month',
                 ],
-                'unit_amount' => 1100
-            ]
+                'unit_amount' => 1100,
+            ],
         ])
             ->create('pm_card_visa');
 
@@ -495,9 +494,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertEquals('$11.00', $invoice->total());
         $this->assertEquals('exclusive', $invoice->invoiceLineItems()[0]->price->tax_behavior);
-
     }
-
 
     public function test_creating_subscription_with_an_anchored_billing_cycle()
     {

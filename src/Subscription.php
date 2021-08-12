@@ -746,7 +746,7 @@ class Subscription extends Model
                 'tax_rates' => $this->getPriceTaxRatesForPayload($price),
             ];
 
-            if(!isset($options['price_data'])) {
+            if (! isset($options['price_data'])) {
                 $payload['price'] = $price;
             }
 

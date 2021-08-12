@@ -25,7 +25,7 @@ trait ManagesInvoices
      */
     public function tab($description, $amount, array $options = [])
     {
-        if ($this->isAutomaticTaxEnabled() && !array_key_exists('price_data', $options)) {
+        if ($this->isAutomaticTaxEnabled() && ! array_key_exists('price_data', $options)) {
             throw new LogicException('When using automatic tax calculation, you need to set "price_data" in options.');
         }
 
@@ -41,7 +41,7 @@ trait ManagesInvoices
             $options['price_data'] = array_merge([
                 'unit_amount' => $amount,
                 'currency' => $this->preferredCurrency(),
-            ],  $options['price_data']);
+            ], $options['price_data']);
         } elseif (array_key_exists('quantity', $options)) {
             $options['unit_amount'] = $options['unit_amount'] ?? $amount;
         } else {
