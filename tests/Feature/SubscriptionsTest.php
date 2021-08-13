@@ -230,10 +230,10 @@ class SubscriptionsTest extends FeatureTestCase
 
         $subscription->swap([[
             'price_data' => [
-                'product'     => static::$productId,
+                'product' => static::$productId,
                 'tax_behavior' => 'exclusive',
-                'currency'    => 'USD',
-                'recurring'   => [
+                'currency' => 'USD',
+                'recurring' => [
                     'interval' => 'month',
                 ],
                 'unit_amount' => 1100,
@@ -465,19 +465,17 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('creating_subscription_with_inline_price_data');
 
-        // Create Subscription
         $user->newSubscription('main')->price([
             'price_data' => [
-                'product'     => static::$productId,
+                'product' => static::$productId,
                 'tax_behavior' => 'exclusive',
-                'currency'    => 'USD',
-                'recurring'   => [
+                'currency' => 'USD',
+                'recurring' => [
                     'interval' => 'month',
                 ],
                 'unit_amount' => 1100,
             ],
-        ])
-            ->create('pm_card_visa');
+        ])->create('pm_card_visa');
 
         $subscription = $user->subscription('main');
 
@@ -489,7 +487,6 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertTrue($subscription->recurring());
         $this->assertFalse($subscription->ended());
 
-        // Invoice Tests
         $invoice = $user->invoices()[0];
 
         $this->assertEquals('$11.00', $invoice->total());

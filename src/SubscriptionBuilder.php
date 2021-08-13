@@ -75,7 +75,7 @@ class SubscriptionBuilder
      *
      * @param  mixed  $owner
      * @param  string  $name
-     * @param  string|string[]  $prices
+     * @param  string|string[]|array[]  $prices
      * @return void
      */
     public function __construct($owner, $name, $prices = [])
@@ -91,17 +91,13 @@ class SubscriptionBuilder
     /**
      * Set a price on the subscription builder.
      *
-     * @param  string  $price
+     * @param  string|array  $price
      * @param  int|null  $quantity
      * @return $this
      */
     public function price($price, $quantity = 1)
     {
-        if (is_array($price)) {
-            $options = $price;
-        } else {
-            $options = ['price' => $price];
-        }
+        $options = is_array($price) ? $price : ['price' => $price];
 
         if (! is_null($quantity)) {
             $options['quantity'] = $quantity;

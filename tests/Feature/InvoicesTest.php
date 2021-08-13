@@ -75,7 +75,7 @@ class InvoicesTest extends FeatureTestCase
 
         $response = $user->invoiceFor('Laravel T-shirt', 599, [
             'price_data' => [
-                'product'      => $productId,
+                'product' => $productId,
                 'tax_behavior' => 'exclusive',
             ],
         ]);
