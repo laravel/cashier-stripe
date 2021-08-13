@@ -26,7 +26,7 @@ trait ManagesInvoices
     public function tab($description, $amount, array $options = [])
     {
         if ($this->isAutomaticTaxEnabled() && ! array_key_exists('price_data', $options)) {
-            throw new LogicException('When using automatic tax calculation, you need to set "price_data" in options.');
+            throw new LogicException('When using automatic tax calculation, you need to define the "price_data" in the options.');
         }
 
         $this->assertCustomerExists();
