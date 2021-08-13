@@ -743,9 +743,12 @@ class Subscription extends Model
             $options = is_string($options) ? [] : $options;
 
             $payload = [
-                'price' => $price,
                 'tax_rates' => $this->getPriceTaxRatesForPayload($price),
             ];
+
+            if (! isset($options['price_data'])) {
+                $payload['price'] = $price;
+            }
 
             if ($isSinglePriceSwap && ! is_null($this->quantity)) {
                 $payload['quantity'] = $this->quantity;

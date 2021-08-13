@@ -25,8 +25,8 @@ trait ManagesInvoices
      */
     public function tab($description, $amount, array $options = [])
     {
-        if ($this->isAutomaticTaxEnabled()) {
-            throw new LogicException('For now, you cannot add invoice items in combination automatic tax calculation.');
+        if ($this->isAutomaticTaxEnabled() && ! array_key_exists('price_data', $options)) {
+            throw new LogicException('When using automatic tax calculation, you need to define the "price_data" in the options.');
         }
 
         $this->assertCustomerExists();
@@ -37,7 +37,12 @@ trait ManagesInvoices
             'description' => $description,
         ], $options);
 
-        if (array_key_exists('quantity', $options)) {
+        if (array_key_exists('price_data', $options)) {
+            $options['price_data'] = array_merge([
+                'unit_amount' => $amount,
+                'currency' => $this->preferredCurrency(),
+            ], $options['price_data']);
+        } elseif (array_key_exists('quantity', $options)) {
             $options['unit_amount'] = $options['unit_amount'] ?? $amount;
         } else {
             $options['amount'] = $amount;

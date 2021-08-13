@@ -62,6 +62,29 @@ class InvoicesTest extends FeatureTestCase
         $this->assertEquals(998, $response->total);
     }
 
+    public function test_customer_can_be_invoiced_with_inline_price_data()
+    {
+        $user = $this->createCustomer('customer_can_be_invoiced_with_inline_price_data');
+        $user->createAsStripeCustomer();
+        $user->updateDefaultPaymentMethod('pm_card_visa');
+
+        $productId = self::stripe()->products->create([
+            'name' => 'Laravel Cashier Test Product',
+            'type' => 'service',
+        ])->id;
+
+        $response = $user->invoiceFor('Laravel T-shirt', 599, [
+            'price_data' => [
+                'product' => $productId,
+                'tax_behavior' => 'exclusive',
+            ],
+        ]);
+
+        $this->assertInstanceOf(Invoice::class, $response);
+        $this->assertEquals(599, $response->total);
+        $this->assertEquals('exclusive', $response->invoiceLineItems()[0]->price->tax_behavior);
+    }
+
     public function test_find_invoice_by_id()
     {
         $user = $this->createCustomer('find_invoice_by_id');
