@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.4.3...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.4.4...13.x)
+
+
+## [v13.4.4 (2021-08-17)](https://github.com/laravel/cashier-stripe/compare/v13.4.3...v13.4.4)
+
+### Changed
+- Add support for inline price data ([#1235](https://github.com/laravel/cashier-stripe/pull/1235))
 
 
 ## [v13.4.3 (2021-08-10)](https://github.com/laravel/cashier-stripe/compare/v13.4.2...v13.4.3)
