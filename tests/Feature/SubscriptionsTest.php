@@ -222,6 +222,28 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertSame(3, $subscription->asStripeSubscription()->quantity);
     }
 
+    public function test_swapping_subscription_with_inline_price_data()
+    {
+        $user = $this->createCustomer('swapping_subscription_with_inline_price_data');
+        $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscription = $user->subscription('main');
+
+        $subscription->swap([[
+            'price_data' => [
+                'product' => static::$productId,
+                'tax_behavior' => 'exclusive',
+                'currency' => 'USD',
+                'recurring' => [
+                    'interval' => 'month',
+                ],
+                'unit_amount' => 1100,
+            ],
+        ]]);
+
+        $this->assertEquals(1100, $subscription->asStripeSubscription()->items->data[0]->price->unit_amount);
+        $this->assertEquals('exclusive', $subscription->asStripeSubscription()->items->data[0]->price->tax_behavior);
+    }
+
     public function test_declined_card_during_new_quantity()
     {
         $user = $this->createCustomer('declined_card_during_new_quantity');
@@ -437,6 +459,38 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals('$5.00', $invoice->total());
         $this->assertEquals('$5.00', $coupon->amountOff());
         $this->assertFalse($coupon->isPercentage());
+    }
+
+    public function test_creating_subscription_with_inline_price_data()
+    {
+        $user = $this->createCustomer('creating_subscription_with_inline_price_data');
+
+        $user->newSubscription('main')->price([
+            'price_data' => [
+                'product' => static::$productId,
+                'tax_behavior' => 'exclusive',
+                'currency' => 'USD',
+                'recurring' => [
+                    'interval' => 'month',
+                ],
+                'unit_amount' => 1100,
+            ],
+        ])->create('pm_card_visa');
+
+        $subscription = $user->subscription('main');
+
+        $this->assertTrue($user->subscribed('main'));
+        $this->assertNotNull($user->subscribed('main', static::$otherPriceId));
+        $this->assertTrue($subscription->active());
+        $this->assertFalse($subscription->cancelled());
+        $this->assertFalse($subscription->onGracePeriod());
+        $this->assertTrue($subscription->recurring());
+        $this->assertFalse($subscription->ended());
+
+        $invoice = $user->invoices()[0];
+
+        $this->assertEquals('$11.00', $invoice->total());
+        $this->assertEquals('exclusive', $invoice->invoiceLineItems()[0]->price->tax_behavior);
     }
 
     public function test_creating_subscription_with_an_anchored_billing_cycle()
