@@ -118,7 +118,7 @@ class SubscriptionItem extends Model
         if ($this->subscription->hasSinglePrice()) {
             $this->subscription->fill([
                 'stripe_status' => $stripeSubscriptionItem->subscription->status,
-                'quantity' => $quantity,
+                'quantity' => $stripeSubscriptionItem->quantity,
             ])->save();
         }
 
