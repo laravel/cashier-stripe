@@ -502,7 +502,7 @@ class Subscription extends Model
 
         $this->fill([
             'stripe_status' => $stripeSubscription->status,
-            'quantity' => $quantity,
+            'quantity' => $stripeSubscription->quantity,
         ])->save();
 
         if ($this->hasIncompletePayment()) {
@@ -850,7 +850,7 @@ class Subscription extends Model
             'stripe_id' => $stripeSubscriptionItem->id,
             'stripe_product' => $stripeSubscriptionItem->price->product,
             'stripe_price' => $stripeSubscriptionItem->price->id,
-            'quantity' => $quantity,
+            'quantity' => $stripeSubscriptionItem->quantity,
         ]);
 
         $this->unsetRelation('items');
