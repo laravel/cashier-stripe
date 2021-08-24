@@ -1,12 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.4.4...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.4.5...master)
 
 ### Changed
 - Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
 
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
+
+## [v13.4.5 (2021-08-23)](https://github.com/laravel/cashier-stripe/compare/v13.4.4...v13.4.5)
+
+### Fixed
+- Fix quantity filling on subscriptions ([#1238](https://github.com/laravel/cashier-stripe/pull/1238))
+- Fix unreachable status value ([#1240](https://github.com/laravel/cashier-stripe/pull/1240))
 
 
 ## [v13.4.4 (2021-08-17)](https://github.com/laravel/cashier-stripe/compare/v13.4.3...v13.4.4)
