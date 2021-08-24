@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.4.4...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.4.5...13.x)
+
+
+## [v13.4.5 (2021-08-23)](https://github.com/laravel/cashier-stripe/compare/v13.4.4...v13.4.5)
+
+### Fixed
+- Fix quantity filling on subscriptions ([#1238](https://github.com/laravel/cashier-stripe/pull/1238))
+- Fix unreachable status value ([#1240](https://github.com/laravel/cashier-stripe/pull/1240))
 
 
 ## [v13.4.4 (2021-08-17)](https://github.com/laravel/cashier-stripe/compare/v13.4.3...v13.4.4)
