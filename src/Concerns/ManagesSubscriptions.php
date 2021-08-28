@@ -176,13 +176,13 @@ trait ManagesSubscriptions
     /**
      * Determine if the customer has a valid subscription on the given product.
      *
-     * @param  string  $price
+     * @param  string  $product
      * @return bool
      */
-    public function onProduct($price)
+    public function onProduct($product)
     {
-        return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($price) {
-            return $subscription->valid() && $subscription->hasProduct($price);
+        return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($product) {
+            return $subscription->valid() && $subscription->hasProduct($product);
         }));
     }
 
