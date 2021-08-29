@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use Laravel\Cashier\Tests\Fixtures\User;
@@ -332,7 +333,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         ]);
 
         $subscription->items()->create([
-            'stripe_id' => 'it_foo',
+            'stripe_id' => 'it_'.Str::random(10),
             'stripe_product' => self::$productId,
             'stripe_price' => self::$priceId,
             'quantity' => 1,
@@ -356,7 +357,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         $subscription->save();
 
         $subscription->items()->create([
-            'stripe_id' => 'it_foo',
+            'stripe_id' => 'it_'.Str::random(10),
             'stripe_product' => self::$productId,
             'stripe_price' => self::$otherPriceId,
             'quantity' => 1,
