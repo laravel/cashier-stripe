@@ -61,15 +61,23 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     protected $refreshed = false;
 
     /**
+     * The data that will be sent when the invoice is refreshed.
+     *
+     * @var array
+     */
+    protected $refreshData = [];
+
+    /**
      * Create a new invoice instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @param  \Stripe\Invoice  $invoice
+     * @param  array  $refreshData
      * @return void
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidInvoice
      */
-    public function __construct($owner, StripeInvoice $invoice)
+    public function __construct($owner, StripeInvoice $invoice, array $refreshData = [])
     {
         if ($owner->stripe_id !== $invoice->customer) {
             throw InvalidInvoice::invalidOwner($invoice, $owner);
@@ -77,6 +85,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
 
         $this->owner = $owner;
         $this->invoice = $invoice;
+        $this->refreshData = $refreshData;
     }
 
     /**
@@ -385,28 +394,24 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
             return;
         }
 
+        $expand = [
+            'account_tax_ids',
+            'discounts',
+            'lines.data.tax_amounts.tax_rate',
+            'total_discount_amounts.discount',
+            'total_tax_amounts.tax_rate',
+        ];
+
         if ($this->invoice->id) {
             $this->invoice = Cashier::stripe()->invoices->retrieve($this->invoice->id, [
-                'expand' => [
-                    'account_tax_ids',
-                    'discounts',
-                    'lines.data.tax_amounts.tax_rate',
-                    'total_discount_amounts.discount',
-                    'total_tax_amounts.tax_rate',
-                ],
+                'expand' => $expand,
             ]);
         } else {
             // If no invoice ID is present then assume this is the customer's upcoming invoice...
-            $this->invoice = Cashier::stripe()->invoices->upcoming([
+            $this->invoice = Cashier::stripe()->invoices->upcoming(array_merge($this->refreshData, [
                 'customer' => $this->owner->stripe_id,
-                'expand' => [
-                    'account_tax_ids',
-                    'discounts',
-                    'lines.data.tax_amounts.tax_rate',
-                    'total_discount_amounts.discount',
-                    'total_tax_amounts.tax_rate',
-                ],
-            ]);
+                'expand' => $expand,
+            ]));
         }
 
         $this->refreshed = true;
