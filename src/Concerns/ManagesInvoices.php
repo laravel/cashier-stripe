@@ -170,7 +170,7 @@ trait ManagesInvoices
         try {
             $stripeInvoice = $this->stripe()->invoices->upcoming($parameters);
 
-            return new Invoice($this, $stripeInvoice);
+            return new Invoice($this, $stripeInvoice, $parameters);
         } catch (StripeInvalidRequestException $exception) {
             //
         }
