@@ -1190,7 +1190,7 @@ class Subscription extends Model
     }
 
     /**
-     * Get an array of the subscription's invoices including pending ones.
+     * Get an array of the subscription's invoices, including pending invoices.
      *
      * @param  array  $parameters
      * @return \Illuminate\Support\Collection|\Laravel\Cashier\Invoice[]
