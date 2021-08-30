@@ -270,7 +270,7 @@ trait ManagesInvoices
     }
 
     /**
-     * Get an array of the customer's invoices.
+     * Get an array of the customer's invoices, including pending invoices.
      *
      * @param  array  $parameters
      * @return \Illuminate\Support\Collection|\Laravel\Cashier\Invoice[]
