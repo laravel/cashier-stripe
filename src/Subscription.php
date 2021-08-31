@@ -1176,6 +1176,31 @@ class Subscription extends Model
     }
 
     /**
+     * Get a collection of the subscription's invoices.
+     *
+     * @param  bool  $includePending
+     * @param  array  $parameters
+     * @return \Illuminate\Support\Collection|\Laravel\Cashier\Invoice[]
+     */
+    public function invoices($includePending = false, $parameters = [])
+    {
+        return $this->owner->invoices(
+            $includePending, array_merge($parameters, ['subscription' => $this->stripe_id])
+        );
+    }
+
+    /**
+     * Get an array of the subscription's invoices, including pending invoices.
+     *
+     * @param  array  $parameters
+     * @return \Illuminate\Support\Collection|\Laravel\Cashier\Invoice[]
+     */
+    public function invoicesIncludingPending(array $parameters = [])
+    {
+        return $this->invoices(true, $parameters);
+    }
+
+    /**
      * Sync the tax rates of the user to the subscription.
      *
      * @return void

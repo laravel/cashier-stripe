@@ -158,7 +158,7 @@ trait ManagesInvoices
         try {
             $stripeInvoice = $this->stripe()->invoices->upcoming($parameters);
 
-            return new Invoice($this, $stripeInvoice);
+            return new Invoice($this, $stripeInvoice, $parameters);
         } catch (StripeInvalidRequestException $exception) {
             //
         }
@@ -258,7 +258,7 @@ trait ManagesInvoices
     }
 
     /**
-     * Get an array of the customer's invoices.
+     * Get an array of the customer's invoices, including pending invoices.
      *
      * @param  array  $parameters
      * @return \Illuminate\Support\Collection|\Laravel\Cashier\Invoice[]

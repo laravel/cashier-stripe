@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Tests\Feature;
 
 use Carbon\Carbon;
 use DateTime;
+use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Payment;
@@ -910,7 +911,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         $subscription = $user->subscriptions()->create([
             'name' => 'default',
-            'stripe_id' => 'sub_xxx',
+            'stripe_id' => 'sub_'.Str::random(10),
             'stripe_status' => 'active',
             'stripe_price' => 'price_xxx',
             'quantity' => 1,
@@ -928,7 +929,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         $user->subscriptions()->create([
             'name' => 'default',
-            'stripe_id' => 'sub_xxx',
+            'stripe_id' => 'sub_'.Str::random(10),
             'stripe_status' => 'active',
             'stripe_price' => 'price_xxx',
             'quantity' => 1,

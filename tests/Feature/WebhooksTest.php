@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Tests\Feature;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Notifications\ConfirmPayment;
 use Stripe\Subscription as StripeSubscription;
@@ -94,7 +95,7 @@ class WebhooksTest extends FeatureTestCase
         ]);
 
         $item = $subscription->items()->create([
-            'stripe_id' => 'it_foo',
+            'stripe_id' => 'it_'.Str::random(10),
             'stripe_product' => 'prod_bar',
             'stripe_price' => 'price_bar',
             'quantity' => 1,
@@ -152,7 +153,7 @@ class WebhooksTest extends FeatureTestCase
         ]);
 
         $item = $subscription->items()->create([
-            'stripe_id' => 'it_foo',
+            'stripe_id' => 'it_'.Str::random(10),
             'stripe_product' => 'prod_bar',
             'stripe_price' => 'price_bar',
             'quantity' => 1,
