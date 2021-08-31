@@ -1,6 +1,17 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.4.5...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.0...13.x)
+
+
+## [v13.5.0 (2021-08-31)](https://github.com/laravel/cashier-stripe/compare/v13.4.5...v13.5.0)
+
+### Added
+- Add invoices methods to subscription ([#1245](https://github.com/laravel/cashier-stripe/pull/1245))
+
+### Fixed
+- Fix webhook order issue ([#1243](https://github.com/laravel/cashier-stripe/pull/1243))
+- Send data when upcoming invoice is refreshed ([#1244](https://github.com/laravel/cashier-stripe/pull/1244))
+- Update customer details when tax id is collected ([#1246](https://github.com/laravel/cashier-stripe/pull/1246))
 
 
 ## [v13.4.5 (2021-08-23)](https://github.com/laravel/cashier-stripe/compare/v13.4.4...v13.4.5)
