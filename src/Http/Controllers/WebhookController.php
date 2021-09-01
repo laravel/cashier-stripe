@@ -135,6 +135,8 @@ class WebhookController extends Controller
                 return;
             }
 
+            $subscription->name = $subscription->name ?? $data['metadata']['name'] ?? $this->newSubscriptionName($payload);
+
             $firstItem = $data['items']['data'][0];
             $isSinglePrice = count($data['items']['data']) === 1;
 
