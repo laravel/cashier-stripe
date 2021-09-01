@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.0...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.1...13.x)
+
+
+## [v13.5.1 (2021-09-01)](https://github.com/laravel/cashier-stripe/compare/v13.5.0...v13.5.1)
+
+### Fixed
+- Fix setting name on subscription ([5d00c21](https://github.com/laravel/cashier-stripe/commit/5d00c21d3b9d8d54d77845dcc07406b7e72d3be0))
 
 
 ## [v13.5.0 (2021-08-31)](https://github.com/laravel/cashier-stripe/compare/v13.4.5...v13.5.0)
