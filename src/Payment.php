@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 use Laravel\Cashier\Exceptions\IncompletePayment;
+use ReturnTypeWillChange;
 use Stripe\PaymentIntent;
 use Stripe\PaymentIntent as StripePaymentIntent;
 
@@ -222,6 +223,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return array
      */
+    #[ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();
