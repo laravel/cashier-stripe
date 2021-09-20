@@ -1041,6 +1041,7 @@ class Subscription extends Model
      * Mark the subscription as cancelled.
      *
      * @return void
+     *
      * @internal
      */
     public function markAsCancelled()
