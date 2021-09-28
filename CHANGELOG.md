@@ -1,6 +1,16 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.1...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.2...13.x)
+
+
+## [v13.5.2 (2021-09-28)](https://github.com/laravel/cashier-stripe/compare/v13.5.1...v13.5.2)
+
+### Changed
+- Use default name for subscription factory ([#1250](https://github.com/laravel/cashier-stripe/pull/1250))
+- PHP 8.1 compatibility ([#1251](https://github.com/laravel/cashier-stripe/pull/1251))
+
+### Fixed
+- Fallback to null quantity for metered price ([#1255](https://github.com/laravel/cashier-stripe/pull/1255))
 
 
 ## [v13.5.1 (2021-09-01)](https://github.com/laravel/cashier-stripe/compare/v13.5.0...v13.5.1)
