@@ -1,12 +1,22 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.5.1...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.5.2...master)
 
 ### Changed
 - Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
 
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
+
+## [v13.5.2 (2021-09-28)](https://github.com/laravel/cashier-stripe/compare/v13.5.1...v13.5.2)
+
+### Changed
+- Use default name for subscription factory ([#1250](https://github.com/laravel/cashier-stripe/pull/1250))
+- PHP 8.1 compatibility ([#1251](https://github.com/laravel/cashier-stripe/pull/1251))
+
+### Fixed
+- Fallback to null quantity for metered price ([#1255](https://github.com/laravel/cashier-stripe/pull/1255))
 
 
 ## [v13.5.1 (2021-09-01)](https://github.com/laravel/cashier-stripe/compare/v13.5.0...v13.5.1)

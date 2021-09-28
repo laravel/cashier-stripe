@@ -850,7 +850,7 @@ class Subscription extends Model
             'stripe_id' => $stripeSubscriptionItem->id,
             'stripe_product' => $stripeSubscriptionItem->price->product,
             'stripe_price' => $stripeSubscriptionItem->price->id,
-            'quantity' => $stripeSubscriptionItem->quantity,
+            'quantity' => $stripeSubscriptionItem->quantity ?? null,
         ]);
 
         $this->unsetRelation('items');
@@ -1041,6 +1041,7 @@ class Subscription extends Model
      * Mark the subscription as cancelled.
      *
      * @return void
+     *
      * @internal
      */
     public function markAsCancelled()

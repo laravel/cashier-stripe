@@ -10,6 +10,7 @@ trait HandlesTaxes
      * Indicates if Cashier should automatically calculate tax for the new subscription.
      *
      * @var bool
+     *
      * @deprecated Use the new Cashier::calculateTaxes() method instead.
      */
     protected $automaticTax = false;
@@ -39,6 +40,7 @@ trait HandlesTaxes
      * Allow taxes to be automatically calculated by Stripe.
      *
      * @return $this
+     *
      * @deprecated Use the new Cashier::calculateTaxes() method instead.
      */
     public function withTax()
