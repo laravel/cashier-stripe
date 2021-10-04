@@ -294,7 +294,7 @@ class SubscriptionBuilder
                 'stripe_id' => $item->id,
                 'stripe_product' => $item->price->product,
                 'stripe_price' => $item->price->id,
-                'quantity' => $item->quantity,
+                'quantity' => $item->quantity ?? null,
             ]);
         }
 
