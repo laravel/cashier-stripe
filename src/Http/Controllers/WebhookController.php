@@ -318,7 +318,7 @@ class WebhookController extends Controller
         return new Response;
     }
     
-     /**
+    /**
      * Set the number of automatic retries due to an object lock timeout from Stripe.
      *
      * @param  int  $retries
