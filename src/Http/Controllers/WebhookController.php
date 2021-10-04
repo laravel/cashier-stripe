@@ -14,8 +14,8 @@ use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
 use Stripe\Subscription as StripeSubscription;
-use Symfony\Component\HttpFoundation\Response;
 use Stripe\Stripe as Stripe;
+use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
 {
@@ -45,9 +45,8 @@ class WebhookController extends Controller
         WebhookReceived::dispatch($payload);
 
         if (method_exists($this, $method)) {
-            
             $this->setMaxNetworkRetries();
-            
+
             $response = $this->{$method}($payload);
 
             WebhookHandled::dispatch($payload);
