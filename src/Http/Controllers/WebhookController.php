@@ -13,8 +13,8 @@ use Laravel\Cashier\Events\WebhookReceived;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
-use Stripe\Subscription as StripeSubscription;
 use Stripe\Stripe as Stripe;
+use Stripe\Subscription as StripeSubscription;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
@@ -317,7 +317,7 @@ class WebhookController extends Controller
     {
         return new Response;
     }
-    
+
     /**
      * Set the number of automatic retries due to an object lock timeout from Stripe.
      *
