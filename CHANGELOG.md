@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.2...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.3...13.x)
+
+
+## [v13.5.3 (2021-09-05)](https://github.com/laravel/cashier-stripe/compare/v13.5.2...v13.5.3)
+
+### Fixed
+- Fix a stripe notice with SubscriptionBuilder and metered prices ([#1261](https://github.com/laravel/cashier-stripe/pull/1261))
 
 
 ## [v13.5.2 (2021-09-28)](https://github.com/laravel/cashier-stripe/compare/v13.5.1...v13.5.2)
