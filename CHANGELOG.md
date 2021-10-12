@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.3...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.4...13.x)
+
+
+## [v13.5.4 (2021-10-12)](https://github.com/laravel/cashier-stripe/compare/v13.5.3...v13.5.4)
+
+### Fixed
+- Handle Stripe Object lock timeout ([#1259](https://github.com/laravel/cashier-stripe/pull/1259))
 
 
 ## [v13.5.3 (2021-09-05)](https://github.com/laravel/cashier-stripe/compare/v13.5.2...v13.5.3)
