@@ -13,6 +13,7 @@ use Laravel\Cashier\Events\WebhookReceived;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
+use Stripe\Stripe as Stripe;
 use Stripe\Subscription as StripeSubscription;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -44,6 +45,8 @@ class WebhookController extends Controller
         WebhookReceived::dispatch($payload);
 
         if (method_exists($this, $method)) {
+            $this->setMaxNetworkRetries();
+
             $response = $this->{$method}($payload);
 
             WebhookHandled::dispatch($payload);
@@ -313,5 +316,16 @@ class WebhookController extends Controller
     protected function missingMethod($parameters = [])
     {
         return new Response;
+    }
+
+    /**
+     * Set the number of automatic retries due to an object lock timeout from Stripe.
+     *
+     * @param  int  $retries
+     * @return void
+     */
+    protected function setMaxNetworkRetries($retries = 3)
+    {
+        Stripe::setMaxNetworkRetries($retries);
     }
 }
