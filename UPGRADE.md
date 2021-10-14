@@ -144,6 +144,8 @@ PR: https://github.com/laravel/cashier-stripe/pull/1077
 
 All support for the deprecated Stripe Sources API has been removed from Cashier. If you haven't already, we recommend that you upgrade to [the Payment Methods API](https://stripe.com/docs/payments/payment-methods).
 
+This also means that the `defaultPaymentMethod` call will no longer return the `default_source` of a customer as a fallback. 
+
 ### New Payment Methods Support
 
 PR: https://github.com/laravel/cashier-stripe/pull/1074
