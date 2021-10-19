@@ -301,7 +301,10 @@
                     if (this.paymentMethod.type === 'card') {
                         if (this.paymentIntent.status === 'requires_payment_method') {
                             data.payment_method.card = this.paymentElement;
-                        } else if (this.paymentIntent.status === 'requires_action') {
+                        } else if (
+                            this.paymentIntent.status === 'requires_action' ||
+                            this.paymentIntent.status === 'requires_confirmation'
+                        ) {
                             data.payment_method = this.paymentIntent.payment_method.id;
                         }
 
