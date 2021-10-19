@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.4...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.5...13.x)
+
+
+## [v13.5.5 (2021-10-19)](https://github.com/laravel/cashier-stripe/compare/v13.5.4...v13.5.5)
+
+### Fixed
+- Fix confirming payments on the payment page ([#1268](https://github.com/laravel/cashier-stripe/pull/1268))
 
 
 ## [v13.5.4 (2021-10-12)](https://github.com/laravel/cashier-stripe/compare/v13.5.3...v13.5.4)
