@@ -8,7 +8,6 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\View;
 use JsonSerializable;
-use ReturnTypeWillChange;
 use Stripe\Checkout\Session;
 
 class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
@@ -138,7 +137,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      *
      * @return array
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();

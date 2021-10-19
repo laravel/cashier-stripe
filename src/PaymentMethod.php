@@ -6,7 +6,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 use Laravel\Cashier\Exceptions\InvalidPaymentMethod;
-use ReturnTypeWillChange;
 use Stripe\PaymentMethod as StripePaymentMethod;
 
 class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
@@ -100,7 +99,7 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
      *
      * @return array
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();

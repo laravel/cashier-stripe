@@ -11,7 +11,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
 use JsonSerializable;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
-use ReturnTypeWillChange;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\InvoiceLineItem as StripeInvoiceLineItem;
@@ -704,7 +703,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      *
      * @return array
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();
