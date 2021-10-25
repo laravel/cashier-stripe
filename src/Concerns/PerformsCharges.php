@@ -90,12 +90,6 @@ trait PerformsCharges
             ],
         ]);
 
-        // Make sure to collect address and name when Tax ID collection is enabled...
-        if ($payload['tax_id_collection']['enabled'] ?? false) {
-            $payload['customer_update']['address'] = 'auto';
-            $payload['customer_update']['name'] = 'auto';
-        }
-
         return Checkout::create($this, array_merge($payload, $sessionOptions), $customerOptions);
     }
 
