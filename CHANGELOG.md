@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.5...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.6...13.x)
+
+
+## [v13.5.6 (2021-10-26)](https://github.com/laravel/cashier-stripe/compare/v13.5.5...v13.5.6)
+
+### Fixed
+- Fix enabling auto collecting in checkout ([#1270](https://github.com/laravel/cashier-stripe/pull/1270))
 
 
 ## [v13.5.5 (2021-10-19)](https://github.com/laravel/cashier-stripe/compare/v13.5.4...v13.5.5)
