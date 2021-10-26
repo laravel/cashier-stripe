@@ -50,6 +50,12 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
     {
         $customer = $owner->createOrGetStripeCustomer($customerOptions);
 
+        // Make sure to collect address and name when Tax ID collection is enabled...
+        if ($sessionOptions['tax_id_collection']['enabled'] ?? false) {
+            $sessionOptions['customer_update']['address'] = 'auto';
+            $sessionOptions['customer_update']['name'] = 'auto';
+        }
+
         $session = $owner->stripe()->checkout->sessions->create(array_merge([
             'customer' => $customer->id,
             'mode' => 'payment',

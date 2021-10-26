@@ -1,12 +1,18 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.5.5...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.5.6...master)
 
 ### Changed
 - Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
 
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
+
+## [v13.5.6 (2021-10-26)](https://github.com/laravel/cashier-stripe/compare/v13.5.5...v13.5.6)
+
+### Fixed
+- Fix enabling auto collecting in checkout ([#1270](https://github.com/laravel/cashier-stripe/pull/1270))
 
 
 ## [v13.5.5 (2021-10-19)](https://github.com/laravel/cashier-stripe/compare/v13.5.4...v13.5.5)
