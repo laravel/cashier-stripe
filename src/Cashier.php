@@ -28,7 +28,7 @@ class Cashier
     const STRIPE_VERSION = '2020-08-27';
 
     /**
-     * The base URL for the Stripe API
+     * The base URL for the Stripe API.
      *
      * @var string
      */
