@@ -12,6 +12,15 @@ abstract class FeatureTestCase extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        if (! getenv('STRIPE_SECRET')) {
+            $this->markTestSkipped('Stripe secret key not set.');
+        }
+
+        parent::setUp();
+    }
+
     protected function defineDatabaseMigrations()
     {
         $this->loadLaravelMigrations();
