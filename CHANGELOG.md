@@ -1,12 +1,21 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.5.6...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.6.0...master)
 
 ### Changed
 - Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
 
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
+
+## [v13.6.0 (2021-11-09)](https://github.com/laravel/cashier-stripe/compare/v13.5.6...v13.6.0)
+
+### Added
+- Add `createAndSendInvoice` method ([#1276](https://github.com/laravel/cashier-stripe/pull/1276))
+
+### Changed
+- Allow the base url for the Stripe API to be customised ([#1273](https://github.com/laravel/cashier-stripe/pull/1273))
 
 
 ## [v13.5.6 (2021-10-26)](https://github.com/laravel/cashier-stripe/compare/v13.5.5...v13.5.6)

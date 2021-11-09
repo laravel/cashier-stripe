@@ -266,6 +266,23 @@ class SubscriptionBuilder
     }
 
     /**
+     * Create a new Stripe subscription and send an invoice to the customer.
+     *
+     * @param  array  $customerOptions
+     * @param  array  $subscriptionOptions
+     * @return \Laravel\Cashier\Subscription
+     *
+     * @throws \Exception
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
+     */
+    public function createAndSendInvoice(array $customerOptions = [], array $subscriptionOptions = [])
+    {
+        return $this->create(null, $customerOptions, array_merge($subscriptionOptions, [
+            'collection_method' => 'send_invoice',
+        ]));
+    }
+
+    /**
      * Create the Eloquent Subscription.
      *
      * @param  \Stripe\Subscription  $stripeSubscription

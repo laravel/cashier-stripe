@@ -38,6 +38,10 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
 
     public static function setUpBeforeClass(): void
     {
+        if (! getenv('STRIPE_SECRET')) {
+            return;
+        }
+
         parent::setUpBeforeClass();
 
         static::$productId = self::stripe()->products->create([

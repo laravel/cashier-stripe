@@ -7,6 +7,7 @@ use Money\Currency;
 use Money\Formatter\IntlMoneyFormatter;
 use Money\Money;
 use NumberFormatter;
+use Stripe\BaseStripeClient;
 use Stripe\Customer as StripeCustomer;
 use Stripe\StripeClient;
 
@@ -25,6 +26,13 @@ class Cashier
      * @var string
      */
     const STRIPE_VERSION = '2020-08-27';
+
+    /**
+     * The base URL for the Stripe API.
+     *
+     * @var string
+     */
+    public static $apiBaseUrl = BaseStripeClient::DEFAULT_API_BASE;
 
     /**
      * The custom currency formatter.
@@ -106,6 +114,7 @@ class Cashier
         return new StripeClient(array_merge([
             'api_key' => $options['api_key'] ?? config('cashier.secret'),
             'stripe_version' => static::STRIPE_VERSION,
+            'api_base' => static::$apiBaseUrl,
         ], $options));
     }
 
