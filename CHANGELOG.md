@@ -1,6 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.5.6...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.6.0...13.x)
+
+
+## [v13.6.0 (2021-11-09)](https://github.com/laravel/cashier-stripe/compare/v13.5.6...v13.6.0)
+
+### Added
+- Add `createAndSendInvoice` method ([#1276](https://github.com/laravel/cashier-stripe/pull/1276))
+
+### Changed
+- Allow the base url for the Stripe API to be customised ([#1273](https://github.com/laravel/cashier-stripe/pull/1273))
 
 
 ## [v13.5.6 (2021-10-26)](https://github.com/laravel/cashier-stripe/compare/v13.5.5...v13.5.6)
