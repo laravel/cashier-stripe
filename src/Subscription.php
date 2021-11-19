@@ -302,6 +302,7 @@ class Subscription extends Model
      * Determine if the subscription is no longer active.
      *
      * @return bool
+     *
      * @deprecated Use canceled instead.
      */
     public function cancelled()
@@ -325,6 +326,7 @@ class Subscription extends Model
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
+     *
      * @deprecated Use scopeCanceled instead.
      */
     public function scopeCancelled($query)
@@ -348,6 +350,7 @@ class Subscription extends Model
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
+     *
      * @deprecated Use scopeNotCanceled instead.
      */
     public function scopeNotCancelled($query)
@@ -1091,6 +1094,7 @@ class Subscription extends Model
      * Mark the subscription as canceled.
      *
      * @return void
+     *
      * @deprecated Use markAsCanceled instead.
      *
      * @internal
