@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Subscription;
+use Stripe\Price as StripePrice;
 use Stripe\Subscription as StripeSubscription;
 
 class SubscriptionFactory extends Factory
@@ -42,13 +43,13 @@ class SubscriptionFactory extends Factory
     /**
      * Add a price identifier to the model.
      *
-     * @param  string  $price
+     * @param  string|\Stripe\Price  $price
      * @return $this
      */
     public function withPrice($price)
     {
         return $this->state([
-            'stripe_price' => $price,
+            'stripe_price' => $price instanceof StripePrice ? $price->id : $price,
         ]);
     }
 
@@ -86,6 +87,7 @@ class SubscriptionFactory extends Factory
     public function canceled()
     {
         return $this->state([
+            'ends_at' => now(),
             'stripe_status' => StripeSubscription::STATUS_CANCELED,
         ]);
     }
