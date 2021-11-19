@@ -43,7 +43,7 @@ class SubscriptionFactory extends Factory
     /**
      * Add a price identifier to the model.
      *
-     * @param  string|\Stripe\Price  $price
+     * @param  \Stripe\Price|string  $price
      * @return $this
      */
     public function withPrice($price)
@@ -87,8 +87,8 @@ class SubscriptionFactory extends Factory
     public function canceled()
     {
         return $this->state([
-            'ends_at' => now(),
             'stripe_status' => StripeSubscription::STATUS_CANCELED,
+            'ends_at' => now(),
         ]);
     }
 
