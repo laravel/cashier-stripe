@@ -580,7 +580,7 @@
 - Add ability to ignore cashier routes ([#763](https://github.com/laravel/cashier-stripe/pull/763))
 
 ### Fixed
-- Only mount card element if payment has not succeeded or been cancelled ([#765](https://github.com/laravel/cashier-stripe/pull/765))
+- Only mount card element if payment has not succeeded or been canceled ([#765](https://github.com/laravel/cashier-stripe/pull/765))
 - Set off_session parameter to true when creating a new subscription ([#764](https://github.com/laravel/cashier-stripe/pull/764))
 
 

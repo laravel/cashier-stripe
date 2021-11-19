@@ -204,12 +204,12 @@ class WebhooksTest extends FeatureTestCase
         ]);
     }
 
-    public function test_cancelled_subscription_is_properly_reactivated()
+    public function test_canceled_subscription_is_properly_reactivated()
     {
-        $user = $this->createCustomer('cancelled_subscription_is_properly_reactivated');
+        $user = $this->createCustomer('canceled_subscription_is_properly_reactivated');
         $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa')->cancel();
 
-        $this->assertTrue($subscription->cancelled());
+        $this->assertTrue($subscription->canceled());
 
         $this->postJson('stripe/webhook', [
             'id' => 'foo',
@@ -230,15 +230,15 @@ class WebhooksTest extends FeatureTestCase
             ],
         ])->assertOk();
 
-        $this->assertFalse($subscription->fresh()->cancelled(), 'Subscription is still cancelled.');
+        $this->assertFalse($subscription->fresh()->canceled(), 'Subscription is still canceled.');
     }
 
-    public function test_subscription_is_marked_as_cancelled_when_deleted_in_stripe()
+    public function test_subscription_is_marked_as_canceled_when_deleted_in_stripe()
     {
-        $user = $this->createCustomer('subscription_is_marked_as_cancelled_when_deleted_in_stripe');
+        $user = $this->createCustomer('subscription_is_marked_as_canceled_when_deleted_in_stripe');
         $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
 
-        $this->assertFalse($subscription->cancelled());
+        $this->assertFalse($subscription->canceled());
 
         $this->postJson('stripe/webhook', [
             'id' => 'foo',
@@ -252,7 +252,7 @@ class WebhooksTest extends FeatureTestCase
             ],
         ])->assertOk();
 
-        $this->assertTrue($subscription->fresh()->cancelled(), 'Subscription is still active.');
+        $this->assertTrue($subscription->fresh()->canceled(), 'Subscription is still active.');
     }
 
     public function test_subscription_is_deleted_when_status_is_incomplete_expired()
