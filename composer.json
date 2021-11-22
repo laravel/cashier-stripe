@@ -16,7 +16,6 @@
     "require": {
         "php": "^7.3|^8.0",
         "ext-json": "*",
-        "ext-bcmath": "*",
         "dompdf/dompdf": "^0.8.6|^1.0.1",
         "illuminate/console": "^8.0",
         "illuminate/contracts": "^8.0",
