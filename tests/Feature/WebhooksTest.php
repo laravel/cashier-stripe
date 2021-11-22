@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Tests\Feature;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Contracts\WithPauseCollection;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Notifications\ConfirmPayment;
 use Stripe\Subscription as StripeSubscription;
@@ -306,5 +307,93 @@ class WebhooksTest extends FeatureTestCase
                     $notification->amount === $exception->payment->amount();
             });
         }
+    }
+
+    public function test_subscription_is_marked_as_paused_when_on_create_webhook() {
+        $user = $this->createCustomer( 'test_subscription_is_marked_as_paused_when_pause_collection_in_stripe', [ 'stripe_id' => 'cus_foo' ] );
+
+        $this->postJson( 'stripe/webhook', [
+            'id'   => 'foo',
+            'type' => 'customer.subscription.created',
+            'data' => [
+                'object' => [
+                    'id'                   => 'sub_foo',
+                    'customer'             => 'cus_foo',
+                    'cancel_at_period_end' => false,
+                    'quantity'             => 10,
+                    'items'                => [
+                        'data' => [
+                            [
+                                'id'       => 'bar',
+                                'price'    => [ 'id' => 'price_foo', 'product' => 'prod_bar' ],
+                                'quantity' => 10,
+                            ],
+                        ],
+                    ],
+                    'status'               => 'active',
+                    'pause_collection'     => [
+                        'behavior' => WithPauseCollection::BEHAVIOR_VOID,
+                    ],
+                ],
+            ],
+        ] )->assertOk();
+
+        $subscription = $user->subscription();
+
+        $this->assertTrue( $subscription->paused(), 'Subscription is not paused.' );
+        $this->assertTrue( $subscription->paused( WithPauseCollection::BEHAVIOR_VOID ), 'Subscription is not paused.' );
+        $this->assertTrue( $subscription->notPaused( WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT ), 'Subscription is paused for wrong behavior.' );
+        $this->assertTrue( $subscription->notPaused( WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE ), 'Subscription is paused for wrong behavior.' );
+
+        $this->assertNull( $subscription->pauseResumesAt() );
+        $this->assertNull( $subscription->pauseResumesAt( WithPauseCollection::BEHAVIOR_VOID ) );
+        $this->assertNull( $subscription->pauseResumesAt( WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT ) );
+        $this->assertNull( $subscription->pauseResumesAt( WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE ) );
+    }
+
+    public function test_subscription_is_marked_as_paused_when_on_update_webhook() {
+        $user         = $this->createCustomer( 'test_subscription_is_marked_as_paused_when_pause_collection_in_stripe' );
+        $subscription = $user->newSubscription( 'main', static::$priceId )->create( 'pm_card_visa' );
+
+        $this->assertFalse( $subscription->paused() );
+
+        $resumesAt = Carbon::now()->addMonth();
+
+        $this->postJson( 'stripe/webhook', [
+            'id'   => 'foo',
+            'type' => 'customer.subscription.updated',
+            'data' => [
+                'object' => [
+                    'id'                   => $subscription->stripe_id,
+                    'customer'             => $user->stripe_id,
+                    'cancel_at_period_end' => false,
+                    'quantity'             => 1,
+                    'items'                => [
+                        'data' => [
+                            [
+                                'id'       => $subscription->items()->first()->stripe_id,
+                                'price'    => [ 'id' => static::$priceId, 'product' => static::$productId ],
+                                'quantity' => 1,
+                            ],
+                        ],
+                    ],
+                    'pause_collection'     => [
+                        'behavior'   => WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT,
+                        'resumes_at' => $resumesAt->timestamp,
+                    ],
+                ],
+            ],
+        ] )->assertOk();
+
+        $subscription->refresh();
+        $this->assertTrue( $subscription->paused(), 'Subscription is still not paused.' );
+        $this->assertTrue( $subscription->paused( WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT ), 'Subscription is still not paused.' );
+        $this->assertTrue( $subscription->notPaused( WithPauseCollection::BEHAVIOR_VOID ), 'Subscription is paused for wrong behavior.' );
+        $this->assertTrue( $subscription->notPaused( WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE ), 'Subscription is paused for wrong behavior.' );
+
+        $this->assertEquals( $resumesAt->timestamp, $subscription->pauseResumesAt()->timestamp );
+        $this->assertEquals( $resumesAt->timestamp, $subscription->pauseResumesAt( WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT )->timestamp );
+        $this->assertNull( $subscription->pauseResumesAt( WithPauseCollection::BEHAVIOR_VOID ) );
+        $this->assertNull( $subscription->pauseResumesAt( WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE ) );
     }
 }

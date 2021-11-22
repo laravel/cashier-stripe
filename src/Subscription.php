@@ -12,6 +12,8 @@ use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
+use Laravel\Cashier\Concerns\UsesPauseCollection;
+use Laravel\Cashier\Contracts\WithPauseCollection;
 use Laravel\Cashier\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
@@ -21,12 +23,13 @@ use Stripe\Subscription as StripeSubscription;
 /**
  * @property \Laravel\Cashier\Billable|\Illuminate\Database\Eloquent\Model $owner
  */
-class Subscription extends Model
+class Subscription extends Model implements WithPauseCollection
 {
     use AllowsCoupons;
     use HasFactory;
     use InteractsWithPaymentBehavior;
     use Prorates;
+    use UsesPauseCollection;
 
     /**
      * The attributes that are not mass assignable.
@@ -49,6 +52,7 @@ class Subscription extends Model
      */
     protected $casts = [
         'quantity' => 'integer',
+        'pause_collection' => 'array',
     ];
 
     /**
