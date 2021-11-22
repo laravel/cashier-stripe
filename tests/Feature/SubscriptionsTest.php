@@ -973,57 +973,56 @@ class SubscriptionsTest extends FeatureTestCase
     public function test_subscription_pause_scopes() {
         $resumesAt = Carbon::now()->addWeek();
 
-        Subscription::factory()->count( 4 )->unpaused()->create();
+        Subscription::factory()->count(4)->unpaused()->create();
 
-        Subscription::factory()->count( 5 )->paused( '' )->create();
+        Subscription::factory()->count(5)->paused('')->create();
 
-        Subscription::factory()->count( 6 )->create( [
-            'pause_collection' => json_encode( [
+        Subscription::factory()->count(6)->create([
+            'pause_collection' => json_encode([
                 'behavior' => null,
-            ] ),
-        ] );
+            ]),
+        ]);
 
-        Subscription::factory()->count( 7 )
-                    ->paused( WithPauseCollection::BEHAVIOR_VOID )->create();
+        Subscription::factory()->count(7)
+                    ->paused(WithPauseCollection::BEHAVIOR_VOID)->create();
 
-        Subscription::factory()->count( 8 )
-                    ->paused( WithPauseCollection::BEHAVIOR_VOID, $resumesAt )
+        Subscription::factory()->count(8)
+                    ->paused(WithPauseCollection::BEHAVIOR_VOID, $resumesAt)
                     ->create();
 
-        Subscription::factory()->count( 9 )
-                    ->paused( WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE )
+        Subscription::factory()->count(9)
+                    ->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE)
                     ->create();
 
-        Subscription::factory()->count( 10 )
-                    ->paused( WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE, $resumesAt )
+        Subscription::factory()->count(10)
+                    ->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE, $resumesAt)
                     ->create();
 
-        Subscription::factory()->count( 11 )
-                    ->paused( WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT )
+        Subscription::factory()->count(11)
+                    ->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT)
                     ->create();
 
-        Subscription::factory()->count( 12 )
-                    ->paused( WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT, $resumesAt )
+        Subscription::factory()->count(12)
+                    ->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT, $resumesAt)
                     ->create();
 
-        $this->assertEquals( 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12, Subscription::query()->count() );
+        $this->assertEquals(4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12, Subscription::query()->count());
 
-        $this->assertEquals( 7 + 8 + 9 + 10 + 11 + 12, Subscription::query()->paused()->count() );
-        $this->assertEquals( 4 + 5 + 6, Subscription::query()->notPaused()->count() );
+        $this->assertEquals(7 + 8 + 9 + 10 + 11 + 12, Subscription::query()->paused()->count());
+        $this->assertEquals(4 + 5 + 6, Subscription::query()->notPaused()->count());
 
-        $this->assertEquals( 7 + 8, Subscription::query()->paused( WithPauseCollection::BEHAVIOR_VOID )->count() );
-        $this->assertEquals( 4 + 5 + 6 + 9 + 10 + 11 + 12, Subscription::query()->notPaused( WithPauseCollection::BEHAVIOR_VOID )->count() );
+        $this->assertEquals(7 + 8, Subscription::query()->paused(WithPauseCollection::BEHAVIOR_VOID)->count());
+        $this->assertEquals(4 + 5 + 6 + 9 + 10 + 11 + 12, Subscription::query()->notPaused(WithPauseCollection::BEHAVIOR_VOID)->count());
 
-        $this->assertEquals( 9 + 10, Subscription::query()->paused( WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE )->count() );
-        $this->assertEquals( 4 + 5 + 6 + 7 + 8 + 11 + 12, Subscription::query()->notPaused( WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE )->count() );
+        $this->assertEquals(9 + 10, Subscription::query()->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE)->count());
+        $this->assertEquals(4 + 5 + 6 + 7 + 8 + 11 + 12, Subscription::query()->notPaused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE)->count());
 
-        $this->assertEquals( 11 + 12, Subscription::query()->paused( WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT )->count() );
-        $this->assertEquals( 4 + 5 + 6 + 7 + 8 + 9 + 10, Subscription::query()->notPaused( WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT )->count() );
+        $this->assertEquals(11 + 12, Subscription::query()->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT)->count());
+        $this->assertEquals(4 + 5 + 6 + 7 + 8 + 9 + 10, Subscription::query()->notPaused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT)->count());
     }
 
-    public function test_subscriptions_can_be_paused()
-    {
-        $user = $this->createCustomer('subscription_upcoming_invoice');
+    public function test_subscriptions_can_be_paused() {
+        $user         = $this->createCustomer('subscription_upcoming_invoice');
         $subscription = $user->newSubscription('main', static::$priceId)
                              ->create('pm_card_visa');
 
@@ -1123,9 +1122,8 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAt()->timestamp);
     }
 
-    public function test_subscriptions_can_not_be_paused_if_canceled()
-    {
-        $user = $this->createCustomer(__FUNCTION__);
+    public function test_subscriptions_can_not_be_paused_if_canceled() {
+        $user         = $this->createCustomer(__FUNCTION__);
         $subscription = $user->newSubscription('main', static::$priceId)
                              ->create('pm_card_visa');
 
@@ -1139,9 +1137,8 @@ class SubscriptionsTest extends FeatureTestCase
     }
 
     /** @test */
-    public function test_subscriptions_can_not_be_unpaused_if_not_paused()
-    {
-        $user = $this->createCustomer(__FUNCTION__);
+    public function test_subscriptions_can_not_be_unpaused_if_not_paused() {
+        $user         = $this->createCustomer(__FUNCTION__);
         $subscription = $user->newSubscription('main', static::$priceId)
                              ->create('pm_card_visa');
 
