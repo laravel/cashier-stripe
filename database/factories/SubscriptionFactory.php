@@ -2,10 +2,12 @@
 
 namespace Laravel\Cashier\Database\Factories;
 
+use Carbon\Carbon;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Contracts\WithPauseCollection;
 use Laravel\Cashier\Subscription;
 use Stripe\Price as StripePrice;
 use Stripe\Subscription as StripeSubscription;
@@ -35,6 +37,7 @@ class SubscriptionFactory extends Factory
             'stripe_status' => StripeSubscription::STATUS_ACTIVE,
             'stripe_price' => null,
             'quantity' => null,
+            'pause_collection' => null,
             'trial_ends_at' => null,
             'ends_at' => null,
         ];
@@ -138,5 +141,34 @@ class SubscriptionFactory extends Factory
         return $this->state([
             'stripe_status' => StripeSubscription::STATUS_UNPAID,
         ]);
+    }
+
+    /**
+     * Mark the subscription as paused.
+     *
+     * @return $this
+     */
+    public function paused( ?string $behavior = null, ?Carbon $resumesAt = null ) {
+        $pauseCollection = [
+            'behavior' => $behavior ?? WithPauseCollection::BEHAVIOR_VOID,
+        ];
+        if ( $resumesAt ) {
+            $pauseCollection['resumes_at'] = $resumesAt->timestamp;
+        }
+
+        return $this->state( [
+            'pause_collection' => $pauseCollection,
+        ] );
+    }
+
+    /**
+     * Mark the subscription as not paused.
+     *
+     * @return $this
+     */
+    public function unpaused() {
+        return $this->state( [
+            'pause_collection' => null,
+        ] );
     }
 }

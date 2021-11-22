@@ -86,6 +86,7 @@ class WebhookController extends Controller
                     'stripe_status' => $data['status'],
                     'stripe_price' => $isSinglePrice ? $firstItem['price']['id'] : null,
                     'quantity' => $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null,
+                    'pause_collection' => $data['pause_collection'] ?? null,
                     'trial_ends_at' => $trialEndsAt,
                     'ends_at' => null,
                 ]);
@@ -174,6 +175,11 @@ class WebhookController extends Controller
             // Status...
             if (isset($data['status'])) {
                 $subscription->stripe_status = $data['status'];
+            }
+
+            // Pause collection...
+            if ( array_key_exists( 'pause_collection', $data ) ) {
+                $subscription->pause_collection = $data['pause_collection'];
             }
 
             $subscription->save();

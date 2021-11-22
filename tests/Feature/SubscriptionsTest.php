@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use DateTime;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Contracts\WithPauseCollection;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
@@ -967,5 +968,187 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertSame('draft', $invoice->status);
         $this->assertSame(1000, $invoice->total);
+    }
+
+    public function test_subscription_pause_scopes() {
+        $resumesAt = Carbon::now()->addWeek();
+
+        Subscription::factory()->count( 4 )->unpaused()->create();
+
+        Subscription::factory()->count( 5 )->paused( '' )->create();
+
+        Subscription::factory()->count( 6 )->create( [
+            'pause_collection' => json_encode( [
+                'behavior' => null,
+            ] ),
+        ] );
+
+        Subscription::factory()->count( 7 )
+                    ->paused( WithPauseCollection::BEHAVIOR_VOID )->create();
+
+        Subscription::factory()->count( 8 )
+                    ->paused( WithPauseCollection::BEHAVIOR_VOID, $resumesAt )
+                    ->create();
+
+        Subscription::factory()->count( 9 )
+                    ->paused( WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE )
+                    ->create();
+
+        Subscription::factory()->count( 10 )
+                    ->paused( WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE, $resumesAt )
+                    ->create();
+
+        Subscription::factory()->count( 11 )
+                    ->paused( WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT )
+                    ->create();
+
+        Subscription::factory()->count( 12 )
+                    ->paused( WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT, $resumesAt )
+                    ->create();
+
+        $this->assertEquals( 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12, Subscription::query()->count() );
+
+        $this->assertEquals( 7 + 8 + 9 + 10 + 11 + 12, Subscription::query()->paused()->count() );
+        $this->assertEquals( 4 + 5 + 6, Subscription::query()->notPaused()->count() );
+
+        $this->assertEquals( 7 + 8, Subscription::query()->paused( WithPauseCollection::BEHAVIOR_VOID )->count() );
+        $this->assertEquals( 4 + 5 + 6 + 9 + 10 + 11 + 12, Subscription::query()->notPaused( WithPauseCollection::BEHAVIOR_VOID )->count() );
+
+        $this->assertEquals( 9 + 10, Subscription::query()->paused( WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE )->count() );
+        $this->assertEquals( 4 + 5 + 6 + 7 + 8 + 11 + 12, Subscription::query()->notPaused( WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE )->count() );
+
+        $this->assertEquals( 11 + 12, Subscription::query()->paused( WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT )->count() );
+        $this->assertEquals( 4 + 5 + 6 + 7 + 8 + 9 + 10, Subscription::query()->notPaused( WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT )->count() );
+    }
+
+    public function test_subscriptions_can_be_paused()
+    {
+        $user = $this->createCustomer('subscription_upcoming_invoice');
+        $subscription = $user->newSubscription('main', static::$priceId)
+                             ->create('pm_card_visa');
+
+        $this->assertEquals(1, count($user->subscriptions));
+
+        $this->assertFalse($subscription->paused());
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_VOID));
+        $this->assertNull($subscription->pauseResumesAtTimestamp());
+        $this->assertNull($subscription->pauseResumesAt());
+
+        $subscription->syncStripePauseCollection();
+
+        $this->assertFalse($subscription->paused());
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_VOID));
+        $this->assertNull($subscription->pauseResumesAtTimestamp());
+        $this->assertNull($subscription->pauseResumesAt());
+
+        $resumesAt = Carbon::now()->addWeek();
+        $subscription->pause(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE, $resumesAt);
+
+        $this->assertTrue($subscription->paused());
+        $this->assertTrue($subscription->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_VOID));
+        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAtTimestamp());
+        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAt()->timestamp);
+
+        $subscription->unpause();
+
+        $this->assertFalse($subscription->paused());
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_VOID));
+        $this->assertNull($subscription->pauseResumesAtTimestamp());
+        $this->assertNull($subscription->pauseResumesAt());
+
+        $resumesAt = Carbon::now()->addDays();
+        $subscription->pauseBehaviorMarkUncollectible($resumesAt);
+
+        $this->assertTrue($subscription->paused());
+        $this->assertTrue($subscription->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_VOID));
+        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAtTimestamp());
+        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAt()->timestamp);
+
+        $resumesAt = Carbon::now()->addDays(2);
+        $subscription->pauseBehaviorKeepAsDraft($resumesAt);
+
+        $this->assertTrue($subscription->paused());
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertTrue($subscription->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_VOID));
+        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAtTimestamp());
+        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAt()->timestamp);
+
+        $subscription->pauseBehaviorVoid();
+
+        $this->assertTrue($subscription->paused());
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertTrue($subscription->paused(WithPauseCollection::BEHAVIOR_VOID));
+        $this->assertNull($subscription->pauseResumesAtTimestamp());
+        $this->assertNull($subscription->pauseResumesAt());
+
+        $resumesAt = Carbon::now()->addDays(3);
+        $subscription->pauseBehaviorKeepAsDraft($resumesAt);
+
+        $this->assertTrue($subscription->paused());
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertTrue($subscription->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_VOID));
+        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAtTimestamp());
+        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAt()->timestamp);
+
+        $subscription->pause_collection = null;
+        $subscription->save();
+
+        $this->assertFalse($subscription->paused());
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_VOID));
+        $this->assertNull($subscription->pauseResumesAtTimestamp());
+        $this->assertNull($subscription->pauseResumesAt());
+
+        $subscription->syncStripePauseCollection();
+
+        $this->assertTrue($subscription->paused());
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertTrue($subscription->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_VOID));
+        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAtTimestamp());
+        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAt()->timestamp);
+    }
+
+    public function test_subscriptions_can_not_be_paused_if_canceled()
+    {
+        $user = $this->createCustomer(__FUNCTION__);
+        $subscription = $user->newSubscription('main', static::$priceId)
+                             ->create('pm_card_visa');
+
+        $this->assertEquals(1, count($user->subscriptions));
+
+        $subscription->cancel();
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unable to pause subscription that is cancelled.');
+        $subscription->pauseBehaviorKeepAsDraft();
+    }
+
+    /** @test */
+    public function test_subscriptions_can_not_be_unpaused_if_not_paused()
+    {
+        $user = $this->createCustomer(__FUNCTION__);
+        $subscription = $user->newSubscription('main', static::$priceId)
+                             ->create('pm_card_visa');
+
+        $this->assertEquals(1, count($user->subscriptions));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unable to unpause subscription that is not paused.');
+        $subscription->unpause();
     }
 }
