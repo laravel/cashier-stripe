@@ -1,12 +1,23 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.6.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.6.1...master)
 
 ### Changed
 - Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
 
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
+
+## [v13.6.1 (2021-11-23)](https://github.com/laravel/cashier-stripe/compare/v13.6.0...v13.6.1)
+
+### Changed
+- Simplify cancelation check ([#1283](https://github.com/laravel/cashier-stripe/pull/1283))
+- Rename cancelled to canceled ([#1284](https://github.com/laravel/cashier-stripe/pull/1284))
+- Allow latest moneyphp version ([#1280](https://github.com/laravel/cashier-stripe/pull/1280), [#1286](https://github.com/laravel/cashier-stripe/pull/1286))
+
+### Fixed
+- Fix factory canceled state ([#1282](https://github.com/laravel/cashier-stripe/pull/1282))
 
 
 ## [v13.6.0 (2021-11-09)](https://github.com/laravel/cashier-stripe/compare/v13.5.6...v13.6.0)
@@ -586,7 +597,7 @@
 - Add ability to ignore cashier routes ([#763](https://github.com/laravel/cashier-stripe/pull/763))
 
 ### Fixed
-- Only mount card element if payment has not succeeded or been cancelled ([#765](https://github.com/laravel/cashier-stripe/pull/765))
+- Only mount card element if payment has not succeeded or been canceled ([#765](https://github.com/laravel/cashier-stripe/pull/765))
 - Set off_session parameter to true when creating a new subscription ([#764](https://github.com/laravel/cashier-stripe/pull/764))
 
 

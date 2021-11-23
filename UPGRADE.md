@@ -443,7 +443,7 @@ Exceptions may be thrown for the following methods: `charge`, `invoiceFor`, and 
 
 > If you would like to let Stripe host your payment verification pages, [you may configure this in your Stripe settings](https://dashboard.stripe.com/account/billing/automatic). However, you should still handle payment exceptions in your application and inform the user they will receive an email with further payment confirmation instructions.
 
-In addition, the subscription `create` method on the subscription builder previously immediately cancelled any subscription with an `incomplete` or `incomplete_expired` status and threw a `SubscriptionCreationFailed` exception when a subscription could not be created. This has been replaced with the behavior described above and the `SubscriptionCreationFailed` exception has been removed.
+In addition, the subscription `create` method on the subscription builder previously immediately canceled any subscription with an `incomplete` or `incomplete_expired` status and threw a `SubscriptionCreationFailed` exception when a subscription could not be created. This has been replaced with the behavior described above and the `SubscriptionCreationFailed` exception has been removed.
 
 #### The Subscription `stripe_status` Column
 
@@ -598,7 +598,7 @@ Previously, when a user attempted to change subscription plans and their payment
 
 However, Cashier will now catch the payment failure exception while allowing the plan swap to continue. The payment failure will be handled by Stripe and Stripe may attempt to retry the payment at a later time. If the payment fails during the final retry attempt, Stripe will execute the action you have configured in your billing settings: https://stripe.com/docs/billing/lifecycle#settings
 
-Therefore, you should ensure you have configured Cashier to handle Stripe's webhooks. When configured properly, this will allow Cashier to mark the subscription as cancelled when the final payment retry attempt fails and Stripe notifies your application via a webhook request. Please refer to our [instructions for setting up Stripe webhooks with Cashier.](https://laravel.com/docs/master/billing#handling-stripe-webhooks).
+Therefore, you should ensure you have configured Cashier to handle Stripe's webhooks. When configured properly, this will allow Cashier to mark the subscription as canceled when the final payment retry attempt fails and Stripe notifies your application via a webhook request. Please refer to our [instructions for setting up Stripe webhooks with Cashier.](https://laravel.com/docs/master/billing#handling-stripe-webhooks).
 
 
 ## Upgrading To 9.0 From 8.x
