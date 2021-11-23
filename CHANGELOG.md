@@ -1,6 +1,17 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.6.0...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.6.1...13.x)
+
+
+## [v13.6.1 (2021-11-23)](https://github.com/laravel/cashier-stripe/compare/v13.6.0...v13.6.1)
+
+### Changed
+- Simplify cancelation check ([#1283](https://github.com/laravel/cashier-stripe/pull/1283))
+- Rename cancelled to canceled ([#1284](https://github.com/laravel/cashier-stripe/pull/1284))
+- Allow latest moneyphp version ([#1280](https://github.com/laravel/cashier-stripe/pull/1280), [#1286](https://github.com/laravel/cashier-stripe/pull/1286))
+
+### Fixed
+- Fix factory canceled state ([#1282](https://github.com/laravel/cashier-stripe/pull/1282))
 
 
 ## [v13.6.0 (2021-11-09)](https://github.com/laravel/cashier-stripe/compare/v13.5.6...v13.6.0)
