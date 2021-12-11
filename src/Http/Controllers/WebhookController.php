@@ -80,16 +80,15 @@ class WebhookController extends Controller
                 $firstItem = $data['items']['data'][0];
                 $isSinglePrice = count($data['items']['data']) === 1;
 
-                $subscription = $user->subscriptions()->create([
+                $subscription = $user->subscriptions()->create(array_merge([
                     'name' => $data['metadata']['name'] ?? $this->newSubscriptionName($payload),
                     'stripe_id' => $data['id'],
                     'stripe_status' => $data['status'],
                     'stripe_price' => $isSinglePrice ? $firstItem['price']['id'] : null,
                     'quantity' => $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null,
-                    'pause_collection' => $data['pause_collection'] ?? null,
                     'trial_ends_at' => $trialEndsAt,
                     'ends_at' => null,
-                ]);
+                ], $this->prepatePauseCollectionFields($data)));
 
                 foreach ($data['items']['data'] as $item) {
                     $subscription->items()->create([
@@ -136,7 +135,7 @@ class WebhookController extends Controller
                 $subscription->items()->delete();
                 $subscription->delete();
 
-                return;
+                return $this->successMethod();
             }
 
             $subscription->name = $subscription->name ?? $data['metadata']['name'] ?? $this->newSubscriptionName($payload);
@@ -178,8 +177,8 @@ class WebhookController extends Controller
             }
 
             // Pause collection...
-            if ( array_key_exists( 'pause_collection', $data ) ) {
-                $subscription->pause_collection = $data['pause_collection'];
+            if (array_key_exists('pause_collection', $data)) {
+                $subscription->fill($this->prepatePauseCollectionFields($data));
             }
 
             $subscription->save();
@@ -333,5 +332,32 @@ class WebhookController extends Controller
     protected function setMaxNetworkRetries($retries = 3)
     {
         Stripe::setMaxNetworkRetries($retries);
+    }
+
+    /**
+     * Prepare pause collection related fields.
+     *
+     * @param  array  $subscriptionData
+     * @return array
+     */
+    protected function prepatePauseCollectionFields(array $subscriptionData)
+    {
+        $pauseCollectionFields = [
+            'pause_behavior' => null,
+            'resumes_at' => null,
+        ];
+
+        $pauseCollectionData = $subscriptionData['pause_collection'] ?? [];
+        if (! empty($pauseCollectionData)
+            && is_array($pauseCollectionData)) {
+            if (! empty($pauseCollectionData['behavior'])) {
+                $pauseCollectionFields['pause_behavior'] = $pauseCollectionData['behavior'];
+            }
+            if (! empty($pauseCollectionData['resumes_at'])) {
+                $pauseCollectionFields['resumes_at'] = Carbon::createFromTimestamp($pauseCollectionData['resumes_at']);
+            }
+        }
+
+        return $pauseCollectionFields;
     }
 }

@@ -7,7 +7,6 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Contracts\WithPauseCollection;
 use Laravel\Cashier\Subscription;
 use Stripe\Subscription as StripeSubscription;
 
@@ -30,13 +29,14 @@ class SubscriptionFactory extends Factory
         $model = Cashier::$customerModel;
 
         return [
-            (new $model)->getForeignKey() => ($model)::factory(),
+            (new $model)->getForeignKey() => method_exists($model, 'factory') ? ($model)::factory() : null,
             'name' => 'default',
-            'stripe_id' => 'sub_'.Str::random(40),
+            'stripe_id' => 'sub_' . Str::random(40),
             'stripe_status' => StripeSubscription::STATUS_ACTIVE,
             'stripe_price' => null,
             'quantity' => null,
-            'pause_collection' => null,
+            'pause_behavior' => null,
+            'resumes_at' => null,
             'trial_ends_at' => null,
             'ends_at' => null,
         ];
@@ -45,7 +45,7 @@ class SubscriptionFactory extends Factory
     /**
      * Add a price identifier to the model.
      *
-     * @param  string  $price
+     * @param string $price
      * @return $this
      */
     public function withPrice($price)
@@ -70,7 +70,7 @@ class SubscriptionFactory extends Factory
     /**
      * Mark the subscription as being within a trial period.
      *
-     * @param  \DateTimeInterface  $trialEndsAt
+     * @param \DateTimeInterface $trialEndsAt
      * @return $this
      */
     public function trialing(DateTimeInterface $trialEndsAt = null)
@@ -146,17 +146,16 @@ class SubscriptionFactory extends Factory
      *
      * @return $this
      */
-    public function paused( ?string $behavior = null, ?Carbon $resumesAt = null ) {
-        $pauseCollection = [
-            'behavior' => $behavior ?? WithPauseCollection::BEHAVIOR_VOID,
+    public function paused(?string $behavior = null, ?Carbon $resumesAt = null)
+    {
+        $pauseCollectionFields = [
+            'pause_behavior' => $behavior ?: Subscription::PAUSE_BEHAVIOR_VOID,
         ];
-        if ( $resumesAt ) {
-            $pauseCollection['resumes_at'] = $resumesAt->timestamp;
+        if ($resumesAt) {
+            $pauseCollectionFields['resumes_at'] = $resumesAt;
         }
 
-        return $this->state( [
-            'pause_collection' => $pauseCollection,
-        ] );
+        return $this->state($pauseCollectionFields);
     }
 
     /**
@@ -164,9 +163,11 @@ class SubscriptionFactory extends Factory
      *
      * @return $this
      */
-    public function unpaused() {
-        return $this->state( [
-            'pause_collection' => null,
-        ] );
+    public function unpaused()
+    {
+        return $this->state([
+            'pause_behavior' => null,
+            'resumes_at' => null,
+        ]);
     }
 }

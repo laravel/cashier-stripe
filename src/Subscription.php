@@ -12,8 +12,7 @@ use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
-use Laravel\Cashier\Concerns\UsesPauseCollection;
-use Laravel\Cashier\Contracts\WithPauseCollection;
+use Laravel\Cashier\Concerns\PausesCollection;
 use Laravel\Cashier\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
@@ -23,13 +22,17 @@ use Stripe\Subscription as StripeSubscription;
 /**
  * @property \Laravel\Cashier\Billable|\Illuminate\Database\Eloquent\Model $owner
  */
-class Subscription extends Model implements WithPauseCollection
+class Subscription extends Model
 {
     use AllowsCoupons;
     use HasFactory;
     use InteractsWithPaymentBehavior;
     use Prorates;
-    use UsesPauseCollection;
+    use PausesCollection;
+
+    const PAUSE_BEHAVIOR_MARK_UNCOLLECTIBLE = 'mark_uncollectible';
+    const PAUSE_BEHAVIOR_KEEP_AS_DRAFT = 'keep_as_draft';
+    const PAUSE_BEHAVIOR_VOID = 'void';
 
     /**
      * The attributes that are not mass assignable.
@@ -52,7 +55,6 @@ class Subscription extends Model implements WithPauseCollection
      */
     protected $casts = [
         'quantity' => 'integer',
-        'pause_collection' => 'array',
     ];
 
     /**
@@ -63,6 +65,7 @@ class Subscription extends Model implements WithPauseCollection
     protected $dates = [
         'created_at',
         'ends_at',
+        'resumes_at',
         'trial_ends_at',
         'updated_at',
     ];
@@ -229,10 +232,10 @@ class Subscription extends Model implements WithPauseCollection
     public function active()
     {
         return (is_null($this->ends_at) || $this->onGracePeriod()) &&
-            $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE &&
-            $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE_EXPIRED &&
-            (! Cashier::$deactivatePastDue || $this->stripe_status !== StripeSubscription::STATUS_PAST_DUE) &&
-            $this->stripe_status !== StripeSubscription::STATUS_UNPAID;
+               $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE &&
+               $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE_EXPIRED &&
+               (! Cashier::$deactivatePastDue || $this->stripe_status !== StripeSubscription::STATUS_PAST_DUE) &&
+               $this->stripe_status !== StripeSubscription::STATUS_UNPAID;
     }
 
     /**
@@ -816,8 +819,8 @@ class Subscription extends Model implements WithPauseCollection
         }
 
         $payload['trial_end'] = $this->onTrial()
-                        ? $this->trial_ends_at->getTimestamp()
-                        : 'now';
+            ? $this->trial_ends_at->getTimestamp()
+            : 'now';
 
         return $payload;
     }
@@ -1236,6 +1239,8 @@ class Subscription extends Model implements WithPauseCollection
         if ($taxRates = $this->owner->priceTaxRates()) {
             return $taxRates[$price] ?? null;
         }
+
+        return null;
     }
 
     /**
@@ -1262,6 +1267,8 @@ class Subscription extends Model implements WithPauseCollection
                 ? new Payment($invoice->payment_intent)
                 : null;
         }
+
+        return null;
     }
 
     /**

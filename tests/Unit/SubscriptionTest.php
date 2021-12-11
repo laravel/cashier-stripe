@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Tests\Unit;
 
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
-use Laravel\Cashier\Contracts\WithPauseCollection;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use Laravel\Cashier\Subscription;
 use PHPUnit\Framework\TestCase;
@@ -144,65 +143,60 @@ class SubscriptionTest extends TestCase
         $this->assertFalse($subscription->hasSinglePrice());
     }
 
-    public function test_we_can_check_if_a_subscription_is_not_paused() {
-        $subscription = new Subscription([ 'pause_collection' => null ]);
+    public function test_we_can_check_if_a_subscription_is_not_paused()
+    {
+        $subscription = new Subscription(['pause_behavior' => null]);
 
         // Generally ...
         $this->assertFalse($subscription->paused());
         $this->assertTrue($subscription->notPaused());
-        $this->assertNull($subscription->pauseResumesAtTimestamp());
         $this->assertNull($subscription->pauseResumesAt());
 
         // Behavior "void" ...
-        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_VOID));
-        $this->assertTrue($subscription->notPaused(WithPauseCollection::BEHAVIOR_VOID));
-        $this->assertNull($subscription->pauseResumesAtTimestamp(WithPauseCollection::BEHAVIOR_VOID));
-        $this->assertNull($subscription->pauseResumesAt(WithPauseCollection::BEHAVIOR_VOID));
+        $this->assertFalse($subscription->paused(Subscription::PAUSE_BEHAVIOR_VOID));
+        $this->assertTrue($subscription->notPaused(Subscription::PAUSE_BEHAVIOR_VOID));
+        $this->assertNull($subscription->pauseResumesAt(Subscription::PAUSE_BEHAVIOR_VOID));
 
         // Behavior "mark_uncollectible" ...
-        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
-        $this->assertTrue($subscription->notPaused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
-        $this->assertNull($subscription->pauseResumesAtTimestamp(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
-        $this->assertNull($subscription->pauseResumesAt(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertFalse($subscription->paused(Subscription::PAUSE_BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertTrue($subscription->notPaused(Subscription::PAUSE_BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertNull($subscription->pauseResumesAt(Subscription::PAUSE_BEHAVIOR_MARK_UNCOLLECTIBLE));
 
         // Behavior "keep_as_draft" ...
-        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
-        $this->assertTrue($subscription->notPaused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
-        $this->assertNull($subscription->pauseResumesAtTimestamp(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
-        $this->assertNull($subscription->pauseResumesAt(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertFalse($subscription->paused(Subscription::PAUSE_BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertTrue($subscription->notPaused(Subscription::PAUSE_BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertNull($subscription->pauseResumesAt(Subscription::PAUSE_BEHAVIOR_KEEP_AS_DRAFT));
     }
 
-    public function test_we_can_check_if_a_subscription_is_paused() {
-        $resumesAt    = Carbon::now()->addWeek();
-        $subscription = new Subscription([
-            'pause_collection' => [
-                'behavior'   => WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE,
-                'resumes_at' => $resumesAt->timestamp,
-            ],
-        ]);
+    public function test_we_can_check_if_a_subscription_is_paused()
+    {
+        $resumesAt = Carbon::now()->addWeek();
+        $subscription = (new Subscription())
+            // Prevent call database connection.
+            ->setDateFormat('Y-m-d H:i:s')
+            ->fill([
+                'pause_behavior' => Subscription::PAUSE_BEHAVIOR_MARK_UNCOLLECTIBLE,
+                'resumes_at' => $resumesAt,
+            ]);
 
         // Generally ...
         $this->assertTrue($subscription->paused());
         $this->assertFalse($subscription->notPaused());
-        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAtTimestamp());
         $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAt()->timestamp);
 
         // Behavior "void" ...
-        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_VOID));
-        $this->assertTrue($subscription->notPaused(WithPauseCollection::BEHAVIOR_VOID));
-        $this->assertNull($subscription->pauseResumesAtTimestamp(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
-        $this->assertNull($subscription->pauseResumesAt(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertFalse($subscription->paused(Subscription::PAUSE_BEHAVIOR_VOID));
+        $this->assertTrue($subscription->notPaused(Subscription::PAUSE_BEHAVIOR_VOID));
+        $this->assertNull($subscription->pauseResumesAt(Subscription::PAUSE_BEHAVIOR_KEEP_AS_DRAFT));
 
         // Behavior "mark_uncollectible" ...
-        $this->assertTrue($subscription->paused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
-        $this->assertFalse($subscription->notPaused(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
-        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAtTimestamp(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE));
-        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAt(WithPauseCollection::BEHAVIOR_MARK_UNCOLLECTIBLE)->timestamp);
+        $this->assertTrue($subscription->paused(Subscription::PAUSE_BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertFalse($subscription->notPaused(Subscription::PAUSE_BEHAVIOR_MARK_UNCOLLECTIBLE));
+        $this->assertEquals($resumesAt->timestamp, $subscription->pauseResumesAt(Subscription::PAUSE_BEHAVIOR_MARK_UNCOLLECTIBLE)->timestamp);
 
         // Behavior "keep_as_draft" ...
-        $this->assertFalse($subscription->paused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
-        $this->assertTrue($subscription->notPaused(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
-        $this->assertNull($subscription->pauseResumesAtTimestamp(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
-        $this->assertNull($subscription->pauseResumesAt(WithPauseCollection::BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertFalse($subscription->paused(Subscription::PAUSE_BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertTrue($subscription->notPaused(Subscription::PAUSE_BEHAVIOR_KEEP_AS_DRAFT));
+        $this->assertNull($subscription->pauseResumesAt(Subscription::PAUSE_BEHAVIOR_KEEP_AS_DRAFT));
     }
 }

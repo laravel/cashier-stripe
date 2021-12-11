@@ -12,7 +12,8 @@ class AddPauseCollectionToSubscriptionsTable extends Migration
      *
      * @return mixed
      */
-    protected function getTableName() {
+    protected function getTableName()
+    {
         $modelClass = \Laravel\Cashier\Cashier::$subscriptionModel;
 
         return (new $modelClass)->getTable();
@@ -23,19 +24,24 @@ class AddPauseCollectionToSubscriptionsTable extends Migration
      *
      * @return void
      */
-    public function up() {
-        Schema::table( $this->getTableName(), function ( Blueprint $table ) {
-            $table->json( 'pause_collection' )->nullable()
-                  ->after( 'quantity' );
-        } );
+    public function up()
+    {
+        Schema::table($this->getTableName(), function (Blueprint $table) {
+            $table->timestamp('resumes_at')->nullable()
+                ->after('quantity');
+            $table->string('pause_behavior', 30)->nullable()
+                ->after('quantity');
+        });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down() {
-        Schema::table( $this->getTableName(), function ( Blueprint $table ) {
-            $table->dropColumn( 'pause_collection' );
-        } );
+    public function down()
+    {
+        Schema::table($this->getTableName(), function (Blueprint $table) {
+            $table->dropColumn('pause_behavior');
+            $table->dropColumn('resumes_at');
+        });
     }
 }
