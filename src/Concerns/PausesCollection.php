@@ -13,13 +13,13 @@ use Stripe\Subscription;
  */
 trait PausesCollection
 {
-
     /**
      * Pause subscription.
      *
      * @param  string  $behavior
      * @param  \Carbon\Carbon|null  $resumesAt
      * @return static
+     *
      * @throws \LogicException
      * @throws \Stripe\Exception\ApiErrorException
      */
@@ -46,6 +46,7 @@ trait PausesCollection
      *
      * @param  \Carbon\Carbon|null  $resumesAt
      * @return static
+     *
      * @throws \LogicException
      * @throws \Stripe\Exception\ApiErrorException
      */
@@ -59,6 +60,7 @@ trait PausesCollection
      *
      * @param  \Carbon\Carbon|null  $resumesAt
      * @return static
+     *
      * @throws \LogicException
      * @throws \Stripe\Exception\ApiErrorException
      */
@@ -72,6 +74,7 @@ trait PausesCollection
      *
      * @param  \Carbon\Carbon|null  $resumesAt
      * @return static
+     *
      * @throws \LogicException
      * @throws \Stripe\Exception\ApiErrorException
      */
@@ -84,6 +87,7 @@ trait PausesCollection
      * Resume the paused subscription.
      *
      * @return static
+     *
      * @throws \LogicException
      * @throws \Stripe\Exception\ApiErrorException
      */
@@ -117,7 +121,7 @@ trait PausesCollection
     /**
      * Check is current subscription paused.
      *
-     * @param  string|null  $behavior - Check specific behavior, if null will check any behavior.
+     * @param  string|null  $behavior  - Check specific behavior, if null will check any behavior.
      * @return bool
      */
     public function paused(?string $behavior = null)
@@ -152,7 +156,7 @@ trait PausesCollection
     /**
      * Check is current subscription not paused.
      *
-     * @param  string|null  $behavior - Check specific behavior, if null will check any behavior.
+     * @param  string|null  $behavior  - Check specific behavior, if null will check any behavior.
      * @return bool
      */
     public function notPaused(?string $behavior = null)
@@ -184,7 +188,7 @@ trait PausesCollection
     /**
      * Get auto pause resumes datetime.
      *
-     * @param  string|null  $behavior - Check specific behavior, if null will check any behavior.
+     * @param  string|null  $behavior  - Check specific behavior, if null will check any behavior.
      * @return \Carbon\Carbon|null
      */
     public function pauseResumesAt(?string $behavior = null)
@@ -201,6 +205,7 @@ trait PausesCollection
      *
      * @param  \Stripe\Subscription  $stripeSubscription
      * @return static
+     *
      * @throws \Illuminate\Database\Eloquent\MassAssignmentException
      */
     public function fillPauseCollectionFields(Subscription $stripeSubscription)
