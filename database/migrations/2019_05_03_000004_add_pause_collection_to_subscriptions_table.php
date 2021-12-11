@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class AddPauseCollectionToSubscriptionsTable extends Migration
 {
-
     /**
      * Get used table name.
      *

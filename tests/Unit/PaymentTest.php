@@ -27,13 +27,13 @@ class PaymentTest extends TestCase
         $this->assertTrue($payment->requiresAction());
     }
 
-    public function test_it_can_return_its_cancelled_status()
+    public function test_it_can_return_its_canceled_status()
     {
         $paymentIntent = new PaymentIntent();
         $paymentIntent->status = Subscription::STATUS_CANCELED;
         $payment = new Payment($paymentIntent);
 
-        $this->assertTrue($payment->isCancelled());
+        $this->assertTrue($payment->isCanceled());
     }
 
     public function test_it_can_return_its_succeeded_status()

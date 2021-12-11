@@ -8,7 +8,7 @@ use Stripe\StripeObject;
 use Stripe\Subscription;
 
 /**
- * @property string|null         $pause_behavior
+ * @property string|null $pause_behavior
  * @property \Carbon\Carbon|null $resumes_at
  */
 trait PausesCollection
@@ -17,7 +17,7 @@ trait PausesCollection
     /**
      * Pause subscription.
      *
-     * @param  string               $behavior
+     * @param  string  $behavior
      * @param  \Carbon\Carbon|null  $resumesAt
      * @return static
      * @throws \LogicException
@@ -135,7 +135,7 @@ trait PausesCollection
      * Filter query by pause_collection behavior.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string|null                            $behavior
+     * @param  string|null  $behavior
      * @return void
      */
     public function scopePaused($query, ?string $behavior = null)
@@ -164,7 +164,7 @@ trait PausesCollection
      * Filter query by not paused payment collection.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string|null                            $behavior
+     * @param  string|null  $behavior
      * @return void
      */
     public function scopeNotPaused($query, ?string $behavior = null)

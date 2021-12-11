@@ -51,11 +51,11 @@
 
                 <div v-else-if="paymentIntent.status === 'canceled'">
                     <h2 class="text-xl mb-4 text-gray-600">
-                        Payment Cancelled
+                        Payment Canceled
                     </h2>
 
                     <p class="mb-6">
-                        This payment was cancelled.
+                        This payment was canceled.
                     </p>
                 </div>
 

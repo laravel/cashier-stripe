@@ -117,13 +117,25 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Determine if the payment was cancelled.
+     * Determine if the payment was canceled.
      *
      * @return bool
      */
-    public function isCancelled()
+    public function isCanceled()
     {
         return $this->paymentIntent->status === StripePaymentIntent::STATUS_CANCELED;
+    }
+
+    /**
+     * Determine if the payment was canceled.
+     *
+     * @return bool
+     *
+     * @deprecated Use isCanceled instead.
+     */
+    public function isCancelled()
+    {
+        return $this->isCanceled();
     }
 
     /**

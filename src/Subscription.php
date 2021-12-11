@@ -11,8 +11,8 @@ use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
-use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Concerns\PausesCollection;
+use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
@@ -231,11 +231,11 @@ class Subscription extends Model
      */
     public function active()
     {
-        return (is_null($this->ends_at) || $this->onGracePeriod()) &&
-               $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE &&
-               $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE_EXPIRED &&
-               (! Cashier::$deactivatePastDue || $this->stripe_status !== StripeSubscription::STATUS_PAST_DUE) &&
-               $this->stripe_status !== StripeSubscription::STATUS_UNPAID;
+        return ! $this->ended() &&
+            $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE &&
+            $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE_EXPIRED &&
+            (! Cashier::$deactivatePastDue || $this->stripe_status !== StripeSubscription::STATUS_PAST_DUE) &&
+            $this->stripe_status !== StripeSubscription::STATUS_UNPAID;
     }
 
     /**
@@ -281,7 +281,7 @@ class Subscription extends Model
      */
     public function recurring()
     {
-        return ! $this->onTrial() && ! $this->cancelled();
+        return ! $this->onTrial() && ! $this->canceled();
     }
 
     /**
@@ -292,7 +292,7 @@ class Subscription extends Model
      */
     public function scopeRecurring($query)
     {
-        $query->notOnTrial()->notCancelled();
+        $query->notOnTrial()->notCanceled();
     }
 
     /**
@@ -300,31 +300,69 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function cancelled()
+    public function canceled()
     {
         return ! is_null($this->ends_at);
     }
 
     /**
-     * Filter query by cancelled.
+     * Determine if the subscription is no longer active.
+     *
+     * @return bool
+     *
+     * @deprecated Use canceled instead.
+     */
+    public function cancelled()
+    {
+        return $this->canceled();
+    }
+
+    /**
+     * Filter query by canceled.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeCancelled($query)
+    public function scopeCanceled($query)
     {
         $query->whereNotNull('ends_at');
     }
 
     /**
-     * Filter query by not cancelled.
+     * Filter query by canceled.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     *
+     * @deprecated Use scopeCanceled instead.
+     */
+    public function scopeCancelled($query)
+    {
+        $this->scopeCanceled($query);
+    }
+
+    /**
+     * Filter query by not canceled.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeNotCancelled($query)
+    public function scopeNotCanceled($query)
     {
         $query->whereNull('ends_at');
+    }
+
+    /**
+     * Filter query by not canceled.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     *
+     * @deprecated Use scopeNotCanceled instead.
+     */
+    public function scopeNotCancelled($query)
+    {
+        $this->scopeNotCanceled($query);
     }
 
     /**
@@ -334,7 +372,7 @@ class Subscription extends Model
      */
     public function ended()
     {
-        return $this->cancelled() && ! $this->onGracePeriod();
+        return $this->canceled() && ! $this->onGracePeriod();
     }
 
     /**
@@ -345,7 +383,7 @@ class Subscription extends Model
      */
     public function scopeEnded($query)
     {
-        $query->cancelled()->notOnGracePeriod();
+        $query->canceled()->notOnGracePeriod();
     }
 
     /**
@@ -1022,7 +1060,7 @@ class Subscription extends Model
             'prorate' => $this->prorateBehavior() === 'create_prorations',
         ]);
 
-        $this->markAsCancelled();
+        $this->markAsCanceled();
 
         return $this;
     }
@@ -1039,19 +1077,19 @@ class Subscription extends Model
             'prorate' => $this->prorateBehavior() === 'create_prorations',
         ]);
 
-        $this->markAsCancelled();
+        $this->markAsCanceled();
 
         return $this;
     }
 
     /**
-     * Mark the subscription as cancelled.
+     * Mark the subscription as canceled.
      *
      * @return void
      *
      * @internal
      */
-    public function markAsCancelled()
+    public function markAsCanceled()
     {
         $this->fill([
             'stripe_status' => StripeSubscription::STATUS_CANCELED,
@@ -1060,7 +1098,21 @@ class Subscription extends Model
     }
 
     /**
-     * Resume the cancelled subscription.
+     * Mark the subscription as canceled.
+     *
+     * @return void
+     *
+     * @deprecated Use markAsCanceled instead.
+     *
+     * @internal
+     */
+    public function markAsCancelled()
+    {
+        $this->markAsCanceled();
+    }
+
+    /**
+     * Resume the canceled subscription.
      *
      * @return $this
      *
@@ -1079,7 +1131,7 @@ class Subscription extends Model
 
         // Finally, we will remove the ending timestamp from the user's record in the
         // local database to indicate that the subscription is active again and is
-        // no longer "cancelled". Then we will save this record in the database.
+        // no longer "canceled". Then we shall save this record in the database.
         $this->fill([
             'stripe_status' => $stripeSubscription->status,
             'ends_at' => null,

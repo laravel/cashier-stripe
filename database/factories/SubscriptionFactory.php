@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Subscription;
+use Stripe\Price as StripePrice;
 use Stripe\Subscription as StripeSubscription;
 
 class SubscriptionFactory extends Factory
@@ -31,7 +32,7 @@ class SubscriptionFactory extends Factory
         return [
             (new $model)->getForeignKey() => method_exists($model, 'factory') ? ($model)::factory() : null,
             'name' => 'default',
-            'stripe_id' => 'sub_' . Str::random(40),
+            'stripe_id' => 'sub_'.Str::random(40),
             'stripe_status' => StripeSubscription::STATUS_ACTIVE,
             'stripe_price' => null,
             'quantity' => null,
@@ -45,13 +46,13 @@ class SubscriptionFactory extends Factory
     /**
      * Add a price identifier to the model.
      *
-     * @param string $price
+     * @param  \Stripe\Price|string  $price
      * @return $this
      */
     public function withPrice($price)
     {
         return $this->state([
-            'stripe_price' => $price,
+            'stripe_price' => $price instanceof StripePrice ? $price->id : $price,
         ]);
     }
 
@@ -70,7 +71,7 @@ class SubscriptionFactory extends Factory
     /**
      * Mark the subscription as being within a trial period.
      *
-     * @param \DateTimeInterface $trialEndsAt
+     * @param  \DateTimeInterface  $trialEndsAt
      * @return $this
      */
     public function trialing(DateTimeInterface $trialEndsAt = null)
@@ -90,6 +91,7 @@ class SubscriptionFactory extends Factory
     {
         return $this->state([
             'stripe_status' => StripeSubscription::STATUS_CANCELED,
+            'ends_at' => now(),
         ]);
     }
 
