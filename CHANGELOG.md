@@ -1,6 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.6.1...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.7.0...13.x)
+
+
+## [v13.7.0 (2022-01-12)](https://github.com/laravel/cashier-stripe/compare/v13.6.1...v13.7.0)
+
+### Added
+- Add deletePaymentMethod ([#1298](https://github.com/laravel/cashier-stripe/pull/1298))
+
+### Changed
+- Laravel 9 Support ([#1299](https://github.com/laravel/cashier-stripe/pull/1299))
 
 
 ## [v13.6.1 (2021-11-23)](https://github.com/laravel/cashier-stripe/compare/v13.6.0...v13.6.1)
