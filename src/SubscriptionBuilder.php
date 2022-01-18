@@ -463,6 +463,7 @@ class SubscriptionBuilder
      * Get the tax percentage for the Stripe payload.
      *
      * @return int|float|null
+     *
      * @deprecated Please migrate to the new Tax Rates API.
      */
     protected function getTaxPercentageForPayload()
