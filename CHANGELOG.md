@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.15.0...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.16.0...12.x)
+
+
+## [v12.16.0 (2022-01-18)](https://github.com/laravel/cashier/compare/v12.15.0...v12.16.0)
+
+### Added
+- Laravel 9 support ([#1302](https://github.com/laravel/cashier-stripe/pull/1302))
 
 
 ## [v12.15.0 (2021-06-22)](https://github.com/laravel/cashier/compare/v12.14.1...v12.15.0)
