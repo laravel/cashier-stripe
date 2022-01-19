@@ -131,7 +131,7 @@
                     {{ $invoice->customer_phone }}<br>
                 @endif
 
-                @if ($invoice->customer_name)
+                @if ($invoice->customer_email)
                     {{ $invoice->customer_email }}<br>
                 @endif
 
