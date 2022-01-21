@@ -5,6 +5,7 @@ namespace Laravel\Cashier;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Console\WebhookCommand;
+use Laravel\Cashier\Contracts\InvoiceRenderer;
 use Stripe\Stripe;
 use Stripe\Util\LoggerInterface;
 
@@ -39,6 +40,7 @@ class CashierServiceProvider extends ServiceProvider
     public function register()
     {
         $this->configure();
+        $this->bindInvoiceRenderer();
         $this->bindLogger();
     }
 
@@ -52,6 +54,20 @@ class CashierServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             __DIR__.'/../config/cashier.php', 'cashier'
         );
+    }
+
+    /**
+     * Bind the default invoicer renderer.
+     *
+     * @return void
+     */
+    protected function bindInvoiceRenderer()
+    {
+        $this->app->bind(InvoiceRenderer::class, function ($app) {
+            return $app->make(
+                config('cashier.invoices.renderer')
+            );
+        });
     }
 
     /**
