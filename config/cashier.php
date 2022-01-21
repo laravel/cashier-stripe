@@ -103,9 +103,9 @@ return [
     | Invoice Settings
     |--------------------------------------------------------------------------
     |
-    | This option is the default paper size for all invoices generated using
-    | Cashier. You are free to customize this settings based on the usual
-    | paper size used by the customers using your Laravel applications.
+    | These options are the defaults for all invoices generated
+    | by Cashier. You are free to customize these based on
+    | the renderer used by your Laravel application.
 
     | Supported paper sizes: 'letter', 'legal', 'A4'
     |
