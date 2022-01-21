@@ -106,14 +106,13 @@ return [
     | These options are the defaults for all invoices generated
     | by Cashier. You are free to customize these based on
     | the renderer used by your Laravel application.
-
-    | Supported paper sizes: 'letter', 'legal', 'A4'
     |
     */
 
     'invoices' => [
         'renderer' => env('CASHIER_INVOICE_RENDERER', Laravel\Cashier\Invoices\DompdfInvoiceRenderer::class),
         'options' => [
+            // Supported dompdf paper sizes: 'letter', 'legal', 'A4'
             'paper' => env('CASHIER_PAPER', 'letter'),
         ],
     ],
