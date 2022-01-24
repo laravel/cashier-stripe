@@ -1,5 +1,7 @@
 <?php
 
+use Laravel\Cashier\Invoices\DompdfInvoiceRenderer;
+
 return [
 
     /*
@@ -103,16 +105,17 @@ return [
     | Invoice Settings
     |--------------------------------------------------------------------------
     |
-    | These options are the defaults for all invoices generated
-    | by Cashier. You are free to customize these based on
-    | the renderer used by your Laravel application.
+    | The following options determine how Cashier invoices are converted from
+    | HTML into PDFs. You're free to change the options based on the needs
+    | of your application or your preferences regarding invoice styling.
     |
     */
 
     'invoices' => [
-        'renderer' => env('CASHIER_INVOICE_RENDERER', Laravel\Cashier\Invoices\DompdfInvoiceRenderer::class),
+        'renderer' => env('CASHIER_INVOICE_RENDERER', DompdfInvoiceRenderer::class),
+
         'options' => [
-            // Supported dompdf paper sizes: 'letter', 'legal', 'A4'
+            // Supported: 'letter', 'legal', 'A4'
             'paper' => env('CASHIER_PAPER', 'letter'),
         ],
     ],

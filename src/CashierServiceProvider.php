@@ -40,8 +40,8 @@ class CashierServiceProvider extends ServiceProvider
     public function register()
     {
         $this->configure();
-        $this->bindInvoiceRenderer();
         $this->bindLogger();
+        $this->bindInvoiceRenderer();
     }
 
     /**
@@ -57,20 +57,6 @@ class CashierServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bind the default invoicer renderer.
-     *
-     * @return void
-     */
-    protected function bindInvoiceRenderer()
-    {
-        $this->app->bind(InvoiceRenderer::class, function ($app) {
-            return $app->make(
-                config('cashier.invoices.renderer')
-            );
-        });
-    }
-
-    /**
      * Bind the Stripe logger interface to the Cashier logger.
      *
      * @return void
@@ -81,6 +67,18 @@ class CashierServiceProvider extends ServiceProvider
             return new Logger(
                 $app->make('log')->channel(config('cashier.logger'))
             );
+        });
+    }
+
+    /**
+     * Bind the default invoice renderer.
+     *
+     * @return void
+     */
+    protected function bindInvoiceRenderer()
+    {
+        $this->app->bind(InvoiceRenderer::class, function ($app) {
+            return $app->make(config('cashier.invoices.renderer'));
         });
     }
 
