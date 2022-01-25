@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Console\WebhookCommand;
 use Laravel\Cashier\Contracts\InvoiceRenderer;
+use Laravel\Cashier\Invoices\DompdfInvoiceRenderer;
 use Stripe\Stripe;
 use Stripe\Util\LoggerInterface;
 
@@ -78,7 +79,7 @@ class CashierServiceProvider extends ServiceProvider
     protected function bindInvoiceRenderer()
     {
         $this->app->bind(InvoiceRenderer::class, function ($app) {
-            return $app->make(config('cashier.invoices.renderer'));
+            return $app->make(config('cashier.invoices.renderer', DompdfInvoiceRenderer::class));
         });
     }
 
