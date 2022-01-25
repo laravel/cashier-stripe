@@ -57,9 +57,9 @@ class PaymentMethodsTest extends FeatureTestCase
         $this->assertTrue($user->hasDefaultPaymentMethod());
     }
 
-    public function test_we_can_remove_payment_methods()
+    public function test_we_can_delete_payment_methods()
     {
-        $user = $this->createCustomer('we_can_remove_payment_methods');
+        $user = $this->createCustomer('we_can_delete_payment_methods');
         $user->createAsStripeCustomer();
 
         $paymentMethod = $user->addPaymentMethod('pm_card_visa');
@@ -67,15 +67,15 @@ class PaymentMethodsTest extends FeatureTestCase
         $this->assertCount(1, $user->paymentMethods());
         $this->assertTrue($user->hasPaymentMethod());
 
-        $user->removePaymentMethod($paymentMethod->asStripePaymentMethod());
+        $user->deletePaymentMethod($paymentMethod->asStripePaymentMethod());
 
         $this->assertCount(0, $user->paymentMethods());
         $this->assertFalse($user->hasPaymentMethod());
     }
 
-    public function test_we_can_remove_the_default_payment_method()
+    public function test_we_can_delete_the_default_payment_method()
     {
-        $user = $this->createCustomer('we_can_remove_the_default_payment_method');
+        $user = $this->createCustomer('we_can_delete_the_default_payment_method');
         $user->createAsStripeCustomer();
 
         $paymentMethod = $user->updateDefaultPaymentMethod('pm_card_visa');
@@ -84,7 +84,7 @@ class PaymentMethodsTest extends FeatureTestCase
         $this->assertTrue($user->hasPaymentMethod());
         $this->assertTrue($user->hasDefaultPaymentMethod());
 
-        $user->removePaymentMethod($paymentMethod->asStripePaymentMethod());
+        $user->deletePaymentMethod($paymentMethod->asStripePaymentMethod());
 
         $this->assertCount(0, $user->paymentMethods());
         $this->assertNull($user->defaultPaymentMethod());

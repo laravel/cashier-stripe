@@ -88,12 +88,12 @@ trait ManagesPaymentMethods
     }
 
     /**
-     * Remove a payment method from the customer.
+     * Delete a payment method from the customer.
      *
      * @param  \Stripe\PaymentMethod|string  $paymentMethod
      * @return void
      */
-    public function removePaymentMethod($paymentMethod)
+    public function deletePaymentMethod($paymentMethod)
     {
         $this->assertCustomerExists();
 
@@ -116,6 +116,19 @@ trait ManagesPaymentMethods
                 'pm_last_four' => null,
             ])->save();
         }
+    }
+
+    /**
+     * Remove a payment method from the customer.
+     *
+     * @param  \Stripe\PaymentMethod|string  $paymentMethod
+     * @return void
+     *
+     * @deprecated Will be removed in a future Cashier Stripe version. Use deletePaymentMethod() instead.
+     */
+    public function removePaymentMethod($paymentMethod)
+    {
+        return $this->deletePaymentMethod($paymentMethod);
     }
 
     /**
