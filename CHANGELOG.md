@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v12.16.0...12.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v12.17.0...12.x)
+
+
+## [v12.17.0 (2022-01-25)](https://github.com/laravel/cashier/compare/v12.16.0...v12.17.0)
+
+### Added
+- Implement invoice renderer ([#1304](https://github.com/laravel/cashier-stripe/pull/1304))
 
 
 ## [v12.16.0 (2022-01-18)](https://github.com/laravel/cashier/compare/v12.15.0...v12.16.0)
