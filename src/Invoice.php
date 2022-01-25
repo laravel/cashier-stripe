@@ -3,13 +3,12 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
-use Dompdf\Dompdf;
-use Dompdf\Options;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
 use JsonSerializable;
+use Laravel\Cashier\Contracts\InvoiceRenderer;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Invoice as StripeInvoice;
@@ -565,19 +564,13 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function pdf(array $data)
     {
-        if (! defined('DOMPDF_ENABLE_AUTOLOAD')) {
-            define('DOMPDF_ENABLE_AUTOLOAD', false);
+        $options = config('cashier.invoices.options', []);
+
+        if ($paper = config('cashier.paper')) {
+            $options['paper'] = $paper;
         }
 
-        $options = new Options;
-        $options->setChroot(base_path());
-
-        $dompdf = new Dompdf($options);
-        $dompdf->setPaper(config('cashier.paper', 'letter'));
-        $dompdf->loadHtml($this->view($data)->render());
-        $dompdf->render();
-
-        return $dompdf->output();
+        return app(InvoiceRenderer::class)->render($this, $data, $options);
     }
 
     /**
