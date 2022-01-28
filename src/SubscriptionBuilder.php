@@ -290,6 +290,13 @@ class SubscriptionBuilder
      */
     protected function createSubscription(StripeSubscription $stripeSubscription)
     {
+        // In some edge cases, it could be that the webhook to create the subscription, arrives
+        // before Cashier can create the subscription in the database. To handle this, we'll
+        // first check if it's not yet added and only then attempt to create it in the DB.
+        if ($subscription = $this->owner->subscriptions()->where('stripe_id', $stripeSubscription->id)->first()) {
+            return $subscription;
+        }
+
         /** @var \Stripe\SubscriptionItem $firstItem */
         $firstItem = $stripeSubscription->items->first();
         $isSinglePrice = $stripeSubscription->items->count() === 1;
