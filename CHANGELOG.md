@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.8.0...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.8.1...13.x)
+
+
+## [v13.8.1 (2022-02-01)](https://github.com/laravel/cashier/compare/v13.8.0...v13.8.1)
+
+### Fixed
+- Prevent duplicate subscription creation ([#1308](https://github.com/laravel/cashier-stripe/pull/1308))
 
 
 ## [v13.8.0 (2022-01-25)](https://github.com/laravel/cashier/compare/v13.7.0...v13.8.0)
