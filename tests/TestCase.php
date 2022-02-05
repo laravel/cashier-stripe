@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests;
 
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\CashierServiceProvider;
 use Laravel\Cashier\Exceptions\StripeSecretKeyException;
@@ -14,9 +15,11 @@ abstract class TestCase extends OrchestraTestCase
     protected function getEnvironmentSetUp($app)
     {
         $apiKey = getenv('STRIPE_SECRET');
+
         if ($apiKey && ! Str::startsWith($apiKey, 'sk_test_')) {
-            throw StripeSecretKeyException::invalidEnvironment($app->environment());
+            throw new InvalidArgumentException("Tests may not be run with a production Stripe key.");
         }
+
         Cashier::useCustomerModel(User::class);
     }
 
