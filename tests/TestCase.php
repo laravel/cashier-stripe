@@ -6,7 +6,6 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\CashierServiceProvider;
-use Laravel\Cashier\Exceptions\StripeSecretKeyException;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
