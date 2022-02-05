@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Unit;
 
+use Carbon\Carbon;
 use InvalidArgumentException;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use Laravel\Cashier\Subscription;
@@ -140,5 +141,17 @@ class SubscriptionTest extends TestCase
 
         $this->assertTrue($subscription->hasMultiplePrices());
         $this->assertFalse($subscription->hasSinglePrice());
+    }
+
+    public function test_cancelled_subscription_during_free_trial()
+    {
+        $subscription = (new Subscription)->setDateFormat('Y-m-d')->fill([
+            'stripe_status' => StripeSubscription::STATUS_CANCELED,
+            'ends_at' => Carbon::yesterday()->format('Y-m-d'),
+            'trial_ends_at' => Carbon::tomorrow()->format('Y-m-d'),
+        ]);
+
+        $this->assertFalse($subscription->onTrial());
+        $this->assertFalse($subscription->valid());
     }
 }
