@@ -386,7 +386,7 @@ class Subscription extends Model
      */
     public function onTrial()
     {
-        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+        return $this->trial_ends_at && $this->trial_ends_at->isFuture() && ! $this->ended();
     }
 
     /**
