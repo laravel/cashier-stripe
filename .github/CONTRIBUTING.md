@@ -10,4 +10,4 @@ Copy the default file using `cp phpunit.xml.dist phpunit.xml` and add the follow
 
     <env name="STRIPE_SECRET" value="Your Stripe Testing Secret Key"/>
 
-**Make sure to use your testing secret key and never your production secret key.** Please note that due to the fact that actual API requests against Stripe are being made, these tests take a few minutes to run.
+**Make sure to use your "testing" secret key and not your production secret key.** Please note that due to the fact that actual API requests against Stripe are being made, these tests take a few minutes to run.
