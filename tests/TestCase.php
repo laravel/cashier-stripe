@@ -13,7 +13,7 @@ abstract class TestCase extends OrchestraTestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $apiKey = getenv('STRIPE_SECRET');
+        $apiKey = config('cashier.secret');
 
         if ($apiKey && ! Str::startsWith($apiKey, 'sk_test_')) {
             throw new InvalidArgumentException('Tests may not be run with a production Stripe key.');

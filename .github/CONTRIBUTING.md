@@ -8,6 +8,6 @@ You will need to set the Stripe **testing** secret environment variable in a cus
 
 Copy the default file using `cp phpunit.xml.dist phpunit.xml` and add the following line below the `CASHIER_MODEL` environment variable in your new `phpunit.xml` file:
 
-    <env name="STRIPE_SECRET" value="Your Stripe Secret Key"/>
+    <env name="STRIPE_SECRET" value="Your Stripe Testing Secret Key"/>
 
-Please note that due to the fact that actual API requests against Stripe are being made, these tests take a few minutes to run.
+**Make sure to use your "testing" secret key and not your production secret key.** Please note that due to the fact that actual API requests against Stripe are being made, these tests take a few minutes to run.
