@@ -13,7 +13,7 @@ use Laravel\Cashier\Events\WebhookReceived;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Cashier\Payment;
 use Laravel\Cashier\Subscription;
-use Stripe\Stripe as Stripe;
+use Stripe\Stripe;
 use Stripe\Subscription as StripeSubscription;
 use Symfony\Component\HttpFoundation\Response;
 
