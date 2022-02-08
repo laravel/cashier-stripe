@@ -1,8 +1,4 @@
 # Release Instructions
 
- 1. Pull down the latest changes on the current stable branch
- 2. Update and commit the [CHANGELOG.md](./CHANGELOG.md) file
- 3. Update the `VERSION` constant in [`Cashier.php`](./src/Cashier.php) and commit it
- 4. Tag a new version of the package
- 5. Push all commits and the new tag to GitHub
- 6. Create a new GitHub release with the same release notes from CHANGELOG.md
+1. Update the `VERSION` constant in [`Cashier.php`](./src/Cashier.php) and commit it
+2. Create a new GitHub release for this version with the release notes
