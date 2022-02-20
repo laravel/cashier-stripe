@@ -224,7 +224,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      * Calculate the raw amount for a given discount.
      *
      * @param  \Laravel\Cashier\Discount  $discount
-     * @return int|null
+     * @return \Stripe\StripeObject|null
      */
     public function rawDiscountFor(Discount $discount)
     {
