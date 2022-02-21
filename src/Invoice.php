@@ -216,7 +216,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     public function discountFor(Discount $discount)
     {
         if (! is_null($discountAmount = $this->rawDiscountFor($discount))) {
-            return $this->formatAmount($discountAmount->amount);
+            return $this->formatAmount($discountAmount);
         }
     }
 
@@ -228,14 +228,15 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function rawDiscountFor(Discount $discount)
     {
-        return Collection::make($this->invoice->total_discount_amounts)
+        return optional(Collection::make($this->invoice->total_discount_amounts)
             ->first(function ($discountAmount) use ($discount) {
                 if (is_string($discountAmount->discount)) {
                     return $discountAmount->discount === $discount->id;
                 } else {
                     return $discountAmount->discount->id === $discount->id;
                 }
-            });
+            }))
+            ->amount;
     }
 
     /**
