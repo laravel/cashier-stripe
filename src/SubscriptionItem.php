@@ -144,13 +144,17 @@ class SubscriptionItem extends Model
     {
         $this->subscription->guardAgainstIncomplete();
 
-        $stripeSubscriptionItem = $this->updateStripeSubscriptionItem(array_merge([
-            'price' => $price,
-            'quantity' => $this->quantity,
-            'payment_behavior' => $this->paymentBehavior(),
-            'proration_behavior' => $this->prorateBehavior(),
-            'tax_rates' => $this->subscription->getPriceTaxRatesForPayload($price),
-        ], $options));
+        $stripeSubscriptionItem = $this->updateStripeSubscriptionItem(array_merge(
+            array_filter([
+                'price' => $price,
+                'payment_behavior' => $this->paymentBehavior(),
+                'proration_behavior' => $this->prorateBehavior(),
+                'tax_rates' => $this->subscription->getPriceTaxRatesForPayload($price),
+                'quantity' => $this->quantity
+            ], function($value) {
+                return $value !== null;
+            }),
+        $options));
 
         $this->fill([
             'stripe_product' => $stripeSubscriptionItem->price->product,
