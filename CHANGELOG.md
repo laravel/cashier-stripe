@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.8.2...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.8.3...13.x)
+
+## [v13.8.3](https://github.com/laravel/cashier-stripe/compare/v13.8.2...v13.8.3) - 2022-02-22
+
+### Changed
+
+- Fix rawDiscountFor method by @driesvints in https://github.com/laravel/cashier-stripe/pull/1325
+- Fix swapping metered price of subscription item by @pietrantonio91 in https://github.com/laravel/cashier-stripe/pull/1328
 
 ## [v13.8.2](https://github.com/laravel/cashier-stripe/compare/v13.8.1...v13.8.2) - 2022-02-08
 
