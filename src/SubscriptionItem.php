@@ -151,9 +151,9 @@ class SubscriptionItem extends Model
                 'payment_behavior' => $this->paymentBehavior(),
                 'proration_behavior' => $this->prorateBehavior(),
                 'tax_rates' => $this->subscription->getPriceTaxRatesForPayload($price),
-            ], function($value) {
+            ], function ($value) {
                 return $value !== null;
-            }), 
+            }),
         $options));
 
         $this->fill([
