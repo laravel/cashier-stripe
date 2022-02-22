@@ -152,7 +152,7 @@ class SubscriptionItem extends Model
                 'proration_behavior' => $this->prorateBehavior(),
                 'tax_rates' => $this->subscription->getPriceTaxRatesForPayload($price),
             ], function ($value) {
-                return $value !== null;
+                return ! is_null($value);
             }),
         $options));
 
