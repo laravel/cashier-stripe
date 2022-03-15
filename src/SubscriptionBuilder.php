@@ -40,7 +40,7 @@ class SubscriptionBuilder
      *
      * @var array
      */
-    protected $items;
+    protected $items = [];
 
     /**
      * The date and time the trial will expire.
@@ -99,6 +99,8 @@ class SubscriptionBuilder
     {
         $options = is_array($price) ? $price : ['price' => $price];
 
+        $quantity = $price['quantity'] ?? $quantity;
+
         if (! is_null($quantity)) {
             $options['quantity'] = $quantity;
         }
@@ -107,10 +109,10 @@ class SubscriptionBuilder
             $options['tax_rates'] = $taxRates;
         }
 
-        if (is_array($price)) {
-            $this->items[] = $options;
+        if (isset($options['price'])) {
+            $this->items[$options['price']] = $options;
         } else {
-            $this->items[$price] = $options;
+            $this->items[] = $options;
         }
 
         return $this;
@@ -451,5 +453,15 @@ class SubscriptionBuilder
         if ($taxRates = $this->owner->priceTaxRates()) {
             return $taxRates[$price] ?? null;
         }
+    }
+
+    /**
+     * Get the items set on the subscription builder.
+     *
+     * @return array
+     */
+    public function getItems()
+    {
+        return $this->items;
     }
 }
