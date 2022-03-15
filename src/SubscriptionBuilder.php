@@ -98,6 +98,7 @@ class SubscriptionBuilder
     public function price($price, $quantity = 1)
     {
         $options = is_array($price) ? $price : ['price' => $price];
+
         $quantity = $price['quantity'] ?? $quantity;
 
         if (! is_null($quantity)) {
@@ -455,7 +456,7 @@ class SubscriptionBuilder
     }
 
     /**
-     * Get items set on the subscription builder.
+     * Get the items set on the subscription builder.
      *
      * @return array
      */
