@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.8.3...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.8.4...13.x)
+
+## [v13.8.4](https://github.com/laravel/cashier-stripe/compare/v13.8.3...v13.8.4) - 2022-03-15
+
+### Changed
+
+- Make use of anonymous classes by @mmachatschek in https://github.com/laravel/cashier-stripe/pull/1329
+- Allow normal and metered prices in builder by @driesvints in https://github.com/laravel/cashier-stripe/pull/1336
 
 ## [v13.8.3](https://github.com/laravel/cashier-stripe/compare/v13.8.2...v13.8.3) - 2022-02-22
 
