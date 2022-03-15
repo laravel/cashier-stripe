@@ -108,7 +108,11 @@ class SubscriptionBuilder
             $options['tax_rates'] = $taxRates;
         }
 
-        $this->items[$options['price']] = $options;
+        if (isset($options['price'])) {
+            $this->items[$options['price']] = $options;
+        } else {
+            $this->items[] = $options;
+        }
 
         return $this;
     }
