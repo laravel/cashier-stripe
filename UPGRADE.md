@@ -43,7 +43,7 @@ You may use the following upgrade checklist to properly enable to the new webhoo
 
 After following this process, your new webhook will be active and ready to receive events.
 
-#### Tax Percentage Removal
+### Tax Percentage Removal
 
 Due to upgrading to a new Stripe API version, the `taxPercentage`, `syncTaxPercentage`, and `getTaxPercentageForPayload` methods have been removed from Cashier since they are deprecated by Stripe. We recommend that you upgrade to Stripe's new Tax Rates API. You can familiarize yourself with Tax Rates via Stripe's documentation on the topic:
 
