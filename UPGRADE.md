@@ -45,6 +45,8 @@ After following this process, your new webhook will be active and ready to recei
 
 ### Tax Percentage Removal
 
+PR: https://github.com/laravel/cashier-stripe/pull/1001
+
 Due to upgrading to a new Stripe API version, the `taxPercentage`, `syncTaxPercentage`, and `getTaxPercentageForPayload` methods have been removed from Cashier since they are deprecated by Stripe. We recommend that you upgrade to Stripe's new Tax Rates API. You can familiarize yourself with Tax Rates via Stripe's documentation on the topic:
 
 Stripe migration guide: https://stripe.com/docs/billing/migration/taxes  
