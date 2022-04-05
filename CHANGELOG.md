@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.8.4...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.8.5...13.x)
+
+## [v13.8.5](https://github.com/laravel/cashier-stripe/compare/v13.8.4...v13.8.5) - 2022-04-05
+
+### Changed
+
+- Pass locale to custom format amount by @driesvints in https://github.com/laravel/cashier-stripe/pull/1340
 
 ## [v13.8.4](https://github.com/laravel/cashier-stripe/compare/v13.8.3...v13.8.4) - 2022-03-15
 
