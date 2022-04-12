@@ -228,6 +228,21 @@ class InvoiceTest extends TestCase
         $tax = $invoice->tax();
 
         $this->assertEquals('$0.50', $tax);
+
+        // No tax...
+        $stripeInvoice = new StripeInvoice();
+        $stripeInvoice->customer = 'foo';
+        $stripeInvoice->tax = null;
+        $stripeInvoice->currency = 'USD';
+
+        $user = new User();
+        $user->stripe_id = 'foo';
+
+        $invoice = new Invoice($user, $stripeInvoice);
+
+        $tax = $invoice->tax();
+
+        $this->assertEquals('$0.00', $tax);
     }
 
     public function test_it_can_determine_if_the_customer_was_exempt_from_taxes()
