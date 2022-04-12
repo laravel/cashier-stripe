@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.8.5...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.8.6...13.x)
+
+## [v13.8.6](https://github.com/laravel/cashier-stripe/compare/v13.8.5...v13.8.6) - 2022-04-12
+
+### Fixed
+
+- Fix issue with zero tax on invoice by @driesvints in https://github.com/laravel/cashier-stripe/pull/1343
 
 ## [v13.8.5](https://github.com/laravel/cashier-stripe/compare/v13.8.4...v13.8.5) - 2022-04-05
 
