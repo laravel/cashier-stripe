@@ -272,7 +272,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function tax()
     {
-        return $this->formatAmount($this->invoice->tax);
+        return $this->formatAmount($this->invoice->tax ?? 0);
     }
 
     /**
