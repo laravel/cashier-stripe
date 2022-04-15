@@ -730,7 +730,7 @@ class Subscription extends Model
             ], [
                 'stripe_product' => $item->price->product,
                 'stripe_price' => $item->price->id,
-                'quantity' => $item->quantity,
+                'quantity' => $item->quantity ?? null,
             ]);
         }
 

@@ -12,7 +12,7 @@ The following required dependency versions have been updated:
 
 ### Stripe API Version
 
-PR: https://github.com/laravel/cashier-stripe/pull/905
+PR: https://github.com/laravel/cashier-stripe/pull/1001
 
 The default Stripe API version for Cashier 13.x will be `2020-08-27`. If this is the latest Stripe API version at the time that you're upgrading to this Cashier version then it's also recommended that you upgrade your own Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
 
@@ -43,7 +43,9 @@ You may use the following upgrade checklist to properly enable to the new webhoo
 
 After following this process, your new webhook will be active and ready to receive events.
 
-#### Tax Percentage Removal
+### Tax Percentage Removal
+
+PR: https://github.com/laravel/cashier-stripe/pull/1001
 
 Due to upgrading to a new Stripe API version, the `taxPercentage`, `syncTaxPercentage`, and `getTaxPercentageForPayload` methods have been removed from Cashier since they are deprecated by Stripe. We recommend that you upgrade to Stripe's new Tax Rates API. You can familiarize yourself with Tax Rates via Stripe's documentation on the topic:
 
