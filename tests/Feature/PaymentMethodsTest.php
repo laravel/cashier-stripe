@@ -3,8 +3,8 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Laravel\Cashier\PaymentMethod;
-use Stripe\SetupIntent as StripeSetupIntent;
 use Stripe\PaymentIntent as StripePaymentIntent;
+use Stripe\SetupIntent as StripeSetupIntent;
 
 class PaymentMethodsTest extends FeatureTestCase
 {
