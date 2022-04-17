@@ -22,7 +22,7 @@ trait ManagesPaymentMethods
 
     /**
      * Create a new PaymentIntent instance.
-	 *
+     * 
      * @param  int  $amount
      * @param  array  $options
      * @return \Stripe\PaymentIntent
