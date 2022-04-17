@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Tests\Feature;
 
 use Laravel\Cashier\PaymentMethod;
 use Stripe\SetupIntent as StripeSetupIntent;
+use Stripe\PaymentIntent as StripePaymentIntent;
 
 class PaymentMethodsTest extends FeatureTestCase
 {
@@ -14,6 +15,15 @@ class PaymentMethodsTest extends FeatureTestCase
         $setupIntent = $user->createSetupIntent();
 
         $this->assertInstanceOf(StripeSetupIntent::class, $setupIntent);
+    }
+
+    public function test_we_can_start_a_new_payment_intent_session()
+    {
+        $user = $this->createCustomer('we_can_start_a_new_payment_intent_session');
+
+        $paymentIntent = $user->createPaymentIntent();
+
+        $this->assertInstanceOf(StripePaymentIntent::class, $paymentIntent);
     }
 
     public function test_we_can_add_payment_methods()
