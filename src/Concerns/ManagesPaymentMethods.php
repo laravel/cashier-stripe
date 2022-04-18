@@ -21,21 +21,6 @@ trait ManagesPaymentMethods
     }
 
     /**
-     * Create a new PaymentIntent instance.
-     *
-     * @param  int  $amount
-     * @param  array  $options
-     * @return \Stripe\PaymentIntent
-     */
-    public function createPaymentIntent($amount, array $options = [])
-    {
-        return $this->stripe()->paymentIntents->create(array_merge([
-            'amount' => $amount,
-            'currency' => config('cashier.currency'),
-        ], $options));
-    }
-
-    /**
      * Determines if the customer currently has a default payment method.
      *
      * @return bool
