@@ -7,6 +7,7 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Checkout;
 use Laravel\Cashier\Payment;
 use LogicException;
+use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
 
 trait PerformsCharges
 {
@@ -93,6 +94,25 @@ trait PerformsCharges
         return new Payment(
             $this->stripe()->paymentIntents->create($options)
         );
+    }
+
+    /**
+     * Find a payment intent by ID.
+     *
+     * @param  string  $id
+     * @return \Laravel\Cashier\Payment|null
+     */
+    public function findPayment($id)
+    {
+        $stripePaymentIntent = null;
+
+        try {
+            $stripePaymentIntent = $this->stripe()->paymentIntents->retrieve($id);
+        } catch (StripeInvalidRequestException $exception) {
+            //
+        }
+
+        return $stripePaymentIntent ? new Payment($stripePaymentIntent) : null;
     }
 
     /**
