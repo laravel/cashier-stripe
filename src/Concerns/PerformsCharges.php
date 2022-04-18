@@ -49,6 +49,8 @@ trait PerformsCharges
     {
         $options['automatic_payment_methods'] = ['enabled' => true];
 
+        unset($options['payment_method_types']);
+
         return $this->createPayment($amount, $options);
     }
 
