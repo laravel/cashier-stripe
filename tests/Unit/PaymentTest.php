@@ -55,7 +55,7 @@ class PaymentTest extends TestCase
 
 class PaymentIntent extends StripePaymentIntent
 {
-    public bool $cancelled = false;
+    public $cancelled = false;
 
     /**
      * @inheritDoc
