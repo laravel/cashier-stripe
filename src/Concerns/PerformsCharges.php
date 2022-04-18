@@ -55,6 +55,23 @@ trait PerformsCharges
     }
 
     /**
+     * Create a new PaymentIntent instance for the given payment method types.
+     *
+     * @param  int  $amount
+     * @param  array  $paymentMethods
+     * @param  array  $options
+     * @return \Laravel\Cashier\Payment
+     */
+    public function payWith($amount, array $paymentMethods, array $options = [])
+    {
+        $options['payment_method_types'] = $paymentMethods;
+
+        unset($options['automatic_payment_methods']);
+
+        return $this->createPayment($amount, $options);
+    }
+
+    /**
      * Create a new Payment instance with a Stripe PaymentIntent.
      *
      * @param  int  $amount
