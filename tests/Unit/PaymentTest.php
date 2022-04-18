@@ -45,7 +45,7 @@ class PaymentTest extends TestCase
         $this->assertTrue($payment->isSucceeded());
     }
 
-    public function test_methods_on_the_payment_method_can_be_called()
+    public function test_stripe_methods_on_the_payment_object_can_be_called()
     {
         $payment = new Payment(new PaymentIntent());
 
