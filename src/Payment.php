@@ -4,12 +4,15 @@ namespace Laravel\Cashier;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Stripe\PaymentIntent as StripePaymentIntent;
 
 class Payment implements Arrayable, Jsonable, JsonSerializable
 {
+    use ForwardsCalls;
+
     /**
      * The Stripe PaymentIntent instance.
      *
@@ -248,5 +251,17 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     public function __get($key)
     {
         return $this->paymentIntent->{$key};
+    }
+
+    /**
+     * Dynamically pass missing methods to the PaymentIntent instance.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->forwardCallTo($this->paymentIntent, $method, $parameters);
     }
 }

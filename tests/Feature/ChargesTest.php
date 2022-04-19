@@ -30,6 +30,26 @@ class ChargesTest extends FeatureTestCase
         $this->assertNull($response->customer);
     }
 
+    public function test_customer_can_pay()
+    {
+        $user = $this->createCustomer('customer_can_pay');
+        $user->createAsStripeCustomer();
+
+        $response = $user->pay(1000);
+
+        $this->assertInstanceOf(Payment::class, $response);
+        $this->assertEquals(1000, $response->rawAmount());
+        $this->assertEquals($user->stripe_id, $response->customer);
+        $this->assertTrue($response->requiresPaymentMethod());
+        $this->assertTrue($response->automatic_payment_methods->enabled);
+
+        // Payment intent can be retrieved...
+        $payment = $user->findPayment($response->id);
+
+        $this->assertInstanceOf(Payment::class, $payment);
+        $this->assertSame($response->id, $payment->id);
+    }
+
     public function test_customer_can_be_charged_and_invoiced_immediately()
     {
         $user = $this->createCustomer('customer_can_be_charged_and_invoiced_immediately');
