@@ -135,12 +135,13 @@ class Cashier
      * @param  int  $amount
      * @param  string|null  $currency
      * @param  string|null  $locale
+     * @param  array  $options
      * @return string
      */
-    public static function formatAmount($amount, $currency = null, $locale = null)
+    public static function formatAmount($amount, $currency = null, $locale = null, array $options = [])
     {
         if (static::$formatCurrencyUsing) {
-            return call_user_func(static::$formatCurrencyUsing, $amount, $currency, $locale);
+            return call_user_func(static::$formatCurrencyUsing, $amount, $currency, $locale, $options);
         }
 
         $money = new Money($amount, new Currency(strtoupper($currency ?? config('cashier.currency'))));
@@ -148,6 +149,11 @@ class Cashier
         $locale = $locale ?? config('cashier.currency_locale');
 
         $numberFormatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
+
+        if (isset($options['min_fraction_digits'])) {
+            $numberFormatter->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $options['min_fraction_digits']);
+        }
+
         $moneyFormatter = new IntlMoneyFormatter($numberFormatter, new ISOCurrencies());
 
         return $moneyFormatter->format($money);
