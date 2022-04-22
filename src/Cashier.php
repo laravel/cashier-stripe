@@ -150,7 +150,7 @@ class Cashier
 
         $numberFormatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
 
-        if ($options['min_fraction_digits'] ?? false) {
+        if (isset($options['min_fraction_digits'])) {
             $numberFormatter->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $options['min_fraction_digits']);
         }
 
