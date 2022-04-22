@@ -60,6 +60,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
         $session = $owner->stripe()->checkout->sessions->create(array_merge([
             'customer' => $customer->id,
             'mode' => 'payment',
+            'locale' => config('cashier.checkout_locale'),
             'success_url' => $sessionOptions['success_url'] ?? route('home').'?checkout=success',
             'cancel_url' => $sessionOptions['cancel_url'] ?? route('home').'?checkout=cancelled',
             'payment_method_types' => ['card'],
