@@ -1,6 +1,16 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.8.6...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.9.0...13.x)
+
+## [v13.9.0](https://github.com/laravel/cashier-stripe/compare/v13.8.6...v13.9.0) - 2022-04-27
+
+### Added
+
+- Add pay method by @mozex in https://github.com/laravel/cashier-stripe/pull/1345
+
+### Changed
+
+- Allow options with formatAmount by @driesvints in https://github.com/laravel/cashier-stripe/pull/1348
 
 ## [v13.8.6](https://github.com/laravel/cashier-stripe/compare/v13.8.5...v13.8.6) - 2022-04-12
 
