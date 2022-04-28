@@ -1,12 +1,22 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.8.6...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.9.0...master)
 
 ### Changed
 - Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
 
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
+## [v13.9.0](https://github.com/laravel/cashier-stripe/compare/v13.8.6...v13.9.0) - 2022-04-27
+
+### Added
+
+- Add pay method by @mozex in https://github.com/laravel/cashier-stripe/pull/1345
+
+### Changed
+
+- Allow options with formatAmount by @driesvints in https://github.com/laravel/cashier-stripe/pull/1348
 
 ## [v13.8.6](https://github.com/laravel/cashier-stripe/compare/v13.8.5...v13.8.6) - 2022-04-12
 

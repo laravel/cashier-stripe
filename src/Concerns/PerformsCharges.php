@@ -7,6 +7,7 @@ use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Checkout;
 use Laravel\Cashier\Payment;
 use LogicException;
+use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
 
 trait PerformsCharges
 {
@@ -27,23 +28,91 @@ trait PerformsCharges
         $options = array_merge([
             'confirmation_method' => 'automatic',
             'confirm' => true,
+        ], $options);
+
+        $options['payment_method'] = $paymentMethod;
+
+        $payment = $this->createPayment($amount, $options);
+
+        $payment->validate();
+
+        return $payment;
+    }
+
+    /**
+     * Create a new PaymentIntent instance.
+     *
+     * @param  int  $amount
+     * @param  array  $options
+     * @return \Laravel\Cashier\Payment
+     */
+    public function pay($amount, array $options = [])
+    {
+        $options['automatic_payment_methods'] = ['enabled' => true];
+
+        unset($options['payment_method_types']);
+
+        return $this->createPayment($amount, $options);
+    }
+
+    /**
+     * Create a new PaymentIntent instance for the given payment method types.
+     *
+     * @param  int  $amount
+     * @param  array  $paymentMethods
+     * @param  array  $options
+     * @return \Laravel\Cashier\Payment
+     */
+    public function payWith($amount, array $paymentMethods, array $options = [])
+    {
+        $options['payment_method_types'] = $paymentMethods;
+
+        unset($options['automatic_payment_methods']);
+
+        return $this->createPayment($amount, $options);
+    }
+
+    /**
+     * Create a new Payment instance with a Stripe PaymentIntent.
+     *
+     * @param  int  $amount
+     * @param  array  $options
+     * @return \Laravel\Cashier\Payment
+     */
+    public function createPayment($amount, array $options = [])
+    {
+        $options = array_merge([
             'currency' => $this->preferredCurrency(),
         ], $options);
 
         $options['amount'] = $amount;
-        $options['payment_method'] = $paymentMethod;
 
         if ($this->hasStripeId()) {
             $options['customer'] = $this->stripe_id;
         }
 
-        $payment = new Payment(
+        return new Payment(
             $this->stripe()->paymentIntents->create($options)
         );
+    }
 
-        $payment->validate();
+    /**
+     * Find a payment intent by ID.
+     *
+     * @param  string  $id
+     * @return \Laravel\Cashier\Payment|null
+     */
+    public function findPayment($id)
+    {
+        $stripePaymentIntent = null;
 
-        return $payment;
+        try {
+            $stripePaymentIntent = $this->stripe()->paymentIntents->retrieve($id);
+        } catch (StripeInvalidRequestException $exception) {
+            //
+        }
+
+        return $stripePaymentIntent ? new Payment($stripePaymentIntent) : null;
     }
 
     /**
