@@ -9,6 +9,7 @@ use Laravel\Cashier\CustomerBalanceTransaction;
 use Laravel\Cashier\Discount;
 use Laravel\Cashier\Exceptions\CustomerAlreadyCreated;
 use Laravel\Cashier\Exceptions\InvalidCustomer;
+use Laravel\Cashier\PromotionCode;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
 
@@ -237,6 +238,37 @@ trait ManagesCustomer
         $this->updateStripeCustomer([
             'promotion_code' => $promotionCodeId,
         ]);
+    }
+
+    /**
+     * Retrieve a promotion code by its code.
+     *
+     * @param  string  $code
+     * @param  array  $options
+     * @return \Laravel\Cashier\PromotionCode|null
+     */
+    public function findPromotionCode($code, array $options = [])
+    {
+        $codes = $this->stripe()->promotionCodes->all(array_merge([
+            'code' => $code,
+            'limit' => 1,
+        ], $options));
+
+        if ($codes && $promotionCode = $codes->first()) {
+            return new PromotionCode($promotionCode);
+        }
+    }
+
+    /**
+     * Retrieve a promotion code by its code.
+     *
+     * @param  string  $code
+     * @param  array  $options
+     * @return \Laravel\Cashier\PromotionCode|null
+     */
+    public function findActivePromotionCode($code, array $options = [])
+    {
+        return $this->findPromotionCode($code, array_merge($options, ['active' => true]));
     }
 
     /**
