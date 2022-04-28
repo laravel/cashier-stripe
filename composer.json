@@ -14,26 +14,26 @@
         }
     ],
     "require": {
-        "php": "^7.4|^8.0",
+        "php": "^8.0",
         "ext-json": "*",
-        "illuminate/console": "^8.37|^9.0",
-        "illuminate/contracts": "^8.37|^9.0",
-        "illuminate/database": "^8.37|^9.0",
-        "illuminate/http": "^8.37|^9.0",
-        "illuminate/log": "^8.37|^9.0",
-        "illuminate/notifications": "^8.37|^9.0",
-        "illuminate/routing": "^8.37|^9.0",
-        "illuminate/support": "^8.37|^9.0",
-        "illuminate/view": "^8.37|^9.0",
+        "illuminate/console": "^9.0",
+        "illuminate/contracts": "^9.0",
+        "illuminate/database": "^9.0",
+        "illuminate/http": "^9.0",
+        "illuminate/log": "^9.0",
+        "illuminate/notifications": "^9.0",
+        "illuminate/routing": "^9.0",
+        "illuminate/support": "^9.0",
+        "illuminate/view": "^9.0",
         "moneyphp/money": "^3.2|^4.0",
         "nesbot/carbon": "^2.0",
         "stripe/stripe-php": "^7.39",
-        "symfony/http-kernel": "^5.0|^6.0",
+        "symfony/http-kernel": "^6.0",
         "symfony/polyfill-intl-icu": "^1.22.1"
     },
     "require-dev": {
         "mockery/mockery": "^1.0",
-        "orchestra/testbench": "^6.0|^7.0",
+        "orchestra/testbench": "^7.0",
         "phpunit/phpunit": "^9.0"
     },
     "suggest": {
