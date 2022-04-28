@@ -119,7 +119,7 @@ class DiscountTest extends FeatureTestCase
     {
         $user = $this->createCustomer('customers_can_retrieve_a_promotion_code');
 
-        $promotionCode = $user->retrievePromotionCode(static::$promotionCodeCode);
+        $promotionCode = $user->findPromotionCode(static::$promotionCodeCode);
 
         $this->assertEquals(static::$promotionCodeCode, $promotionCode->code);
 
@@ -130,7 +130,7 @@ class DiscountTest extends FeatureTestCase
             'code' => 'NEWYEAR',
         ]);
 
-        $promotionCode = $user->retrieveActivePromotionCode($inactivePromotionCode->id);
+        $promotionCode = $user->findActivePromotionCode($inactivePromotionCode->id);
 
         $this->assertNull($promotionCode);
     }

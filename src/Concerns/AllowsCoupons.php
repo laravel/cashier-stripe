@@ -60,7 +60,7 @@ trait AllowsCoupons
      * @param  array  $options
      * @return \Laravel\Cashier\PromotionCode|null
      */
-    public function retrievePromotionCode($code, array $options = [])
+    public function findPromotionCode($code, array $options = [])
     {
         $codes = $this->stripe()->promotionCodes->all(array_merge([
             'code' => $code,
@@ -79,9 +79,9 @@ trait AllowsCoupons
      * @param  array  $options
      * @return \Laravel\Cashier\PromotionCode|null
      */
-    public function retrieveActivePromotionCode($code, array $options = [])
+    public function findActivePromotionCode($code, array $options = [])
     {
-        return $this->retrievePromotionCode($code, array_merge($options, ['active' => true]));
+        return $this->findPromotionCode($code, array_merge($options, ['active' => true]));
     }
 
     /**
