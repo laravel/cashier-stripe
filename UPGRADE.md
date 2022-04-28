@@ -1,5 +1,15 @@
 # Upgrade Guide
 
+## Upgrading To 14.0 From 13.x
+
+### Minimum Versions
+
+The following required dependency versions have been updated:
+
+- The minimum PHP version is now v8.0
+- The minimum Laravel version is now v9.0
+
+
 ## Upgrading To 13.0 From 12.x
 
 ### Minimum Versions
