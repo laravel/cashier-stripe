@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\CustomerBalanceTransaction;
+use Laravel\Cashier\Discount;
 use Laravel\Cashier\Exceptions\CustomerAlreadyCreated;
 use Laravel\Cashier\Exceptions\InvalidCustomer;
 use Stripe\Customer as StripeCustomer;
@@ -195,6 +196,20 @@ trait ManagesCustomer
     }
 
     /**
+     * The discount on the customer if there is one.
+     *
+     * @return \Laravel\Cashier\Discount|null
+     */
+    public function discount()
+    {
+        $customer = $this->asStripeCustomer(['discount.promotion_code']);
+
+        return $customer->discount
+            ? new Discount($customer->discount)
+            : null;
+    }
+
+    /**
      * Apply a coupon to the customer.
      *
      * @param  string  $coupon
@@ -206,6 +221,21 @@ trait ManagesCustomer
 
         $this->updateStripeCustomer([
             'coupon' => $coupon,
+        ]);
+    }
+
+    /**
+     * Apply a promotion code to the customer.
+     *
+     * @param  string  $promotionCodeId
+     * @return void
+     */
+    public function applyPromotionCode($promotionCodeId)
+    {
+        $this->assertCustomerExists();
+
+        $this->updateStripeCustomer([
+            'promotion_code' => $promotionCodeId,
         ]);
     }
 

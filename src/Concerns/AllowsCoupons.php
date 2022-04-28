@@ -2,6 +2,8 @@
 
 namespace Laravel\Cashier\Concerns;
 
+use Laravel\Cashier\PromotionCode;
+
 trait AllowsCoupons
 {
     /**
@@ -49,6 +51,37 @@ trait AllowsCoupons
         $this->promotionCodeId = $promotionCodeId;
 
         return $this;
+    }
+
+    /**
+     * Retrieve a promotion code by its code.
+     *
+     * @param  string  $code
+     * @param  array  $options
+     * @return \Laravel\Cashier\PromotionCode|null
+     */
+    public function retrievePromotionCode($code, array $options = [])
+    {
+        $codes = $this->stripe()->promotionCodes->all(array_merge([
+            'code' => $code,
+            'limit' => 1,
+        ], $options));
+
+        if ($codes && $promotionCode = $codes->first()) {
+            return new PromotionCode($promotionCode);
+        }
+    }
+
+    /**
+     * Retrieve a promotion code by its code.
+     *
+     * @param  string  $code
+     * @param  array  $options
+     * @return \Laravel\Cashier\PromotionCode|null
+     */
+    public function retrieveActivePromotionCode($code, array $options = [])
+    {
+        return $this->retrievePromotionCode($code, array_merge($options, ['active' => true]));
     }
 
     /**
