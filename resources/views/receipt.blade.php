@@ -214,8 +214,8 @@
                         <tr class="row">
                             <td>{{ $subscription->description }}</td>
                             <td>
-                                {{ $subscription->startDateAsCarbon()->formatLocalized('%B %e, %Y') }} -
-                                {{ $subscription->endDateAsCarbon()->formatLocalized('%B %e, %Y') }}
+                                {{ $subscription->startDateAsCarbon()->toFormattedDateString() }} -
+                                {{ $subscription->endDateAsCarbon()->toFormattedDateString() }}
                             </td>
 
                             @if ($invoice->hasTax())
