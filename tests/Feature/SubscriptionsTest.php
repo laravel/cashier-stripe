@@ -198,7 +198,7 @@ class SubscriptionsTest extends FeatureTestCase
             'coupon' => static::$couponId,
         ]);
 
-        $this->assertEquals(static::$couponId, $subscription->asStripeSubscription()->discount->coupon->id);
+        $this->assertEquals(static::$couponId, $subscription->discount()->coupon()->id);
     }
 
     public function test_swapping_subscription_and_preserving_quantity()
@@ -755,19 +755,6 @@ class SubscriptionsTest extends FeatureTestCase
         $subscription->endTrial();
 
         $this->assertNull($subscription->trial_ends_at);
-    }
-
-    public function test_applying_coupons_to_existing_customers()
-    {
-        $user = $this->createCustomer('applying_coupons_to_existing_customers');
-
-        $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
-
-        $user->applyCoupon(static::$couponId);
-
-        $customer = $user->asStripeCustomer();
-
-        $this->assertEquals(static::$couponId, $customer->discount->coupon->id);
     }
 
     public function test_subscription_state_scopes()

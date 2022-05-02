@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
@@ -35,6 +36,40 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
     public function coupon()
     {
         return new Coupon($this->discount->coupon);
+    }
+
+    /**
+     * Get the promotion code applied to create this discount.
+     *
+     * @return \Laravel\Cashier\PromotionCode|null
+     */
+    public function promotionCode()
+    {
+        if (! is_null($this->discount->promotion_code) && ! is_string($this->discount->promotion_code)) {
+            return new PromotionCode($this->discount->promotion_code);
+        }
+    }
+
+    /**
+     * Get the date that the coupon was applied.
+     *
+     * @return \Carbon\Carbon
+     */
+    public function start()
+    {
+        return Carbon::createFromTimestamp($this->discount->start);
+    }
+
+    /**
+     * Get the date that this discount will end.
+     *
+     * @return \Carbon\Carbon|null
+     */
+    public function end()
+    {
+        if (! is_null($this->discount->end)) {
+            return Carbon::createFromTimestamp($this->discount->end);
+        }
     }
 
     /**

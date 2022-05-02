@@ -1313,6 +1313,46 @@ class Subscription extends Model
     }
 
     /**
+     * The discount that applies to the subscription, if applicable.
+     *
+     * @return \Laravel\Cashier\Discount|null
+     */
+    public function discount()
+    {
+        $subscription = $this->asStripeSubscription(['discount.promotion_code']);
+
+        return $subscription->discount
+            ? new Discount($subscription->discount)
+            : null;
+    }
+
+    /**
+     * Apply a coupon to the subscription.
+     *
+     * @param  string  $coupon
+     * @return void
+     */
+    public function applyCoupon($coupon)
+    {
+        $this->updateStripeSubscription([
+            'coupon' => $coupon,
+        ]);
+    }
+
+    /**
+     * Apply a promotion code to the subscription.
+     *
+     * @param  string  $promotionCodeId
+     * @return void
+     */
+    public function applyPromotionCode($promotionCodeId)
+    {
+        $this->updateStripeSubscription([
+            'promotion_code' => $promotionCodeId,
+        ]);
+    }
+
+    /**
      * Make sure a subscription is not incomplete when performing changes.
      *
      * @return void
