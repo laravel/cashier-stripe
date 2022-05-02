@@ -1313,7 +1313,7 @@ class Subscription extends Model
     }
 
     /**
-     * The discount on the subscription if there is one.
+     * The discount that applies to the subscription, if applicable.
      *
      * @return \Laravel\Cashier\Discount|null
      */

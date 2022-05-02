@@ -197,7 +197,7 @@ trait ManagesCustomer
     }
 
     /**
-     * The discount on the customer if there is one.
+     * The discount that applies to the customer, if applicable.
      *
      * @return \Laravel\Cashier\Discount|null
      */
