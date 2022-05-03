@@ -1,6 +1,16 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.9.0...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.10.0...13.x)
+
+## [v13.10.0](https://github.com/laravel/cashier-stripe/compare/v13.9.0...v13.10.0) - 2022-05-03
+
+### Added
+
+- Discount improvements by @driesvints in https://github.com/laravel/cashier-stripe/pull/1354
+
+### Fixed
+
+- Fix deprecation with Carbon on receipts by @driesvints in https://github.com/laravel/cashier-stripe/pull/1356
 
 ## [v13.9.0](https://github.com/laravel/cashier-stripe/compare/v13.8.6...v13.9.0) - 2022-04-27
 
