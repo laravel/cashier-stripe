@@ -401,6 +401,27 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription's trial has expired.
+     *
+     * @return bool
+     */
+    public function hasExpiredTrial()
+    {
+        return $this->trial_ends_at && $this->trial_ends_at->isPast();
+    }
+
+    /**
+     * Filter query by expired trial.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeExpiredTrial($query)
+    {
+        $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '<', Carbon::now());
+    }
+
+    /**
      * Filter query by not on trial.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query

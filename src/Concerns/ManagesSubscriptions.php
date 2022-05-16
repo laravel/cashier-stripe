@@ -43,6 +43,28 @@ trait ManagesSubscriptions
     }
 
     /**
+     * Determine if the Stripe model's trial has ended.
+     *
+     * @param  string  $name
+     * @param  string|null  $price
+     * @return bool
+     */
+    public function hasExpiredTrial($name = 'default', $price = null)
+    {
+        if (func_num_args() === 0 && $this->hasExpiredGenericTrial()) {
+            return true;
+        }
+
+        $subscription = $this->subscription($name);
+
+        if (! $subscription || ! $subscription->hasExpiredTrial()) {
+            return false;
+        }
+
+        return ! $price || $subscription->hasPrice($price);
+    }
+
+    /**
      * Determine if the Stripe model is on a "generic" trial at the model level.
      *
      * @return bool
@@ -50,6 +72,16 @@ trait ManagesSubscriptions
     public function onGenericTrial()
     {
         return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+    }
+
+    /**
+     * Determine if the Stripe model's "generic" trial at the model level has expired.
+     *
+     * @return bool
+     */
+    public function hasExpiredGenericTrial()
+    {
+        return $this->trial_ends_at && $this->trial_ends_at->isPast();
     }
 
     /**
