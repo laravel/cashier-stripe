@@ -405,18 +405,18 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function hasTrialExpired()
+    public function hasExpiredTrial()
     {
         return $this->trial_ends_at && $this->trial_ends_at->isPast();
     }
 
     /**
-     * Filter query by trial expired.
+     * Filter query by expired trial.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeTrialExpired($query)
+    public function scopeExpiredTrial($query)
     {
         $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '<', Carbon::now());
     }

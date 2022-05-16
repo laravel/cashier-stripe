@@ -147,13 +147,13 @@ class SubscriptionTest extends TestCase
         $subscription->setDateFormat('Y-m-d H:i:s');
         $subscription->trial_ends_at = now()->subDay();
 
-        $this->assertTrue($subscription->hasTrialExpired());
+        $this->assertTrue($subscription->hasExpiredTrial());
 
         $subscription = new Subscription();
         $subscription->setDateFormat('Y-m-d H:i:s');
         $subscription->trial_ends_at = now()->addDay();
 
-        $this->assertFalse($subscription->hasTrialExpired());
+        $this->assertFalse($subscription->hasExpiredTrial());
     }
 
     public function test_we_can_check_if_it_has_a_single_price()

@@ -49,15 +49,15 @@ trait ManagesSubscriptions
      * @param  string|null  $price
      * @return bool
      */
-    public function hasTrialExpired($name = 'default', $price = null)
+    public function hasExpiredTrial($name = 'default', $price = null)
     {
-        if (func_num_args() === 0 && $this->hasGenericTrialExpired()) {
+        if (func_num_args() === 0 && $this->hasExpiredGenericTrial()) {
             return true;
         }
 
         $subscription = $this->subscription($name);
 
-        if (! $subscription || ! $subscription->hasTrialExpired()) {
+        if (! $subscription || ! $subscription->hasExpiredTrial()) {
             return false;
         }
 
@@ -79,7 +79,7 @@ trait ManagesSubscriptions
      *
      * @return bool
      */
-    public function hasGenericTrialExpired()
+    public function hasExpiredGenericTrial()
     {
         return $this->trial_ends_at && $this->trial_ends_at->isPast();
     }

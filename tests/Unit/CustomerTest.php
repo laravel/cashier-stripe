@@ -32,8 +32,8 @@ class CustomerTest extends TestCase
 
         $user->trial_ends_at = Carbon::yesterday();
 
-        $this->assertTrue($user->hasTrialExpired());
-        $this->assertTrue($user->hasGenericTrialExpired());
+        $this->assertTrue($user->hasExpiredTrial());
+        $this->assertTrue($user->hasExpiredGenericTrial());
     }
 
     public function test_we_can_determine_if_it_has_a_payment_method()
