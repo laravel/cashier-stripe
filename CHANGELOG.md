@@ -1,6 +1,20 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.10.1...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.11.0...13.x)
+
+## [v13.11.0](https://github.com/laravel/cashier-stripe/compare/v13.10.1...v13.11.0) - 2022-05-17
+
+### Added
+
+- Add new hasTrialExpired methods by @driesvints in https://github.com/laravel/cashier-stripe/pull/1366
+
+### Changed
+
+- Allow Stripe SDK v8 by @ankurk91 in https://github.com/laravel/cashier-stripe/pull/1365
+
+### Fixed
+
+- Fix reference to billable by @driesvints in https://github.com/laravel/cashier-stripe/pull/1363
 
 ## [v13.10.1](https://github.com/laravel/cashier-stripe/compare/v13.10.0...v13.10.1) - 2022-05-05
 
