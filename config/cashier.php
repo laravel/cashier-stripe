@@ -19,6 +19,8 @@ return [
 
     'secret' => env('STRIPE_SECRET'),
 
+    'stripe_version' => env('STRIPE_VERSION'),
+
     /*
     |--------------------------------------------------------------------------
     | Cashier Path
