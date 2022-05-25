@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Laravel\Cashier\Exceptions\CustomerAlreadyCreated;
 use Laravel\Cashier\Exceptions\InvalidCustomer;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Laravel\Cashier\Tests\Fixtures\UserWithCustomStripeKey;
 use PHPUnit\Framework\TestCase;
 
 class CustomerTest extends TestCase
@@ -72,5 +73,17 @@ class CustomerTest extends TestCase
         $this->expectException(CustomerAlreadyCreated::class);
 
         $user->createAsStripeCustomer();
+    }
+    
+    public function test_stripe_id_can_be_customized()
+    {
+        $user = new UserWithCustomStripeKey();
+
+        $user->setStripeId('foo');
+
+        $this->assertEquals('foo', $user->stripeId());
+        $this->assertEquals('foo', $user->stripe_customer_id);
+
+        $this->assertEquals('stripe_customer_id', $user->stripeKey());
     }
 }
