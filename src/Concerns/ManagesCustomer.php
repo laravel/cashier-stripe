@@ -417,7 +417,7 @@ trait ManagesCustomer
     {
         $this->assertCustomerExists();
 
-        return $this->stripe()->customers->createTaxId($this->stripe_id, [
+        return $this->stripe()->customers->createTaxId($this->stripeId(), [
             'type' => $type,
             'value' => $value,
         ]);
@@ -434,7 +434,7 @@ trait ManagesCustomer
         $this->assertCustomerExists();
 
         try {
-            $this->stripe()->customers->deleteTaxId($this->stripe_id, $id);
+            $this->stripe()->customers->deleteTaxId($this->stripeId(), $id);
         } catch (StripeInvalidRequestException $exception) {
             //
         }

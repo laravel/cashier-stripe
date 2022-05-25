@@ -78,7 +78,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function __construct($owner, StripeInvoice $invoice, array $refreshData = [])
     {
-        if ($owner->stripe_id !== $invoice->customer) {
+        if ($owner->stripeId() !== $invoice->customer) {
             throw InvalidInvoice::invalidOwner($invoice, $owner);
         }
 
@@ -409,7 +409,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
         } else {
             // If no invoice ID is present then assume this is the customer's upcoming invoice...
             $this->invoice = Cashier::stripe()->invoices->upcoming(array_merge($this->refreshData, [
-                'customer' => $this->owner->stripe_id,
+                'customer' => $this->owner->stripeId(),
                 'expand' => $expand,
             ]));
         }

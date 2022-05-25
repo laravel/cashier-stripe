@@ -35,7 +35,7 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
      */
     public function __construct($owner, StripePaymentMethod $paymentMethod)
     {
-        if ($owner->stripe_id !== $paymentMethod->customer) {
+        if ($owner->stripeId() !== $paymentMethod->customer) {
             throw InvalidPaymentMethod::invalidOwner($paymentMethod, $owner);
         }
 

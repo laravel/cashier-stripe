@@ -14,6 +14,6 @@ class CustomerAlreadyCreated extends Exception
      */
     public static function exists($owner)
     {
-        return new static(class_basename($owner)." is already a Stripe customer with ID {$owner->stripe_id}.");
+        return new static(class_basename($owner)." is already a Stripe customer with ID {$owner->stripeId()}.");
     }
 }

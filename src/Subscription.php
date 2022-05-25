@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
+use Laravel\Cashier\Concerns\BelongsToStripe;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionFactory;
@@ -23,6 +24,7 @@ use Stripe\Subscription as StripeSubscription;
  */
 class Subscription extends Model
 {
+    use BelongsToStripe;
     use AllowsCoupons;
     use HasFactory;
     use InteractsWithPaymentBehavior;
@@ -731,7 +733,7 @@ class Subscription extends Model
         );
 
         $stripeSubscription = $this->owner->stripe()->subscriptions->update(
-            $this->stripe_id, $this->getSwapOptions($items, $options)
+            $this->stripeId(), $this->getSwapOptions($items, $options)
         );
 
         /** @var \Stripe\SubscriptionItem $firstItem */
@@ -747,7 +749,7 @@ class Subscription extends Model
 
         foreach ($stripeSubscription->items as $item) {
             $this->items()->updateOrCreate([
-                'stripe_id' => $item->id,
+                $this->items()->getModel()->stripeKey() => $item->id,
             ], [
                 'stripe_product' => $item->price->product,
                 'stripe_price' => $item->price->id,
@@ -897,7 +899,7 @@ class Subscription extends Model
 
         $stripeSubscriptionItem = $this->owner->stripe()->subscriptionItems
             ->create(array_filter(array_merge([
-                'subscription' => $this->stripe_id,
+                'subscription' => $this->stripeId(),
                 'price' => $price,
                 'quantity' => $quantity,
                 'tax_rates' => $this->getPriceTaxRatesForPayload($price),
@@ -906,7 +908,7 @@ class Subscription extends Model
             ], $options)));
 
         $this->items()->create([
-            'stripe_id' => $stripeSubscriptionItem->id,
+            $this->items()->getModel()->stripeKey() => $stripeSubscriptionItem->id,
             'stripe_product' => $stripeSubscriptionItem->price->product,
             'stripe_price' => $stripeSubscriptionItem->price->id,
             'quantity' => $stripeSubscriptionItem->quantity ?? null,
@@ -1070,7 +1072,7 @@ class Subscription extends Model
      */
     public function cancelNow()
     {
-        $this->owner->stripe()->subscriptions->cancel($this->stripe_id, [
+        $this->owner->stripe()->subscriptions->cancel($this->stripeId(), [
             'prorate' => $this->prorateBehavior() === 'create_prorations',
         ]);
 
@@ -1086,7 +1088,7 @@ class Subscription extends Model
      */
     public function cancelNowAndInvoice()
     {
-        $this->owner->stripe()->subscriptions->cancel($this->stripe_id, [
+        $this->owner->stripe()->subscriptions->cancel($this->stripeId(), [
             'invoice_now' => true,
             'prorate' => $this->prorateBehavior() === 'create_prorations',
         ]);
@@ -1175,7 +1177,7 @@ class Subscription extends Model
     public function invoice(array $options = [])
     {
         try {
-            return $this->user->invoice(array_merge($options, ['subscription' => $this->stripe_id]));
+            return $this->user->invoice(array_merge($options, ['subscription' => $this->stripeId()]));
         } catch (IncompletePayment $exception) {
             // Set the new Stripe subscription status immediately when payment fails...
             $this->fill([
@@ -1209,7 +1211,7 @@ class Subscription extends Model
     public function upcomingInvoice(array $options = [])
     {
         return $this->owner->upcomingInvoice(array_merge([
-            'subscription' => $this->stripe_id,
+            'subscription' => $this->stripeId(),
         ], $options));
     }
 
@@ -1259,7 +1261,7 @@ class Subscription extends Model
     public function invoices($includePending = false, $parameters = [])
     {
         return $this->owner->invoices(
-            $includePending, array_merge($parameters, ['subscription' => $this->stripe_id])
+            $includePending, array_merge($parameters, ['subscription' => $this->stripeId()])
         );
     }
 
@@ -1412,7 +1414,7 @@ class Subscription extends Model
     public function updateStripeSubscription(array $options = [])
     {
         return $this->owner->stripe()->subscriptions->update(
-            $this->stripe_id, $options
+            $this->stripeId(), $options
         );
     }
 
@@ -1425,7 +1427,7 @@ class Subscription extends Model
     public function asStripeSubscription(array $expand = [])
     {
         return $this->owner->stripe()->subscriptions->retrieve(
-            $this->stripe_id, ['expand' => $expand]
+            $this->stripeId(), ['expand' => $expand]
         );
     }
 

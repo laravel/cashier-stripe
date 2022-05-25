@@ -24,6 +24,16 @@ trait BelongsToStripe
     }
 
     /**
+     * Retrieve the Stripe attribute key.
+     *
+     * @return string
+     */
+    public function stripeKey()
+    {
+        return $this->stripeKey;
+    }
+
+    /**
      * Determine if the customer has a Stripe ID.
      *
      * @return bool
