@@ -14,16 +14,6 @@ trait BelongsToStripe
     protected $stripeKey = 'stripe_id';
 
     /**
-     * Retrieve the Stripe ID.
-     *
-     * @return string|null
-     */
-    public function stripeId()
-    {
-        return $this->{$this->stripeKey};
-    }
-
-    /**
      * Retrieve the Stripe attribute key.
      *
      * @return string
@@ -34,7 +24,17 @@ trait BelongsToStripe
     }
 
     /**
-     * Determine if the customer has a Stripe ID.
+     * Retrieve the Stripe ID.
+     *
+     * @return string|null
+     */
+    public function stripeId()
+    {
+        return $this->{$this->stripeKey};
+    }
+
+    /**
+     * Determine if the instance has a Stripe ID.
      *
      * @return bool
      */
