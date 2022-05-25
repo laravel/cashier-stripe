@@ -127,7 +127,7 @@ class WebhookController extends Controller
     {
         if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
             $data = $payload['data']['object'];
-            
+
             $stripeKey = $user->subscriptions()->getModel()->stripeKey();
 
             $subscription = $user->subscriptions()->firstOrNew([$stripeKey => $data['id']]);

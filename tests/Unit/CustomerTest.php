@@ -74,7 +74,7 @@ class CustomerTest extends TestCase
 
         $user->createAsStripeCustomer();
     }
-    
+
     public function test_stripe_id_can_be_customized()
     {
         $user = new UserWithCustomStripeKey();

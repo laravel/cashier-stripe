@@ -46,8 +46,7 @@ trait BelongsToStripe
     /**
      * Set the Stripe ID.
      *
-     * @param string $stripeId
-     *
+     * @param  string  $stripeId
      * @return $this
      */
     public function setStripeId($stripeId)

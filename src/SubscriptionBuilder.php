@@ -293,7 +293,7 @@ class SubscriptionBuilder
     protected function createSubscription(StripeSubscription $stripeSubscription)
     {
         $stripeKey = $this->owner->subscriptions()->getModel()->stripeKey();
-        
+
         if ($subscription = $this->owner->subscriptions()->where($stripeKey, $stripeSubscription->id)->first()) {
             return $subscription;
         }
