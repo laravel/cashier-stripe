@@ -26,7 +26,11 @@ class WebhookController extends Controller
      */
     public function __construct()
     {
-        if (config('cashier.webhook.secret')) {
+        $webhookSecret = config('cashier.webhook.secret');
+        if (user()->hasRole('User')){
+            $webhookSecret = user()->agency->get('stripe_webhook_secret', null);
+        }
+        if ($webhookSecret) {
             $this->middleware(VerifyWebhookSignature::class);
         }
     }

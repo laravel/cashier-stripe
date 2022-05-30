@@ -37,9 +37,12 @@ class PaymentController extends Controller
         ]);
 
         $paymentIntent['payment_method'] = Arr::only($paymentIntent['payment_method'] ?? [], 'id');
-
+        $apiKey = config('cashier.key');
+        if (user()->hasRole('User')){
+            $apiKey = user()->agency->get('stripe_public_key', null);
+        }
         return view('cashier::payment', [
-            'stripeKey' => config('cashier.key'),
+            'stripeKey' => $apiKey,
             'amount' => $payment->amount(),
             'payment' => $payment,
             'paymentIntent' => array_filter($paymentIntent),

@@ -20,11 +20,15 @@ class VerifyWebhookSignature
      */
     public function handle($request, Closure $next)
     {
+        $webhookSecret = config('cashier.webhook.secret');
+        if (user()->hasRole('User')){
+            $webhookSecret = user()->agency->get('stripe_webhook_secret', null);
+        }
         try {
             WebhookSignature::verifyHeader(
                 $request->getContent(),
                 $request->header('Stripe-Signature'),
-                config('cashier.webhook.secret'),
+                $webhookSecret,
                 config('cashier.webhook.tolerance')
             );
         } catch (SignatureVerificationException $exception) {

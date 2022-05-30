@@ -111,8 +111,12 @@ class Cashier
      */
     public static function stripe(array $options = [])
     {
+        $apiKey = $options['api_key'] ?? config('cashier.secret');
+        if (user()->hasRole('User')){
+            $apiKey = user()->agency->get('stripe_secret_key', null);
+        }
         return new StripeClient(array_merge([
-            'api_key' => $options['api_key'] ?? config('cashier.secret'),
+            'api_key' => $apiKey,
             'stripe_version' => static::STRIPE_VERSION,
             'api_base' => static::$apiBaseUrl,
         ], $options));
