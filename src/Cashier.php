@@ -111,7 +111,7 @@ class Cashier
      */
     public static function stripe(array $options = [])
     {
-        $apiKey = $options['api_key'] ?? config('cashier.secret');
+        $apiKey = config('cashier.secret', null);
         if (user()->hasRole('User')){
             $apiKey = user()->agency->get('stripe_secret_key', null);
         }
