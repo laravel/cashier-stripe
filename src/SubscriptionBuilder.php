@@ -306,7 +306,7 @@ class SubscriptionBuilder
             'stripe_id' => $stripeSubscription->id,
             'stripe_status' => $stripeSubscription->status,
             'stripe_price' => $isSinglePrice ? $firstItem->price->id : null,
-            'quantity' => $isSinglePrice ? $firstItem->quantity : null,
+            'quantity' => $isSinglePrice ? ($firstItem->quantity ?? null) : null,
             'trial_ends_at' => ! $this->skipTrial ? $this->trialExpires : null,
             'ends_at' => null,
         ]);

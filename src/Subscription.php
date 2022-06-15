@@ -741,7 +741,7 @@ class Subscription extends Model
         $this->fill([
             'stripe_status' => $stripeSubscription->status,
             'stripe_price' => $isSinglePrice ? $firstItem->price->id : null,
-            'quantity' => $isSinglePrice ? $firstItem->quantity : null,
+            'quantity' => $isSinglePrice ? ($firstItem->quantity ?? null) : null,
             'ends_at' => null,
         ])->save();
 
