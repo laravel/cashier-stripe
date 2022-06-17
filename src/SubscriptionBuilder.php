@@ -161,6 +161,19 @@ class SubscriptionBuilder
 
         return $this;
     }
+    
+    /**
+     * Specify the number of months of the trial.
+     *
+     * @param  int  $trialMonths
+     * @return $this
+     */
+    public function trialMonths($trialMonths)
+    {
+        $this->trialExpires = Carbon::now()->addMonths($trialMonths);
+
+        return $this;
+    }
 
     /**
      * Specify the ending date of the trial.
