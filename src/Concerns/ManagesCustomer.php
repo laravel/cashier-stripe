@@ -110,10 +110,10 @@ trait ManagesCustomer
      * @param  array  $options
      * @return \Stripe\Customer
      */
-    public function createOrGetStripeCustomer(array $options = [])
+    public function createOrGetStripeCustomer(array $options = [], array $expand = [])
     {
         if ($this->hasStripeId()) {
-            return $this->asStripeCustomer();
+            return $this->asStripeCustomer($expand);
         }
 
         return $this->createAsStripeCustomer($options);
