@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.11.0...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.11.1...13.x)
+
+## [v13.11.1](https://github.com/laravel/cashier-stripe/compare/v13.11.0...v13.11.1) - 2022-06-21
+
+### Fixed
+
+- Fixed undefined quantity notice by @Lyrisbee in https://github.com/laravel/cashier-stripe/pull/1377
 
 ## [v13.11.0](https://github.com/laravel/cashier-stripe/compare/v13.10.1...v13.11.0) - 2022-05-17
 
