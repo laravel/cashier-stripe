@@ -403,12 +403,12 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
         ];
 
         if ($this->invoice->id) {
-            $this->invoice = Cashier::stripe()->invoices->retrieve($this->invoice->id, [
+            $this->invoice = $this->owner->stripe()->invoices->retrieve($this->invoice->id, [
                 'expand' => $expand,
             ]);
         } else {
             // If no invoice ID is present then assume this is the customer's upcoming invoice...
-            $this->invoice = Cashier::stripe()->invoices->upcoming(array_merge($this->refreshData, [
+            $this->invoice = $this->owner->stripe()->invoices->upcoming(array_merge($this->refreshData, [
                 'customer' => $this->owner->stripe_id,
                 'expand' => $expand,
             ]));
