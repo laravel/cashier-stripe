@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.11.1...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.12.0...13.x)
+
+## [v13.12.0](https://github.com/laravel/cashier-stripe/compare/v13.11.1...v13.12.0) - 2022-06-28
+
+### Changed
+
+- Update reference to Stripe SDK by @driesvints in https://github.com/laravel/cashier-stripe/pull/1383
+- Re-add support for Sources API by @driesvints in https://github.com/laravel/cashier-stripe/pull/1384
 
 ## [v13.11.1](https://github.com/laravel/cashier-stripe/compare/v13.11.0...v13.11.1) - 2022-06-21
 
