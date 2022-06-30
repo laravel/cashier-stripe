@@ -116,7 +116,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get the total amount that was paid (or will be paid).
+     * Get the total amount minus the starting balance that was paid (or will be paid).
      *
      * @return string
      */
@@ -126,13 +126,33 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get the raw total amount that was paid (or will be paid).
+     * Get the raw total amount minus the starting balance that was paid (or will be paid).
      *
      * @return int
      */
     public function rawTotal()
     {
         return $this->invoice->total + $this->rawStartingBalance();
+    }
+
+    /**
+     * Get the total amount that was paid (or will be paid).
+     *
+     * @return string
+     */
+    public function realTotal()
+    {
+        return $this->formatAmount($this->rawRealTotal());
+    }
+
+    /**
+     * Get the raw total amount that was paid (or will be paid).
+     *
+     * @return int
+     */
+    public function rawRealTotal()
+    {
+        return $this->invoice->total;
     }
 
     /**
@@ -143,6 +163,26 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     public function subtotal()
     {
         return $this->formatAmount($this->invoice->subtotal);
+    }
+
+    /**
+     * Get the amount due for the invoice.
+     *
+     * @return string
+     */
+    public function amountDue()
+    {
+        return $this->formatAmount($this->rawAmountDue());
+    }
+
+    /**
+     * Get the raw amount due for the invoice.
+     *
+     * @return int
+     */
+    public function rawAmountDue()
+    {
+        return $this->invoice->amount_due ?? 0;
     }
 
     /**
@@ -173,6 +213,60 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     public function rawStartingBalance()
     {
         return $this->invoice->starting_balance ?? 0;
+    }
+
+    /**
+     * Determine if the account had an ending balance.
+     *
+     * @return bool
+     */
+    public function hasEndingBalance()
+    {
+        return ! is_null($this->invoice->ending_balance);
+    }
+
+    /**
+     * Get the ending balance for the invoice.
+     *
+     * @return string
+     */
+    public function endingBalance()
+    {
+        return $this->formatAmount($this->rawEndingBalance());
+    }
+
+    /**
+     * Get the raw ending balance for the invoice.
+     *
+     * @return int
+     */
+    public function rawEndingBalance()
+    {
+        return $this->invoice->ending_balance ?? 0;
+    }
+
+    /**
+     * Get the applied balance for the invoice.
+     *
+     * @return string
+     */
+    public function appliedBalance()
+    {
+        return $this->formatAmount($this->rawAppliedBalance());
+    }
+
+    /**
+     * Get the raw ending balance for the invoice.
+     *
+     * @return int
+     */
+    public function rawAppliedBalance()
+    {
+        if (! $this->hasEndingBalance()) {
+            return 0;
+        }
+
+        return $this->rawStartingBalance() - $this->rawEndingBalance();
     }
 
     /**

@@ -289,23 +289,33 @@
                         @endforeach
                     @endunless
 
-                    <!-- Starting Balance -->
-                    @if ($invoice->hasStartingBalance())
-                        <tr>
-                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
-                                Customer Balance
-                            </td>
-                            <td>{{ $invoice->startingBalance() }}</td>
-                        </tr>
-                    @endif
-
                     <!-- Display The Final Total -->
                     <tr>
                         <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
-                            <strong>Total</strong>
+                            Total
                         </td>
                         <td>
-                            <strong>{{ $invoice->total() }}</strong>
+                            {{ $invoice->realTotal() }}
+                        </td>
+                    </tr>
+
+                    <!-- Applied Balance -->
+                    @if ($invoice->hasEndingBalance())
+                        <tr>
+                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
+                                Applied balance
+                            </td>
+                            <td>{{ $invoice->appliedBalance() }}</td>
+                        </tr>
+                    @endif
+
+                    <!-- Display The Amount Due -->
+                    <tr>
+                        <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
+                            <strong>Amount due</strong>
+                        </td>
+                        <td>
+                            <strong>{{ $invoice->amountDue() }}</strong>
                         </td>
                     </tr>
                 </table>
