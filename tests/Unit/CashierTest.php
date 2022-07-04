@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Tests\Unit;
 
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Tests\TestCase;
+use Stripe\StripeClient;
 
 class CashierTest extends TestCase
 {
@@ -16,4 +17,16 @@ class CashierTest extends TestCase
     {
         $this->assertSame('$10', Cashier::formatAmount(1000, null, null, ['min_fraction_digits' => 0]));
     }
+
+    public function test_stripe_client_can_be_overridden()
+    {
+        $fakeClient = new class {};
+
+        $this->assertInstanceOf(StripeClient::class, Cashier::stripe());
+
+        Cashier::useStripeClient($fakeClient);
+
+        $this->assertInstanceOf($fakeClient::class, Cashier::stripe());
+    }
 }
+

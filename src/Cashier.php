@@ -91,6 +91,13 @@ class Cashier
     public static $subscriptionItemModel = SubscriptionItem::class;
 
     /**
+     * The stripe client instance.
+     *
+     * @var StripeClient
+     */
+    public static $stripeClientInstance = null;
+
+    /**
      * Get the customer instance by its Stripe ID.
      *
      * @param  \Stripe\Customer|string|null  $stripeId
@@ -111,7 +118,7 @@ class Cashier
      */
     public static function stripe(array $options = [])
     {
-        return new StripeClient(array_merge([
+        return self::$stripeClientInstance ?? new StripeClient(array_merge([
             'api_key' => $options['api_key'] ?? config('cashier.secret'),
             'stripe_version' => static::STRIPE_VERSION,
             'api_base' => static::$apiBaseUrl,
@@ -238,5 +245,16 @@ class Cashier
     public static function useSubscriptionItemModel($subscriptionItemModel)
     {
         static::$subscriptionItemModel = $subscriptionItemModel;
+    }
+
+    /**
+     * Set the stripe client instance.
+     *
+     * @param  string  $stripeClient
+     * @return void
+     */
+    public static function useStripeClient($client)
+    {
+        self::$stripeClientInstance = $client;
     }
 }
