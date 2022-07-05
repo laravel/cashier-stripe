@@ -255,6 +255,6 @@ class Cashier
      */
     public static function useStripeClient($client)
     {
-        self::$stripeClientInstance = $client;
+        static::$stripeClientInstance = $client;
     }
 }
