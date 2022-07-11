@@ -20,7 +20,7 @@
     "require": {
         "php": "^7.3|^8.0",
         "ext-json": "*",
-        "dompdf/dompdf": "^1.2.1",
+        "dompdf/dompdf": "^1.2.1|^2.0",
         "illuminate/console": "^8.37|^9.0",
         "illuminate/contracts": "^8.37|^9.0",
         "illuminate/database": "^8.37|^9.0",
