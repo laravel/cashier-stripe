@@ -14,6 +14,9 @@ use Stripe\Subscription as StripeSubscription;
 
 class Subscription extends Model
 {
+    //changing the name of the table to stripe_subscriptions
+    protected $table = 'stripe_subscriptions';
+
     /**
      * The attributes that are not mass assignable.
      *
