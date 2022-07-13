@@ -1,6 +1,16 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.12.0...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.13.0...13.x)
+
+## [v13.13.0](https://github.com/laravel/cashier-stripe/compare/v13.12.0...v13.13.0) - 2022-07-13
+
+### Changed
+
+- Allow dompdf v2 by @carlalexander in https://github.com/laravel/cashier-stripe/pull/1393
+
+### Fixed
+
+- Fix receipt totals and balance by @driesvints in https://github.com/laravel/cashier-stripe/pull/1388
 
 ## [v13.12.0](https://github.com/laravel/cashier-stripe/compare/v13.11.1...v13.12.0) - 2022-06-28
 
