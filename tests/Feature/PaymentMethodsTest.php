@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Laravel\Cashier\PaymentMethod;
+use Stripe\Card as StripeCard;
 use Stripe\SetupIntent as StripeSetupIntent;
 
 class PaymentMethodsTest extends FeatureTestCase
@@ -113,6 +114,22 @@ class PaymentMethodsTest extends FeatureTestCase
         $this->assertEquals('visa', $user->pm_type);
         $this->assertEquals('4242', $paymentMethod->card->last4);
         $this->assertEquals('4242', $user->pm_last_four);
+    }
+
+    public function test_legacy_we_can_retrieve_an_old_default_source_as_a_default_payment_method()
+    {
+        $user = $this->createCustomer('we_can_retrieve_an_old_default_source_as_a_default_payment_method');
+        $customer = $user->createAsStripeCustomer(['expand' => ['sources']]);
+
+        $card = $customer->sources->create(['source' => 'tok_visa']);
+        $customer->default_source = $card->id;
+        $customer->save();
+
+        $paymentMethod = $user->defaultPaymentMethod();
+
+        $this->assertInstanceOf(StripeCard::class, $paymentMethod);
+        $this->assertEquals('Visa', $paymentMethod->brand);
+        $this->assertEquals('4242', $paymentMethod->last4);
     }
 
     public function test_we_can_retrieve_all_payment_methods()

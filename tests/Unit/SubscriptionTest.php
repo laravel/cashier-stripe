@@ -126,6 +126,36 @@ class SubscriptionTest extends TestCase
         (new Subscription)->extendTrial(now()->subDay());
     }
 
+    public function test_it_can_determine_if_the_subscription_is_on_trial()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->trial_ends_at = now()->addDay();
+
+        $this->assertTrue($subscription->onTrial());
+
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->trial_ends_at = now()->subDay();
+
+        $this->assertFalse($subscription->onTrial());
+    }
+
+    public function test_it_can_determine_if_a_trial_has_expired()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->trial_ends_at = now()->subDay();
+
+        $this->assertTrue($subscription->hasExpiredTrial());
+
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->trial_ends_at = now()->addDay();
+
+        $this->assertFalse($subscription->hasExpiredTrial());
+    }
+
     public function test_we_can_check_if_it_has_a_single_price()
     {
         $subscription = new Subscription(['stripe_price' => 'foo']);

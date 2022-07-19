@@ -69,7 +69,7 @@ class InvoiceTest extends TestCase
 
         $invoice = new Invoice($user, $stripeInvoice);
 
-        $total = $invoice->total();
+        $total = $invoice->realTotal();
 
         $this->assertEquals('$10.00', $total);
     }
@@ -86,7 +86,7 @@ class InvoiceTest extends TestCase
 
         $invoice = new Invoice($user, $stripeInvoice);
 
-        $total = $invoice->rawTotal();
+        $total = $invoice->rawRealTotal();
 
         $this->assertEquals(1000, $total);
     }
@@ -166,25 +166,41 @@ class InvoiceTest extends TestCase
 
         $invoice = new Invoice($user, $stripeInvoice);
 
-        $startingBalance = $invoice->startingBalance();
-
-        $this->assertEquals('-$4.50', $startingBalance);
+        $this->assertEquals('-$4.50', $invoice->startingBalance());
+        $this->assertEquals(-450, $invoice->rawStartingBalance());
     }
 
-    public function test_it_can_return_its_raw_starting_balance()
+    public function test_it_can_return_its_ending_balance()
     {
         $stripeInvoice = new StripeInvoice();
         $stripeInvoice->customer = 'foo';
-        $stripeInvoice->starting_balance = -450;
+        $stripeInvoice->ending_balance = -450;
+        $stripeInvoice->currency = 'USD';
 
         $user = new User();
         $user->stripe_id = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
-        $startingBalance = $invoice->rawStartingBalance();
+        $this->assertEquals('-$4.50', $invoice->endingBalance());
+        $this->assertEquals(-450, $invoice->rawEndingBalance());
+    }
 
-        $this->assertEquals(-450, $startingBalance);
+    public function test_it_can_return_its_applied_balance()
+    {
+        $stripeInvoice = new StripeInvoice();
+        $stripeInvoice->customer = 'foo';
+        $stripeInvoice->ending_balance = -350;
+        $stripeInvoice->starting_balance = -500;
+        $stripeInvoice->currency = 'USD';
+
+        $user = new User();
+        $user->stripe_id = 'foo';
+
+        $invoice = new Invoice($user, $stripeInvoice);
+
+        $this->assertEquals('-$1.50', $invoice->appliedBalance());
+        $this->assertEquals(-150, $invoice->rawAppliedBalance());
     }
 
     public function test_it_can_determine_if_it_has_a_discount_applied()

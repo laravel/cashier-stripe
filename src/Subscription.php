@@ -401,6 +401,27 @@ class Subscription extends Model
     }
 
     /**
+     * Determine if the subscription's trial has expired.
+     *
+     * @return bool
+     */
+    public function hasExpiredTrial()
+    {
+        return $this->trial_ends_at && $this->trial_ends_at->isPast();
+    }
+
+    /**
+     * Filter query by expired trial.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeExpiredTrial($query)
+    {
+        $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '<', Carbon::now());
+    }
+
+    /**
      * Filter query by not on trial.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -720,7 +741,7 @@ class Subscription extends Model
         $this->fill([
             'stripe_status' => $stripeSubscription->status,
             'stripe_price' => $isSinglePrice ? $firstItem->price->id : null,
-            'quantity' => $isSinglePrice ? $firstItem->quantity : null,
+            'quantity' => $isSinglePrice ? ($firstItem->quantity ?? null) : null,
             'ends_at' => null,
         ])->save();
 
@@ -1310,6 +1331,46 @@ class Subscription extends Model
                 ? new Payment($invoice->payment_intent)
                 : null;
         }
+    }
+
+    /**
+     * The discount that applies to the subscription, if applicable.
+     *
+     * @return \Laravel\Cashier\Discount|null
+     */
+    public function discount()
+    {
+        $subscription = $this->asStripeSubscription(['discount.promotion_code']);
+
+        return $subscription->discount
+            ? new Discount($subscription->discount)
+            : null;
+    }
+
+    /**
+     * Apply a coupon to the subscription.
+     *
+     * @param  string  $coupon
+     * @return void
+     */
+    public function applyCoupon($coupon)
+    {
+        $this->updateStripeSubscription([
+            'coupon' => $coupon,
+        ]);
+    }
+
+    /**
+     * Apply a promotion code to the subscription.
+     *
+     * @param  string  $promotionCodeId
+     * @return void
+     */
+    public function applyPromotionCode($promotionCodeId)
+    {
+        $this->updateStripeSubscription([
+            'promotion_code' => $promotionCodeId,
+        ]);
     }
 
     /**

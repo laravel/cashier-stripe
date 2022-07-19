@@ -6,8 +6,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\CustomerBalanceTransaction;
+use Laravel\Cashier\Discount;
 use Laravel\Cashier\Exceptions\CustomerAlreadyCreated;
 use Laravel\Cashier\Exceptions\InvalidCustomer;
+use Laravel\Cashier\PromotionCode;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
 
@@ -195,6 +197,20 @@ trait ManagesCustomer
     }
 
     /**
+     * The discount that applies to the customer, if applicable.
+     *
+     * @return \Laravel\Cashier\Discount|null
+     */
+    public function discount()
+    {
+        $customer = $this->asStripeCustomer(['discount.promotion_code']);
+
+        return $customer->discount
+            ? new Discount($customer->discount)
+            : null;
+    }
+
+    /**
      * Apply a coupon to the customer.
      *
      * @param  string  $coupon
@@ -207,6 +223,52 @@ trait ManagesCustomer
         $this->updateStripeCustomer([
             'coupon' => $coupon,
         ]);
+    }
+
+    /**
+     * Apply a promotion code to the customer.
+     *
+     * @param  string  $promotionCodeId
+     * @return void
+     */
+    public function applyPromotionCode($promotionCodeId)
+    {
+        $this->assertCustomerExists();
+
+        $this->updateStripeCustomer([
+            'promotion_code' => $promotionCodeId,
+        ]);
+    }
+
+    /**
+     * Retrieve a promotion code by its code.
+     *
+     * @param  string  $code
+     * @param  array  $options
+     * @return \Laravel\Cashier\PromotionCode|null
+     */
+    public function findPromotionCode($code, array $options = [])
+    {
+        $codes = $this->stripe()->promotionCodes->all(array_merge([
+            'code' => $code,
+            'limit' => 1,
+        ], $options));
+
+        if ($codes && $promotionCode = $codes->first()) {
+            return new PromotionCode($promotionCode);
+        }
+    }
+
+    /**
+     * Retrieve a promotion code by its code.
+     *
+     * @param  string  $code
+     * @param  array  $options
+     * @return \Laravel\Cashier\PromotionCode|null
+     */
+    public function findActivePromotionCode($code, array $options = [])
+    {
+        return $this->findPromotionCode($code, array_merge($options, ['active' => true]));
     }
 
     /**

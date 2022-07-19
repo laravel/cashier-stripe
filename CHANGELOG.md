@@ -8,6 +8,59 @@
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
 
+## [v13.13.0](https://github.com/laravel/cashier-stripe/compare/v13.12.0...v13.13.0) - 2022-07-13
+
+### Changed
+
+- Allow dompdf v2 by @carlalexander in https://github.com/laravel/cashier-stripe/pull/1393
+
+### Fixed
+
+- Fix receipt totals and balance by @driesvints in https://github.com/laravel/cashier-stripe/pull/1388
+
+## [v13.12.0](https://github.com/laravel/cashier-stripe/compare/v13.11.1...v13.12.0) - 2022-06-28
+
+### Changed
+
+- Update reference to Stripe SDK by @driesvints in https://github.com/laravel/cashier-stripe/pull/1383
+- Re-add support for Sources API by @driesvints in https://github.com/laravel/cashier-stripe/pull/1384
+
+## [v13.11.1](https://github.com/laravel/cashier-stripe/compare/v13.11.0...v13.11.1) - 2022-06-21
+
+### Fixed
+
+- Fixed undefined quantity notice by @Lyrisbee in https://github.com/laravel/cashier-stripe/pull/1377
+
+## [v13.11.0](https://github.com/laravel/cashier-stripe/compare/v13.10.1...v13.11.0) - 2022-05-17
+
+### Added
+
+- Add new hasTrialExpired methods by @driesvints in https://github.com/laravel/cashier-stripe/pull/1366
+
+### Changed
+
+- Allow Stripe SDK v8 by @ankurk91 in https://github.com/laravel/cashier-stripe/pull/1365
+
+### Fixed
+
+- Fix reference to billable by @driesvints in https://github.com/laravel/cashier-stripe/pull/1363
+
+## [v13.10.1](https://github.com/laravel/cashier-stripe/compare/v13.10.0...v13.10.1) - 2022-05-05
+
+### Security
+
+- Bump Dompdf by @driesvints in https://github.com/laravel/cashier-stripe/pull/1360
+
+## [v13.10.0](https://github.com/laravel/cashier-stripe/compare/v13.9.0...v13.10.0) - 2022-05-03
+
+### Added
+
+- Discount improvements by @driesvints in https://github.com/laravel/cashier-stripe/pull/1354
+
+### Fixed
+
+- Fix deprecation with Carbon on receipts by @driesvints in https://github.com/laravel/cashier-stripe/pull/1356
+
 ## [v13.9.0](https://github.com/laravel/cashier-stripe/compare/v13.8.6...v13.9.0) - 2022-04-27
 
 ### Added
