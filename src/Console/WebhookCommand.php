@@ -44,12 +44,12 @@ class WebhookCommand extends Command
             'api_version' => $this->option('api-version') ?? Cashier::STRIPE_VERSION,
         ]);
 
-        $this->info('The Stripe webhook was created successfully. Retrieve the webhook secret in your Stripe dashboard and define it as an environment variable.');
+        $this->components->info('The Stripe webhook was created successfully. Retrieve the webhook secret in your Stripe dashboard and define it as an environment variable.');
 
         if ($this->option('disabled')) {
             $endpoint->update($endpoint->id, ['disabled' => true]);
 
-            $this->info('The Stripe webhook was disabled as requested. You may enable the webhook via the Stripe dashboard when needed.');
+            $this->components->info('The Stripe webhook was disabled as requested. You may enable the webhook via the Stripe dashboard when needed.');
         }
     }
 }
