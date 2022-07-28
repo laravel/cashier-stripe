@@ -113,10 +113,7 @@ trait ManagesPaymentMethods
 
         // If the payment method was the default payment method, we'll remove it manually...
         if ($stripePaymentMethod->id === $defaultPaymentMethod) {
-            $this->forceFill([
-                'pm_type' => null,
-                'pm_last_four' => null,
-            ])->save();
+            $this->resetDefaultPaymentMethod();
         }
     }
 
@@ -210,10 +207,7 @@ trait ManagesPaymentMethods
                 $this->fillSourceDetails($defaultPaymentMethod)->save();
             }
         } else {
-            $this->forceFill([
-                'pm_type' => null,
-                'pm_last_four' => null,
-            ])->save();
+            $this->resetDefaultPaymentMethod();
         }
 
         return $this;
@@ -256,6 +250,22 @@ trait ManagesPaymentMethods
             $this->pm_last_four = $source->last4;
         }
 
+        return $this;
+    }
+    
+    /**
+     * Resets the model's deault payment method properties.
+     *
+     * @return $this
+     *
+     */
+    protected function resetDefaultPaymentMethod()
+    {
+        $this->forceFill([
+            'pm_type' => null,
+            'pm_last_four' => null,
+        ])->save();
+        
         return $this;
     }
 
