@@ -264,7 +264,7 @@ trait ManagesPaymentMethods
             'pm_type' => null,
             'pm_last_four' => null,
         ])->save();
-        
+
         return $this;
     }
 
