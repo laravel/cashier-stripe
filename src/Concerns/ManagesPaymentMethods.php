@@ -252,12 +252,11 @@ trait ManagesPaymentMethods
 
         return $this;
     }
-    
+
     /**
      * Resets the model's deault payment method properties.
      *
      * @return $this
-     *
      */
     protected function resetDefaultPaymentMethod()
     {
