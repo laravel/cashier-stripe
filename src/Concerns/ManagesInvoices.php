@@ -9,7 +9,6 @@ use Laravel\Cashier\Payment;
 use LogicException;
 use Stripe\Exception\CardException as StripeCardException;
 use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
-use Stripe\Invoice as StripeInvoice;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -118,36 +117,45 @@ trait ManagesInvoices
      */
     public function invoice(array $options = [])
     {
-        $this->assertCustomerExists();
-
-        $parameters = array_merge([
-            'automatic_tax' => $this->automaticTaxPayload(),
-            'customer' => $this->stripe_id,
-        ], $options);
-
         try {
-            /** @var \Stripe\Invoice $invoice */
-            $stripeInvoice = $this->stripe()->invoices->create($parameters);
+            $invoice = $this->createInvoice(array_merge($options, [
+                'pending_invoice_items_behavior' => 'include_and_require',
+            ]));
 
-            if ($stripeInvoice->collection_method === StripeInvoice::COLLECTION_METHOD_CHARGE_AUTOMATICALLY) {
-                $stripeInvoice = $stripeInvoice->pay();
-            } else {
-                $stripeInvoice = $stripeInvoice->sendInvoice();
-            }
-
-            return new Invoice($this, $stripeInvoice);
+            return $invoice->chargesAutomatically() ? $invoice->pay() : $invoice->send();
         } catch (StripeInvalidRequestException $exception) {
             return false;
         } catch (StripeCardException $exception) {
             $payment = new Payment(
                 $this->stripe()->paymentIntents->retrieve(
-                    $stripeInvoice->refresh()->payment_intent,
+                    $invoice->asStripeInvoice()->refresh()->payment_intent,
                     ['expand' => ['invoice.subscription']]
                 )
             );
 
             $payment->validate();
         }
+    }
+
+    /**
+     * Create an invoice within Stripe.
+     *
+     * @param  array  $options
+     * @return \Laravel\Cashier\Invoice
+     */
+    public function createInvoice(array $options = [])
+    {
+        $this->assertCustomerExists();
+
+        $parameters = array_merge([
+            'automatic_tax' => $this->automaticTaxPayload(),
+            'customer' => $this->stripe_id,
+            'pending_invoice_items_behavior' => 'exclude',
+        ], $options);
+
+        $stripeInvoice = $this->stripe()->invoices->create($parameters);
+
+        return new Invoice($this, $stripeInvoice);
     }
 
     /**

@@ -435,6 +435,26 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Determine if the invoice will be charged automatically.
+     *
+     * @return bool
+     */
+    public function chargesAutomatically()
+    {
+        return $this->invoice->collection_method === StripeInvoice::COLLECTION_METHOD_CHARGE_AUTOMATICALLY;
+    }
+
+    /**
+     * Determine if the invoice will be be sent by email.
+     *
+     * @return bool
+     */
+    public function sendsInvoice()
+    {
+        return $this->invoice->collection_method === StripeInvoice::COLLECTION_METHOD_SEND_INVOICE;
+    }
+
+    /**
      * Get all of the "invoice item" line items.
      *
      * @return \Laravel\Cashier\InvoiceLineItem[]
@@ -475,6 +495,52 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
             ->map(function (StripeInvoiceLineItem $item) {
                 return new InvoiceLineItem($this, $item);
             })->all();
+    }
+
+    /**
+     * Add an invoice item to this invoice.
+     *
+     * @param  string  $description
+     * @param  int  $amount
+     * @param  array  $options
+     * @return \Stripe\InvoiceItem
+     */
+    public function tab($description, $amount, array $options = [])
+    {
+        $item = $this->owner()->tab($description, $amount, array_merge($options, ['invoice' => $this->invoice->id]));
+
+        $this->refresh();
+
+        return $item;
+    }
+
+    /**
+     * Add an invoice item for a specific Price ID to this invoice.
+     *
+     * @param  string  $price
+     * @param  int  $quantity
+     * @param  array  $options
+     * @return \Stripe\InvoiceItem
+     */
+    public function tabPrice($price, $quantity = 1, array $options = [])
+    {
+        $item = $this->owner()->tabPrice($price, $quantity, array_merge($options, ['invoice' => $this->invoice->id]));
+
+        $this->refresh();
+
+        return $item;
+    }
+
+    /**
+     * Refresh the invoice.
+     *
+     * @return $this
+     */
+    public function refresh()
+    {
+        $this->invoice = $this->invoice->refresh();
+
+        return $this;
     }
 
     /**
