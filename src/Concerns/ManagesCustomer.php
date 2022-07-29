@@ -186,7 +186,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Get the preferred locales that should be synced to Stripe.
+     * Get the locales that should be synced to Stripe.
      *
      * @return array
      */
