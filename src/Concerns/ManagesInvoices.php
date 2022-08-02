@@ -118,9 +118,9 @@ trait ManagesInvoices
     public function invoice(array $options = [])
     {
         try {
-            $invoice = $this->createInvoice(array_merge($options, [
+            $invoice = $this->createInvoice(array_merge([
                 'pending_invoice_items_behavior' => 'include_and_require',
-            ]));
+            ], $options));
 
             return $invoice->chargesAutomatically() ? $invoice->pay() : $invoice->send();
         } catch (StripeInvalidRequestException $exception) {
