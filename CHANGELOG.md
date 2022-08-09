@@ -1,6 +1,16 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.14.0...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.15.0...13.x)
+
+## [v13.15.0](https://github.com/laravel/cashier-stripe/compare/v13.14.0...v13.15.0) - 2022-08-09
+
+### Added
+
+- Allow Stripe SDK v9 by @driesvints in https://github.com/laravel/cashier-stripe/pull/1413
+
+### Fixed
+
+- Fix issue with overwriting behavior by @driesvints in https://github.com/laravel/cashier-stripe/pull/1410
 
 ## [v13.14.0](https://github.com/laravel/cashier-stripe/compare/v13.13.0...v13.14.0) - 2022-08-02
 
