@@ -119,7 +119,7 @@ trait ManagesInvoices
     {
         try {
             $invoice = $this->createInvoice(array_merge([
-                'pending_invoice_items_behavior' => 'include_and_require',
+                'pending_invoice_items_behavior' => 'include',
             ], $options));
 
             return $invoice->chargesAutomatically() ? $invoice->pay() : $invoice->send();
