@@ -499,6 +499,52 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Add an invoice item to this invoice.
+     *
+     * @param  string  $description
+     * @param  int  $amount
+     * @param  array  $options
+     * @return \Stripe\InvoiceItem
+     */
+    public function tab($description, $amount, array $options = [])
+    {
+        $item = $this->owner()->tab($description, $amount, array_merge($options, ['invoice' => $this->invoice->id]));
+
+        $this->refresh();
+
+        return $item;
+    }
+
+    /**
+     * Add an invoice item for a specific Price ID to this invoice.
+     *
+     * @param  string  $price
+     * @param  int  $quantity
+     * @param  array  $options
+     * @return \Stripe\InvoiceItem
+     */
+    public function tabPrice($price, $quantity = 1, array $options = [])
+    {
+        $item = $this->owner()->tabPrice($price, $quantity, array_merge($options, ['invoice' => $this->invoice->id]));
+
+        $this->refresh();
+
+        return $item;
+    }
+
+    /**
+     * Refresh the invoice.
+     *
+     * @return $this
+     */
+    public function refresh()
+    {
+        $this->invoice = $this->invoice->refresh();
+
+        return $this;
+    }
+
+    /**
      * Refresh the invoice with expanded objects.
      *
      * @return void

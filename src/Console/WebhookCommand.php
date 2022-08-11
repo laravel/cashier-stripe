@@ -31,7 +31,9 @@ class WebhookCommand extends Command
      */
     public function handle()
     {
-        $endpoint = Cashier::stripe()->webhookEndpoints->create([
+        $webhookEndpoints = Cashier::stripe()->webhookEndpoints;
+
+        $endpoint = $webhookEndpoints->create([
             'enabled_events' => [
                 'customer.subscription.created',
                 'customer.subscription.updated',
@@ -47,7 +49,7 @@ class WebhookCommand extends Command
         $this->components->info('The Stripe webhook was created successfully. Retrieve the webhook secret in your Stripe dashboard and define it as an environment variable.');
 
         if ($this->option('disabled')) {
-            $endpoint->update($endpoint->id, ['disabled' => true]);
+            $webhookEndpoints->update($endpoint->id, ['disabled' => true]);
 
             $this->components->info('The Stripe webhook was disabled as requested. You may enable the webhook via the Stripe dashboard when needed.');
         }

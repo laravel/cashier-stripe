@@ -1,12 +1,32 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.9.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.15.0...master)
 
 ### Changed
 - Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
 
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
+## [v13.15.0](https://github.com/laravel/cashier-stripe/compare/v13.14.0...v13.15.0) - 2022-08-09
+
+### Added
+
+- Allow Stripe SDK v9 by @driesvints in https://github.com/laravel/cashier-stripe/pull/1413
+
+### Fixed
+
+- Fix issue with overwriting behavior by @driesvints in https://github.com/laravel/cashier-stripe/pull/1410
+
+## [v13.14.0](https://github.com/laravel/cashier-stripe/compare/v13.13.0...v13.14.0) - 2022-08-02
+
+### Added
+
+- Create invoices separately by @driesvints in https://github.com/laravel/cashier-stripe/pull/1409
+
+### Fixed
+
+- Fix webhook command by @driesvints in https://github.com/laravel/cashier-stripe/pull/1407
 
 ## [v13.13.0](https://github.com/laravel/cashier-stripe/compare/v13.12.0...v13.13.0) - 2022-07-13
 

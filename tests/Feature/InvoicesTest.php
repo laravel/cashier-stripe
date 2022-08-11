@@ -31,6 +31,21 @@ class InvoicesTest extends FeatureTestCase
         $user->invoice();
     }
 
+    public function test_invoices_can_be_created()
+    {
+        $user = $this->createCustomer('invoices_can_be_created');
+        $user->createAsStripeCustomer();
+
+        $invoice = $user->createInvoice();
+
+        $this->assertInstanceOf(Invoice::class, $invoice);
+        $this->assertEquals(0, $invoice->rawTotal());
+
+        $invoice->tab('Laracon', 49900);
+
+        $this->assertEquals(49900, $invoice->rawTotal());
+    }
+
     public function test_customer_can_be_invoiced()
     {
         $user = $this->createCustomer('customer_can_be_invoiced');

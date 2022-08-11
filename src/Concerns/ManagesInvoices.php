@@ -117,13 +117,10 @@ trait ManagesInvoices
      */
     public function invoice(array $options = [])
     {
-        $this->assertCustomerExists();
-
         try {
-            $invoice = new Invoice($this, $this->stripe()->invoices->create(array_merge([
-                'automatic_tax' => $this->automaticTaxPayload(),
-                'customer' => $this->stripe_id,
-            ], $options)));
+            $invoice = $this->createInvoice(array_merge([
+                'pending_invoice_items_behavior' => 'include_and_require',
+            ], $options));
 
             return $invoice->chargesAutomatically() ? $invoice->pay() : $invoice->send();
         } catch (StripeCardException $exception) {
@@ -136,6 +133,27 @@ trait ManagesInvoices
 
             $payment->validate();
         }
+    }
+
+    /**
+     * Create an invoice within Stripe.
+     *
+     * @param  array  $options
+     * @return \Laravel\Cashier\Invoice
+     */
+    public function createInvoice(array $options = [])
+    {
+        $this->assertCustomerExists();
+
+        $parameters = array_merge([
+            'automatic_tax' => $this->automaticTaxPayload(),
+            'customer' => $this->stripe_id,
+            'pending_invoice_items_behavior' => 'exclude',
+        ], $options);
+
+        $stripeInvoice = $this->stripe()->invoices->create($parameters);
+
+        return new Invoice($this, $stripeInvoice);
     }
 
     /**
