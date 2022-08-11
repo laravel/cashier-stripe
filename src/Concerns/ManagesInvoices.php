@@ -119,11 +119,11 @@ trait ManagesInvoices
     {
         try {
             $invoice = $this->createInvoice(array_merge([
-                'pending_invoice_items_behavior' => 'include_and_require',
+                'pending_invoice_items_behavior' => 'include',
             ], $options));
 
             return $invoice->chargesAutomatically() ? $invoice->pay() : $invoice->send();
-        } catch (StripeCardException $exception) {
+        } catch (StripeCardException) {
             $payment = new Payment(
                 $this->stripe()->paymentIntents->retrieve(
                     $invoice->asStripeInvoice()->refresh()->payment_intent,
@@ -148,7 +148,6 @@ trait ManagesInvoices
         $parameters = array_merge([
             'automatic_tax' => $this->automaticTaxPayload(),
             'customer' => $this->stripe_id,
-            'pending_invoice_items_behavior' => 'exclude',
         ], $options);
 
         $stripeInvoice = $this->stripe()->invoices->create($parameters);
