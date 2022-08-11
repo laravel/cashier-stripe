@@ -7,15 +7,6 @@ use Laravel\Cashier\Cashier;
 trait HandlesTaxes
 {
     /**
-     * Indicates if Cashier should automatically calculate tax for the new subscription.
-     *
-     * @var bool
-     *
-     * @deprecated Use the new Cashier::calculateTaxes() method instead.
-     */
-    protected $automaticTax = false;
-
-    /**
      * The IP address of the customer used to determine the tax location.
      *
      * @var string|null
@@ -35,20 +26,6 @@ trait HandlesTaxes
      * @var bool
      */
     protected $collectTaxIds = false;
-
-    /**
-     * Allow taxes to be automatically calculated by Stripe.
-     *
-     * @return $this
-     *
-     * @deprecated Use the new Cashier::calculateTaxes() method instead.
-     */
-    public function withTax()
-    {
-        $this->automaticTax = true;
-
-        return $this;
-    }
 
     /**
      * Set the The IP address of the customer used to determine the tax location.
@@ -102,7 +79,7 @@ trait HandlesTaxes
      */
     protected function isAutomaticTaxEnabled()
     {
-        return $this->automaticTax ?: Cashier::$calculatesTaxes;
+        return Cashier::$calculatesTaxes;
     }
 
     /**
