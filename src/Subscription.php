@@ -299,18 +299,6 @@ class Subscription extends Model
     }
 
     /**
-     * Determine if the subscription is no longer active.
-     *
-     * @return bool
-     *
-     * @deprecated Use canceled instead.
-     */
-    public function cancelled()
-    {
-        return $this->canceled();
-    }
-
-    /**
      * Filter query by canceled.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -322,19 +310,6 @@ class Subscription extends Model
     }
 
     /**
-     * Filter query by canceled.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     *
-     * @deprecated Use scopeCanceled instead.
-     */
-    public function scopeCancelled($query)
-    {
-        $this->scopeCanceled($query);
-    }
-
-    /**
      * Filter query by not canceled.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -343,19 +318,6 @@ class Subscription extends Model
     public function scopeNotCanceled($query)
     {
         $query->whereNull('ends_at');
-    }
-
-    /**
-     * Filter query by not canceled.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
-     *
-     * @deprecated Use scopeNotCanceled instead.
-     */
-    public function scopeNotCancelled($query)
-    {
-        $this->scopeNotCanceled($query);
     }
 
     /**
@@ -1109,20 +1071,6 @@ class Subscription extends Model
             'stripe_status' => StripeSubscription::STATUS_CANCELED,
             'ends_at' => Carbon::now(),
         ])->save();
-    }
-
-    /**
-     * Mark the subscription as canceled.
-     *
-     * @return void
-     *
-     * @deprecated Use markAsCanceled instead.
-     *
-     * @internal
-     */
-    public function markAsCancelled()
-    {
-        $this->markAsCanceled();
     }
 
     /**

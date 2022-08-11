@@ -130,18 +130,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Determine if the payment was canceled.
-     *
-     * @return bool
-     *
-     * @deprecated Use isCanceled instead.
-     */
-    public function isCancelled()
-    {
-        return $this->isCanceled();
-    }
-
-    /**
      * Determine if the payment was successful.
      *
      * @return bool

@@ -121,19 +121,6 @@ trait ManagesPaymentMethods
     }
 
     /**
-     * Remove a payment method from the customer.
-     *
-     * @param  \Stripe\PaymentMethod|string  $paymentMethod
-     * @return void
-     *
-     * @deprecated Will be removed in a future Cashier Stripe version. Use deletePaymentMethod() instead.
-     */
-    public function removePaymentMethod($paymentMethod)
-    {
-        return $this->deletePaymentMethod($paymentMethod);
-    }
-
-    /**
      * Get the default payment method for the customer.
      *
      * @return \Laravel\Cashier\PaymentMethod|\Stripe\Card|\Stripe\BankAccount|null
