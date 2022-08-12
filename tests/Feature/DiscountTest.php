@@ -83,7 +83,9 @@ class DiscountTest extends FeatureTestCase
     {
         $user = $this->createCustomer('applying_coupons_to_existing_customers');
 
-        $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $user->applyCoupon(static::$couponId);
 
@@ -101,7 +103,9 @@ class DiscountTest extends FeatureTestCase
     {
         $user = $this->createCustomer('applying_coupons_to_existing_subscriptions');
 
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $subscription->applyCoupon(static::$couponId);
 

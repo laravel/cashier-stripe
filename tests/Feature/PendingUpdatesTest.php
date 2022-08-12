@@ -77,7 +77,9 @@ class PendingUpdatesTest extends FeatureTestCase
     {
         $user = $this->createCustomer('subscription_can_error_if_incomplete');
 
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         // Set a faulty card as the customer's default payment method.
         $user->updateDefaultPaymentMethod('pm_card_threeDSecure2Required');
@@ -100,7 +102,9 @@ class PendingUpdatesTest extends FeatureTestCase
     // {
     //     $user = $this->createCustomer('subscription_can_be_pending_if_incomplete');
     //
-    //     $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+    //     $subscription = $user->newSubscription('main', static::$priceId)
+    //         ->allowPaymentFailures()
+    //         ->create('pm_card_visa');
     //
     //     // Set a faulty card as the customer's default payment method.
     //     $user->updateDefaultPaymentMethod('pm_card_threeDSecure2Required');

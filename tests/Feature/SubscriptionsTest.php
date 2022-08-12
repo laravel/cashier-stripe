@@ -270,7 +270,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         try {
             // Attempt to increment quantity and pay with a faulty card.
-            $subscription = $subscription->incrementAndInvoice(3);
+            $subscription = $subscription->allowPaymentFailures()->incrementAndInvoice(3);
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $e) {
@@ -299,7 +299,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         try {
             // Attempt to increment quantity and pay with a faulty card.
-            $subscription = $subscription->incrementAndInvoice(3);
+            $subscription = $subscription->allowPaymentFailures()->incrementAndInvoice(3);
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $e) {
@@ -371,7 +371,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         try {
             // Attempt to swap and pay with a faulty card.
-            $subscription = $subscription->swapAndInvoice(static::$premiumPriceId);
+            $subscription = $subscription->allowPaymentFailures()->swapAndInvoice(static::$premiumPriceId);
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $e) {
@@ -399,7 +399,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         try {
             // Attempt to swap and pay with a faulty card.
-            $subscription = $subscription->swapAndInvoice(static::$premiumPriceId);
+            $subscription = $subscription->allowPaymentFailures()->swapAndInvoice(static::$premiumPriceId);
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $e) {
@@ -674,7 +674,7 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);
         $this->assertEquals(1000, $user->upcomingInvoice()->rawTotal());
 
-        $subscription->swapAndInvoice(static::$premiumPriceId);
+        $subscription->allowPaymentFailures()->swapAndInvoice(static::$premiumPriceId);
 
         // Assert that a new invoice was created because of immediate invoicing.
         $this->assertNotSame($invoice->id, ($invoice = $user->invoices()->first())->id);
@@ -714,7 +714,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertTrue($subscription->onTrial());
 
-        $subscription = $subscription->skipTrial()->swapAndInvoice(static::$otherPriceId);
+        $subscription = $subscription->skipTrial()->allowPaymentFailures()->swapAndInvoice(static::$otherPriceId);
 
         $this->assertFalse($subscription->onTrial());
     }
@@ -805,7 +805,6 @@ class SubscriptionsTest extends FeatureTestCase
 
         // Start with an incomplete subscription.
         $subscription = $user->subscriptions()
-            ->allowPaymentFailures()
             ->create([
                 'name' => 'yearly',
                 'stripe_id' => 'xxxx',
@@ -951,7 +950,6 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('subscriptions_with_options_can_be_created');
 
         $subscription = $user->subscriptions()
-            ->allowPaymentFailures()
             ->create([
                 'name' => 'default',
                 'stripe_id' => 'sub_'.Str::random(10),

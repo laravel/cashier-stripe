@@ -207,7 +207,10 @@ class WebhooksTest extends FeatureTestCase
     public function test_canceled_subscription_is_properly_reactivated()
     {
         $user = $this->createCustomer('canceled_subscription_is_properly_reactivated');
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa')->cancel();
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa')
+            ->cancel();
 
         $this->assertTrue($subscription->canceled());
 
@@ -236,7 +239,9 @@ class WebhooksTest extends FeatureTestCase
     public function test_subscription_is_marked_as_canceled_when_deleted_in_stripe()
     {
         $user = $this->createCustomer('subscription_is_marked_as_canceled_when_deleted_in_stripe');
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $this->assertFalse($subscription->canceled());
 
@@ -258,7 +263,9 @@ class WebhooksTest extends FeatureTestCase
     public function test_subscription_is_deleted_when_status_is_incomplete_expired()
     {
         $user = $this->createCustomer('subscription_is_deleted_when_status_is_incomplete_expired');
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $this->assertCount(1, $user->subscriptions);
 
@@ -283,7 +290,9 @@ class WebhooksTest extends FeatureTestCase
         $user = $this->createCustomer('payment_action_required_email_is_sent');
 
         try {
-            $user->newSubscription('main', static::$priceId)->create('pm_card_threeDSecure2Required');
+            $user->newSubscription('main', static::$priceId)
+                ->allowPaymentFailures()
+                ->create('pm_card_threeDSecure2Required');
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $exception) {

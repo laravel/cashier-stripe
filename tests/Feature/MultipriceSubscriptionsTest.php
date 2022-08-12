@@ -98,6 +98,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         $user->priceTaxRates = [self::$otherPriceId => [self::$taxRateId]];
 
         $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])
+            ->allowPaymentFailures()
             ->price(self::$premiumPriceId, 5)
             ->quantity(10, self::$priceId)
             ->create('pm_card_visa');
@@ -124,7 +125,9 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('customers_can_add_prices');
 
-        $subscription = $user->newSubscription('main', self::$priceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', self::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $subscription->addPrice(self::$otherPriceId, 5);
 
@@ -146,7 +149,9 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('customers_can_remove_prices');
 
-        $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $this->assertCount(2, $subscription->items);
 
@@ -170,7 +175,9 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('multiprice_subscriptions_can_be_resumed');
 
-        $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $subscription->cancel();
 
@@ -198,7 +205,9 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('subscription_item_quantities_can_be_updated');
 
-        $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $subscription->updateQuantity(5, self::$otherPriceId);
 
@@ -211,7 +220,9 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('subscription_item_quantities_can_be_incremented');
 
-        $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $subscription->incrementQuantity(3, self::$otherPriceId);
 
@@ -229,6 +240,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('subscription_item_quantities_can_be_decremented');
 
         $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])
+            ->allowPaymentFailures()
             ->quantity(5, self::$otherPriceId)
             ->create('pm_card_visa');
 
@@ -247,7 +259,9 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('multiple_prices_can_be_swapped');
 
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $subscription = $subscription->swap([static::$otherPriceId, static::$premiumPriceId => ['quantity' => 3]]);
 
@@ -266,7 +280,9 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('subscription_items_can_swap_prices');
 
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $item = $subscription->items()->first()->swap(static::$otherPriceId, ['quantity' => 3]);
 
@@ -282,7 +298,9 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('subscription_item_changes_can_be_prorated');
 
-        $subscription = $user->newSubscription('main', static::$premiumPriceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$premiumPriceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $this->assertEquals(2000, ($invoice = $user->invoices()->first())->rawTotal());
 
@@ -309,6 +327,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('subscription_item_quantity_changes_can_be_prorated');
 
         $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])
+            ->allowPaymentFailures()
             ->quantity(3, self::$otherPriceId)
             ->create('pm_card_visa');
 
@@ -328,13 +347,15 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
     protected function createSubscriptionWithSinglePrice(User $user)
     {
         /** @var \Laravel\Cashier\Subscription $subscription */
-        $subscription = $user->subscriptions()->create([
-            'name' => 'main',
-            'stripe_id' => 'sub_foo',
-            'stripe_price' => self::$priceId,
-            'quantity' => 1,
-            'stripe_status' => StripeSubscription::STATUS_ACTIVE,
-        ]);
+        $subscription = $user->subscriptions()
+            ->allowPaymentFailures()
+            ->create([
+                'name' => 'main',
+                'stripe_id' => 'sub_foo',
+                'stripe_price' => self::$priceId,
+                'quantity' => 1,
+                'stripe_status' => StripeSubscription::STATUS_ACTIVE,
+            ]);
 
         $subscription->items()->create([
             'stripe_id' => 'it_'.Str::random(10),
