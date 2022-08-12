@@ -29,7 +29,7 @@
         "illuminate/routing": "^9.21",
         "illuminate/support": "^9.21",
         "illuminate/view": "^9.21",
-        "moneyphp/money": "^3.2|^4.0",
+        "moneyphp/money": "^4.0",
         "nesbot/carbon": "^2.0",
         "stripe/stripe-php": "^7.39|^8.0|^9.0",
         "symfony/http-kernel": "^6.0",
@@ -42,7 +42,7 @@
     },
     "suggest": {
         "ext-intl": "Allows for more locales besides the default \"en\" when formatting money values.",
-        "dompdf/dompdf": "Required when generating and downloading invoice PDF's (^0.8.6|^1.0.1)."
+        "dompdf/dompdf": "Required when generating and downloading invoice PDF's (^1.0.1|^2.0)."
     },
     "autoload": {
         "psr-4": {
