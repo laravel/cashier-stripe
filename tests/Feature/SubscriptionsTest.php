@@ -377,11 +377,13 @@ class SubscriptionsTest extends FeatureTestCase
         // Set a faulty card as the customer's default payment method.
         $paymentMethod = $user->updateDefaultPaymentMethod('pm_card_chargeCustomerFail');
 
+        $subscription->updateStripeSubscription([
+            'default_payment_method' => $paymentMethod->id,
+        ]);
+
         try {
             // Attempt to swap and pay with a faulty card.
-            $subscription = $subscription->swapAndInvoice(static::$premiumPriceId, [
-                'default_payment_method' => $paymentMethod->id,
-            ]);
+            $subscription = $subscription->allowPaymentFailures()->swapAndInvoice(static::$premiumPriceId);
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $e) {
@@ -407,11 +409,13 @@ class SubscriptionsTest extends FeatureTestCase
         // Set a card that requires a next action as the customer's default payment method.
         $paymentMethod = $user->updateDefaultPaymentMethod('pm_card_threeDSecure2Required');
 
+        $subscription->updateStripeSubscription([
+            'default_payment_method' => $paymentMethod->id,
+        ]);
+
         try {
             // Attempt to swap and pay with a faulty card.
-            $subscription = $subscription->swapAndInvoice(static::$premiumPriceId, [
-                'default_payment_method' => $paymentMethod->id,
-            ]);
+            $subscription = $subscription->allowPaymentFailures()->swapAndInvoice(static::$premiumPriceId);
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $e) {
