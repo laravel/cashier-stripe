@@ -401,6 +401,7 @@ class SubscriptionBuilder
             'metadata' => $this->metadata,
             'items' => Collection::make($this->items)->values()->all(),
             'payment_behavior' => $this->paymentBehavior(),
+            'payment_settings' => ['save_default_payment_method' => 'on_subscription'],
             'promotion_code' => $this->promotionCodeId,
             'proration_behavior' => $this->prorateBehavior(),
             'trial_end' => $this->getTrialEndForPayload(),
