@@ -348,7 +348,6 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
     {
         /** @var \Laravel\Cashier\Subscription $subscription */
         $subscription = $user->subscriptions()
-            ->allowPaymentFailures()
             ->create([
                 'name' => 'main',
                 'stripe_id' => 'sub_foo',
