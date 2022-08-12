@@ -309,7 +309,7 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         // Assert that no new invoice was created because of no prorating.
         $this->assertEquals($invoice->id, $user->invoices()->first()->id);
 
-        $subscription->addPriceAndInvoice(self::$priceId);
+        $subscription->allowPaymentFailures()->addPriceAndInvoice(self::$priceId);
 
         // Assert that a new invoice was created because of no prorating.
         $this->assertEquals(1000, ($invoice = $user->invoices()->first())->rawTotal());
