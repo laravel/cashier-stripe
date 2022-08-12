@@ -113,6 +113,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         // Create Subscription
         $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->withMetadata($metadata = ['order_id' => '8'])
             ->create('pm_card_visa');
 
@@ -191,7 +192,9 @@ class SubscriptionsTest extends FeatureTestCase
     public function test_swapping_subscription_with_coupon()
     {
         $user = $this->createCustomer('swapping_subscription_with_coupon');
-        $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
         $subscription = $user->subscription('main');
 
         $subscription->swap(static::$otherPriceId, [
@@ -205,6 +208,7 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('swapping_subscription_and_preserving_quantity');
         $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->quantity(5, static::$priceId)
             ->create('pm_card_visa');
 
@@ -218,6 +222,7 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('swapping_subscription_and_adopting_new_quantity');
         $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->quantity(5, static::$priceId)
             ->create('pm_card_visa');
 
@@ -230,7 +235,9 @@ class SubscriptionsTest extends FeatureTestCase
     public function test_swapping_subscription_with_inline_price_data()
     {
         $user = $this->createCustomer('swapping_subscription_with_inline_price_data');
-        $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
         $subscription = $user->subscription('main');
 
         $subscription->swap([[
@@ -254,6 +261,7 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('declined_card_during_new_quantity');
 
         $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->quantity(5)
             ->create('pm_card_visa');
 
@@ -282,6 +290,7 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('declined_card_during_new_quantity_for_specific_price');
 
         $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->quantity(5, static::$priceId)
             ->create('pm_card_visa');
 
@@ -310,7 +319,9 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('declined_card_during_subscribing_results_in_an_exception');
 
         try {
-            $user->newSubscription('main', static::$priceId)->create('pm_card_chargeCustomerFail');
+            $user->newSubscription('main', static::$priceId)
+                ->allowPaymentFailures()
+                ->create('pm_card_chargeCustomerFail');
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $e) {
@@ -330,7 +341,9 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('next_action_needed_during_subscribing_results_in_an_exception');
 
         try {
-            $user->newSubscription('main', static::$priceId)->create('pm_card_threeDSecure2Required');
+            $user->newSubscription('main', static::$priceId)
+                ->allowPaymentFailures()
+                ->create('pm_card_threeDSecure2Required');
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $e) {
@@ -349,7 +362,9 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('declined_card_during_price_swap_results_in_an_exception');
 
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         // Set a faulty card as the customer's default payment method.
         $user->updateDefaultPaymentMethod('pm_card_chargeCustomerFail');
@@ -375,7 +390,9 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('next_action_needed_during_price_swap_results_in_an_exception');
 
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         // Set a card that requires a next action as the customer's default payment method.
         $user->updateDefaultPaymentMethod('pm_card_threeDSecure2Required');
@@ -401,7 +418,9 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('downgrade_with_faulty_card_does_not_incomplete_subscription');
 
-        $subscription = $user->newSubscription('main', static::$premiumPriceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$premiumPriceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         // Set a card that requires a next action as the customer's default payment method.
         $user->updateDefaultPaymentMethod('pm_card_chargeCustomerFail');
@@ -420,7 +439,9 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('downgrade_with_3d_secure_does_not_incomplete_subscription');
 
-        $subscription = $user->newSubscription('main', static::$premiumPriceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$premiumPriceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         // Set a card that requires a next action as the customer's default payment method.
         $user->updateDefaultPaymentMethod('pm_card_threeDSecure2Required');
@@ -441,6 +462,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         // Create Subscription
         $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->withCoupon(static::$couponId)
             ->create('pm_card_visa');
 
@@ -470,17 +492,20 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('creating_subscription_with_inline_price_data');
 
-        $user->newSubscription('main')->price([
-            'price_data' => [
-                'product' => static::$productId,
-                'tax_behavior' => 'exclusive',
-                'currency' => 'USD',
-                'recurring' => [
-                    'interval' => 'month',
+        $user->newSubscription('main')
+            ->allowPaymentFailures()
+            ->price([
+                'price_data' => [
+                    'product' => static::$productId,
+                    'tax_behavior' => 'exclusive',
+                    'currency' => 'USD',
+                    'recurring' => [
+                        'interval' => 'month',
+                    ],
+                    'unit_amount' => 1100,
                 ],
-                'unit_amount' => 1100,
-            ],
-        ])->create('pm_card_visa');
+            ])
+            ->create('pm_card_visa');
 
         $subscription = $user->subscription('main');
 
@@ -504,6 +529,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         // Create Subscription
         $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->anchorBillingCycleOn(new DateTime('first day of next month'))
             ->create('pm_card_visa');
 
@@ -538,6 +564,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         // Create Subscription
         $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->trialDays(7)
             ->create('pm_card_visa');
 
@@ -583,6 +610,7 @@ class SubscriptionsTest extends FeatureTestCase
         $user->trial_ends_at = $tomorrow = Carbon::tomorrow();
 
         $user->newSubscription('default', static::$priceId)
+            ->allowPaymentFailures()
             ->create('pm_card_visa');
 
         $subscription = $user->subscription('default');
@@ -599,6 +627,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         // Create Subscription
         $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->trialUntil(Carbon::tomorrow()->hour(3)->minute(15))
             ->create('pm_card_visa');
 
@@ -633,7 +662,9 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('subscription_changes_can_be_prorated');
 
-        $subscription = $user->newSubscription('main', static::$premiumPriceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$premiumPriceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $this->assertEquals(2000, ($invoice = $user->invoices()->first())->rawTotal());
 
@@ -661,6 +692,7 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('trial_remains_when_customer_is_invoiced_immediately_on_swap');
 
         $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->trialDays(5)
             ->create('pm_card_visa');
 
@@ -676,6 +708,7 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('trial_on_swap_is_skipped_when_explicitly_asked_to');
 
         $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->trialDays(5)
             ->create('pm_card_visa');
 
@@ -690,12 +723,15 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('no_prorate_on_subscription_create');
 
-        $subscription = $user->newSubscription('main', static::$priceId)->noProrate()->create('pm_card_visa', [], [
-            'collection_method' => 'send_invoice',
-            'days_until_due' => 30,
-            'backdate_start_date' => Carbon::now()->addDays(5)->subYear()->startOfDay()->unix(),
-            'billing_cycle_anchor' => Carbon::now()->addDays(5)->startOfDay()->unix(),
-        ]);
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->noProrate()
+            ->create('pm_card_visa', [], [
+                'collection_method' => 'send_invoice',
+                'days_until_due' => 30,
+                'backdate_start_date' => Carbon::now()->addDays(5)->subYear()->startOfDay()->unix(),
+                'billing_cycle_anchor' => Carbon::now()->addDays(5)->startOfDay()->unix(),
+            ]);
 
         $this->assertEquals(static::$priceId, $subscription->stripe_price);
         $this->assertTrue($subscription->active());
@@ -710,12 +746,15 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('always_invoice_after_no_prorate');
 
-        $subscription = $user->newSubscription('main', static::$priceId)->noProrate()->create('pm_card_visa', [], [
-            'collection_method' => 'send_invoice',
-            'days_until_due' => 30,
-            'backdate_start_date' => Carbon::now()->addDays(5)->subYear()->startOfDay()->unix(),
-            'billing_cycle_anchor' => Carbon::now()->addDays(5)->startOfDay()->unix(),
-        ]);
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->noProrate()
+            ->create('pm_card_visa', [], [
+                'collection_method' => 'send_invoice',
+                'days_until_due' => 30,
+                'backdate_start_date' => Carbon::now()->addDays(5)->subYear()->startOfDay()->unix(),
+                'billing_cycle_anchor' => Carbon::now()->addDays(5)->startOfDay()->unix(),
+            ]);
 
         $this->assertEquals(static::$priceId, $subscription->stripe_price);
         $this->assertCount(0, $user->invoices());
@@ -734,7 +773,9 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('trials_can_be_extended');
 
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $this->assertNull($subscription->trial_ends_at);
 
@@ -749,6 +790,7 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('trials_can_be_ended');
 
         $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->trialDays(10)
             ->create('pm_card_visa');
 
@@ -762,15 +804,17 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('subscription_state_scopes');
 
         // Start with an incomplete subscription.
-        $subscription = $user->subscriptions()->create([
-            'name' => 'yearly',
-            'stripe_id' => 'xxxx',
-            'stripe_status' => StripeSubscription::STATUS_INCOMPLETE,
-            'stripe_price' => 'stripe-yearly',
-            'quantity' => 1,
-            'trial_ends_at' => null,
-            'ends_at' => null,
-        ]);
+        $subscription = $user->subscriptions()
+            ->allowPaymentFailures()
+            ->create([
+                'name' => 'yearly',
+                'stripe_id' => 'xxxx',
+                'stripe_status' => StripeSubscription::STATUS_INCOMPLETE,
+                'stripe_price' => 'stripe-yearly',
+                'quantity' => 1,
+                'trial_ends_at' => null,
+                'ends_at' => null,
+            ]);
 
         // Subscription is incomplete
         $this->assertTrue($user->subscriptions()->incomplete()->exists());
@@ -860,7 +904,9 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('retrieve_the_latest_payment_for_a_subscription');
 
         try {
-            $user->newSubscription('main', static::$priceId)->create('pm_card_threeDSecure2Required');
+            $user->newSubscription('main', static::$priceId)
+                ->allowPaymentFailures()
+                ->create('pm_card_threeDSecure2Required');
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $e) {
@@ -876,7 +922,9 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('subscriptions_with_tax_rates_can_be_created');
         $user->taxRates = [self::$taxRateId];
 
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
         $stripeSubscription = $subscription->asStripeSubscription();
 
         $this->assertEquals([self::$taxRateId], [$stripeSubscription->default_tax_rates[0]->id]);
@@ -887,9 +935,11 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('subscriptions_with_options_can_be_created');
 
         $backdateStartDate = now()->subMonth()->getTimestamp();
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa', [], [
-            'backdate_start_date' => $backdateStartDate,
-        ]);
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa', [], [
+                'backdate_start_date' => $backdateStartDate,
+            ]);
         $stripeSubscription = $subscription->asStripeSubscription();
 
         $this->assertEquals($backdateStartDate, $stripeSubscription->start_date);
@@ -900,15 +950,17 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('subscriptions_with_options_can_be_created');
 
-        $subscription = $user->subscriptions()->create([
-            'name' => 'default',
-            'stripe_id' => 'sub_'.Str::random(10),
-            'stripe_status' => 'active',
-            'stripe_price' => 'price_xxx',
-            'quantity' => 1,
-            'trial_ends_at' => null,
-            'ends_at' => null,
-        ]);
+        $subscription = $user->subscriptions()
+            ->allowPaymentFailures()
+            ->create([
+                'name' => 'default',
+                'stripe_id' => 'sub_'.Str::random(10),
+                'stripe_status' => 'active',
+                'stripe_price' => 'price_xxx',
+                'quantity' => 1,
+                'trial_ends_at' => null,
+                'ends_at' => null,
+            ]);
 
         $this->assertTrue($user->refresh()->subscribed());
 
@@ -935,7 +987,9 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('subscriptions_can_be_canceled_at_a_specific_time');
 
-        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
+            ->create('pm_card_visa');
 
         $subscription = $subscription->cancelAt($endsAt = now()->addMonths(3));
 
@@ -948,6 +1002,7 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('subscription_upcoming_invoice');
         $subscription = $user->newSubscription('main', static::$priceId)
+            ->allowPaymentFailures()
             ->create('pm_card_visa');
 
         $invoice = $subscription->previewInvoice(static::$otherPriceId);
