@@ -527,9 +527,29 @@ class Subscription extends Model
         ])->save();
 
         if ($this->hasIncompletePayment()) {
-            (new Payment(
-                $stripeSubscription->latest_invoice->payment_intent
-            ))->validate();
+            try {
+                (new Payment(
+                    $stripeSubscription->latest_invoice->payment_intent
+                ))->validate();
+            } catch (IncompletePayment $e) {
+                if ($e->payment->requiresConfirmation()) {
+                    $e->payment->confirm();
+
+                    $stripeSubscription = $this->asStripeSubscription(['latest_invoice.payment_intent']);
+
+                    $this->fill([
+                        'stripe_status' => $stripeSubscription->status,
+                    ])->save();
+
+                    if ($this->hasIncompletePayment()) {
+                        (new Payment(
+                            $stripeSubscription->latest_invoice->payment_intent
+                        ))->validate();
+                    }
+                } else {
+                    throw $e;
+                }
+            }
         }
 
         return $this;
@@ -881,6 +901,38 @@ class Subscription extends Model
                 'stripe_price' => null,
                 'quantity' => null,
             ])->save();
+        }
+
+        $stripeSubscription = $this->asStripeSubscription(['latest_invoice.payment_intent']);
+
+        $this->fill([
+            'stripe_status' => $stripeSubscription->status,
+        ])->save();
+
+        if ($this->hasIncompletePayment()) {
+            try {
+                (new Payment(
+                    $stripeSubscription->latest_invoice->payment_intent
+                ))->validate();
+            } catch (IncompletePayment $e) {
+                if ($e->payment->requiresConfirmation()) {
+                    $e->payment->confirm();
+
+                    $stripeSubscription = $this->asStripeSubscription(['latest_invoice.payment_intent']);
+
+                    $this->fill([
+                        'stripe_status' => $stripeSubscription->status,
+                    ])->save();
+
+                    if ($this->hasIncompletePayment()) {
+                        (new Payment(
+                            $stripeSubscription->latest_invoice->payment_intent
+                        ))->validate();
+                    }
+                } else {
+                    throw $e;
+                }
+            }
         }
 
         return $this;

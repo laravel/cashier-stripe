@@ -11,7 +11,19 @@ trait InteractsWithPaymentBehavior
      *
      * @var string
      */
-    protected $paymentBehavior = StripeSubscription::PAYMENT_BEHAVIOR_ALLOW_INCOMPLETE;
+    protected $paymentBehavior = StripeSubscription::PAYMENT_BEHAVIOR_DEFAULT_INCOMPLETE;
+
+    /**
+     * Set any new subscription as incomplete when created.
+     *
+     * @return $this
+     */
+    public function defaultIncomplete()
+    {
+        $this->paymentBehavior = StripeSubscription::PAYMENT_BEHAVIOR_DEFAULT_INCOMPLETE;
+
+        return $this;
+    }
 
     /**
      * Allow subscription changes even if payment fails.
