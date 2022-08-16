@@ -9,16 +9,16 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
+use Laravel\Cashier\Concerns\HandlesPaymentFailures;
 use Laravel\Cashier\Concerns\HandlesTaxes;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
-use Laravel\Cashier\Exceptions\IncompletePayment;
-use Stripe\PaymentMethod as StripePaymentMethod;
 use Stripe\Subscription as StripeSubscription;
 
 class SubscriptionBuilder
 {
     use AllowsCoupons;
+    use HandlesPaymentFailures;
     use HandlesTaxes;
     use InteractsWithPaymentBehavior;
     use Prorates;
@@ -260,35 +260,7 @@ class SubscriptionBuilder
 
         $subscription = $this->createSubscription($stripeSubscription);
 
-        if ($subscription->hasIncompletePayment()) {
-            try {
-                (new Payment(
-                    $stripeSubscription->latest_invoice->payment_intent
-                ))->validate();
-            } catch (IncompletePayment $e) {
-                if ($paymentMethod && $e->payment->requiresConfirmation()) {
-                    $e->payment->confirm([
-                        'payment_method' => $paymentMethod instanceof StripePaymentMethod
-                            ? $paymentMethod->id
-                            : $paymentMethod,
-                    ]);
-
-                    $stripeSubscription = $subscription->asStripeSubscription(['latest_invoice.payment_intent']);
-
-                    $subscription->fill([
-                        'stripe_status' => $stripeSubscription->status,
-                    ])->save();
-
-                    if ($subscription->hasIncompletePayment()) {
-                        (new Payment(
-                            $stripeSubscription->latest_invoice->payment_intent
-                        ))->validate();
-                    }
-                } else {
-                    throw $e;
-                }
-            }
-        }
+        $this->handlePaymentFailure($subscription, $paymentMethod);
 
         return $subscription;
     }

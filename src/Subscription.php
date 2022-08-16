@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
+use Laravel\Cashier\Concerns\HandlesPaymentFailures;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionFactory;
@@ -24,6 +25,7 @@ use Stripe\Subscription as StripeSubscription;
 class Subscription extends Model
 {
     use AllowsCoupons;
+    use HandlesPaymentFailures;
     use HasFactory;
     use InteractsWithPaymentBehavior;
     use Prorates;
@@ -526,31 +528,7 @@ class Subscription extends Model
             'quantity' => $stripeSubscription->quantity,
         ])->save();
 
-        if ($this->hasIncompletePayment()) {
-            try {
-                (new Payment(
-                    $stripeSubscription->latest_invoice->payment_intent
-                ))->validate();
-            } catch (IncompletePayment $e) {
-                if ($e->payment->requiresConfirmation()) {
-                    $e->payment->confirm();
-
-                    $stripeSubscription = $this->asStripeSubscription(['latest_invoice.payment_intent']);
-
-                    $this->fill([
-                        'stripe_status' => $stripeSubscription->status,
-                    ])->save();
-
-                    if ($this->hasIncompletePayment()) {
-                        (new Payment(
-                            $stripeSubscription->latest_invoice->payment_intent
-                        ))->validate();
-                    }
-                } else {
-                    throw $e;
-                }
-            }
-        }
+        $this->handlePaymentFailure($this);
 
         return $this;
     }
@@ -698,6 +676,7 @@ class Subscription extends Model
      * @param  array  $options
      * @return $this
      *
+     * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
     public function swap($prices, array $options = [])
@@ -742,11 +721,7 @@ class Subscription extends Model
 
         $this->unsetRelation('items');
 
-        if ($this->hasIncompletePayment()) {
-            (new Payment(
-                $stripeSubscription->latest_invoice->payment_intent
-            ))->validate();
-        }
+        $this->handlePaymentFailure($this);
 
         return $this;
     }
@@ -903,37 +878,13 @@ class Subscription extends Model
             ])->save();
         }
 
-        $stripeSubscription = $this->asStripeSubscription(['latest_invoice.payment_intent']);
+        $stripeSubscription = $this->asStripeSubscription();
 
         $this->fill([
             'stripe_status' => $stripeSubscription->status,
         ])->save();
 
-        if ($this->hasIncompletePayment()) {
-            try {
-                (new Payment(
-                    $stripeSubscription->latest_invoice->payment_intent
-                ))->validate();
-            } catch (IncompletePayment $e) {
-                if ($e->payment->requiresConfirmation()) {
-                    $e->payment->confirm();
-
-                    $stripeSubscription = $this->asStripeSubscription(['latest_invoice.payment_intent']);
-
-                    $this->fill([
-                        'stripe_status' => $stripeSubscription->status,
-                    ])->save();
-
-                    if ($this->hasIncompletePayment()) {
-                        (new Payment(
-                            $stripeSubscription->latest_invoice->payment_intent
-                        ))->validate();
-                    }
-                } else {
-                    throw $e;
-                }
-            }
-        }
+        $this->handlePaymentFailure($this);
 
         return $this;
     }
