@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.15.0...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.15.1...13.x)
+
+## [v13.15.1](https://github.com/laravel/cashier-stripe/compare/v13.15.0...v13.15.1) - 2022-08-16
+
+### Fixed
+
+- Fix Stripe key not found by @driesvints in https://github.com/laravel/cashier-stripe/pull/1421
 
 ## [v13.15.0](https://github.com/laravel/cashier-stripe/compare/v13.14.0...v13.15.0) - 2022-08-09
 
