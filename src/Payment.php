@@ -202,7 +202,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     public function asStripePaymentIntent(array $expand = [])
     {
         if ($expand) {
-            return $this->paymentIntent->retrieve(
+            return $this->customer()->stripe()->paymentIntents->retrieve(
                 $this->paymentIntent->id, ['expand' => $expand]
             );
         }
