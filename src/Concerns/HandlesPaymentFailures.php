@@ -18,6 +18,8 @@ trait HandlesPaymentFailures
      * @return void
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
+     *
+     * @internal
      */
     public function handlePaymentFailure(Subscription $subscription, $paymentMethod = null)
     {
