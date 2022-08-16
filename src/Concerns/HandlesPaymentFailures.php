@@ -30,28 +30,25 @@ trait HandlesPaymentFailures
                 if ($e->payment->requiresConfirmation()) {
                     try {
                         if ($paymentMethod) {
-                            $e->payment->confirm([
+                            $paymentIntent = $e->payment->confirm([
+                                'expand' => ['invoice.subscription'],
                                 'payment_method' => $paymentMethod instanceof StripePaymentMethod
                                     ? $paymentMethod->id
                                     : $paymentMethod,
                             ]);
                         } else {
-                            $e->payment->confirm();
+                            $paymentIntent = $e->payment->confirm(['expand' => ['invoice.subscription']]);
                         }
                     } catch (StripeCardException) {
-                        //
+                        $paymentIntent = $e->payment->asStripePaymentIntent(['invoice.subscription']);
                     }
 
-                    $stripeSubscription = $subscription->asStripeSubscription(['latest_invoice.payment_intent']);
-
                     $subscription->fill([
-                        'stripe_status' => $stripeSubscription->status,
+                        'stripe_status' => $paymentIntent->invoice->subscription->status,
                     ])->save();
 
                     if ($subscription->hasIncompletePayment()) {
-                        (new Payment(
-                            $stripeSubscription->latest_invoice->payment_intent
-                        ))->validate();
+                        (new Payment($paymentIntent))->validate();
                     }
                 } else {
                     throw $e;
