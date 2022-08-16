@@ -871,14 +871,14 @@ class Subscription extends Model
 
         $this->unsetRelation('items');
 
+        $stripeSubscription = $this->asStripeSubscription();
+
         if ($this->hasSinglePrice()) {
             $this->fill([
                 'stripe_price' => null,
                 'quantity' => null,
-            ])->save();
+            ]);
         }
-
-        $stripeSubscription = $this->asStripeSubscription();
 
         $this->fill([
             'stripe_status' => $stripeSubscription->status,
