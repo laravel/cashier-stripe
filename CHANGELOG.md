@@ -1,12 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.15.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.15.1...master)
 
 ### Changed
 - Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
 
 ### Removed
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+
+
+## [v13.15.1](https://github.com/laravel/cashier-stripe/compare/v13.15.0...v13.15.1) - 2022-08-16
+
+### Fixed
+
+- Fix Stripe key not found by @driesvints in https://github.com/laravel/cashier-stripe/pull/1421
 
 ## [v13.15.0](https://github.com/laravel/cashier-stripe/compare/v13.14.0...v13.15.0) - 2022-08-09
 
