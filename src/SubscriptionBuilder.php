@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
+use Laravel\Cashier\Concerns\HandlesPaymentFailures;
 use Laravel\Cashier\Concerns\HandlesTaxes;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
@@ -17,6 +18,7 @@ use Stripe\Subscription as StripeSubscription;
 class SubscriptionBuilder
 {
     use AllowsCoupons;
+    use HandlesPaymentFailures;
     use HandlesTaxes;
     use InteractsWithPaymentBehavior;
     use Prorates;
@@ -258,11 +260,7 @@ class SubscriptionBuilder
 
         $subscription = $this->createSubscription($stripeSubscription);
 
-        if ($subscription->hasIncompletePayment()) {
-            (new Payment(
-                $stripeSubscription->latest_invoice->payment_intent
-            ))->validate();
-        }
+        $this->handlePaymentFailure($subscription, $paymentMethod);
 
         return $subscription;
     }

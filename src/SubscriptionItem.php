@@ -6,6 +6,7 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Laravel\Cashier\Concerns\HandlesPaymentFailures;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionItemFactory;
@@ -15,6 +16,7 @@ use Laravel\Cashier\Database\Factories\SubscriptionItemFactory;
  */
 class SubscriptionItem extends Model
 {
+    use HandlesPaymentFailures;
     use HasFactory;
     use InteractsWithPaymentBehavior;
     use Prorates;
@@ -115,18 +117,19 @@ class SubscriptionItem extends Model
             'quantity' => $stripeSubscriptionItem->quantity,
         ])->save();
 
+        $stripeSubscription = $this->subscription->asStripeSubscription();
+
         if ($this->subscription->hasSinglePrice()) {
-            $stripeSubscription = $this->subscription->asStripeSubscription();
-
             $this->subscription->fill([
-                'stripe_status' => $stripeSubscription->status,
                 'quantity' => $stripeSubscriptionItem->quantity,
-            ])->save();
+            ]);
         }
 
-        if ($this->subscription->hasIncompletePayment()) {
-            optional($this->subscription->latestPayment())->validate();
-        }
+        $this->subscription->fill([
+            'stripe_status' => $stripeSubscription->status,
+        ])->save();
+
+        $this->handlePaymentFailure($this->subscription);
 
         return $this;
     }
@@ -162,16 +165,20 @@ class SubscriptionItem extends Model
             'quantity' => $stripeSubscriptionItem->quantity,
         ])->save();
 
+        $stripeSubscription = $this->subscription->asStripeSubscription();
+
         if ($this->subscription->hasSinglePrice()) {
             $this->subscription->fill([
                 'stripe_price' => $price,
                 'quantity' => $stripeSubscriptionItem->quantity,
-            ])->save();
+            ]);
         }
 
-        if ($this->subscription->hasIncompletePayment()) {
-            optional($this->subscription->latestPayment())->validate();
-        }
+        $this->subscription->fill([
+            'stripe_status' => $stripeSubscription->status,
+        ])->save();
+
+        $this->handlePaymentFailure($this->subscription);
 
         return $this;
     }
