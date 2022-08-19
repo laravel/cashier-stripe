@@ -325,7 +325,7 @@ trait ManagesCustomer
      * @param  array  $options
      * @return \Laravel\Cashier\CustomerBalanceTransaction
      */
-    public function increaseBalance($amount, $description = null, array $options = [])
+    public function creditBalance($amount, $description = null, array $options = [])
     {
         return $this->applyBalance(-$amount, $description, $options);
     }
@@ -338,7 +338,7 @@ trait ManagesCustomer
      * @param  array  $options
      * @return \Laravel\Cashier\CustomerBalanceTransaction
      */
-    public function decreaseBalance($amount, $description = null, array $options = [])
+    public function debitBalance($amount, $description = null, array $options = [])
     {
         return $this->applyBalance($amount, $description, $options);
     }
