@@ -9,7 +9,7 @@ use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Stripe\Subscription as StripeSubscription;
 
-class MultipriceSubscriptionsTest extends FeatureTestCase
+class SubscriptionsWithMultiplePricesTest extends FeatureTestCase
 {
     /**
      * @var string
@@ -91,9 +91,9 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         ])->id;
     }
 
-    public function test_customers_can_have_multiprice_subscriptions()
+    public function test_customers_can_have_subscriptions_with_multiple_prices()
     {
-        $user = $this->createCustomer('customers_can_have_multiprice_subscriptions');
+        $user = $this->createCustomer('customers_can_have_subscriptions_with_multiple_prices');
 
         $user->priceTaxRates = [self::$otherPriceId => [self::$taxRateId]];
 
@@ -166,9 +166,9 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         $subscription->removePrice(self::$priceId);
     }
 
-    public function test_multiprice_subscriptions_can_be_resumed()
+    public function test_subscriptions_with_multiple_prices_can_be_resumed()
     {
-        $user = $this->createCustomer('multiprice_subscriptions_can_be_resumed');
+        $user = $this->createCustomer('subscriptions_with_multiple_prices_can_be_resumed');
 
         $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])->create('pm_card_visa');
 
@@ -183,9 +183,9 @@ class MultipriceSubscriptionsTest extends FeatureTestCase
         $this->assertFalse($subscription->onGracePeriod());
     }
 
-    public function test_price_is_required_when_updating_quantities_for_multiprice_subscriptions()
+    public function test_price_is_required_when_updating_quantities_for_subscriptions_with_multiple_prices()
     {
-        $user = $this->createCustomer('price_is_required_when_updating_quantities_for_multiprice_subscriptions');
+        $user = $this->createCustomer('price_is_required_when_updating_quantities_for_subscriptions_with_multiple_prices');
 
         $subscription = $this->createSubscriptionWithMultiplePrices($user);
 
