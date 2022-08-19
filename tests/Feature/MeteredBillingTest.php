@@ -106,9 +106,9 @@ class MeteredBillingTest extends FeatureTestCase
         }
     }
 
-    public function test_reporting_usage_for_multiprice_subscriptions()
+    public function test_reporting_usage_for_subscriptions_with_multiple_prices()
     {
-        $user = $this->createCustomer('reporting_usage_for_multiprice_subscriptions');
+        $user = $this->createCustomer('reporting_usage_for_subscriptions_with_multiple_prices');
 
         $subscription = $user->newSubscription('main', [static::$licensedPrice])
             ->meteredPrice(static::$meteredPrice)
@@ -162,9 +162,9 @@ class MeteredBillingTest extends FeatureTestCase
         $this->assertSame(1, $subscription->quantity);
     }
 
-    public function test_swap_metered_price_to_different_price_with_a_multiprice_subscription()
+    public function test_swap_metered_price_to_different_price_with_a_subscription_with_multiple_prices()
     {
-        $user = $this->createCustomer('swap_metered_price_to_different_price_with_a_multiprice_subscription');
+        $user = $this->createCustomer('swap_metered_price_to_different_price_with_a_subscription_with_multiple_prices');
 
         $subscription = $user->newSubscription('main')
             ->meteredPrice(static::$meteredPrice)
@@ -205,9 +205,9 @@ class MeteredBillingTest extends FeatureTestCase
         $this->assertNull($subscription->quantity);
     }
 
-    public function test_add_metered_price_to_a_multiprice_subscription()
+    public function test_add_metered_price_to_a_subscription_with_multiple_prices()
     {
-        $user = $this->createCustomer('add_metered_price_to_a_multiprice_subscription');
+        $user = $this->createCustomer('add_metered_price_to_a_subscription_with_multiple_prices');
 
         $subscription = $user->newSubscription('main')
             ->meteredPrice(static::$meteredPrice)

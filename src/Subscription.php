@@ -1388,7 +1388,7 @@ class Subscription extends Model
     }
 
     /**
-     * Make sure a price argument is provided when the subscription is a multi price subscription.
+     * Make sure a price argument is provided when the subscription is a subscription with multiple prices.
      *
      * @return void
      *
@@ -1398,7 +1398,7 @@ class Subscription extends Model
     {
         if ($this->hasMultiplePrices()) {
             throw new InvalidArgumentException(
-                'This method requires a price argument since the subscription has multiple prices.'
+                'This method requires a price argument since the subscription has multiple products.'
             );
         }
     }
