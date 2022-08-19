@@ -318,6 +318,32 @@ trait ManagesCustomer
     }
 
     /**
+     * Increase a customer's balance.
+     *
+     * @param  int  $amount
+     * @param  string|null  $description
+     * @param  array  $options
+     * @return \Laravel\Cashier\CustomerBalanceTransaction
+     */
+    public function increaseBalance($amount, $description = null, array $options = [])
+    {
+        return $this->applyBalance(-$amount, $description, $options);
+    }
+
+    /**
+     * Decrease a customer's balance.
+     *
+     * @param  int  $amount
+     * @param  string|null  $description
+     * @param  array  $options
+     * @return \Laravel\Cashier\CustomerBalanceTransaction
+     */
+    public function decreaseBalance($amount, $description = null, array $options = [])
+    {
+        return $this->applyBalance($amount, $description, $options);
+    }
+
+    /**
      * Apply a new amount to the customer's balance.
      *
      * @param  int  $amount
