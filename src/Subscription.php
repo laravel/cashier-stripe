@@ -1398,7 +1398,7 @@ class Subscription extends Model
     {
         if ($this->hasMultiplePrices()) {
             throw new InvalidArgumentException(
-                'This method requires a price argument since the subscription has multiple products.'
+                'This method requires a price argument since the subscription has multiple prices.'
             );
         }
     }
