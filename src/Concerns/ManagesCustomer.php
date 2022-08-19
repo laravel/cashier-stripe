@@ -318,7 +318,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Increase a customer's balance.
+     * Credit a customer's balance.
      *
      * @param  int  $amount
      * @param  string|null  $description
@@ -331,7 +331,7 @@ trait ManagesCustomer
     }
 
     /**
-     * Decrease a customer's balance.
+     * Debit a customer's balance.
      *
      * @param  int  $amount
      * @param  string|null  $description
