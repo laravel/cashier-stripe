@@ -1339,7 +1339,7 @@ class Subscription extends Model
     }
 
     /**
-     * Make sure a price argument is provided when the subscription is a multi price subscription.
+     * Make sure a price argument is provided when the subscription is a subscription with multiple prices.
      *
      * @return void
      *

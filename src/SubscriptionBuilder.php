@@ -142,7 +142,7 @@ class SubscriptionBuilder
     {
         if (is_null($price)) {
             if (count($this->items) > 1) {
-                throw new InvalidArgumentException('Price is required when creating multi-price subscriptions.');
+                throw new InvalidArgumentException('Price is required when creating subscriptions with multiple prices.');
             }
 
             $price = Arr::first($this->items)['price'];

@@ -333,6 +333,32 @@ trait ManagesCustomer
     }
 
     /**
+     * Credit a customer's balance.
+     *
+     * @param  int  $amount
+     * @param  string|null  $description
+     * @param  array  $options
+     * @return \Laravel\Cashier\CustomerBalanceTransaction
+     */
+    public function creditBalance($amount, $description = null, array $options = [])
+    {
+        return $this->applyBalance(-$amount, $description, $options);
+    }
+
+    /**
+     * Debit a customer's balance.
+     *
+     * @param  int  $amount
+     * @param  string|null  $description
+     * @param  array  $options
+     * @return \Laravel\Cashier\CustomerBalanceTransaction
+     */
+    public function debitBalance($amount, $description = null, array $options = [])
+    {
+        return $this->applyBalance($amount, $description, $options);
+    }
+
+    /**
      * Apply a new amount to the customer's balance.
      *
      * @param  int  $amount
