@@ -105,6 +105,30 @@ $request->user()->checkout('price_tshirt', [
 ]);
 ```
 
+### Removed Functionality
+
+PR: https://github.com/laravel/cashier-stripe/pull/1418
+
+Below is a list of methods that have been renamed in Cashier 14 and their corresponding replacements:
+
+```php
+// Removed...
+$user->removePaymentMethod($paymentMethod);
+$payment->isCancelled();
+$subscription->cancelled();
+Subscription::query()->cancelled()->get();
+Subscription::query()->notCancelled()->get();
+$subscription->markAsCancelled();
+
+// Replacement...
+$user->deletePaymentMethod($paymentMethod);
+$paymend->isCanceled();
+$subscription->canceled();
+Subscription::query()->canceled()->get();
+Subscription::query()->notCanceled()->get();
+$subscription->markAsCanceled();
+```
+
 ## Upgrading To 13.0 From 12.x
 
 ### Minimum Versions
