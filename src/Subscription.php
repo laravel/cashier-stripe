@@ -1119,7 +1119,7 @@ class Subscription extends Model
      * Invoice the subscription outside of the regular billing cycle.
      *
      * @param  array  $options
-     * @return \Laravel\Cashier\Invoice|bool
+     * @return \Laravel\Cashier\Invoice
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
