@@ -1,6 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.15.1...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v13.15.1...14.x)
 
 ### Changed
 - Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
