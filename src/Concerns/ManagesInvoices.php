@@ -57,7 +57,7 @@ trait ManagesInvoices
      * @param  int  $amount
      * @param  array  $tabOptions
      * @param  array  $invoiceOptions
-     * @return \Laravel\Cashier\Invoice|bool
+     * @return \Laravel\Cashier\Invoice
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
@@ -96,7 +96,7 @@ trait ManagesInvoices
      * @param  int  $quantity
      * @param  array  $tabOptions
      * @param  array  $invoiceOptions
-     * @return \Laravel\Cashier\Invoice|bool
+     * @return \Laravel\Cashier\Invoice
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
@@ -111,7 +111,7 @@ trait ManagesInvoices
      * Invoice the customer outside of the regular billing cycle.
      *
      * @param  array  $options
-     * @return \Laravel\Cashier\Invoice|bool
+     * @return \Laravel\Cashier\Invoice
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */

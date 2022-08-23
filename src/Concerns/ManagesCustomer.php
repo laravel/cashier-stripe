@@ -188,11 +188,11 @@ trait ManagesCustomer
     /**
      * Get the locales that should be synced to Stripe.
      *
-     * @return array
+     * @return array|null
      */
     public function stripePreferredLocales()
     {
-        return [];
+        // return ['en'];
     }
 
     /**
