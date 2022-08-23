@@ -14,7 +14,7 @@ The following required dependency versions have been updated:
 
 PR: https://github.com/laravel/cashier-stripe/pull/1417
 
-The default Stripe API version for Cashier 14.x will be `2022-08-01`. If this is the latest Stripe API version at the time that you're upgrading to this Cashier version then it's also recommended that you upgrade your own Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
+The default Stripe API version for Cashier 14.x is `2022-08-01`. If this is the latest Stripe API version at the time that you're upgrading to this Cashier version then it's also recommended that you upgrade your own Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
 
 If you use the Stripe SDK directly, make sure to properly test your integration after updating.
 
@@ -32,7 +32,7 @@ This will create a new webhook with the same Stripe API version as Cashier [in y
 php artisan cashier:webhook --disabled --url "http://example.com/stripe/webhook"
 ```
 
-You may use the following upgrade checklist to properly enable to the new webhook:
+You may use the following upgrade checklist to properly enable the new webhook:
 
 1. If you have webhook signature verification enabled, disable it on production by temporarily removing the `STRIPE_WEBHOOK_SECRET` environment variable.
 2. Add any extra Stripe events your application requires to the new webhook in your Stripe dashboard.
@@ -47,19 +47,19 @@ After following this process, your new webhook will be active and ready to recei
 
 PR: https://github.com/laravel/cashier-stripe/pull/1312
 
-Dompdf is now an optional dependency. If you were using Cashier to generate and download invoice receipts (highly likely) you should require this as a dependency from now on:
+Dompdf is now an optional dependency. If you were using Cashier to generate and download invoice receipts (most applications), you should require this Composer dependency:
 
 ```php
 composer require dompdf/dompdf
 ```
 
-### New subscription behavior
+### New Subscription Behavior
 
 PR: https://github.com/laravel/cashier-stripe/pull/1420
 
-Starting with Cashier v14, the new default `payment_behavior` value for starting new subscriptions and performing updates will be `default_incomplete` [as recommended by Stripe](https://stripe.com/docs/billing/subscriptions/overview#how-payments-work-subscriptions).
+Beginning with Cashier 14, the new default `payment_behavior` value when starting new subscriptions and performing subscription updates is `default_incomplete` [as recommended by Stripe](https://stripe.com/docs/billing/subscriptions/overview#how-payments-work-subscriptions).
 
-If you were specifically relying on the previously `allow_incomplete` default you should call the `allowPaymentFailures()` method before performing these.
+If you were specifically relying on the previously `allow_incomplete` default behavior, you should call the `allowPaymentFailures()` method before creating or updating subscriptions:
 
 ```php
 // New subscriptions...
@@ -77,13 +77,13 @@ $user->subscription('default')
 
 PR: https://github.com/laravel/cashier-stripe/pull/1210
 
-In previous Cashier versions, when using any of the invoicing methods (`invoice`, `invoiceFor`, `invoicePrice`), Stripe exceptions were caught and these methods would returned `false`. In Cashier v14, these exceptions will bubble up to the application and should be handled by the app itself. `CardException`'s are still caught to trigger the `IncompletePayment` exceptions.
+In previous Cashier versions, when using any of the invoicing methods (`invoice`, `invoiceFor`, `invoicePrice`), Stripe exceptions were caught internally and these methods would return `false`. In Cashier 14, these exceptions will bubble up to the application and should be handled by the application itself. `CardException`'s are still caught internally in ordre to trigger `IncompletePayment` exceptions.
 
-### Removed Checkout button
+### Removed Checkout Button
 
 PR: https://github.com/laravel/cashier-stripe/pull/1219
 
-The shipped checkout button was removed from Cashier. Instead, you should use the Checkout redirect from a controller:
+The checkout button previously included with Cashier has been removed. Instead, you should use the checkout redirect from a controller:
 
 ```php
 use Illuminate\Http\Request;
@@ -97,7 +97,7 @@ Route::get('/product-checkout', function (Request $request) {
 
 PR: https://github.com/laravel/cashier-stripe/pull/1400
 
-Previously, Cashier would set cards as the default payment methods when using Checkout. This has now been changed so that you can [manage your payment methods from your Stripe Dashboard](https://dashboard.stripe.com/settings/payment_methods). If you want to restore the previous behavior, you need to explicitly pass the payment methods you want to use through the `payment_method_types` option:
+Previously, Cashier would set cards as the default payment methods when using Checkout. This has now been changed so that you can [manage your payment methods from your Stripe Dashboard](https://dashboard.stripe.com/settings/payment_methods). If you want to restore the previous behavior, you should  explicitly pass the payment methods you want to use via the `payment_method_types` option:
 
 ```
 $request->user()->checkout('price_tshirt', [
