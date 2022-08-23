@@ -1,13 +1,39 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v13.15.1...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.0.0...14.x)
 
 ### Changed
+
 - Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
 
 ### Removed
+
 - Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
 
+## [v14.0.0](https://github.com/laravel/cashier/compare/v13.15.1...v14.0.0) - 2022-08-23
+
+### Added
+
+- Sync preferred locales by @driesvints in https://github.com/laravel/cashier-stripe/pull/1408
+- Add new balance transaction methods by @driesvints in https://github.com/laravel/cashier-stripe/pull/1423
+
+### Changed
+
+- Cascade Stripe exceptions when invoicing by @driesvints in https://github.com/laravel/cashier-stripe/pull/1210
+- Make invoice data optional by @driesvints in https://github.com/laravel/cashier-stripe/pull/1217
+- Make dompdf optional by @driesvints in https://github.com/laravel/cashier-stripe/pull/1312
+- Manage Checkout PM from Dashboard by @driesvints in https://github.com/laravel/cashier-stripe/pull/1400
+- Improves console output by @nunomaduro in https://github.com/laravel/cashier-stripe/pull/1401
+- Update to new Stripe version by @driesvints in https://github.com/laravel/cashier-stripe/pull/1417
+- New subscription behavior by @driesvints in https://github.com/laravel/cashier-stripe/pull/1420
+
+### Removed
+
+- Drop PHP 7.3 support by @driesvints in https://github.com/laravel/cashier-stripe/pull/1186
+- Remove Checkout button by @driesvints in https://github.com/laravel/cashier-stripe/pull/1219
+- Drop PHP 7.4 and Laravel v8 support by @driesvints in https://github.com/laravel/cashier-stripe/pull/1353
+- Remove deprecated functionality by @driesvints in https://github.com/laravel/cashier-stripe/pull/1418
+- Drop MoneyPHP 3.x by @driesvints in https://github.com/laravel/cashier-stripe/pull/1416
 
 ## [v13.15.1](https://github.com/laravel/cashier-stripe/compare/v13.15.0...v13.15.1) - 2022-08-16
 
