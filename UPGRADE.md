@@ -109,7 +109,7 @@ $request->user()->checkout('price_tshirt', [
 
 PR: https://github.com/laravel/cashier-stripe/pull/1418
 
-Below is a list of methods that have been removed in Cashier v14 and what their replacements are:
+Below is a list of methods that have been renamed in Cashier 14 and their corresponding replacements:
 
 ```php
 // Removed...
