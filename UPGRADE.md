@@ -122,7 +122,7 @@ $subscription->markAsCancelled();
 
 // Replacement...
 $user->deletePaymentMethod($paymentMethod);
-$paymend->isCanceled();
+$payment->isCanceled();
 $subscription->canceled();
 Subscription::query()->canceled()->get();
 Subscription::query()->notCanceled()->get();
