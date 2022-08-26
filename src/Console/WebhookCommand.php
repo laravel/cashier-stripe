@@ -41,6 +41,7 @@ class WebhookCommand extends Command
                 'customer.updated',
                 'customer.deleted',
                 'invoice.payment_action_required',
+                'invoice.payment_succeeded',
             ],
             'url' => $this->option('url') ?? route('cashier.webhook'),
             'api_version' => $this->option('api-version') ?? Cashier::STRIPE_VERSION,
