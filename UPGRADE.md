@@ -63,9 +63,9 @@ If you were specifically relying on the previously `allow_incomplete` default be
 
 ```php
 // New subscriptions...
-$request->user()->allowPaymentFailures()->newSubscription(
+$request->user()->newSubscription(
     'default', 'price_monthly'
-)->create($request->paymentMethodId);
+)->allowPaymentFailures()->create($request->paymentMethodId);
 
 // Subscription changes...
 $user->subscription('default')
