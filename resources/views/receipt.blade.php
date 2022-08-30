@@ -187,7 +187,19 @@
                     <!-- Display The Invoice Items -->
                     @foreach ($invoice->invoiceItems() as $item)
                         <tr class="row">
-                            <td colspan="2">{{ $item->description }}</td>
+                            @if($item->period?->start === $item->period?->end)
+                                <td colspan="2">
+                                    {{ $item->description }}
+                                </td>
+                            @else
+                                <td>
+                                    {{ $item->description }}
+                                </td>
+                                <td>
+                                    {{ \Carbon\Carbon::parse($item->period->start)->toFormattedDateString() }}
+                                    - {{ \Carbon\Carbon::parse($item->period->end)->toFormattedDateString() }}
+                                </td>
+                            @endif
 
                             @if ($invoice->hasTax())
                                 <td>
