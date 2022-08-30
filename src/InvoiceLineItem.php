@@ -144,26 +144,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Determine if the invoice line item has a period set.
-     *
-     * @return bool
-     */
-    public function hasPeriod()
-    {
-        return ! is_null($this->item->period);
-    }
-
-    /**
-     * Determine if the invoice line item has a period with the same start and end date.
-     *
-     * @return bool
-     */
-    public function hasEqualPeriod()
-    {
-        return $this->hasPeriod() ? $this->item->period->start === $this->item->period->end : false;
-    }
-
-    /**
      * Get a human readable date for the start date.
      *
      * @return string|null
@@ -209,6 +189,26 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
         if ($this->hasPeriod()) {
             return Carbon::createFromTimestampUTC($this->item->period->end);
         }
+    }
+
+    /**
+     * Determine if the invoice line item has a defined period.
+     *
+     * @return bool
+     */
+    public function hasPeriod()
+    {
+        return ! is_null($this->item->period);
+    }
+
+    /**
+     * Determine if the invoice line item has a period with the same start and end date.
+     *
+     * @return bool
+     */
+    public function periodStartAndEndAreEqual()
+    {
+        return $this->hasPeriod() ? $this->item->period->start === $this->item->period->end : false;
     }
 
     /**

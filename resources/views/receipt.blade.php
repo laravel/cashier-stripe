@@ -187,7 +187,7 @@
                     <!-- Display The Invoice Line Items -->
                     @foreach ($invoice->invoiceLineItems() as $item)
                         <tr class="row">
-                            @if (! $item->hasPeriod() || $item->hasEqualPeriod())
+                            @if (! $item->hasPeriod() || $item->periodStartAndEndAreEqual())
                                 <td colspan="2">
                                     {{ $item->description }}
                                 </td>
