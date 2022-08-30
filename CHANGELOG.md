@@ -1,6 +1,20 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.15.1...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.16.0...13.x)
+
+## [v13.16.0](https://github.com/laravel/cashier-stripe/compare/v13.15.1...v13.16.0) - 2022-08-30
+
+### Added
+
+- Add new balance transaction methods by @driesvints in https://github.com/laravel/cashier-stripe/pull/1423
+
+### Changed
+
+- Add invoice.payment_succeeded event to WebhookCommand by @driesvints in https://github.com/laravel/cashier-stripe/pull/1428
+
+### Fixed
+
+- Fix applied balance on receipts by @driesvints in https://github.com/laravel/cashier-stripe/pull/1429
 
 ## [v13.15.1](https://github.com/laravel/cashier-stripe/compare/v13.15.0...v13.15.1) - 2022-08-16
 
