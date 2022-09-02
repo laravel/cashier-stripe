@@ -955,4 +955,18 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertSame('draft', $invoice->status);
         $this->assertSame(1000, $invoice->total);
     }
+
+    public function test_invoice_subscription_directly()
+    {
+        $user = $this->createCustomer('invoice_subscription_directly');
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->create('pm_card_visa');
+
+        $subscription->updateQuantity(3);
+
+        $invoice = $subscription->invoice();
+
+        $this->assertSame('paid', $invoice->status);
+        $this->assertSame(2000, $invoice->total);
+    }
 }
