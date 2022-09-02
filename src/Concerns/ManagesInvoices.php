@@ -150,6 +150,10 @@ trait ManagesInvoices
             'customer' => $this->stripe_id,
         ], $options);
 
+        if (array_key_exists('subscription', $parameters)) {
+            unset($parameters['pending_invoice_items_behavior']);
+        }
+
         $stripeInvoice = $this->stripe()->invoices->create($parameters);
 
         return new Invoice($this, $stripeInvoice);
