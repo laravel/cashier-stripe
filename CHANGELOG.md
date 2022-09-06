@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.1.0...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.1.1...14.x)
+
+## [v14.1.1](https://github.com/laravel/cashier/compare/v14.1.0...v14.1.1) - 2022-09-06
+
+### Fixed
+
+- Fix subscription invoicing bug by @driesvints in https://github.com/laravel/cashier-stripe/pull/1434
 
 ## [v14.1.0](https://github.com/laravel/cashier/compare/v14.0.0...v14.1.0) - 2022-08-30
 
