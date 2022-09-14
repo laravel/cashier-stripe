@@ -34,15 +34,7 @@ class WebhookCommand extends Command
         $webhookEndpoints = Cashier::stripe()->webhookEndpoints;
 
         $endpoint = $webhookEndpoints->create([
-            'enabled_events' => [
-                'customer.subscription.created',
-                'customer.subscription.updated',
-                'customer.subscription.deleted',
-                'customer.updated',
-                'customer.deleted',
-                'invoice.payment_action_required',
-                'invoice.payment_succeeded',
-            ],
+            'enabled_events' => config('cashier.webhook.events'),
             'url' => $this->option('url') ?? route('cashier.webhook'),
             'api_version' => $this->option('api-version') ?? Cashier::STRIPE_VERSION,
         ]);
