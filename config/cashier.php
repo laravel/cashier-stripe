@@ -47,14 +47,14 @@ return [
         'secret' => env('STRIPE_WEBHOOK_SECRET'),
         'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
         'events' => [
-          'customer.subscription.created',
-          'customer.subscription.updated',
-          'customer.subscription.deleted',
-          'customer.updated',
-          'customer.deleted',
-          'invoice.payment_action_required',
-          'invoice.payment_succeeded',
-        ]
+            'customer.subscription.created',
+            'customer.subscription.updated',
+            'customer.subscription.deleted',
+            'customer.updated',
+            'customer.deleted',
+            'invoice.payment_action_required',
+            'invoice.payment_succeeded',
+        ],
     ],
 
     /*
