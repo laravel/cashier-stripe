@@ -46,7 +46,7 @@ return [
     'webhook' => [
         'secret' => env('STRIPE_WEBHOOK_SECRET'),
         'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
-        'enabled_events' => [
+        'events' => [
           'customer.subscription.created',
           'customer.subscription.updated',
           'customer.subscription.deleted',
