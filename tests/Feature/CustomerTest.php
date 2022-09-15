@@ -117,7 +117,6 @@ class CustomerTest extends FeatureTestCase
         $this->assertSame(300, $user->rawBalance());
     }
 
-
     public function test_on_generic_trial_scopes()
     {
         $user = $this->createCustomer('on_generic_trial', ['trial_ends_at' => Carbon::tomorrow()]);
