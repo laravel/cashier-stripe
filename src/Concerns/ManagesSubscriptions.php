@@ -76,7 +76,7 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Filter query by on generic trial.
+     * Filter the given query for generic trials.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
@@ -97,7 +97,7 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Filter query by expired generic trial.
+     * Filter the given query for expired generic trials.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
