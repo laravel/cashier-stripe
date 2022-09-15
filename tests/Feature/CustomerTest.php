@@ -2,8 +2,10 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Laravel\Cashier\CustomerBalanceTransaction;
+use Laravel\Cashier\Tests\Fixtures\User;
 use Stripe\TaxId as StripeTaxId;
 
 class CustomerTest extends FeatureTestCase
@@ -114,5 +116,22 @@ class CustomerTest extends FeatureTestCase
         $this->assertSame('-$2.00', $transaction->amount());
         $this->assertSame(300, $transaction->rawEndingBalance());
         $this->assertSame(300, $user->rawBalance());
+    }
+
+
+    public function test_on_generic_trial_scopes()
+    {
+        $user = $this->createCustomer('on_generic_trial', ['trial_ends_at' => Carbon::tomorrow()]);
+
+        $this->assertTrue($user->query()->onGenericTrial()->exists());
+        $this->assertFalse($user->query()->hasExpiredGenericTrial()->exists());
+    }
+
+    public function test_expired_generic_trial_scopes()
+    {
+        $user = $this->createCustomer('on_generic_trial', ['trial_ends_at' => Carbon::yesterday()]);
+
+        $this->assertFalse($user->query()->onGenericTrial()->exists());
+        $this->assertTrue($user->query()->hasExpiredGenericTrial()->exists());
     }
 }
