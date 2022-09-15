@@ -5,7 +5,6 @@ namespace Laravel\Cashier\Tests\Feature;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Laravel\Cashier\CustomerBalanceTransaction;
-use Laravel\Cashier\Tests\Fixtures\User;
 use Stripe\TaxId as StripeTaxId;
 
 class CustomerTest extends FeatureTestCase
