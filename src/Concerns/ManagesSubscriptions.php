@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Concerns;
 
+use Carbon\Carbon;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionBuilder;
@@ -75,6 +76,17 @@ trait ManagesSubscriptions
     }
 
     /**
+     * Filter the given query for generic trials.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeOnGenericTrial($query)
+    {
+        $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '>', Carbon::now());
+    }
+
+    /**
      * Determine if the Stripe model's "generic" trial at the model level has expired.
      *
      * @return bool
@@ -82,6 +94,17 @@ trait ManagesSubscriptions
     public function hasExpiredGenericTrial()
     {
         return $this->trial_ends_at && $this->trial_ends_at->isPast();
+    }
+
+    /**
+     * Filter the given query for expired generic trials.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeHasExpiredGenericTrial($query)
+    {
+        $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '<', Carbon::now());
     }
 
     /**
