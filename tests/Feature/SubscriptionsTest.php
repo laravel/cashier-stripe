@@ -690,9 +690,7 @@ class SubscriptionsTest extends FeatureTestCase
     {
         $user = $this->createCustomer('no_prorate_on_subscription_create');
 
-        $subscription = $user->newSubscription('main', static::$priceId)->noProrate()->create('pm_card_visa', [], [
-            'collection_method' => 'send_invoice',
-            'days_until_due' => 30,
+        $subscription = $user->newSubscription('main', static::$priceId)->noProrate()->createAndSendInvoice([], [
             'backdate_start_date' => Carbon::now()->addDays(5)->subYear()->startOfDay()->unix(),
             'billing_cycle_anchor' => Carbon::now()->addDays(5)->startOfDay()->unix(),
         ]);
@@ -708,11 +706,9 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_swap_and_invoice_after_no_prorate_with_billing_cycle_anchor_delays_invoicing()
     {
-        $user = $this->createCustomer('always_invoice_after_no_prorate');
+        $user = $this->createCustomer('swap_and_invoice_after_no_prorate_with_billing_cycle_anchor_delays_invoicing');
 
-        $subscription = $user->newSubscription('main', static::$priceId)->noProrate()->create('pm_card_visa', [], [
-            'collection_method' => 'send_invoice',
-            'days_until_due' => 30,
+        $subscription = $user->newSubscription('main', static::$priceId)->noProrate()->createAndSendInvoice([], [
             'backdate_start_date' => Carbon::now()->addDays(5)->subYear()->startOfDay()->unix(),
             'billing_cycle_anchor' => Carbon::now()->addDays(5)->startOfDay()->unix(),
         ]);
