@@ -277,7 +277,9 @@ class SubscriptionBuilder
      */
     public function createAndSendInvoice(array $customerOptions = [], array $subscriptionOptions = [])
     {
-        return $this->create(null, $customerOptions, array_merge($subscriptionOptions, [
+        return $this->create(null, $customerOptions, array_merge([
+            'days_until_due' => 30,
+        ], $subscriptionOptions, [
             'collection_method' => 'send_invoice',
         ]));
     }
