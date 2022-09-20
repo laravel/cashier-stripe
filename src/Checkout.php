@@ -45,9 +45,9 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
-    public static function anonymous(array $sessionOptions = [], array $customerOptions = [])
+    public static function anonymous(array $sessionOptions = [])
     {
-        return static::create(null, $sessionOptions, $customerOptions);
+        return static::create(null, $sessionOptions);
     }
 
     /**
