@@ -129,4 +129,28 @@ class CheckoutTest extends FeatureTestCase
         $this->assertNull($checkout->allow_promotion_codes);
         $this->assertSame(1210, $checkout->amount_total);
     }
+
+    public function test_anonymous_can_start_a_checkout_session()
+    {
+        $sessionData = [
+            'line_items' => [
+                [
+                    'price_data' => [
+                        'currency' => 'USD',
+                        'product_data' => [
+                            'name' => 'PHP Elephant',
+                        ],
+                        'unit_amount' => 200,
+                    ],
+                    'quantity' => 1,
+                ]
+            ],
+            'mode' => 'payment',
+            'success_url' => 'http://example.com',
+            'cancel_url' => 'http://example.com',
+        ];
+        $checkout = Checkout::anonymous($sessionData);
+
+        $this->assertInstanceOf(Checkout::class, $checkout);
+    }
 }
