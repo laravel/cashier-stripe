@@ -39,13 +39,13 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
     }
 
     /**
-     * Begin a new anonymous checkout session.
+     * Begin a new guest checkout session.
      *
      * @param  array  $sessionOptions
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
-    public static function anonymous(array $sessionOptions = [])
+    public static function guest(array $sessionOptions = [])
     {
         return static::create(null, $sessionOptions);
     }
@@ -60,10 +60,6 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      */
     public static function create($owner, array $sessionOptions = [], array $customerOptions = [])
     {
-        if ($owner) {
-            $customer = $owner->createOrGetStripeCustomer($customerOptions);
-        }
-
         // Make sure to collect address and name when Tax ID collection is enabled...
         if ($sessionOptions['tax_id_collection']['enabled'] ?? false) {
             $sessionOptions['customer_update']['address'] = 'auto';
@@ -77,10 +73,12 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
         ], $sessionOptions);
 
         if ($owner) {
-            $data['customer'] = $customer->id;
-        }
+            $data['customer'] = $owner->createOrGetStripeCustomer($customerOptions)->id;
 
-        $session = $owner->stripe()->checkout->sessions->create($data);
+            $session = $owner->stripe()->checkout->sessions->create($data);
+        } else {
+            $session = Cashier::stripe()->checkout->sessions->create($data);
+        }
 
         return new static($owner, $session);
     }

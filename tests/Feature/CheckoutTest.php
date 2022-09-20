@@ -130,9 +130,9 @@ class CheckoutTest extends FeatureTestCase
         $this->assertSame(1210, $checkout->amount_total);
     }
 
-    public function test_anonymous_can_start_a_checkout_session()
+    public function test_guest_customers_can_start_a_checkout_session()
     {
-        $sessionData = [
+        $checkout = Checkout::guest([
             'line_items' => [
                 [
                     'price_data' => [
@@ -145,11 +145,9 @@ class CheckoutTest extends FeatureTestCase
                     'quantity' => 1,
                 ],
             ],
-            'mode' => 'payment',
             'success_url' => 'http://example.com',
             'cancel_url' => 'http://example.com',
-        ];
-        $checkout = Checkout::anonymous($sessionData);
+        ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
     }
