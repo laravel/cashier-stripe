@@ -1,9 +1,10 @@
 <?php
 
 namespace Laravel\Cashier;
+
+use Illuminate\Support\Collection;
 use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\HandlesTaxes;
-use Illuminate\Support\Collection;
 
 class CheckoutBuilder
 {
