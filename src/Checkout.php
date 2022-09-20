@@ -14,7 +14,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
     /**
      * The Stripe model instance.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var \Illuminate\Database\Eloquent\Model|null
      */
     protected $owner;
 
@@ -28,7 +28,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
     /**
      * Create a new checkout session instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @param  \Illuminate\Database\Eloquent\Model|null  $owner
      * @param  \Stripe\Checkout\Session  $session
      * @return void
      */
@@ -41,14 +41,16 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
     /**
      * Begin a new checkout session.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @param  \Illuminate\Database\Eloquent\Model|null  $owner
      * @param  array  $sessionOptions
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
     public static function create($owner, array $sessionOptions = [], array $customerOptions = [])
     {
-        $customer = $owner->createOrGetStripeCustomer($customerOptions);
+        if ($owner) {
+            $customer = $owner->createOrGetStripeCustomer($customerOptions);
+        }
 
         // Make sure to collect address and name when Tax ID collection is enabled...
         if ($sessionOptions['tax_id_collection']['enabled'] ?? false) {
@@ -56,12 +58,17 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
             $sessionOptions['customer_update']['name'] = 'auto';
         }
 
-        $session = $owner->stripe()->checkout->sessions->create(array_merge([
-            'customer' => $customer->id,
+        $data = array_merge([
             'mode' => 'payment',
             'success_url' => $sessionOptions['success_url'] ?? route('home').'?checkout=success',
             'cancel_url' => $sessionOptions['cancel_url'] ?? route('home').'?checkout=cancelled',
-        ], $sessionOptions));
+        ], $sessionOptions);
+
+        if ($owner) {
+            $data['customer'] = $customer->id;
+        }
+
+        $session = $owner->stripe()->checkout->sessions->create($data);
 
         return new static($owner, $session);
     }
