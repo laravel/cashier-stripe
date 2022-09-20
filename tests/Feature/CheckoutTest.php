@@ -132,19 +132,15 @@ class CheckoutTest extends FeatureTestCase
 
     public function test_guest_customers_can_start_a_checkout_session()
     {
-        $checkout = Checkout::guest([
-            'line_items' => [
-                [
-                    'price_data' => [
-                        'currency' => 'USD',
-                        'product_data' => [
-                            'name' => 'PHP Elephant',
-                        ],
-                        'unit_amount' => 200,
-                    ],
-                    'quantity' => 1,
-                ],
+        $shirtPrice = self::stripe()->prices->create([
+            'currency' => 'USD',
+            'product_data' => [
+                'name' => 'T-shirt',
             ],
+            'unit_amount' => 1500,
+        ]);
+
+        $checkout = Checkout::guest()->create($shirtPrice->id, [
             'success_url' => 'http://example.com',
             'cancel_url' => 'http://example.com',
         ]);

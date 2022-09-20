@@ -350,22 +350,16 @@ class SubscriptionBuilder
         }
 
         $payload = array_filter([
-            'automatic_tax' => $this->automaticTaxPayload(),
-            'mode' => 'subscription',
             'line_items' => Collection::make($this->items)->values()->all(),
-            'allow_promotion_codes' => $this->allowPromotionCodes,
-            'discounts' => $this->checkoutDiscounts(),
+            'mode' => 'subscription',
             'subscription_data' => array_filter([
                 'default_tax_rates' => $this->getTaxRatesForPayload(),
                 'trial_end' => $trialEnd ? $trialEnd->getTimestamp() : null,
                 'metadata' => array_merge($this->metadata, ['name' => $this->name]),
             ]),
-            'tax_id_collection' => [
-                'enabled' => Cashier::$calculatesTaxes ?: $this->collectTaxIds,
-            ],
         ]);
 
-        return Checkout::create($this->owner, array_merge($payload, $sessionOptions), $customerOptions);
+        return Checkout::customer($this->owner, $this)->create([], array_merge($payload, $sessionOptions), $customerOptions);
     }
 
     /**
