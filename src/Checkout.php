@@ -42,7 +42,6 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * Begin a new guest checkout session.
      *
      * @param  array  $sessionOptions
-     * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
     public static function guest(array $sessionOptions = [])
