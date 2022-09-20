@@ -143,7 +143,7 @@ class CheckoutTest extends FeatureTestCase
                         'unit_amount' => 200,
                     ],
                     'quantity' => 1,
-                ]
+                ],
             ],
             'mode' => 'payment',
             'success_url' => 'http://example.com',
