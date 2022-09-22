@@ -22,23 +22,23 @@ class CheckoutBuilder
      * Create a new checkout builder instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $owner
-     * @param  object|null  $subject
+     * @param  object|null  $parentInstance
      * @return void
      */
-    public function __construct($owner = null, $subject = null)
+    public function __construct($owner = null, $parentInstance = null)
     {
         $this->owner = $owner;
 
-        if ($subject && in_array(AllowsCoupons::class, class_uses_recursive($subject))) {
-            $this->couponId = $subject->couponId;
-            $this->promotionCodeId = $subject->promotionCodeId;
-            $this->allowPromotionCodes = $subject->allowPromotionCodes;
+        if ($parentInstance && in_array(AllowsCoupons::class, class_uses_recursive($parentInstance))) {
+            $this->couponId = $parentInstance->couponId;
+            $this->promotionCodeId = $parentInstance->promotionCodeId;
+            $this->allowPromotionCodes = $parentInstance->allowPromotionCodes;
         }
 
-        if ($subject && in_array(HandlesTaxes::class, class_uses_recursive($subject))) {
-            $this->customerIpAddress = $subject->customerIpAddress;
-            $this->estimationBillingAddress = $subject->estimationBillingAddress;
-            $this->collectTaxIds = $subject->collectTaxIds;
+        if ($parentInstance && in_array(HandlesTaxes::class, class_uses_recursive($parentInstance))) {
+            $this->customerIpAddress = $parentInstance->customerIpAddress;
+            $this->estimationBillingAddress = $parentInstance->estimationBillingAddress;
+            $this->collectTaxIds = $parentInstance->collectTaxIds;
         }
     }
 
