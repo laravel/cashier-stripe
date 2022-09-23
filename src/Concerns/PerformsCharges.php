@@ -2,8 +2,6 @@
 
 namespace Laravel\Cashier\Concerns;
 
-use Illuminate\Support\Collection;
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Checkout;
 use Laravel\Cashier\Payment;
 use LogicException;
@@ -139,27 +137,7 @@ trait PerformsCharges
      */
     public function checkout($items, array $sessionOptions = [], array $customerOptions = [])
     {
-        $payload = array_filter([
-            'allow_promotion_codes' => $this->allowPromotionCodes,
-            'automatic_tax' => $this->automaticTaxPayload(),
-            'discounts' => $this->checkoutDiscounts(),
-            'line_items' => Collection::make((array) $items)->map(function ($item, $key) {
-                if (is_string($key)) {
-                    return ['price' => $key, 'quantity' => $item];
-                }
-
-                $item = is_string($item) ? ['price' => $item] : $item;
-
-                $item['quantity'] = $item['quantity'] ?? 1;
-
-                return $item;
-            })->values()->all(),
-            'tax_id_collection' => [
-                'enabled' => Cashier::$calculatesTaxes ?: $this->collectTaxIds,
-            ],
-        ]);
-
-        return Checkout::create($this, array_merge($payload, $sessionOptions), $customerOptions);
+        return Checkout::customer($this, $this)->create($items, $sessionOptions, $customerOptions);
     }
 
     /**

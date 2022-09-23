@@ -41,12 +41,24 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
     /**
      * Begin a new guest checkout session.
      *
-     * @param  array  $sessionOptions
-     * @return \Laravel\Cashier\Checkout
+     * @param  object|null  $parentInstance
+     * @return \Laravel\Cashier\CheckoutBuilder
      */
-    public static function guest(array $sessionOptions = [])
+    public static function guest($parentInstance = null)
     {
-        return static::create(null, $sessionOptions);
+        return new CheckoutBuilder(null, $parentInstance);
+    }
+
+    /**
+     * Begin a new customer checkout session.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $owner
+     * @param  object|null  $parentInstance
+     * @return \Laravel\Cashier\CheckoutBuilder
+     */
+    public static function customer($owner, $parentInstance = null)
+    {
+        return new CheckoutBuilder($owner, $parentInstance);
     }
 
     /**
