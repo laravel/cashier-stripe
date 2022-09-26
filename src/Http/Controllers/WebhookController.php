@@ -214,7 +214,11 @@ class WebhookController extends Controller
             $user->subscriptions->filter(function ($subscription) use ($payload) {
                 return $subscription->stripe_id === $payload['data']['object']['id'];
             })->each(function ($subscription) {
-                $subscription->markAsCanceled();
+                if(config('cashier.webhook.skip_trial', false)){
+                    $subscription->skipTrial()->markAsCanceled();
+                }else{
+                    $subscription->markAsCanceled();
+                }
             });
         }
 

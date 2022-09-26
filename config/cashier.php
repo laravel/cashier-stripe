@@ -55,6 +55,7 @@ return [
             'invoice.payment_action_required',
             'invoice.payment_succeeded',
         ],
+        'skip_trial' => env('STRIPE_WEBHOOK_SKIP_TRIAL', false),
     ],
 
     /*
