@@ -1073,7 +1073,7 @@ class Subscription extends Model
         $this->fill([
             'stripe_status' => StripeSubscription::STATUS_CANCELED,
             'ends_at' => Carbon::now(),
-            'trial_ends_at' => NULL
+            'trial_ends_at' => null
         ])->save();
     }
 
