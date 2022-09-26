@@ -1070,6 +1070,10 @@ class Subscription extends Model
      */
     public function markAsCanceled()
     {
+        if (Cashier::$skipTrials) {
+            $this->skipTrial();
+        }
+
         $this->fill([
             'stripe_status' => StripeSubscription::STATUS_CANCELED,
             'ends_at' => Carbon::now(),

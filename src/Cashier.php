@@ -70,6 +70,13 @@ class Cashier
     public static $calculatesTaxes = false;
 
     /**
+     * Indicate if Cashier should skip (generic) trials when cancelling subscriptions.
+     *
+     * @var bool
+     */
+    public static $skipTrials = false;
+
+    /**
      * The default customer model class name.
      *
      * @var string
@@ -203,6 +210,18 @@ class Cashier
     public static function calculateTaxes()
     {
         static::$calculatesTaxes = true;
+
+        return new static;
+    }
+
+    /**
+     * Configure Cashier to skip (generic) trials when cancelling subscriptions.
+     *
+     * @return static
+     */
+    public static function skipTrials()
+    {
+        static::$skipTrials = true;
 
         return new static;
     }
