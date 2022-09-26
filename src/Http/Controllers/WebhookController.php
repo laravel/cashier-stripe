@@ -203,7 +203,7 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle a canceled customer from a Stripe subscription.
+     * Handle customer subscription deleted.
      *
      * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
