@@ -13,25 +13,15 @@
             font-size: 12px;
         }
 
-        h2 {
-            font-size: 28px;
-            color: #ccc;
-        }
-
         .container {
             padding-top: 30px;
         }
 
-        .invoice-head td {
-            padding: 0 8px;
-        }
-
         .table th {
-            vertical-align: bottom;
-            font-weight: bold;
-            padding: 8px;
-            line-height: 14px;
             border-bottom: 1px solid #ddd;
+            font-weight: bold;
+            padding: 8px 8px 8px 0;
+            vertical-align: bottom;
         }
 
         .table tr.row td {
@@ -39,9 +29,18 @@
         }
 
         .table td {
-            padding: 8px;
-            line-height: 14px;
+            padding: 8px 8px 8px 0;
             vertical-align: top;
+        }
+
+        .table th:last-child,
+        .table td:last-child {
+            padding-right: 0;
+        }
+
+        .dates {
+            color: #555;
+            font-size: 10px;
         }
     </style>
 </head>
@@ -91,6 +90,10 @@
 
                 @isset($location)
                     {{ $location }}<br>
+                @endisset
+
+                @isset($country)
+                    {{ $country }}<br>
                 @endisset
 
                 @isset($phone)
@@ -177,7 +180,8 @@
                 <table width="100%" class="table" border="0">
                     <tr>
                         <th align="left">Description</th>
-                        <th align="left">Date</th>
+                        <th align="left">Qty</th>
+                        <th align="left">Unit price</th>
 
                         @if ($invoice->hasTax())
                             <th align="right">Tax</th>
@@ -189,18 +193,18 @@
                     <!-- Display The Invoice Line Items -->
                     @foreach ($invoice->invoiceLineItems() as $item)
                         <tr class="row">
-                            @if (! $item->hasPeriod() || $item->periodStartAndEndAreEqual())
-                                <td colspan="2">
-                                    {{ $item->description }}
-                                </td>
-                            @else
-                                <td>
-                                    {{ $item->description }}
-                                </td>
-                                <td>
-                                    {{ $item->startDate() }} - {{ $item->endDate() }}
-                                </td>
-                            @endif
+                            <td>
+                                {{ $item->description }}
+
+                                @if ($item->hasPeriod() && ! $item->periodStartAndEndAreEqual())
+                                    <br><span class="dates">
+                                        {{ $item->startDate() }} - {{ $item->endDate() }}
+                                    </span>
+                                @endif
+                            </td>
+
+                            <td>{{ $item->quantity }}</td>
+                            <td>{{ $item->unitAmountExcludingTax() }}</td>
 
                             @if ($invoice->hasTax())
                                 <td align="right">
@@ -226,7 +230,7 @@
                     @if ($invoice->hasDiscount() || $invoice->hasTax() || $invoice->hasStartingBalance())
                         <tr>
                             <td></td>
-                            <td colspan="{{ $invoice->hasTax() ? 2 : 1 }}">Subtotal</td>
+                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}">Subtotal</td>
                             <td align="right">{{ $invoice->subtotal() }}</td>
                         </tr>
                     @endif
@@ -238,7 +242,7 @@
 
                             <tr>
                                 <td></td>
-                                <td colspan="{{ $invoice->hasTax() ? 2 : 1 }}" align="right">
+                                <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" align="right">
                                     @if ($coupon->isPercentage())
                                         {{ $coupon->name() }} ({{ $coupon->percentOff() }}% Off)
                                     @else
@@ -255,7 +259,7 @@
                     @unless ($invoice->isNotTaxExempt())
                         <tr>
                             <td></td>
-                            <td colspan="{{ $invoice->hasTax() ? 2 : 1 }}" align="right">
+                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" align="right">
                                 @if ($invoice->isTaxExempt())
                                     Tax is exempted
                                 @else
@@ -268,7 +272,7 @@
                         @foreach ($invoice->taxes() as $tax)
                             <tr>
                                 <td></td>
-                                <td colspan="2">
+                                <td colspan="3">
                                     {{ $tax->display_name }} {{ $tax->jurisdiction ? ' - '.$tax->jurisdiction : '' }}
                                     ({{ $tax->percentage }}%{{ $tax->isInclusive() ? ' incl.' : '' }})
                                 </td>
@@ -280,7 +284,7 @@
                     <!-- Display The Final Total -->
                     <tr>
                         <td></td>
-                        <td colspan="{{ $invoice->hasTax() ? 2 : 1 }}">
+                        <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}">
                             Total
                         </td>
                         <td align="right">
@@ -292,7 +296,7 @@
                     @if ($invoice->rawAppliedBalance() > 0)
                         <tr>
                             <td></td>
-                            <td colspan="{{ $invoice->hasTax() ? 2 : 1 }}">
+                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}">
                                 Applied balance
                             </td>
                             <td align="right">{{ $invoice->appliedBalance() }}</td>
@@ -302,7 +306,7 @@
                     <!-- Display The Amount Due -->
                     <tr>
                         <td></td>
-                        <td colspan="{{ $invoice->hasTax() ? 2 : 1 }}">
+                        <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}">
                             <strong>Amount due</strong>
                         </td>
                         <td align="right">

@@ -50,6 +50,16 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Get the unit amount excluding tax for the invoice line item.
+     *
+     * @return string
+     */
+    public function unitAmountExcludingTax()
+    {
+        return $this->formatAmount($this->item->unit_amount_excluding_tax);
+    }
+
+    /**
      * Determine if the line item has both inclusive and exclusive tax.
      *
      * @return bool
