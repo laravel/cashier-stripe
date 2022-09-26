@@ -199,8 +199,27 @@ class InvoiceTest extends TestCase
 
         $invoice = new Invoice($user, $stripeInvoice);
 
+        $this->assertTrue($invoice->hasAppliedBalance());
         $this->assertEquals('-$1.50', $invoice->appliedBalance());
         $this->assertEquals(-150, $invoice->rawAppliedBalance());
+    }
+
+    public function test_it_can_return_its_applied_balance_when_depleted()
+    {
+        $stripeInvoice = new StripeInvoice();
+        $stripeInvoice->customer = 'foo';
+        $stripeInvoice->ending_balance = 0;
+        $stripeInvoice->starting_balance = -500;
+        $stripeInvoice->currency = 'USD';
+
+        $user = new User();
+        $user->stripe_id = 'foo';
+
+        $invoice = new Invoice($user, $stripeInvoice);
+
+        $this->assertTrue($invoice->hasAppliedBalance());
+        $this->assertEquals('-$5.00', $invoice->appliedBalance());
+        $this->assertEquals(-500, $invoice->rawAppliedBalance());
     }
 
     public function test_it_can_determine_if_it_has_a_discount_applied()
