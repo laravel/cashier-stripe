@@ -31,7 +31,6 @@
             font-weight: bold;
             padding: 8px;
             line-height: 14px;
-            text-align: left;
             border-bottom: 1px solid #ddd;
         }
 
@@ -42,7 +41,6 @@
         .table td {
             padding: 8px;
             line-height: 14px;
-            text-align: left;
             vertical-align: top;
         }
     </style>
@@ -50,25 +48,42 @@
 <body>
 
 <div class="container">
-    <table style="margin-left: auto; margin-right: auto;" width="550">
-        <tr>
+    <table style="margin-left: auto; margin-right: auto;" width="100%">
+        <tr valign="top">
             <td width="160">
-                &nbsp;
+                <span style="font-size: 28px;">
+                    Receipt
+                </span>
+
+                <!-- Invoice Info -->
+                <p>
+                    @isset ($product)
+                        <strong>Product:</strong> {{ $product }}<br>
+                    @endisset
+
+                    <strong>Date:</strong> {{ $invoice->date()->toFormattedDateString() }}<br>
+
+                    @if ($dueDate = $invoice->dueDate())
+                        <strong>Due date:</strong> {{ $dueDate->toFormattedDateString() }}<br>
+                    @endif
+
+                    @if ($invoiceId = $id ?? $invoice->number)
+                        <strong>Invoice Number:</strong> {{ $invoiceId }}<br>
+                    @endif
+                </p>
             </td>
 
             <!-- Account Name / Header Image -->
             <td align="right">
-                <strong>{{ $header ?? $vendor ?? $invoice->account_name }}</strong>
+                <span style="font-size: 28px; color: #ccc;">
+                    <strong>{{ $header ?? $vendor ?? $invoice->account_name }}</strong>
+                </span>
             </td>
         </tr>
         <tr valign="top">
-            <td style="font-size:9px;">
-                <span style="font-size: 28px; color: #ccc;">
-                    Receipt
-                </span><br><br>
-
+            <td width="50%">
                 <!-- Account Details -->
-                {{ $vendor ?? $invoice->account_name }}<br>
+                <strong>{{ $vendor ?? $invoice->account_name }}</strong><br>
 
                 @isset($street)
                     {{ $street }}<br>
@@ -97,11 +112,10 @@
                         {{ $taxId->value }}<br>
                     @endforeach
                 @endisset
-
-                <br><br>
-
+            </td>
+            <td width="50%">
                 <!-- Customer Details -->
-                <strong>Bill to:</strong><br>
+                <strong>Recipient</strong><br>
 
                 {{ $invoice->customer_name ?? $invoice->customer_email }}<br>
 
@@ -139,22 +153,9 @@
                     {{ $taxId->value }}<br>
                 @endforeach
             </td>
-            <td>
-                <!-- Invoice Info -->
-                <p>
-                    @isset ($product)
-                        <strong>Product:</strong> {{ $product }}<br>
-                    @endisset
-
-                    <strong>Date:</strong> {{ $invoice->date()->toFormattedDateString() }}<br>
-
-                    @if ($dueDate = $invoice->dueDate())
-                        <strong>Due date:</strong> {{ $dueDate->toFormattedDateString() }}<br>
-                    @endif
-
-                    <strong>Invoice Number:</strong> {{ $id ?? $invoice->number }}<br>
-                </p>
-
+        </tr>
+        <tr valign="top">
+            <td colspan="2">
                 <!-- Memo / Description -->
                 @if ($invoice->description)
                     <p>
@@ -168,14 +169,15 @@
                         {{ $vat }}
                     </p>
                 @endif
-
-                <br><br>
-
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
                 <!-- Invoice Table -->
                 <table width="100%" class="table" border="0">
                     <tr>
                         <th align="left">Description</th>
-                        <th align="right">Date</th>
+                        <th align="left">Date</th>
 
                         @if ($invoice->hasTax())
                             <th align="right">Tax</th>
@@ -201,7 +203,7 @@
                             @endif
 
                             @if ($invoice->hasTax())
-                                <td>
+                                <td align="right">
                                     @if ($inclusiveTaxPercentage = $item->inclusiveTaxPercentage())
                                         {{ $inclusiveTaxPercentage }}% incl.
                                     @endif
@@ -216,15 +218,16 @@
                                 </td>
                             @endif
 
-                            <td>{{ $item->total() }}</td>
+                            <td align="right">{{ $item->total() }}</td>
                         </tr>
                     @endforeach
 
                     <!-- Display The Subtotal -->
                     @if ($invoice->hasDiscount() || $invoice->hasTax() || $invoice->hasStartingBalance())
                         <tr>
-                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">Subtotal</td>
-                            <td>{{ $invoice->subtotal() }}</td>
+                            <td></td>
+                            <td colspan="{{ $invoice->hasTax() ? 2 : 1 }}">Subtotal</td>
+                            <td align="right">{{ $invoice->subtotal() }}</td>
                         </tr>
                     @endif
 
@@ -234,7 +237,8 @@
                             @php($coupon = $discount->coupon())
 
                             <tr>
-                                <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
+                                <td></td>
+                                <td colspan="{{ $invoice->hasTax() ? 2 : 1 }}" align="right">
                                     @if ($coupon->isPercentage())
                                         {{ $coupon->name() }} ({{ $coupon->percentOff() }}% Off)
                                     @else
@@ -242,7 +246,7 @@
                                     @endif
                                 </td>
 
-                                <td>-{{ $invoice->discountFor($discount) }}</td>
+                                <td align="right">-{{ $invoice->discountFor($discount) }}</td>
                             </tr>
                         @endforeach
                     @endif
@@ -250,33 +254,36 @@
                     <!-- Display The Taxes -->
                     @unless ($invoice->isNotTaxExempt())
                         <tr>
-                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
+                            <td></td>
+                            <td colspan="{{ $invoice->hasTax() ? 2 : 1 }}" align="right">
                                 @if ($invoice->isTaxExempt())
                                     Tax is exempted
                                 @else
                                     Tax to be paid on reverse charge basis
                                 @endif
                             </td>
-                            <td></td>
+                            <td align="right"></td>
                         </tr>
                     @else
                         @foreach ($invoice->taxes() as $tax)
                             <tr>
-                                <td colspan="3" style="text-align: right;">
+                                <td></td>
+                                <td colspan="2">
                                     {{ $tax->display_name }} {{ $tax->jurisdiction ? ' - '.$tax->jurisdiction : '' }}
                                     ({{ $tax->percentage }}%{{ $tax->isInclusive() ? ' incl.' : '' }})
                                 </td>
-                                <td>{{ $tax->amount() }}</td>
+                                <td align="right">{{ $tax->amount() }}</td>
                             </tr>
                         @endforeach
                     @endunless
 
                     <!-- Display The Final Total -->
                     <tr>
-                        <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
+                        <td></td>
+                        <td colspan="{{ $invoice->hasTax() ? 2 : 1 }}">
                             Total
                         </td>
-                        <td>
+                        <td align="right">
                             {{ $invoice->realTotal() }}
                         </td>
                     </tr>
@@ -284,19 +291,21 @@
                     <!-- Applied Balance -->
                     @if ($invoice->rawAppliedBalance() > 0)
                         <tr>
-                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
+                            <td></td>
+                            <td colspan="{{ $invoice->hasTax() ? 2 : 1 }}">
                                 Applied balance
                             </td>
-                            <td>{{ $invoice->appliedBalance() }}</td>
+                            <td align="right">{{ $invoice->appliedBalance() }}</td>
                         </tr>
                     @endif
 
                     <!-- Display The Amount Due -->
                     <tr>
-                        <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" style="text-align: right;">
+                        <td></td>
+                        <td colspan="{{ $invoice->hasTax() ? 2 : 1 }}">
                             <strong>Amount due</strong>
                         </td>
-                        <td>
+                        <td align="right">
                             <strong>{{ $invoice->amountDue() }}</strong>
                         </td>
                     </tr>
