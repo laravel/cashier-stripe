@@ -1,6 +1,23 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.1.1...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.2.0...14.x)
+
+## [v14.2.0](https://github.com/laravel/cashier/compare/v14.1.1...v14.2.0) - 2022-09-27
+
+### Added
+
+- Fresh receipt template by @driesvints in https://github.com/laravel/cashier-stripe/pull/1446
+- Allow guest checkout by @alexgaal & @driesvints in https://github.com/laravel/cashier-stripe/pull/1438 & https://github.com/laravel/cashier-stripe/pull/1439
+
+### Changed
+
+- Configurable Webhook Enabled Events by @yob-yob in https://github.com/laravel/cashier-stripe/pull/1435
+- Add generic trial scopes by @lioneaglesolutions in https://github.com/laravel/cashier-stripe/pull/1436
+- Add days until due to sends invoice by @driesvints in https://github.com/laravel/cashier-stripe/pull/1437
+
+### Fixed
+
+- Fix applied balance on invoices by @driesvints in https://github.com/laravel/cashier-stripe/pull/1445
 
 ## [v14.1.1](https://github.com/laravel/cashier/compare/v14.1.0...v14.1.1) - 2022-09-06
 
