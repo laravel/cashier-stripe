@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.2.0...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.2.1...14.x)
+
+## [v14.2.1](https://github.com/laravel/cashier/compare/v14.2.0...v14.2.1) - 2022-09-27
+
+### Fixed
+
+- Add fallback for null value in unitAmountExcludingTax method by @jayan-blutui in https://github.com/laravel/cashier-stripe/pull/1447
 
 ## [v14.2.0](https://github.com/laravel/cashier/compare/v14.1.1...v14.2.0) - 2022-09-27
 
