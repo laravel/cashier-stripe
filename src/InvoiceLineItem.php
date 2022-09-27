@@ -56,7 +56,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      */
     public function unitAmountExcludingTax()
     {
-        return $this->formatAmount($this->item->unit_amount_excluding_tax);
+        return $this->formatAmount($this->item->unit_amount_excluding_tax ?? 0);
     }
 
     /**
