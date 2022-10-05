@@ -569,7 +569,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
             'total_tax_amounts.tax_rate',
         ];
 
-        if ($this->invoice->id) {
+        if (property_exists($this->invoice, 'id') && $this->invoice->id) {
             $this->invoice = $this->owner->stripe()->invoices->retrieve($this->invoice->id, [
                 'expand' => $expand,
             ]);
