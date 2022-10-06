@@ -153,7 +153,7 @@ trait PerformsCharges
     public function checkoutCharge($amount, $name, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
     {
         if ($this->isAutomaticTaxEnabled()) {
-            throw new LogicException('For now, you cannot use checkout charges in combination automatic tax calculation.');
+            throw new LogicException('For now, you cannot use checkout charges in combination with automatic tax calculation.');
         }
 
         return $this->checkout([[
