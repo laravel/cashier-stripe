@@ -2,7 +2,7 @@
 
 ## Upgrading To 14.0 From 13.x
 
-When upgrading to a new major version, it's always a good idea to make sure your published config file is up to date with [the latest version](/config/cashier.php).
+When upgrading to a new major version, it's always a good idea to make sure your published configuration file is up to date with [the latest version of the configuration file in Cashier itself](/config/cashier.php).
 
 ### Minimum Versions
 
