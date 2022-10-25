@@ -57,15 +57,16 @@ trait ManagesInvoices
      * @param  int  $amount
      * @param  array  $tabOptions
      * @param  array  $invoiceOptions
+     * @param  array  $payOptions
      * @return \Laravel\Cashier\Invoice
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
-    public function invoiceFor($description, $amount, array $tabOptions = [], array $invoiceOptions = [])
+    public function invoiceFor($description, $amount, array $tabOptions = [], array $invoiceOptions = [], array $payOptions = [])
     {
         $this->tab($description, $amount, $tabOptions);
 
-        return $this->invoice($invoiceOptions);
+        return $this->invoice($invoiceOptions, $payOptions);
     }
 
     /**
@@ -96,33 +97,35 @@ trait ManagesInvoices
      * @param  int  $quantity
      * @param  array  $tabOptions
      * @param  array  $invoiceOptions
+     * @param  array  $payOptions
      * @return \Laravel\Cashier\Invoice
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
-    public function invoicePrice($price, $quantity = 1, array $tabOptions = [], array $invoiceOptions = [])
+    public function invoicePrice($price, $quantity = 1, array $tabOptions = [], array $invoiceOptions = [], array $payOptions = [])
     {
         $this->tabPrice($price, $quantity, $tabOptions);
 
-        return $this->invoice($invoiceOptions);
+        return $this->invoice($invoiceOptions, $payOptions);
     }
 
     /**
      * Invoice the customer outside of the regular billing cycle.
      *
      * @param  array  $options
+     * @param  array  $payOptions
      * @return \Laravel\Cashier\Invoice
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
-    public function invoice(array $options = [])
+    public function invoice(array $options = [], array $payOptions = [])
     {
         try {
             $invoice = $this->createInvoice(array_merge([
                 'pending_invoice_items_behavior' => 'include',
             ], $options));
 
-            return $invoice->chargesAutomatically() ? $invoice->pay() : $invoice->send();
+            return $invoice->chargesAutomatically() ? $invoice->pay($payOptions) : $invoice->send();
         } catch (StripeCardException) {
             $payment = new Payment(
                 $this->stripe()->paymentIntents->retrieve(
