@@ -2,6 +2,8 @@
 
 ## Upgrading To 14.0 From 13.x
 
+When upgrading to a new major version, it's always a good idea to make sure your published config file is up to date with [the latest version](/config/cashier.php).
+
 ### Minimum Versions
 
 The following required dependency versions have been updated:
