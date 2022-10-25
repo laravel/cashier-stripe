@@ -1,6 +1,14 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.2.1...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.2.2...14.x)
+
+## [v14.2.2](https://github.com/laravel/cashier/compare/v14.2.1...v14.2.2) - 2022-10-25
+
+### Fixed
+
+- Fix undefined property id notice by @Lyrisbee in https://github.com/laravel/cashier-stripe/pull/1448
+- fix minor typo by @owainjones74 in https://github.com/laravel/cashier-stripe/pull/1450
+- Fix StripeObject values problem by @Lyrisbee in https://github.com/laravel/cashier-stripe/pull/1449
 
 ## [v14.2.1](https://github.com/laravel/cashier/compare/v14.2.0...v14.2.1) - 2022-09-27
 
