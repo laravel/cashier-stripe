@@ -16,6 +16,13 @@ use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
 trait ManagesCustomer
 {
     /**
+     * The cached Stripe customer object.
+     *
+     * @var \Stripe\Customer|null
+     */
+    protected $stripeCustomer;
+
+    /**
      * Retrieve the Stripe customer ID.
      *
      * @return string|null
@@ -88,7 +95,7 @@ trait ManagesCustomer
 
         $this->save();
 
-        return $customer;
+        return $this->stripeCustomer = $customer;
     }
 
     /**
@@ -99,7 +106,7 @@ trait ManagesCustomer
      */
     public function updateStripeCustomer(array $options = [])
     {
-        return $this->stripe()->customers->update(
+        return $this->stripeCustomer = $this->stripe()->customers->update(
             $this->stripe_id, $options
         );
     }
@@ -129,7 +136,11 @@ trait ManagesCustomer
     {
         $this->assertCustomerExists();
 
-        return $this->stripe()->customers->retrieve(
+        if ($this->stripeCustomer && empty($expand)) {
+            return $this->stripeCustomer;
+        }
+
+        return $this->stripeCustomer = $this->stripe()->customers->retrieve(
             $this->stripe_id, ['expand' => $expand]
         );
     }
