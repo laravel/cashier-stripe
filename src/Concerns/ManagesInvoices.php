@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Concerns;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
 use Laravel\Cashier\Invoice;
@@ -118,11 +119,22 @@ trait ManagesInvoices
     public function invoice(array $options = [])
     {
         try {
+            $payOptions = Arr::only($options, $payOptionKeys = [
+                'forgive',
+                'mandate',
+                'off_session',
+                'paid_out_of_band',
+                'payment_method',
+                'source',
+            ]);
+
+            Arr::forget($options, $payOptionKeys);
+
             $invoice = $this->createInvoice(array_merge([
                 'pending_invoice_items_behavior' => 'include',
             ], $options));
 
-            return $invoice->chargesAutomatically() ? $invoice->pay() : $invoice->send();
+            return $invoice->chargesAutomatically() ? $invoice->pay($payOptions) : $invoice->send();
         } catch (StripeCardException) {
             $payment = new Payment(
                 $this->stripe()->paymentIntents->retrieve(
