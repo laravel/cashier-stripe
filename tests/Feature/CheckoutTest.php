@@ -129,4 +129,22 @@ class CheckoutTest extends FeatureTestCase
         $this->assertNull($checkout->allow_promotion_codes);
         $this->assertSame(1210, $checkout->amount_total);
     }
+
+    public function test_guest_customers_can_start_a_checkout_session()
+    {
+        $shirtPrice = self::stripe()->prices->create([
+            'currency' => 'USD',
+            'product_data' => [
+                'name' => 'T-shirt',
+            ],
+            'unit_amount' => 1500,
+        ]);
+
+        $checkout = Checkout::guest()->create($shirtPrice->id, [
+            'success_url' => 'http://example.com',
+            'cancel_url' => 'http://example.com',
+        ]);
+
+        $this->assertInstanceOf(Checkout::class, $checkout);
+    }
 }

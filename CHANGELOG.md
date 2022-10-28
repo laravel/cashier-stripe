@@ -1,16 +1,56 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.0.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.2.2...master)
+
+## [v14.2.2](https://github.com/laravel/cashier/compare/v14.2.1...v14.2.2) - 2022-10-25
+
+### Fixed
+
+- Fix undefined property id notice by @Lyrisbee in https://github.com/laravel/cashier-stripe/pull/1448
+- fix minor typo by @owainjones74 in https://github.com/laravel/cashier-stripe/pull/1450
+- Fix StripeObject values problem by @Lyrisbee in https://github.com/laravel/cashier-stripe/pull/1449
+
+## [v14.2.1](https://github.com/laravel/cashier/compare/v14.2.0...v14.2.1) - 2022-09-27
+
+### Fixed
+
+- Add fallback for null value in unitAmountExcludingTax method by @jayan-blutui in https://github.com/laravel/cashier-stripe/pull/1447
+
+## [v14.2.0](https://github.com/laravel/cashier/compare/v14.1.1...v14.2.0) - 2022-09-27
+
+### Added
+
+- Fresh receipt template by @driesvints in https://github.com/laravel/cashier-stripe/pull/1446
+- Allow guest checkout by @alexgaal & @driesvints in https://github.com/laravel/cashier-stripe/pull/1438 & https://github.com/laravel/cashier-stripe/pull/1439
 
 ### Changed
 
-- Cascade Stripe exceptions when invoicing ([#1210](https://github.com/laravel/cashier-stripe/pull/1210))
+- Configurable Webhook Enabled Events by @yob-yob in https://github.com/laravel/cashier-stripe/pull/1435
+- Add generic trial scopes by @lioneaglesolutions in https://github.com/laravel/cashier-stripe/pull/1436
+- Add days until due to sends invoice by @driesvints in https://github.com/laravel/cashier-stripe/pull/1437
 
-### Removed
+### Fixed
 
-- Drop PHP 7.3 support ([#1186](https://github.com/laravel/cashier-stripe/pull/1186))
+- Fix applied balance on invoices by @driesvints in https://github.com/laravel/cashier-stripe/pull/1445
 
-## [v14.0.0](https://github.com/laravel/cashier/compare/v13.15.1...v14.0.0) - 2022-08-23
+## [v14.1.1](https://github.com/laravel/cashier/compare/v14.1.0...v14.1.1) - 2022-09-06
+
+### Fixed
+
+- Fix subscription invoicing bug by @driesvints in https://github.com/laravel/cashier-stripe/pull/1434
+
+## [v14.1.0](https://github.com/laravel/cashier/compare/v14.0.0...v14.1.0) - 2022-08-30
+
+### Changed
+
+- Add invoice.payment_succeeded event to WebhookCommand by @driesvints in https://github.com/laravel/cashier-stripe/pull/1428
+
+### Fixed
+
+- Fix applied balance on receipts by @driesvints in https://github.com/laravel/cashier-stripe/pull/1429
+- Renders the invoice item dates on invoices when set by @nicko170 in https://github.com/laravel/cashier-stripe/pull/1432
+
+## [v14.0.0](https://github.com/laravel/cashier/compare/v13.16.0...v14.0.0) - 2022-08-23
 
 ### Added
 
@@ -34,6 +74,20 @@
 - Drop PHP 7.4 and Laravel v8 support by @driesvints in https://github.com/laravel/cashier-stripe/pull/1353
 - Remove deprecated functionality by @driesvints in https://github.com/laravel/cashier-stripe/pull/1418
 - Drop MoneyPHP 3.x by @driesvints in https://github.com/laravel/cashier-stripe/pull/1416
+
+## [v13.16.0](https://github.com/laravel/cashier-stripe/compare/v13.15.1...v13.16.0) - 2022-08-30
+
+### Added
+
+- Add new balance transaction methods by @driesvints in https://github.com/laravel/cashier-stripe/pull/1423
+
+### Changed
+
+- Add invoice.payment_succeeded event to WebhookCommand by @driesvints in https://github.com/laravel/cashier-stripe/pull/1428
+
+### Fixed
+
+- Fix applied balance on receipts by @driesvints in https://github.com/laravel/cashier-stripe/pull/1429
 
 ## [v13.15.1](https://github.com/laravel/cashier-stripe/compare/v13.15.0...v13.15.1) - 2022-08-16
 

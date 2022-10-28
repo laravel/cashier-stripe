@@ -11,21 +11,21 @@ trait HandlesTaxes
      *
      * @var string|null
      */
-    protected $customerIpAddress;
+    public $customerIpAddress;
 
     /**
      * The pre-collected billing address used to estimate tax rates when performing "one-off" charges.
      *
      * @var array
      */
-    protected $estimationBillingAddress = [];
+    public $estimationBillingAddress = [];
 
     /**
      * Indicates if Tax IDs should be collected during a Stripe Checkout session.
      *
      * @var bool
      */
-    protected $collectTaxIds = false;
+    public $collectTaxIds = false;
 
     /**
      * Set the The IP address of the customer used to determine the tax location.

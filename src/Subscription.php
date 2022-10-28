@@ -50,19 +50,9 @@ class Subscription extends Model
      * @var array
      */
     protected $casts = [
+        'ends_at' => 'datetime',
         'quantity' => 'integer',
-    ];
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = [
-        'created_at',
-        'ends_at',
-        'trial_ends_at',
-        'updated_at',
+        'trial_ends_at' => 'datetime',
     ];
 
     /**

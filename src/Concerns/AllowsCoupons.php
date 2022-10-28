@@ -9,21 +9,21 @@ trait AllowsCoupons
      *
      * @var string|null
      */
-    protected $couponId;
+    public $couponId;
 
     /**
      * The promotion code ID being applied.
      *
      * @var string|null
      */
-    protected $promotionCodeId;
+    public $promotionCodeId;
 
     /**
      * Determines if user redeemable promotion codes are available in Stripe Checkout.
      *
      * @var bool
      */
-    protected $allowPromotionCodes = false;
+    public $allowPromotionCodes = false;
 
     /**
      * The coupon ID to be applied.

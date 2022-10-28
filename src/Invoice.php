@@ -247,6 +247,16 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Determine if the invoice has balance applied.
+     *
+     * @return bool
+     */
+    public function hasAppliedBalance()
+    {
+        return $this->rawAppliedBalance() < 0;
+    }
+
+    /**
      * Get the applied balance for the invoice.
      *
      * @return string
@@ -257,16 +267,12 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get the raw ending balance for the invoice.
+     * Get the raw applied balance for the invoice.
      *
      * @return int
      */
     public function rawAppliedBalance()
     {
-        if (! $this->hasEndingBalance()) {
-            return 0;
-        }
-
         return $this->rawStartingBalance() - $this->rawEndingBalance();
     }
 
@@ -563,7 +569,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
             'total_tax_amounts.tax_rate',
         ];
 
-        if ($this->invoice->id) {
+        if (isset($this->invoice->id) && $this->invoice->id) {
             $this->invoice = $this->owner->stripe()->invoices->retrieve($this->invoice->id, [
                 'expand' => $expand,
             ]);

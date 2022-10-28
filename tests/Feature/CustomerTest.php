@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Tests\Feature;
 
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Laravel\Cashier\CustomerBalanceTransaction;
 use Stripe\TaxId as StripeTaxId;
@@ -49,7 +50,7 @@ class CustomerTest extends FeatureTestCase
 
         $url = $user->billingPortalUrl('https://example.com');
 
-        $this->assertStringStartsWith('https://billing.stripe.com/session/', $url);
+        $this->assertStringStartsWith('https://billing.stripe.com/', $url);
     }
 
     public function test_customers_can_be_redirected_to_their_billing_portal()
@@ -60,7 +61,7 @@ class CustomerTest extends FeatureTestCase
         $response = $user->redirectToBillingPortal('https://example.com');
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertStringStartsWith('https://billing.stripe.com/session/', $response->getTargetUrl());
+        $this->assertStringStartsWith('https://billing.stripe.com/', $response->getTargetUrl());
     }
 
     public function test_customers_can_manage_tax_ids()
@@ -114,5 +115,21 @@ class CustomerTest extends FeatureTestCase
         $this->assertSame('-$2.00', $transaction->amount());
         $this->assertSame(300, $transaction->rawEndingBalance());
         $this->assertSame(300, $user->rawBalance());
+    }
+
+    public function test_on_generic_trial_scopes()
+    {
+        $user = $this->createCustomer('on_generic_trial', ['trial_ends_at' => Carbon::tomorrow()]);
+
+        $this->assertTrue($user->query()->onGenericTrial()->exists());
+        $this->assertFalse($user->query()->hasExpiredGenericTrial()->exists());
+    }
+
+    public function test_expired_generic_trial_scopes()
+    {
+        $user = $this->createCustomer('on_generic_trial', ['trial_ends_at' => Carbon::yesterday()]);
+
+        $this->assertFalse($user->query()->onGenericTrial()->exists());
+        $this->assertTrue($user->query()->hasExpiredGenericTrial()->exists());
     }
 }
