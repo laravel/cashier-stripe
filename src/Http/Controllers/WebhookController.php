@@ -203,7 +203,7 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle a canceled customer from a Stripe subscription.
+     * Handle the cancellation of a customer subscription.
      *
      * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
@@ -214,7 +214,7 @@ class WebhookController extends Controller
             $user->subscriptions->filter(function ($subscription) use ($payload) {
                 return $subscription->stripe_id === $payload['data']['object']['id'];
             })->each(function ($subscription) {
-                $subscription->markAsCanceled();
+                $subscription->skipTrial()->markAsCanceled();
             });
         }
 
