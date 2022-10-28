@@ -203,7 +203,7 @@ class WebhookController extends Controller
     }
 
     /**
-     * Handle customer subscription canceled.
+     * Handle the cancellation of a customer subscription.
      *
      * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
