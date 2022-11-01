@@ -1,6 +1,17 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.2.2...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.3.0...14.x)
+
+## [v14.3.0](https://github.com/laravel/cashier/compare/v14.2.2...v14.3.0) - 2022-11-01
+
+### Added
+
+- Allow incomplete subscriptions as active by @driesvints in https://github.com/laravel/cashier-stripe/pull/1466
+
+### Changed
+
+- Refactor dates property by @driesvints in https://github.com/laravel/cashier-stripe/pull/1462
+- Pass pay options to pay method by @driesvints in https://github.com/laravel/cashier-stripe/pull/1464
 
 ## [v14.2.2](https://github.com/laravel/cashier/compare/v14.2.1...v14.2.2) - 2022-10-25
 
