@@ -22,9 +22,9 @@ class SubscriptionFactory extends Factory
     /**
      * Define the model's default state.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
         $model = Cashier::$customerModel;
 
@@ -43,10 +43,9 @@ class SubscriptionFactory extends Factory
     /**
      * Add a price identifier to the model.
      *
-     * @param  \Stripe\Price|string  $price
      * @return $this
      */
-    public function withPrice($price)
+    public function withPrice(StripePrice|string $price): static
     {
         return $this->state([
             'stripe_price' => $price instanceof StripePrice ? $price->id : $price,
@@ -58,7 +57,7 @@ class SubscriptionFactory extends Factory
      *
      * @return $this
      */
-    public function active()
+    public function active(): static
     {
         return $this->state([
             'stripe_status' => StripeSubscription::STATUS_ACTIVE,
@@ -68,10 +67,9 @@ class SubscriptionFactory extends Factory
     /**
      * Mark the subscription as being within a trial period.
      *
-     * @param  \DateTimeInterface  $trialEndsAt
      * @return $this
      */
-    public function trialing(DateTimeInterface $trialEndsAt = null)
+    public function trialing(DateTimeInterface $trialEndsAt = null): static
     {
         return $this->state([
             'stripe_status' => StripeSubscription::STATUS_TRIALING,
@@ -84,7 +82,7 @@ class SubscriptionFactory extends Factory
      *
      * @return $this
      */
-    public function canceled()
+    public function canceled(): static
     {
         return $this->state([
             'stripe_status' => StripeSubscription::STATUS_CANCELED,
@@ -97,7 +95,7 @@ class SubscriptionFactory extends Factory
      *
      * @return $this
      */
-    public function incomplete()
+    public function incomplete(): static
     {
         return $this->state([
             'stripe_status' => StripeSubscription::STATUS_INCOMPLETE,
@@ -109,7 +107,7 @@ class SubscriptionFactory extends Factory
      *
      * @return $this
      */
-    public function incompleteAndExpired()
+    public function incompleteAndExpired(): static
     {
         return $this->state([
             'stripe_status' => StripeSubscription::STATUS_INCOMPLETE_EXPIRED,
@@ -121,7 +119,7 @@ class SubscriptionFactory extends Factory
      *
      * @return $this
      */
-    public function pastDue()
+    public function pastDue(): static
     {
         return $this->state([
             'stripe_status' => StripeSubscription::STATUS_PAST_DUE,
@@ -133,7 +131,7 @@ class SubscriptionFactory extends Factory
      *
      * @return $this
      */
-    public function unpaid()
+    public function unpaid(): static
     {
         return $this->state([
             'stripe_status' => StripeSubscription::STATUS_UNPAID,
