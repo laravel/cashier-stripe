@@ -32,7 +32,7 @@ trait ManagesCustomer
      */
     public function hasStripeId()
     {
-        return ! is_null($this->stripe_id);
+        return ! empty($this->stripe_id);
     }
 
     /**
