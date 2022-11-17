@@ -136,11 +136,11 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
             })
             ->sum(function (object $taxAmount) {
                 $taxRate = $taxAmount->tax_rate;
-                
+
                 if (is_string($taxRate)) {
                     $taxRate = Cashier::stripe()->taxRates->retrieve($taxRate);
                 }
-                
+
                 return $taxRate->percentage;
             });
     }
