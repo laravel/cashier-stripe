@@ -6,7 +6,7 @@
 
 PR: https://github.com/laravel/cashier-stripe/pull/1478
 
-The default Stripe API version for Cashier 14.4 is `2022-11-15`. If this is the latest Stripe API version at the time that you're upgrading to this Cashier version then it's also recommended that you upgrade your own Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
+The default Stripe API version for Cashier 14.4 is `2022-11-15`. If this is the latest Stripe API version when you upgrade to this Cashier version, then we recommend you also upgrade your Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
 
 If you use the Stripe PHP SDK directly, make sure to properly test your integration after updating.
 
@@ -18,7 +18,7 @@ You should ensure your webhook operates on the same API version as Cashier. To d
 php artisan cashier:webhook --disabled
 ```
 
-This will create a new webhook with the same Stripe API version as Cashier [in your Stripe dashboard](https://dashboard.stripe.com/webhooks). The webhook will be immediately disabled so it doesn't interfere with your existing production application until you are ready to enable it. By default, the webhook will be created using the `APP_URL` environment variable to determine the proper URL for your application. If you need to use a different URL, you can use the `--url` flag when invoking the command:
+This will create a new webhook [in your Stripe dashboard](https://dashboard.stripe.com/webhooks) with the same Stripe API version as Cashier. The webhook will be immediately disabled so it doesn't interfere with your existing production application until you are ready to enable it. By default, the webhook will be created using the `APP_URL` environment variable to determine the proper URL for your application. If you need to use a different URL, you can use the `--url` flag when invoking the command:
 
 ```bash
 php artisan cashier:webhook --disabled --url "http://example.com/stripe/webhook"
