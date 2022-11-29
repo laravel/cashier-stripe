@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.3.1...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.4.0...14.x)
+
+## [v14.4.0](https://github.com/laravel/cashier/compare/v14.3.1...v14.4.0) - 2022-11-29
+
+### Changed
+
+- Update Stripe API version and Stripe PHP SDK v10 support by @driesvints in https://github.com/laravel/cashier-stripe/pull/1478
 
 ## [v14.3.1](https://github.com/laravel/cashier/compare/v14.3.0...v14.3.1) - 2022-11-15
 
