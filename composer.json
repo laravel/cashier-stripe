@@ -26,6 +26,7 @@
         "illuminate/http": "^9.21",
         "illuminate/log": "^9.21",
         "illuminate/notifications": "^9.21",
+        "illuminate/pagination": "^9.21",
         "illuminate/routing": "^9.21",
         "illuminate/support": "^9.21",
         "illuminate/view": "^9.21",
