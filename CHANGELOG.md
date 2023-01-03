@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.4.0...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.6.0...14.x)
+
+## [v14.6.0](https://github.com/laravel/cashier/compare/v14.4.0...v14.6.0) - 2023-01-03
+
+### Changed
+
+- Adds types to database migrations and factories by @nunomaduro in https://github.com/laravel/cashier-stripe/pull/1472
 
 ## [v14.4.0](https://github.com/laravel/cashier/compare/v14.3.1...v14.4.0) - 2022-11-29
 
