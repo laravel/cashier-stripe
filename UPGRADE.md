@@ -1,5 +1,40 @@
 # Upgrade Guide
 
+## Upgrading To 14.4 From 14.3
+
+### Stripe API Version
+
+PR: https://github.com/laravel/cashier-stripe/pull/1478
+
+The default Stripe API version for Cashier 14.4 is `2022-11-15`. If this is the latest Stripe API version when you upgrade to this Cashier version, then we recommend you also upgrade your Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
+
+If you use the Stripe PHP SDK directly, make sure to properly test your integration after updating.
+
+#### Upgrading Your Webhook
+
+You should ensure your webhook operates on the same API version as Cashier. To do so, you may use the `cashier:webhook` command from your production environment to create a new webhook that matches Cashier's Stripe API version:
+
+```bash
+php artisan cashier:webhook --disabled
+```
+
+This will create a new webhook [in your Stripe dashboard](https://dashboard.stripe.com/webhooks) with the same Stripe API version as Cashier. The webhook will be immediately disabled so it doesn't interfere with your existing production application until you are ready to enable it. By default, the webhook will be created using the `APP_URL` environment variable to determine the proper URL for your application. If you need to use a different URL, you can use the `--url` flag when invoking the command:
+
+```bash
+php artisan cashier:webhook --disabled --url "http://example.com/stripe/webhook"
+```
+
+You may use the following upgrade checklist to properly enable the new webhook:
+
+1. If you have webhook signature verification enabled, disable it on production by temporarily removing the `STRIPE_WEBHOOK_SECRET` environment variable.
+2. Add any extra Stripe events your application requires to the new webhook in your Stripe dashboard.
+3. Disable the old webhook in your Stripe dashboard.
+4. Enable the new webhook in your Stripe dashboard.
+5. Re-enable the new webhook secret by re-adding the `STRIPE_WEBHOOK_SECRET` environment variable in production with the secret from the new webhook.
+6. Remove the old webhook in your Stripe dashboard.
+
+After following this process, your new webhook will be active and ready to receive events.
+
 ## Upgrading To 14.0 From 13.x
 
 When upgrading to a new major version, it's always a good idea to make sure your published configuration file is up to date with [the latest version of the configuration file in Cashier itself](/config/cashier.php).
@@ -18,7 +53,7 @@ PR: https://github.com/laravel/cashier-stripe/pull/1417
 
 The default Stripe API version for Cashier 14.x is `2022-08-01`. If this is the latest Stripe API version at the time that you're upgrading to this Cashier version then it's also recommended that you upgrade your own Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
 
-If you use the Stripe SDK directly, make sure to properly test your integration after updating.
+If you use the Stripe PHP SDK directly, make sure to properly test your integration after updating.
 
 #### Upgrading Your Webhook
 
@@ -139,7 +174,7 @@ The following required dependency versions have been updated:
 
 - The minimum PHP version is now v7.3
 - The minimum Laravel version is now v8.0
-- The minimum Stripe SDK version is now v7.39
+- The minimum Stripe PHP SDK version is now v7.39
 
 ### Stripe API Version
 
@@ -147,7 +182,7 @@ PR: https://github.com/laravel/cashier-stripe/pull/1001
 
 The default Stripe API version for Cashier 13.x will be `2020-08-27`. If this is the latest Stripe API version at the time that you're upgrading to this Cashier version then it's also recommended that you upgrade your own Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
 
-If you use the Stripe SDK directly, make sure to properly test your integration after updating.
+If you use the Stripe PHP SDK directly, make sure to properly test your integration after updating.
 
 #### Upgrading Your Webhook
 
@@ -402,7 +437,7 @@ The following required dependency versions have been updated:
 
 - The minimum PHP version is now v7.2
 - The minimum Laravel version is now v6.0
-- The minimum Stripe SDK version is now v7.0
+- The minimum Stripe PHP SDK version is now v7.0
 
 ### Stripe API Version
 
@@ -510,7 +545,7 @@ The following dependencies were bumped to new minimum versions:
 
 - The minimum Laravel version is now v5.8
 - The minimum Symfony dependencies are now v4.3
-- The minimum Stripe SDK version is now v6.40
+- The minimum Stripe PHP SDK version is now v6.40
 - The minimum Carbon version is now v2.0
 
 ### Fixed API Version

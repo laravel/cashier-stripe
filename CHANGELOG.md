@@ -1,6 +1,35 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.2.2...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.6.0...master)
+
+## [v14.6.0](https://github.com/laravel/cashier/compare/v14.4.0...v14.6.0) - 2023-01-03
+
+### Changed
+
+- Adds types to database migrations and factories by @nunomaduro in https://github.com/laravel/cashier-stripe/pull/1472
+
+## [v14.4.0](https://github.com/laravel/cashier/compare/v14.3.1...v14.4.0) - 2022-11-29
+
+### Changed
+
+- Update Stripe API version and Stripe PHP SDK v10 support by @driesvints in https://github.com/laravel/cashier-stripe/pull/1478
+
+## [v14.3.1](https://github.com/laravel/cashier/compare/v14.3.0...v14.3.1) - 2022-11-15
+
+### Changed
+
+- Modernize migrations by @driesvints in https://github.com/laravel/cashier-stripe/pull/1471
+
+## [v14.3.0](https://github.com/laravel/cashier/compare/v14.2.2...v14.3.0) - 2022-11-01
+
+### Added
+
+- Allow incomplete subscriptions as active by @driesvints in https://github.com/laravel/cashier-stripe/pull/1466
+
+### Changed
+
+- Refactor dates property by @driesvints in https://github.com/laravel/cashier-stripe/pull/1462
+- Pass pay options to pay method by @driesvints in https://github.com/laravel/cashier-stripe/pull/1464
 
 ## [v14.2.2](https://github.com/laravel/cashier/compare/v14.2.1...v14.2.2) - 2022-10-25
 

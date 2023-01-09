@@ -25,7 +25,7 @@ class Cashier
      *
      * @var string
      */
-    const STRIPE_VERSION = '2022-08-01';
+    const STRIPE_VERSION = '2022-11-15';
 
     /**
      * The base URL for the Stripe API.
@@ -61,6 +61,13 @@ class Cashier
      * @var bool
      */
     public static $deactivatePastDue = true;
+
+    /**
+     * Indicates if Cashier will mark incomplete subscriptions as inactive.
+     *
+     * @var bool
+     */
+    public static $deactivateIncomplete = true;
 
     /**
      * Indicates if Cashier will automatically calculate taxes using Stripe Tax.
@@ -191,6 +198,18 @@ class Cashier
     public static function keepPastDueSubscriptionsActive()
     {
         static::$deactivatePastDue = false;
+
+        return new static;
+    }
+
+    /**
+     * Configure Cashier to maintain incomplete subscriptions as active.
+     *
+     * @return static
+     */
+    public static function keepIncompleteSubscriptionsActive()
+    {
+        static::$deactivateIncomplete = false;
 
         return new static;
     }

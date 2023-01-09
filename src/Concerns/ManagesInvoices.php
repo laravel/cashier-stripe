@@ -2,6 +2,9 @@
 
 namespace Laravel\Cashier\Concerns;
 
+use Illuminate\Pagination\Cursor;
+use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
@@ -299,5 +302,43 @@ trait ManagesInvoices
     public function invoicesIncludingPending(array $parameters = [])
     {
         return $this->invoices(true, $parameters);
+    }
+
+    /**
+     * Get a cursor paginator for the customer's invoices.
+     *
+     * @param  int|null  $perPage
+     * @param  array  $parameters
+     * @param  string  $cursorName
+     * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
+     * @return \Illuminate\Contracts\Pagination\CursorPaginator
+     */
+    public function cursorPaginateInvoices($perPage = 24, array $parameters = [], $cursorName = 'cursor', $cursor = null)
+    {
+        if (! $cursor instanceof Cursor) {
+            $cursor = is_string($cursor)
+                ? Cursor::fromEncoded($cursor)
+                : CursorPaginator::resolveCurrentCursor($cursorName, $cursor);
+        }
+
+        if (! is_null($cursor)) {
+            if ($cursor->pointsToNextItems()) {
+                $parameters['starting_after'] = $cursor->parameter('id');
+            } else {
+                $parameters['ending_before'] = $cursor->parameter('id');
+            }
+        }
+
+        $invoices = $this->invoices(true, array_merge($parameters, ['limit' => $perPage + 1]));
+
+        if (! is_null($cursor) && $cursor->pointsToPreviousItems()) {
+            $invoices = $invoices->reverse();
+        }
+
+        return new CursorPaginator($invoices, $perPage, $cursor, array_merge([
+            'path' => Paginator::resolveCurrentPath(),
+            'cursorName' => $cursorName,
+            'parameters' => ['id'],
+        ]));
     }
 }
