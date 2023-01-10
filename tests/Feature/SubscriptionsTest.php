@@ -476,6 +476,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertCount(2, $subscription->items);
     }
+
     public function test_creating_subscription_with_inline_price_data()
     {
         $user = $this->createCustomer('creating_subscription_with_inline_price_data');
