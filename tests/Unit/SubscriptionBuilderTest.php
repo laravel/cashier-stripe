@@ -24,4 +24,11 @@ class SubscriptionBuilderTest extends TestCase
             'price_baz' => ['price' => 'price_baz', 'quantity' => 0],
         ], $builder->getItems());
     }
+
+    public function test_it_can_be_instantiated_with_no_price()
+    {
+        $builder = new SubscriptionBuilder(new User, 'default');
+        
+        $this->assertEmpty($builder->getItems());
+    }
 }

@@ -28,6 +28,11 @@ class MeteredBillingTest extends FeatureTestCase
      */
     protected static $licensedPrice;
 
+    /**
+     * @var string
+     */
+    protected static $otherLicensedPrice;
+
     public static function setUpBeforeClass(): void
     {
         if (! getenv('STRIPE_SECRET')) {
@@ -72,6 +77,16 @@ class MeteredBillingTest extends FeatureTestCase
             ],
             'unit_amount' => 1000,
         ])->id;
+
+        static::$otherLicensedPrice = self::stripe()->prices->create([
+            'product' => static::$productId,
+            'nickname' => 'Monthly $5 Licensed',
+            'currency' => 'USD',
+            'recurring' => [
+                'interval' => 'month',
+            ],
+            'unit_amount' => 500,
+        ])->id;
     }
 
     public function test_report_usage_for_metered_price()
@@ -91,6 +106,18 @@ class MeteredBillingTest extends FeatureTestCase
         $summary = $subscription->usageRecords()->first();
 
         $this->assertSame($summary->total_usage, 15);
+    }
+
+    public function test_create_new_metered_subscription_with_additional_licensed_price()
+    {
+        $user = $this->createCustomer('reporting_usage_for_licensed_price_throws_exception');
+
+        $subscription = $user->newSubscription('main')
+            ->meteredPrice(static::$meteredPrice)
+            ->prices([static::$licensedPrice, static::$otherLicensedPrice])
+            ->create('pm_card_visa');
+
+        $this->assertSame($subscription->items->count(), 3);
     }
 
     public function test_reporting_usage_for_licensed_price_throws_exception()
