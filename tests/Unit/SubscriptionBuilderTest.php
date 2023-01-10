@@ -18,8 +18,8 @@ class SubscriptionBuilderTest extends TestCase
         ]);
 
         $this->assertSame([
-            'price_foo' => ['price' => 'price_foo', 'quantity' => 1],
-            'price_bux' => ['price' => 'price_bux', 'quantity' => 1],
+            'price_foo' => ['price' => 'price_foo'],
+            'price_bux' => ['price' => 'price_bux'],
             'price_bar' => ['price' => 'price_bar', 'quantity' => 1],
             'price_baz' => ['price' => 'price_baz', 'quantity' => 0],
         ], $builder->getItems());

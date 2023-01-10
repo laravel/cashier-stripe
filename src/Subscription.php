@@ -837,7 +837,7 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function addPrice($price, $quantity = 1, array $options = [])
+    public function addPrice($price, $quantity = null, array $options = [])
     {
         $this->guardAgainstIncomplete();
 
@@ -886,14 +886,14 @@ class Subscription extends Model
      * Add a new Stripe price to the subscription, and invoice immediately.
      *
      * @param  string  $price
-     * @param  int  $quantity
+     * @param  int|null  $quantity
      * @param  array  $options
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function addPriceAndInvoice($price, $quantity = 1, array $options = [])
+    public function addPriceAndInvoice($price, $quantity = null, array $options = [])
     {
         $this->alwaysInvoice();
 

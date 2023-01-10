@@ -97,7 +97,7 @@ class SubscriptionBuilder
      * @param  int|null  $quantity
      * @return $this
      */
-    public function price($price, $quantity = 1)
+    public function price($price, $quantity = null)
     {
         $options = is_array($price) ? $price : ['price' => $price];
 
@@ -128,7 +128,7 @@ class SubscriptionBuilder
      */
     public function meteredPrice($price)
     {
-        return $this->price($price, null);
+        return $this->price($price);
     }
 
     /**
