@@ -468,7 +468,7 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_creating_subscription_with_multiple_prices()
     {
-        $user = $this->createCustomer('creating_subscription_with_inline_price_data'); 
+        $user = $this->createCustomer('creating_subscription_with_inline_price_data');
 
         $subscription = $user->newSubscription('main')
             ->prices([static::$priceId, static::$otherPriceId])

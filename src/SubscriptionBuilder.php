@@ -122,10 +122,10 @@ class SubscriptionBuilder
 
     /**
      * Set multiple prices on the subscription builder.
-     * 
+     *
      * @param $prices
      */
-    public function prices(array $prices): self 
+    public function prices(array $prices): self
     {
         foreach ((array) $prices as $price) {
             $this->price($price);

@@ -28,7 +28,7 @@ class SubscriptionBuilderTest extends TestCase
     public function test_it_can_be_instantiated_with_no_price()
     {
         $builder = new SubscriptionBuilder(new User, 'default');
-        
+
         $this->assertEmpty($builder->getItems());
     }
 }
