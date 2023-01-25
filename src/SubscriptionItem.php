@@ -45,6 +45,7 @@ class SubscriptionItem extends Model
     public function subscription()
     {
         $model = Cashier::$subscriptionModel;
+
         return $this->belongsTo($model, (new $model)->getForeignKey());
     }
 
