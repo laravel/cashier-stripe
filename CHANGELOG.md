@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.7.0...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.7.1...14.x)
+
+## [v14.7.1](https://github.com/laravel/cashier/compare/v14.7.0...v14.7.1) - 2023-01-31
+
+### Fixed
+
+- Fix wrong foreignKey on SubscriptionItem by @zofe in https://github.com/laravel/cashier-stripe/pull/1494
 
 ## [v14.7.0](https://github.com/laravel/cashier/compare/v14.6.0...v14.7.0) - 2023-01-10
 
