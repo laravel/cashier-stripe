@@ -14,6 +14,12 @@
 
 - Adds types to database migrations and factories by @nunomaduro in https://github.com/laravel/cashier-stripe/pull/1472
 
+## [v14.5.0](https://github.com/laravel/cashier/compare/v14.4.0...v14.5.0) - 2022-12-06
+
+### Added
+
+- Cursor pagination for invoices by @driesvints in https://github.com/laravel/cashier-stripe/pull/1479
+
 ## [v14.4.0](https://github.com/laravel/cashier/compare/v14.3.1...v14.4.0) - 2022-11-29
 
 ### Changed
