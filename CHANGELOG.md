@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.7.1...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.7.2...14.x)
+
+## [v14.7.2](https://github.com/laravel/cashier/compare/v14.7.1...v14.7.2) - 2023-02-03
+
+### Fixed
+
+- Return null if attribute isn't found by @driesvints in https://github.com/laravel/cashier-stripe/pull/1496
 
 ## [v14.7.1](https://github.com/laravel/cashier/compare/v14.7.0...v14.7.1) - 2023-01-31
 
