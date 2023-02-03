@@ -6,6 +6,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Tests\TestCase;
+use Stripe\ApiRequestor as StripeApiRequestor;
+use Stripe\HttpClient\CurlClient as StripeCurlClient;
 use Stripe\StripeClient;
 
 abstract class FeatureTestCase extends TestCase
@@ -19,6 +21,10 @@ abstract class FeatureTestCase extends TestCase
         }
 
         parent::setUp();
+
+        $curl = new StripeCurlClient();
+        $curl->setEnableHttp2(false);
+        StripeApiRequestor::setHttpClient($curl);
     }
 
     protected function defineDatabaseMigrations()
