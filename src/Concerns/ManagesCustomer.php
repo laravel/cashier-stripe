@@ -145,7 +145,7 @@ trait ManagesCustomer
      */
     public function stripeName()
     {
-        return $this->name;
+        return $this->name ?? null;
     }
 
     /**
@@ -155,7 +155,7 @@ trait ManagesCustomer
      */
     public function stripeEmail()
     {
-        return $this->email;
+        return $this->email ?? null;
     }
 
     /**
@@ -165,7 +165,7 @@ trait ManagesCustomer
      */
     public function stripePhone()
     {
-        return $this->phone;
+        return $this->phone ?? null;
     }
 
     /**
