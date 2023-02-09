@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.7.2...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.8.0...14.x)
+
+## [v14.8.0](https://github.com/laravel/cashier/compare/v14.7.2...v14.8.0) - 2023-02-09
+
+### Added
+
+- Add SyncCustomerDetails job by @driesvints in https://github.com/laravel/cashier-stripe/pull/1498
 
 ## [v14.7.2](https://github.com/laravel/cashier/compare/v14.7.1...v14.7.2) - 2023-02-03
 
