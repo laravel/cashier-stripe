@@ -7,6 +7,16 @@ use Laravel\Cashier\Cashier;
 
 class WebhookCommand extends Command
 {
+    public const DEFAULT_EVENTS = [
+        'customer.subscription.created',
+        'customer.subscription.updated',
+        'customer.subscription.deleted',
+        'customer.updated',
+        'customer.deleted',
+        'invoice.payment_action_required',
+        'invoice.payment_succeeded',
+    ];
+
     /**
      * The name and signature of the console command.
      *
@@ -33,18 +43,8 @@ class WebhookCommand extends Command
     {
         $webhookEndpoints = Cashier::stripe()->webhookEndpoints;
 
-        $defaultEvents = [
-            'customer.subscription.created',
-            'customer.subscription.updated',
-            'customer.subscription.deleted',
-            'customer.updated',
-            'customer.deleted',
-            'invoice.payment_action_required',
-            'invoice.payment_succeeded',
-        ];
-
         $endpoint = $webhookEndpoints->create(array_filter([
-            'enabled_events' => config('cashier.webhook.events') ?: $defaultEvents,
+            'enabled_events' => config('cashier.webhook.events') ?: self::DEFAULT_EVENTS,
             'url' => $this->option('url') ?? route('cashier.webhook'),
             'api_version' => $this->option('api-version') ?? Cashier::STRIPE_VERSION,
         ]));
