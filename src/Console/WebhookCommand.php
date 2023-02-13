@@ -33,11 +33,21 @@ class WebhookCommand extends Command
     {
         $webhookEndpoints = Cashier::stripe()->webhookEndpoints;
 
-        $endpoint = $webhookEndpoints->create([
-            'enabled_events' => config('cashier.webhook.events'),
+        $defaultEvents = [
+            'customer.subscription.created',
+            'customer.subscription.updated',
+            'customer.subscription.deleted',
+            'customer.updated',
+            'customer.deleted',
+            'invoice.payment_action_required',
+            'invoice.payment_succeeded',
+        ];
+
+        $endpoint = $webhookEndpoints->create(array_filter([
+            'enabled_events' => config('cashier.webhook.events') ?: $defaultEvents,
             'url' => $this->option('url') ?? route('cashier.webhook'),
             'api_version' => $this->option('api-version') ?? Cashier::STRIPE_VERSION,
-        ]);
+        ]));
 
         $this->components->info('The Stripe webhook was created successfully. Retrieve the webhook secret in your Stripe dashboard and define it as an environment variable.');
 
