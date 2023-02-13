@@ -7,6 +7,16 @@ use Laravel\Cashier\Cashier;
 
 class WebhookCommand extends Command
 {
+    public const DEFAULT_EVENTS = [
+        'customer.subscription.created',
+        'customer.subscription.updated',
+        'customer.subscription.deleted',
+        'customer.updated',
+        'customer.deleted',
+        'invoice.payment_action_required',
+        'invoice.payment_succeeded',
+    ];
+
     /**
      * The name and signature of the console command.
      *
@@ -33,11 +43,11 @@ class WebhookCommand extends Command
     {
         $webhookEndpoints = Cashier::stripe()->webhookEndpoints;
 
-        $endpoint = $webhookEndpoints->create([
-            'enabled_events' => config('cashier.webhook.events'),
+        $endpoint = $webhookEndpoints->create(array_filter([
+            'enabled_events' => config('cashier.webhook.events') ?: self::DEFAULT_EVENTS,
             'url' => $this->option('url') ?? route('cashier.webhook'),
             'api_version' => $this->option('api-version') ?? Cashier::STRIPE_VERSION,
-        ]);
+        ]));
 
         $this->components->info('The Stripe webhook was created successfully. Retrieve the webhook secret in your Stripe dashboard and define it as an environment variable.');
 
