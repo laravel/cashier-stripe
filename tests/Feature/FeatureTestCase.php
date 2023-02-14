@@ -22,7 +22,7 @@ abstract class FeatureTestCase extends TestCase
 
         parent::setUp();
 
-        $curl = new StripeCurlClient();
+        $curl = new StripeCurlClient([CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1]);
         $curl->setEnableHttp2(false);
         StripeApiRequestor::setHttpClient($curl);
     }
