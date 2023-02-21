@@ -13,7 +13,6 @@ use Laravel\Cashier\Contracts\InvoiceRenderer;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Invoice as StripeInvoice;
-use Stripe\InvoiceLineItem as StripeInvoiceLineItem;
 use Symfony\Component\HttpFoundation\Response;
 
 class Invoice implements Arrayable, Jsonable, JsonSerializable
