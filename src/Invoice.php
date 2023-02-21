@@ -13,7 +13,6 @@ use Laravel\Cashier\Contracts\InvoiceRenderer;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Invoice as StripeInvoice;
-use Stripe\InvoiceLineItem as StripeInvoiceLineItem;
 use Symfony\Component\HttpFoundation\Response;
 
 class Invoice implements Arrayable, Jsonable, JsonSerializable
@@ -498,10 +497,25 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
 
         $this->refreshWithExpandedData();
 
-        return $this->items = Collection::make($this->invoice->lines->autoPagingIterator())
-            ->map(function (StripeInvoiceLineItem $item) {
-                return new InvoiceLineItem($this, $item);
-            })->all();
+        $page = $this->invoice->lines;
+
+        $items = Collection::make();
+
+        while (true) {
+            foreach ($page as $item) {
+                $items->push(new InvoiceLineItem($this, $item));
+            }
+
+            $page = $page->nextPage([
+                'expand' => ['data.tax_amounts.tax_rate'],
+            ]);
+
+            if ($page->isEmpty()) {
+                break;
+            }
+        }
+
+        return $this->items = $items->reverse()->all();
     }
 
     /**
