@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.8.1...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.8.2...14.x)
+
+## [v14.8.2](https://github.com/laravel/cashier/compare/v14.8.1...v14.8.2) - 2023-02-21
+
+- Fix invoice line items by @driesvints in https://github.com/laravel/cashier-stripe/pull/1503
 
 ## [v14.8.1](https://github.com/laravel/cashier/compare/v14.8.0...v14.8.1) - 2023-02-14
 
