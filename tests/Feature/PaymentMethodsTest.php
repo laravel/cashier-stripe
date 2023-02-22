@@ -17,6 +17,17 @@ class PaymentMethodsTest extends FeatureTestCase
         $this->assertInstanceOf(StripeSetupIntent::class, $setupIntent);
     }
 
+    public function test_we_can_retrieve_an_existing_setup_intent()
+    {
+        $user = $this->createCustomer('we_can_retrieve_a_setup_intent');
+
+        $originalSetupIntent = $user->createSetupIntent();
+
+        $retrievedSetupIntent = $user->findSetupIntent($originalSetupIntent->id);
+
+        $this->assertEquals($originalSetupIntent->id, $retrievedSetupIntent->id);
+    }
+
     public function test_we_can_add_payment_methods()
     {
         $user = $this->createCustomer('we_can_add_payment_methods');
