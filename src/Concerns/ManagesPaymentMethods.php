@@ -23,11 +23,11 @@ trait ManagesPaymentMethods
     }
 
     /**
-     * Retrieve a SetupIntent from Stripe
+     * Retrieve a SetupIntent from Stripe.
      *
-     * @param  string $id
-     * @param  array $params
-     * @param  array $options
+     * @param  string  $id
+     * @param  array  $params
+     * @param  array  $options
      * @return \Stripe\SetupIntent
      */
     public function findSetupIntent(string $id, array $params = [], array $options = [])
