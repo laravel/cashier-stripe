@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.16.0...13.x)
+## [Unreleased](https://github.com/laravel/cashier-stripe/compare/v13.17.0...13.x)
+
+## [v13.17.0](https://github.com/laravel/cashier-stripe/compare/v13.16.0...v13.17.0) - 2023-03-01
+
+- Laravel v10 support by @driesvints in https://github.com/laravel/cashier-stripe/pull/1507
 
 ## [v13.16.0](https://github.com/laravel/cashier-stripe/compare/v13.15.1...v13.16.0) - 2022-08-30
 
