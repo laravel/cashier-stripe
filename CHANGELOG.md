@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.8.2...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.9.0...14.x)
+
+## [v14.9.0](https://github.com/laravel/cashier/compare/v14.8.2...v14.9.0) - 2023-03-02
+
+- Provide findSetupIntent method by @andycowan in https://github.com/laravel/cashier-stripe/pull/1505
+- Fix deletion of subscription items in swap() by @glspdotnet in https://github.com/laravel/cashier-stripe/pull/1509
 
 ## [v14.8.2](https://github.com/laravel/cashier/compare/v14.8.1...v14.8.2) - 2023-02-21
 
