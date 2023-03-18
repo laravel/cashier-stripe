@@ -114,7 +114,7 @@ $user->subscription('default')
 
 PR: https://github.com/laravel/cashier-stripe/pull/1210
 
-In previous Cashier versions, when using any of the invoicing methods (`invoice`, `invoiceFor`, `invoicePrice`), Stripe exceptions were caught internally and these methods would return `false`. In Cashier 14, these exceptions will bubble up to the application and should be handled by the application itself. `CardException`'s are still caught internally in ordre to trigger `IncompletePayment` exceptions.
+In previous Cashier versions, when using any of the invoicing methods (`invoice`, `invoiceFor`, `invoicePrice`), Stripe exceptions were caught internally and these methods would return `false`. In Cashier 14, these exceptions will bubble up to the application and should be handled by the application itself. `CardException`'s are still caught internally in order to trigger `IncompletePayment` exceptions.
 
 ### Removed Checkout Button
 
