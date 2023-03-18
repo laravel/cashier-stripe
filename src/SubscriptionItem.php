@@ -159,7 +159,7 @@ class SubscriptionItem extends Model
             ], function ($value) {
                 return ! is_null($value);
             }),
-        $options));
+            $options));
 
         $this->fill([
             'stripe_product' => $stripeSubscriptionItem->price->product,
