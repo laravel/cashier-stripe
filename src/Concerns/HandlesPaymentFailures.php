@@ -11,6 +11,13 @@ use Stripe\PaymentMethod as StripePaymentMethod;
 trait HandlesPaymentFailures
 {
     /**
+     * The options to be used when confirming a payment intent.
+     *
+     * @var array
+     */
+    protected $paymentFailureConfirmOptions = [];
+
+    /**
      * Handle a failed payment for the given subscription.
      *
      * @param  \Laravel\Cashier\Subscription  $subscription
@@ -30,14 +37,20 @@ trait HandlesPaymentFailures
                 if ($e->payment->requiresConfirmation()) {
                     try {
                         if ($paymentMethod) {
-                            $paymentIntent = $e->payment->confirm([
-                                'expand' => ['invoice.subscription'],
-                                'payment_method' => $paymentMethod instanceof StripePaymentMethod
-                                    ? $paymentMethod->id
-                                    : $paymentMethod,
-                            ]);
+                            $paymentIntent = $e->payment->confirm(array_merge(
+                                $this->paymentFailureConfirmOptions,
+                                [
+                                    'expand' => ['invoice.subscription'],
+                                    'payment_method' => $paymentMethod instanceof StripePaymentMethod
+                                        ? $paymentMethod->id
+                                        : $paymentMethod,
+                                ]
+                            ));
                         } else {
-                            $paymentIntent = $e->payment->confirm(['expand' => ['invoice.subscription']]);
+                            $paymentIntent = $e->payment->confirm(array_merge(
+                                $this->paymentFailureConfirmOptions,
+                                ['expand' => ['invoice.subscription']]
+                            ));
                         }
                     } catch (StripeCardException) {
                         $paymentIntent = $e->payment->asStripePaymentIntent(['invoice.subscription']);
@@ -55,5 +68,18 @@ trait HandlesPaymentFailures
                 }
             }
         }
+    }
+
+    /**
+     * Set the options to be used when confirming a payment intent.
+     *
+     * @param  array  $options
+     * @return $this
+     */
+    public function withPaymentFailureConfirmOptions(array $options)
+    {
+        $this->paymentFailureConfirmOptions = $options;
+
+        return $this;
     }
 }
