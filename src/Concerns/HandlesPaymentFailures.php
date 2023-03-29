@@ -68,6 +68,8 @@ trait HandlesPaymentFailures
                 }
             }
         }
+
+        $this->paymentConfirmOptions = [];
     }
 
     /**
