@@ -15,7 +15,7 @@ trait HandlesPaymentFailures
      *
      * @var array
      */
-    protected $paymentConfirmOptions = [];
+    protected $paymentConfirmationOptions = [];
 
     /**
      * Handle a failed payment for the given subscription.
@@ -38,7 +38,7 @@ trait HandlesPaymentFailures
                     try {
                         if ($paymentMethod) {
                             $paymentIntent = $e->payment->confirm(array_merge(
-                                $this->paymentConfirmOptions,
+                                $this->paymentConfirmationOptions,
                                 [
                                     'expand' => ['invoice.subscription'],
                                     'payment_method' => $paymentMethod instanceof StripePaymentMethod
@@ -48,7 +48,7 @@ trait HandlesPaymentFailures
                             ));
                         } else {
                             $paymentIntent = $e->payment->confirm(array_merge(
-                                $this->paymentConfirmOptions,
+                                $this->paymentConfirmationOptions,
                                 ['expand' => ['invoice.subscription']]
                             ));
                         }
@@ -69,18 +69,18 @@ trait HandlesPaymentFailures
             }
         }
 
-        $this->paymentConfirmOptions = [];
+        $this->paymentConfirmationOptions = [];
     }
 
     /**
-     * Set the options to be used when confirming a payment intent.
+     * Specify the options to be used when confirming a payment intent.
      *
      * @param  array  $options
      * @return $this
      */
-    public function withPaymentConfirmOptions(array $options)
+    public function witihPaymentConfirmationOptions(array $options)
     {
-        $this->paymentConfirmOptions = $options;
+        $this->paymentConfirmationOptions = $options;
 
         return $this;
     }
