@@ -78,7 +78,7 @@ trait HandlesPaymentFailures
      * @param  array  $options
      * @return $this
      */
-    public function witihPaymentConfirmationOptions(array $options)
+    public function withPaymentConfirmationOptions(array $options)
     {
         $this->paymentConfirmationOptions = $options;
 
