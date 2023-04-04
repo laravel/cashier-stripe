@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.9.0...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.10.0...14.x)
+
+## [v14.10.0](https://github.com/laravel/cashier/compare/v14.9.0...v14.10.0) - 2023-04-04
+
+- Set payment confirm options by @driesvints in https://github.com/laravel/cashier-stripe/pull/1516
 
 ## [v14.9.0](https://github.com/laravel/cashier/compare/v14.8.2...v14.9.0) - 2023-03-02
 
