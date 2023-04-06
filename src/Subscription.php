@@ -886,7 +886,6 @@ class Subscription extends Model
         return $this;
     }
 
-
     /**
      * Adds or increments Stripe price to the subscription.
      *
@@ -901,7 +900,6 @@ class Subscription extends Model
     {
         try {
             return $this->addPrice($price, $quantity, $options);
-
         } catch (SubscriptionUpdateFailure $e) {
             return $this->incrementQuantity($quantity, $price);
         }
