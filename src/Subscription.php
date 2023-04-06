@@ -886,6 +886,27 @@ class Subscription extends Model
         return $this;
     }
 
+
+    /**
+     * Adds or increments Stripe price to the subscription.
+     *
+     * @param  string  $price
+     * @param  int|null  $quantity
+     * @param  array  $options
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function addOrIncrementPrice($price, $quantity = 1, array $options = [])
+    {
+        try {
+            return $this->addPrice($price, $quantity, $options);
+
+        } catch (SubscriptionUpdateFailure $e) {
+            return $this->incrementQuantity($quantity, $price);
+        }
+    }
+
     /**
      * Add a new Stripe price to the subscription, and invoice immediately.
      *
