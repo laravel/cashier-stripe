@@ -85,7 +85,7 @@ trait HandlesPaymentFailures
      *
      * @return $this
      */
-    public function ignoreIncompletePayment()
+    public function ignoreIncompletePayments()
     {
         $this->confirmIncompletePayment = false;
 
