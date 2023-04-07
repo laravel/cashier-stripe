@@ -11,6 +11,13 @@ use Stripe\PaymentMethod as StripePaymentMethod;
 trait HandlesPaymentFailures
 {
     /**
+     * Indicates if incomplete payments should be confirmed automatically.
+     *
+     * @var bool
+     */
+    protected $confirmIncompletePayment = true;
+
+    /**
      * The options to be used when confirming a payment intent.
      *
      * @var array
@@ -30,7 +37,7 @@ trait HandlesPaymentFailures
      */
     public function handlePaymentFailure(Subscription $subscription, $paymentMethod = null)
     {
-        if ($subscription->hasIncompletePayment()) {
+        if ($this->confirmIncompletePayment && $subscription->hasIncompletePayment()) {
             try {
                 $subscription->latestPayment()->validate();
             } catch (IncompletePayment $e) {
@@ -69,7 +76,20 @@ trait HandlesPaymentFailures
             }
         }
 
+        $this->confirmIncompletePayment = true;
         $this->paymentConfirmationOptions = [];
+    }
+
+    /**
+     * Prevent automatic confirmation of incomplete payments.
+     *
+     * @return $this
+     */
+    public function ignoreIncompletePayments()
+    {
+        $this->confirmIncompletePayment = false;
+
+        return $this;
     }
 
     /**
