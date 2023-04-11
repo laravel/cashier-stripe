@@ -124,6 +124,21 @@ trait ManagesCustomer
     }
 
     /**
+     * Delete the Stripe customer for the current user.
+     * @return void
+     */
+    public function deleteStripeCustomer()
+    {
+        $this->assertCustomerExists();
+
+        $this->stripe()->customers->delete($this->stripe_id);
+
+        $this->stripe_id = null;
+
+        $this->save();
+    }
+
+    /**
      * Get the Stripe customer for the model.
      *
      * @param  array  $expand
