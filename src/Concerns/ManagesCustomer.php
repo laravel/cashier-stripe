@@ -125,6 +125,7 @@ trait ManagesCustomer
 
     /**
      * Delete the Stripe customer for the current user.
+     * 
      * @return void
      */
     public function deleteStripeCustomer()
