@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.10.0...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.11.0...14.x)
+
+## [v14.11.0](https://github.com/laravel/cashier/compare/v14.10.0...v14.11.0) - 2023-04-11
+
+- Add ability to ignore incomplete payments by @driesvints in https://github.com/laravel/cashier-stripe/pull/1524
 
 ## [v14.10.0](https://github.com/laravel/cashier/compare/v14.9.0...v14.10.0) - 2023-04-04
 
