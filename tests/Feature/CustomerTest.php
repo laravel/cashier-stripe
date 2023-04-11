@@ -132,8 +132,9 @@ class CustomerTest extends FeatureTestCase
         $this->assertFalse($user->query()->onGenericTrial()->exists());
         $this->assertTrue($user->query()->hasExpiredGenericTrial()->exists());
     }
-    
-    public function test_customer_can_be_deleted() {
+
+    public function test_customer_can_be_deleted() 
+    {
 
         $customer = $user->createAsStripeCustomer();
 
