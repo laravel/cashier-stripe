@@ -150,7 +150,7 @@ trait PerformsCharges
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
-    public function checkoutCharge($amount, $name, $quantity = 1, array $sessionOptions = [], array $customerOptions = [])
+    public function checkoutCharge($amount, $name, $quantity = 1, array $sessionOptions = [], array $customerOptions = [], $description = null)
     {
         if ($this->isAutomaticTaxEnabled()) {
             throw new LogicException('For now, you cannot use checkout charges in combination with automatic tax calculation.');
@@ -161,6 +161,7 @@ trait PerformsCharges
                 'currency' => $this->preferredCurrency(),
                 'product_data' => [
                     'name' => $name,
+                    '$description' => $description,
                 ],
                 'unit_amount' => $amount,
             ],
