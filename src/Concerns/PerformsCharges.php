@@ -160,9 +160,9 @@ trait PerformsCharges
         return $this->checkout([[
             'price_data' => [
                 'currency' => $this->preferredCurrency(),
-                'product_data' => array_merge([
+                'product_data' => array_merge($productData, [
                     'name' => $name,
-                ], $productData),
+                ]),
                 'unit_amount' => $amount,
             ],
             'quantity' => $quantity,
