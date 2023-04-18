@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.11.0...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.0...14.x)
+
+## [v14.12.0](https://github.com/laravel/cashier/compare/v14.11.0...v14.12.0) - 2023-04-18
+
+- Add ability to set a description on "one-off" charge checkouts by @AmrAb-05 in https://github.com/laravel/cashier-stripe/pull/1525
 
 ## [v14.11.0](https://github.com/laravel/cashier/compare/v14.10.0...v14.11.0) - 2023-04-11
 
