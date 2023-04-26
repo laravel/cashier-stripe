@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class SubscriptionBuilderTest extends TestCase
 {
-    public function test_it_can_be_instantiated_with_both_normal_and_metered_prices()
+    public function test_it_can_be_instantiated()
     {
         $builder = new SubscriptionBuilder(new User, 'default', [
             'price_foo',

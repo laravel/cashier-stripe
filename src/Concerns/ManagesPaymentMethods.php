@@ -23,6 +23,19 @@ trait ManagesPaymentMethods
     }
 
     /**
+     * Retrieve a SetupIntent from Stripe.
+     *
+     * @param  string  $id
+     * @param  array  $params
+     * @param  array  $options
+     * @return \Stripe\SetupIntent
+     */
+    public function findSetupIntent(string $id, array $params = [], array $options = [])
+    {
+        return $this->stripe()->setupIntents->retrieve($id, $params, $options);
+    }
+
+    /**
      * Determines if the customer currently has a default payment method.
      *
      * @return bool

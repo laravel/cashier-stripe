@@ -1,12 +1,69 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.6.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.0...master)
+
+## [v14.12.0](https://github.com/laravel/cashier/compare/v14.11.0...v14.12.0) - 2023-04-18
+
+- Add ability to set a description on "one-off" charge checkouts by @AmrAb-05 in https://github.com/laravel/cashier-stripe/pull/1525
+
+## [v14.11.0](https://github.com/laravel/cashier/compare/v14.10.0...v14.11.0) - 2023-04-11
+
+- Add ability to ignore incomplete payments by @driesvints in https://github.com/laravel/cashier-stripe/pull/1524
+
+## [v14.10.0](https://github.com/laravel/cashier/compare/v14.9.0...v14.10.0) - 2023-04-04
+
+- Set payment confirm options by @driesvints in https://github.com/laravel/cashier-stripe/pull/1516
+
+## [v14.9.0](https://github.com/laravel/cashier/compare/v14.8.2...v14.9.0) - 2023-03-02
+
+- Provide findSetupIntent method by @andycowan in https://github.com/laravel/cashier-stripe/pull/1505
+- Fix deletion of subscription items in swap() by @glspdotnet in https://github.com/laravel/cashier-stripe/pull/1509
+
+## [v14.8.2](https://github.com/laravel/cashier/compare/v14.8.1...v14.8.2) - 2023-02-21
+
+- Fix invoice line items by @driesvints in https://github.com/laravel/cashier-stripe/pull/1503
+
+## [v14.8.1](https://github.com/laravel/cashier/compare/v14.8.0...v14.8.1) - 2023-02-14
+
+### Fixed
+
+- Fix webhook command by @driesvints in https://github.com/laravel/cashier-stripe/pull/1499
+
+## [v14.8.0](https://github.com/laravel/cashier/compare/v14.7.2...v14.8.0) - 2023-02-09
+
+### Added
+
+- Add SyncCustomerDetails job by @driesvints in https://github.com/laravel/cashier-stripe/pull/1498
+
+## [v14.7.2](https://github.com/laravel/cashier/compare/v14.7.1...v14.7.2) - 2023-02-03
+
+### Fixed
+
+- Return null if attribute isn't found by @driesvints in https://github.com/laravel/cashier-stripe/pull/1496
+
+## [v14.7.1](https://github.com/laravel/cashier/compare/v14.7.0...v14.7.1) - 2023-01-31
+
+### Fixed
+
+- Fix wrong foreignKey on SubscriptionItem by @zofe in https://github.com/laravel/cashier-stripe/pull/1494
+
+## [v14.7.0](https://github.com/laravel/cashier/compare/v14.6.0...v14.7.0) - 2023-01-10
+
+### Added
+
+- Laravel v10 Support by @driesvints in https://github.com/laravel/cashier-stripe/pull/1486
 
 ## [v14.6.0](https://github.com/laravel/cashier/compare/v14.4.0...v14.6.0) - 2023-01-03
 
 ### Changed
 
 - Adds types to database migrations and factories by @nunomaduro in https://github.com/laravel/cashier-stripe/pull/1472
+
+## [v14.5.0](https://github.com/laravel/cashier/compare/v14.4.0...v14.5.0) - 2022-12-06
+
+### Added
+
+- Cursor pagination for invoices by @driesvints in https://github.com/laravel/cashier-stripe/pull/1479
 
 ## [v14.4.0](https://github.com/laravel/cashier/compare/v14.3.1...v14.4.0) - 2022-11-29
 

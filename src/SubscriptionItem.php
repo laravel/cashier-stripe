@@ -44,7 +44,9 @@ class SubscriptionItem extends Model
      */
     public function subscription()
     {
-        return $this->belongsTo(Cashier::$subscriptionModel);
+        $model = Cashier::$subscriptionModel;
+
+        return $this->belongsTo($model, (new $model)->getForeignKey());
     }
 
     /**
@@ -157,7 +159,7 @@ class SubscriptionItem extends Model
             ], function ($value) {
                 return ! is_null($value);
             }),
-        $options));
+            $options));
 
         $this->fill([
             'stripe_product' => $stripeSubscriptionItem->price->product,

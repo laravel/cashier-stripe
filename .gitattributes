@@ -14,6 +14,7 @@
 .gitignore export-ignore
 .styleci.yml export-ignore
 CHANGELOG.md export-ignore
+phpstan.neon.dist export-ignore
 phpunit.xml.dist export-ignore
 RELEASE.md export-ignore
 UPGRADE.md export-ignore
