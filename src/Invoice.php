@@ -760,16 +760,6 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Determine if the invoice is deleted.
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return $this->invoice->status === StripeInvoice::STATUS_DELETED;
-    }
-
-    /**
      * Get the View instance for the invoice.
      *
      * @param  array  $data
