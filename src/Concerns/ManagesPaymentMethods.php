@@ -232,7 +232,7 @@ trait ManagesPaymentMethods
             $this->pm_last_four = $paymentMethod->card->last4;
         } else {
             $this->pm_type = $type = $paymentMethod->type;
-            $this->pm_last_four = optional($paymentMethod)->$type->last4;
+            $this->pm_last_four = $paymentMethod?->$type->last4 ?? null;
         }
 
         return $this;
