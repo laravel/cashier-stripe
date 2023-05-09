@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.0...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.1...14.x)
+
+## [v14.12.1](https://github.com/laravel/cashier/compare/v14.12.0...v14.12.1) - 2023-05-09
+
+- Fallback for empty pm_type object on fillPaymentMethodDetails by @shatterproof in https://github.com/laravel/cashier-stripe/pull/1531
 
 ## [v14.12.0](https://github.com/laravel/cashier/compare/v14.11.0...v14.12.0) - 2023-04-18
 
