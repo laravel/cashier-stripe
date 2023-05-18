@@ -259,7 +259,7 @@ class WebhookController extends Controller
 
         return $this->successMethod();
     }
-    
+
     /**
      * Handle payment method automatically updated by vendor.
      *
