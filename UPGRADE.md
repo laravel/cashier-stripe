@@ -6,7 +6,7 @@
 
 PR: https://github.com/laravel/cashier-stripe/pull/1534
 
-The webhook endpoint details [in your Stripe dashboard](https://dashboard.stripe.com/webhooks) should be updated to add `payment_method.automatically_updated` as one of the events sent to ensure that a user's payment method stays in sync between Cashier and Stripe when automatically updated by the issuer.
+[Your Stripe webhook](https://dashboard.stripe.com/webhooks) should be updated to include `payment_method.automatically_updated` as one of the events sent to your application. This will ensure that user payment method information stays in sync between Cashier and Stripe when the information is automatically updated by the card issuer.
 
 ## Upgrading To 14.4 From 14.3
 
