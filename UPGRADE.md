@@ -1,5 +1,13 @@
 # Upgrade Guide
 
+## Upgrading To 14.13 From 14.12
+
+### Webhook Added
+
+PR: https://github.com/laravel/cashier-stripe/pull/1534
+
+[Your Stripe webhook](https://dashboard.stripe.com/webhooks) should be updated to include `payment_method.automatically_updated` as one of the events sent to your application. This will ensure that user payment method information stays in sync between Cashier and Stripe when the information is automatically updated by the card issuer.
+
 ## Upgrading To 14.4 From 14.3
 
 ### Stripe API Version
@@ -80,7 +88,7 @@ You may use the following upgrade checklist to properly enable the new webhook:
 
 After following this process, your new webhook will be active and ready to receive events.
 
-### Optionally Dompdf Dependency
+### Optional Dompdf Dependency
 
 PR: https://github.com/laravel/cashier-stripe/pull/1312
 

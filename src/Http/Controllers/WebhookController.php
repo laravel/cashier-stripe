@@ -261,6 +261,21 @@ class WebhookController extends Controller
     }
 
     /**
+     * Handle payment method automatically updated by vendor.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handlePaymentMethodAutomaticallyUpdated(array $payload)
+    {
+        if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
+            $user->updateDefaultPaymentMethodFromStripe();
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
      * Handle payment action required for invoice.
      *
      * @param  array  $payload
