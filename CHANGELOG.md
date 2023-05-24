@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.1...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.2...14.x)
+
+## [v14.12.2](https://github.com/laravel/cashier/compare/v14.12.1...v14.12.2) - 2023-05-24
+
+- Handle automatic payment method updates by @shatterproof in https://github.com/laravel/cashier-stripe/pull/1534
 
 ## [v14.12.1](https://github.com/laravel/cashier/compare/v14.12.0...v14.12.1) - 2023-05-09
 
