@@ -70,12 +70,6 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      */
     public static function create($owner, array $sessionOptions = [], array $customerOptions = [])
     {
-        // Make sure to collect address and name when Tax ID collection is enabled...
-        if ($sessionOptions['tax_id_collection']['enabled'] ?? false) {
-            $sessionOptions['customer_update']['address'] = 'auto';
-            $sessionOptions['customer_update']['name'] = 'auto';
-        }
-
         $data = array_merge([
             'mode' => 'payment',
             'success_url' => $sessionOptions['success_url'] ?? route('home').'?checkout=success',
@@ -85,10 +79,18 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
         if ($owner) {
             $data['customer'] = $owner->createOrGetStripeCustomer($customerOptions)->id;
 
-            $session = $owner->stripe()->checkout->sessions->create($data);
+            $stripe = $owner->stripe();
         } else {
-            $session = Cashier::stripe()->checkout->sessions->create($data);
+            $stripe = Cashier::stripe();
         }
+
+        // Make sure to collect address and name when Tax ID collection is enabled...
+        if (isset($data['customer']) && $data['tax_id_collection']['enabled'] ?? false) {
+            $data['customer_update']['address'] = 'auto';
+            $data['customer_update']['name'] = 'auto';
+        }
+
+        $session = $stripe->checkout->sessions->create($data);
 
         return new static($owner, $session);
     }
