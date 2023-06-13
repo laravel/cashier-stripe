@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.2...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.3...14.x)
+
+## [v14.12.3](https://github.com/laravel/cashier/compare/v14.12.2...v14.12.3) - 2023-06-13
+
+- Fix bug with customer_update in checkout by @driesvints in https://github.com/laravel/cashier-stripe/pull/1538
 
 ## [v14.12.2](https://github.com/laravel/cashier/compare/v14.12.1...v14.12.2) - 2023-05-24
 
