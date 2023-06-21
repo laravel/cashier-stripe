@@ -53,17 +53,16 @@ trait ManagesPaymentMethods
      */
     public function hasPaymentMethod($type = 'card')
     {
-        return $this->paymentMethods($type)->isNotEmpty();
+        return $this->paymentMethods(['type' => $type])->isNotEmpty();
     }
 
     /**
-     * Get a collection of the customer's payment methods of the given type.
+     * Get a collection of the customer's payment methods.
      *
-     * @param  string  $type
      * @param  array  $parameters
      * @return \Illuminate\Support\Collection|\Laravel\Cashier\PaymentMethod[]
      */
-    public function paymentMethods($type = 'card', $parameters = [])
+    public function paymentMethods($parameters = [])
     {
         if (! $this->hasStripeId()) {
             return new Collection();
@@ -71,9 +70,8 @@ trait ManagesPaymentMethods
 
         $parameters = array_merge(['limit' => 24], $parameters);
 
-        // "type" is temporarily required by Stripe...
         $paymentMethods = $this->stripe()->paymentMethods->all(
-            ['customer' => $this->stripe_id, 'type' => $type] + $parameters
+            ['customer' => $this->stripe_id] + $parameters
         );
 
         return Collection::make($paymentMethods->data)->map(function ($paymentMethod) {
@@ -267,7 +265,7 @@ trait ManagesPaymentMethods
      */
     public function deletePaymentMethods($type = 'card')
     {
-        $this->paymentMethods($type)->each(function (PaymentMethod $paymentMethod) {
+        $this->paymentMethods(['type' => $type])->each(function (PaymentMethod $paymentMethod) {
             $paymentMethod->delete();
         });
 
