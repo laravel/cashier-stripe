@@ -121,7 +121,7 @@ trait ManagesCustomer
     public function createOrGetStripeCustomer(array $options = [])
     {
         if ($this->hasStripeId()) {
-            return $this->asStripeCustomer();
+            return $this->asStripeCustomer($options['expand'] ?? []);
         }
 
         return $this->createAsStripeCustomer($options);
