@@ -1139,9 +1139,9 @@ class Subscription extends Model
      *
      * @return \Laravel\Cashier\Invoice|null
      */
-    public function latestInvoice()
+    public function latestInvoice(array $expand = [])
     {
-        $stripeSubscription = $this->asStripeSubscription(['latest_invoice']);
+        $stripeSubscription = $this->asStripeSubscription(['latest_invoice', ...$expand]);
 
         if ($stripeSubscription->latest_invoice) {
             return new Invoice($this->owner, $stripeSubscription->latest_invoice);
