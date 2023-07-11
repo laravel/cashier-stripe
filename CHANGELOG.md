@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.3...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/14.12.4...14.x)
+
+## [14.12.4](https://github.com/laravel/cashier/compare/v14.12.3...14.12.4) - 2023-07-11
+
+- Update ManagesCustomer to include optional metadata when creating or syncing a user by [@dbhynds](https://github.com/dbhynds) in https://github.com/laravel/cashier-stripe/pull/1543
+- Update ManagesCustomer.php > createOrGetStripeCustomer() > allow "expand" when retrieving a Customer by [@Ronan](https://github.com/Ronan)-Lenor in https://github.com/laravel/cashier-stripe/pull/1547
+- createSetupIntent add customer stripe_id option by [@clementmas](https://github.com/clementmas) in https://github.com/laravel/cashier-stripe/pull/1545
 
 ## [v14.12.3](https://github.com/laravel/cashier/compare/v14.12.2...v14.12.3) - 2023-06-13
 
