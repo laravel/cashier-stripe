@@ -307,6 +307,7 @@ class InvoiceTest extends TestCase
 
         $this->assertTrue($invoice->reverseChargeApplies());
     }
+
     public function test_it_can_determine_if_is_deleted(): void
     {
         $customerId = 'foo';
