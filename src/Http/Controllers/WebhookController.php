@@ -319,7 +319,7 @@ class WebhookController extends Controller
      */
     protected function successMethod($parameters = [])
     {
-        return new Response('Webhook Handled', 200);
+        return new Response('Webhook Handled', Response::HTTP_OK);
     }
 
     /**

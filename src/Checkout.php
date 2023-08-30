@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Facades\Redirect;
 use JsonSerializable;
 use Stripe\Checkout\Session;
+use Symfony\Component\HttpFoundation\Response;
 
 class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
 {
@@ -102,7 +103,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      */
     public function redirect()
     {
-        return Redirect::to($this->session->url, 303);
+        return Redirect::to($this->session->url, Response::HTTP_SEE_OTHER);
     }
 
     /**

@@ -824,7 +824,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function downloadAs($filename, array $data = [])
     {
-        return new Response($this->pdf($data), 200, [
+        return new Response($this->pdf($data), Response::HTTP_OK, [
             'Content-Description' => 'File Transfer',
             'Content-Disposition' => 'attachment; filename="'.$filename.'.pdf"',
             'Content-Transfer-Encoding' => 'binary',
