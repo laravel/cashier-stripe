@@ -90,7 +90,7 @@ trait PerformsCharges
         }
 
         return new Payment(
-            $this->stripe()->paymentIntents->create($options)
+            self::stripe()->paymentIntents->create($options)
         );
     }
 
@@ -105,7 +105,7 @@ trait PerformsCharges
         $stripePaymentIntent = null;
 
         try {
-            $stripePaymentIntent = $this->stripe()->paymentIntents->retrieve($id);
+            $stripePaymentIntent = self::stripe()->paymentIntents->retrieve($id);
         } catch (StripeInvalidRequestException $exception) {
             //
         }
@@ -122,7 +122,7 @@ trait PerformsCharges
      */
     public function refund($paymentIntent, array $options = [])
     {
-        return $this->stripe()->refunds->create(
+        return self::stripe()->refunds->create(
             ['payment_intent' => $paymentIntent] + $options
         );
     }
