@@ -307,4 +307,65 @@ class InvoiceTest extends TestCase
 
         $this->assertTrue($invoice->reverseChargeApplies());
     }
+    public function test_it_can_determine_if_is_deleted(): void
+    {
+        $customerId = 'foo';
+
+        $stripeInvoice = new StripeInvoice();
+
+        $stripeInvoice->customer = $customerId;
+        $stripeInvoice->status = StripeInvoice::STATUS_DELETED;
+
+        $user = new User();
+
+        $user->stripe_id = $customerId;
+
+        $invoice = new Invoice($user, $stripeInvoice);
+
+        $this->assertTrue($invoice->isDeleted());
+    }
+
+    /**
+     * @dataProvider provideInvoiceStatusNotDeleted
+     */
+    public function test_it_can_determine_if_is_not_deleted(string $invoiceStatus): void
+    {
+        $customerId = 'foo';
+
+        $stripeInvoice = new StripeInvoice();
+
+        $stripeInvoice->customer = $customerId;
+        $stripeInvoice->status = $invoiceStatus;
+
+        $user = new User();
+
+        $user->stripe_id = $customerId;
+
+        $invoice = new Invoice($user, $stripeInvoice);
+
+        $this->assertFalse($invoice->isDeleted());
+    }
+
+    /**
+     * @return array<string, array{0: string}>
+     */
+    public function provideInvoiceStatusNotDeleted(): array
+    {
+        $invoiceStatuses = [
+            StripeInvoice::STATUS_DRAFT,
+            StripeInvoice::STATUS_OPEN,
+            StripeInvoice::STATUS_PAID,
+            StripeInvoice::STATUS_UNCOLLECTIBLE,
+            StripeInvoice::STATUS_VOID,
+        ];
+
+        return array_combine(
+            $invoiceStatuses,
+            array_map(static function (string $invoiceStatus): array {
+                return [
+                    $invoiceStatus,
+                ];
+            }, $invoiceStatuses)
+        );
+    }
 }
