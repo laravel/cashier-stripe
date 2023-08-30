@@ -51,7 +51,7 @@ trait ManagesInvoices
             $options['amount'] = $amount;
         }
 
-        return $this->stripe()->invoiceItems->create($options);
+        return static::stripe()->invoiceItems->create($options);
     }
 
     /**
@@ -90,7 +90,7 @@ trait ManagesInvoices
             'quantity' => $quantity,
         ], $options);
 
-        return $this->stripe()->invoiceItems->create($options);
+        return static::stripe()->invoiceItems->create($options);
     }
 
     /**
@@ -140,7 +140,7 @@ trait ManagesInvoices
             return $invoice->chargesAutomatically() ? $invoice->pay($payOptions) : $invoice->send();
         } catch (StripeCardException) {
             $payment = new Payment(
-                $this->stripe()->paymentIntents->retrieve(
+                static::stripe()->paymentIntents->retrieve(
                     $invoice->asStripeInvoice()->refresh()->payment_intent,
                     ['expand' => ['invoice.subscription']]
                 )
@@ -169,7 +169,7 @@ trait ManagesInvoices
             unset($parameters['pending_invoice_items_behavior']);
         }
 
-        $stripeInvoice = $this->stripe()->invoices->create($parameters);
+        $stripeInvoice = static::stripe()->invoices->create($parameters);
 
         return new Invoice($this, $stripeInvoice);
     }
@@ -192,7 +192,7 @@ trait ManagesInvoices
         ], $options);
 
         try {
-            $stripeInvoice = $this->stripe()->invoices->upcoming($parameters);
+            $stripeInvoice = static::stripe()->invoices->upcoming($parameters);
 
             return new Invoice($this, $stripeInvoice, $parameters);
         } catch (StripeInvalidRequestException $exception) {
@@ -211,7 +211,7 @@ trait ManagesInvoices
         $stripeInvoice = null;
 
         try {
-            $stripeInvoice = $this->stripe()->invoices->retrieve($id);
+            $stripeInvoice = static::stripe()->invoices->retrieve($id);
         } catch (StripeInvalidRequestException $exception) {
             //
         }
@@ -275,7 +275,7 @@ trait ManagesInvoices
 
         $parameters = array_merge(['limit' => 24], $parameters);
 
-        $stripeInvoices = $this->stripe()->invoices->all(
+        $stripeInvoices = static::stripe()->invoices->all(
             ['customer' => $this->stripe_id] + $parameters
         );
 
