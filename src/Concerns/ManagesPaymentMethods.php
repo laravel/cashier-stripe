@@ -23,7 +23,7 @@ trait ManagesPaymentMethods
             $options['customer'] = $this->stripe_id;
         }
 
-        return self::stripe()->setupIntents->create($options);
+        return static::stripe()->setupIntents->create($options);
     }
 
     /**
@@ -36,7 +36,7 @@ trait ManagesPaymentMethods
      */
     public function findSetupIntent(string $id, array $params = [], array $options = [])
     {
-        return self::stripe()->setupIntents->retrieve($id, $params, $options);
+        return static::stripe()->setupIntents->retrieve($id, $params, $options);
     }
 
     /**
@@ -76,7 +76,7 @@ trait ManagesPaymentMethods
         $parameters = array_merge(['limit' => 24], $parameters);
 
         // "type" is temporarily required by Stripe...
-        $paymentMethods = self::stripe()->paymentMethods->all(
+        $paymentMethods = static::stripe()->paymentMethods->all(
             ['customer' => $this->stripe_id, 'type' => $type] + $parameters
         );
 
@@ -309,6 +309,6 @@ trait ManagesPaymentMethods
             return $paymentMethod;
         }
 
-        return self::stripe()->paymentMethods->retrieve($paymentMethod);
+        return static::stripe()->paymentMethods->retrieve($paymentMethod);
     }
 }
