@@ -6,7 +6,7 @@ The Laravel contributing guide can be found in the [Laravel documentation](https
 
 You will need to set the Stripe **testing** secret environment variable in a custom `phpunit.xml` file in order to run the Cashier tests.
 
-Copy the default file using `cp phpunit.xml.dist phpunit.xml` and add the following line below the `CASHIER_MODEL` environment variable in your new `phpunit.xml` file:
+Copy the default file using `cp phpunit.xml.dist phpunit.xml` and add the following line to the `<php>` section in your new `phpunit.xml` file:
 
     <env name="STRIPE_SECRET" value="Your Stripe Testing Secret Key"/>
 
