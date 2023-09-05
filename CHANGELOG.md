@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/14.12.4...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.5...14.x)
+
+## [v14.12.5](https://github.com/laravel/cashier/compare/14.12.4...v14.12.5) - 2023-09-05
+
+- Fix: Invoke `static` method statically by [@localheinz](https://github.com/localheinz) in https://github.com/laravel/cashier-stripe/pull/1557
+- Fix: Remove reference to `CASHIER_MODEL` enviromment variable by [@localheinz](https://github.com/localheinz) in https://github.com/laravel/cashier-stripe/pull/1563
 
 ## [14.12.4](https://github.com/laravel/cashier/compare/v14.12.3...14.12.4) - 2023-07-11
 
