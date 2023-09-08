@@ -206,7 +206,7 @@ trait ManagesCustomer
      */
     public function stripeMetadata()
     {
-        // return [];
+        return [];
     }
 
     /**
