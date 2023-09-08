@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.5...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.6...14.x)
+
+## [v14.12.6](https://github.com/laravel/cashier/compare/v14.12.5...v14.12.6) - 2023-09-08
+
+- Prevent Sync From Deleting Existing Metadata by [@toddstoker](https://github.com/toddstoker) in https://github.com/laravel/cashier-stripe/pull/1565
 
 ## [v14.12.5](https://github.com/laravel/cashier/compare/14.12.4...v14.12.5) - 2023-09-05
 
