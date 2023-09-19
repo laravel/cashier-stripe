@@ -104,7 +104,7 @@ class SubscriptionsTest extends FeatureTestCase
             'currency_options' => [
                 'eur' => [
                     'unit_amount' => 900,
-                ] 
+                ], 
             ],
             'recurring' => [
                 'interval' => 'month',
@@ -213,7 +213,7 @@ class SubscriptionsTest extends FeatureTestCase
     public function test_subscriptions_can_be_created_with_existing_currency_option()
     {
         $user = $this->createCustomer('subscriptions_can_be_created_with_existing_currency_option');
-        
+
         // Create Subscription
         $user->newSubscription('main', static::$currencyOptionPriceId)
             ->withCurrency('EUR')
