@@ -247,13 +247,13 @@ class SubscriptionBuilder
     public function withUserDefaultCurrency()
     {
         // Not a Stripe customer yet
-        if (!$this->owner->stripe_id) {
+        if (! $this->owner->stripe_id) {
             return $this;
         }
 
         $stripeCustomer = $this->owner->asStripeCustomer();
 
-        if (!empty($stripeCustomer['currency'])) {
+        if (! empty($stripeCustomer['currency'])) {
             $this->currency = $stripeCustomer['currency'];
         }
 
