@@ -104,7 +104,7 @@ class SubscriptionsTest extends FeatureTestCase
             'currency_options' => [
                 'eur' => [
                     'unit_amount' => 900,
-                ], 
+                ],
             ],
             'recurring' => [
                 'interval' => 'month',
@@ -237,7 +237,6 @@ class SubscriptionsTest extends FeatureTestCase
             $user->newSubscription('main', static::$currencyOptionPriceId)
                 ->withCurrency('SEK')
                 ->create('pm_card_visa');
-                
         } catch (Exception $e) {
             $this->assertFalse($user->subscribed('main'));
             $this->assertFalse($user->subscribedToProduct(static::$productId, 'main'));
