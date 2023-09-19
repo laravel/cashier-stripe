@@ -38,6 +38,13 @@ class SubscriptionBuilder
     protected $name;
 
     /**
+     * The user currency.
+     *
+     * @var string
+     */
+    protected $currency;
+
+    /**
      * The prices the customer is being subscribed to.
      *
      * @var array
@@ -220,6 +227,40 @@ class SubscriptionBuilder
     }
 
     /**
+     * The currency code to use.
+     *
+     * @param  string  $currency
+     * @return $this
+     */
+    public function withCurrency($currency)
+    {
+        $this->currency = $currency;
+
+        return $this;
+    }
+
+    /**
+     * Use the customer Stripe default currency.
+     *
+     * @return $this
+     */
+    public function withUserDefaultCurrency()
+    {
+        // Not a Stripe customer yet
+        if (!$this->owner->stripe_id) {
+            return $this;
+        }
+
+        $stripeCustomer = $this->owner->asStripeCustomer();
+
+        if (!empty($stripeCustomer['currency'])) {
+            $this->currency = $stripeCustomer['currency'];
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a new Stripe subscription to the Stripe model.
      *
      * @param  array  $customerOptions
@@ -394,6 +435,7 @@ class SubscriptionBuilder
             'expand' => ['latest_invoice.payment_intent'],
             'metadata' => $this->metadata,
             'items' => Collection::make($this->items)->values()->all(),
+            'currency' => $this->currency,
             'payment_behavior' => $this->paymentBehavior(),
             'promotion_code' => $this->promotionCodeId,
             'proration_behavior' => $this->prorateBehavior(),

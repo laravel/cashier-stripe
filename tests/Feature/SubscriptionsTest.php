@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Tests\Feature;
 
 use Carbon\Carbon;
 use DateTime;
+use Exception;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Exceptions\IncompletePayment;
@@ -34,6 +35,11 @@ class SubscriptionsTest extends FeatureTestCase
      * @var string
      */
     protected static $premiumPriceId;
+
+    /**
+     * @var string
+     */
+    protected static $currencyOptionPriceId;
 
     /**
      * @var string
@@ -89,6 +95,22 @@ class SubscriptionsTest extends FeatureTestCase
             ],
             'billing_scheme' => 'per_unit',
             'unit_amount' => 2000,
+        ])->id;
+
+        static::$currencyOptionPriceId = self::stripe()->prices->create([
+            'product' => static::$productId,
+            'nickname' => 'Monthly $10 or 9€ Other',
+            'currency' => 'USD',
+            'currency_options' => [
+                'eur' => [
+                    'unit_amount' => 900,
+                ] 
+            ],
+            'recurring' => [
+                'interval' => 'month',
+            ],
+            'billing_scheme' => 'per_unit',
+            'unit_amount' => 1000,
         ])->id;
 
         static::$couponId = self::stripe()->coupons->create([
@@ -186,6 +208,64 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertFalse($invoice->hasStartingBalance());
         $this->assertEmpty($invoice->discounts());
         $this->assertInstanceOf(Carbon::class, $invoice->date());
+    }
+
+    public function test_subscriptions_can_be_created_with_existing_currency_option()
+    {
+        $user = $this->createCustomer('subscriptions_can_be_created_with_existing_currency_option');
+        
+        // Create Subscription
+        $user->newSubscription('main', static::$currencyOptionPriceId)
+            ->withCurrency('EUR')
+            ->create('pm_card_visa');
+
+        $subscription = $user->subscription('main');
+        $this->assertTrue($user->subscribed('main'));
+        $this->assertTrue($user->subscribedToProduct(static::$productId, 'main'));
+        $this->assertTrue($user->subscribedToPrice(static::$currencyOptionPriceId, 'main'));
+        $this->assertTrue($user->subscription('main')->active());
+    }
+
+    /** @link https://github.com/laravel/cashier-stripe/issues/1570 */
+    public function test_subscriptions_cannot_be_created_with_unexistent_currency_option()
+    {
+        // Create Customer
+        $user = $this->createCustomer('subscriptions_cannot_be_created_with_unexistent_currency_option');
+
+        try {
+            // Create Subscription
+            $user->newSubscription('main', static::$currencyOptionPriceId)
+                ->withCurrency('SEK')
+                ->create('pm_card_visa');
+                
+        } catch (Exception $e) {
+            $this->assertFalse($user->subscribed('main'));
+            $this->assertFalse($user->subscribedToProduct(static::$productId, 'main'));
+            $this->assertFalse($user->subscribedToPrice(static::$currencyOptionPriceId, 'main'));
+        }
+
+    }
+
+    /** @link https://github.com/laravel/cashier-stripe/issues/1570 */
+    public function test_subscriptions_can_be_created_with_user_default_currency()
+    {
+        // Create Customer
+        $user = $this->createCustomer('subscriptions_can_be_created_with_user_default_currency');
+
+        // Create Subscription with a currency
+        $user->newSubscription('main', static::$currencyOptionPriceId)
+        ->withCurrency('EUR')
+        ->create('pm_card_visa');
+
+        // Create Subscription with the default currency
+        $user->newSubscription('another_main', static::$currencyOptionPriceId)
+            ->withUserDefaultCurrency()
+            ->create('pm_card_visa');
+
+        $subscription = $user->subscription('another_main');
+        $this->assertTrue($user->subscribed('another_main'));
+        $this->assertTrue($user->subscribedToProduct(static::$productId, 'another_main'));
+        $this->assertEquals($subscription->asStripeSubscription()->currency, 'eur');
     }
 
     public function test_swapping_subscription_with_coupon()
