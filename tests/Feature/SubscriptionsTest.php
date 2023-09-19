@@ -243,7 +243,6 @@ class SubscriptionsTest extends FeatureTestCase
             $this->assertFalse($user->subscribedToProduct(static::$productId, 'main'));
             $this->assertFalse($user->subscribedToPrice(static::$currencyOptionPriceId, 'main'));
         }
-
     }
 
     /** @link https://github.com/laravel/cashier-stripe/issues/1570 */
