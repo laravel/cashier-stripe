@@ -108,7 +108,8 @@ class SubscriptionsTest extends FeatureTestCase
     }
 
 
-    public function test_subscribed_when_multiple_subscriptions_of_same_name_exist(){
+    public function test_subscribed_when_multiple_subscriptions_of_same_name_exist()
+    {
         $user = $this->createCustomer('subscriptions_can_be_created');
 
         // Create Subscription

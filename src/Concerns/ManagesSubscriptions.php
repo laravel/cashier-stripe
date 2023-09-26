@@ -136,8 +136,8 @@ trait ManagesSubscriptions
     public function subscribed($name = 'default', $price = null)
     {
         $subscriptions = $this->subscriptions()->where('name', $name)->get();
-        foreach ($subscriptions as $subscription){
-            if ($subscription->valid() && (!$price || $subscription->hasPrice($price))) {
+        foreach ($subscriptions as $subscription) {
+            if ($subscription->valid() && (! $price || $subscription->hasPrice($price))) {
                 return true;
             }
         }
