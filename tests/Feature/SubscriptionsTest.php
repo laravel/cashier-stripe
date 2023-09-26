@@ -107,6 +107,24 @@ class SubscriptionsTest extends FeatureTestCase
         ])->id;
     }
 
+
+    public function test_subscribed_when_multiple_subscriptions_of_same_name_exist(){
+        $user = $this->createCustomer('subscriptions_can_be_created');
+
+        // Create Subscription
+        $user->newSubscription('main', static::$priceId)
+            ->withMetadata($metadata = ['order_id' => '8'])
+            ->create('pm_card_visa');
+
+        // Create Canceled Subscription
+        $user->newSubscription('main', static::$priceId)
+            ->withMetadata($metadata = ['order_id' => '8'])
+            ->create('pm_card_visa');
+        $user->subscription('main')->cancelNow();
+
+
+        $this->assertTrue($user->subscribed('main'));
+    }
     public function test_subscriptions_can_be_created()
     {
         $user = $this->createCustomer('subscriptions_can_be_created');
