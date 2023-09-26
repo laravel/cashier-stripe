@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.6...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.7...14.x)
+
+## [v14.12.7](https://github.com/laravel/cashier/compare/v14.12.6...v14.12.7) - 2023-09-26
+
+- Add `Conditionable` trait to subscription builder by [@maartenpaauw](https://github.com/maartenpaauw) in https://github.com/laravel/cashier-stripe/pull/1573
 
 ## [v14.12.6](https://github.com/laravel/cashier/compare/v14.12.5...v14.12.6) - 2023-09-08
 
