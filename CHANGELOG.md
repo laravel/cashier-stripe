@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.7...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.8...14.x)
+
+## [v14.12.8](https://github.com/laravel/cashier/compare/v14.12.7...v14.12.8) - 2023-10-03
+
+- [14.x] Fix array merge for checkout by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1579
+- [14.x] Fix default sync by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1580
 
 ## [v14.12.7](https://github.com/laravel/cashier/compare/v14.12.6...v14.12.7) - 2023-09-26
 
