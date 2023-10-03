@@ -179,6 +179,8 @@ trait ManagesCustomer
      */
     public function stripeAddress()
     {
+        return [];
+
         // return [
         //     'city' => 'Little Rock',
         //     'country' => 'US',
@@ -196,6 +198,8 @@ trait ManagesCustomer
      */
     public function stripePreferredLocales()
     {
+        return [];
+
         // return ['en'];
     }
 
