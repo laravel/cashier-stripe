@@ -361,7 +361,8 @@ class SubscriptionBuilder
             ]),
         ]);
 
-        return Checkout::customer($this->owner, $this)->create([], array_merge($payload, $sessionOptions), $customerOptions);
+        return Checkout::customer($this->owner, $this)
+            ->create([], array_merge_recursive($payload, $sessionOptions), $customerOptions);
     }
 
     /**
