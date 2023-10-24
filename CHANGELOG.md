@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.8...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.9...14.x)
+
+## [v14.12.9](https://github.com/laravel/cashier/compare/v14.12.8...v14.12.9) - 2023-10-24
+
+- Log more info about invalid pm exception by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1582
 
 ## [v14.12.8](https://github.com/laravel/cashier/compare/v14.12.7...v14.12.8) - 2023-10-03
 
