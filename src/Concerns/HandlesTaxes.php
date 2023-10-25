@@ -84,7 +84,7 @@ trait HandlesTaxes
                 'tax_id_collection' => ['enabled' => true],
             ]);
         }
-        
+
         return [];
     }
 
