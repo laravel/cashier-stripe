@@ -79,7 +79,7 @@ trait HandlesTaxes
      */
     protected function calculateTaxes()
     {
-        if (Cashier::$calculatesTaxes ?: $this->collectTaxIds){
+        if (Cashier::$calculatesTaxes ?: $this->collectTaxIds) {
             return array_filter([
                 'tax_id_collection' => ['enabled' => true],
             ]);
