@@ -78,11 +78,13 @@ class CheckoutBuilder
                 $item['quantity'] = $item['quantity'] ?? 1;
 
                 return $item;
-            })->values()->all(),
-            'tax_id_collection' => [
-                'enabled' => Cashier::$calculatesTaxes ?: $this->collectTaxIds,
-            ],
+            })->values()->all()
         ]);
+
+        if (Cashier::$calculatesTaxes ?: $this->collectTaxIds)
+        {
+            $payload['tax_id_collection'] = ['enabled' => true];
+        }
 
         return Checkout::create($this->owner, array_merge($payload, $sessionOptions), $customerOptions);
     }
