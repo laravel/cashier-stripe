@@ -79,7 +79,7 @@ class CheckoutBuilder
 
                 return $item;
             })->values()->all(),
-            'tax_id_collection' => $this->calculateTaxes()
+            'tax_id_collection' => $this->calculateTaxes(),
         ]);
 
         return Checkout::create($this->owner, array_merge($payload, $sessionOptions), $customerOptions);
