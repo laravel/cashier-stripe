@@ -73,6 +73,21 @@ trait HandlesTaxes
     }
 
     /**
+     * Get the payload for Stripe tax calculation.
+     *
+     * @return array
+     */
+    protected function calculateTaxes()
+    {
+        if (Cashier::$calculatesTaxes ?: $this->collectTaxIds){
+            return array_filter([
+                "tax_id_collection" => ["enabled" => true]
+            ]);
+        }
+        return [];
+    }
+
+    /**
      * Determine if automatic tax is enabled.
      *
      * @return bool
