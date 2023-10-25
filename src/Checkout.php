@@ -85,7 +85,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
         }
 
         // Make sure to collect address and name when Tax ID collection is enabled...
-        if (isset($data['customer']) && $data['tax_id_collection']['enabled'] ?? false) {
+        if (isset($data['customer']) && ($data['tax_id_collection']['enabled'] ?? false)) {
             $data['customer_update']['address'] = 'auto';
             $data['customer_update']['name'] = 'auto';
         }
