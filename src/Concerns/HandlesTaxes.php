@@ -81,7 +81,7 @@ trait HandlesTaxes
     {
         if (Cashier::$calculatesTaxes ?: $this->collectTaxIds){
             return array_filter([
-                'tax_id_collection' => ['enabled' => true]
+                'tax_id_collection' => ['enabled' => true],
             ]);
         }
         return [];
