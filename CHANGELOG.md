@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.9...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.10...14.x)
+
+## [v14.12.10](https://github.com/laravel/cashier/compare/v14.12.9...v14.12.10) - 2023-10-25
+
+- Fix Tax ID collection requires updating business name on the customer by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/cashier-stripe/pull/1586
 
 ## [v14.12.9](https://github.com/laravel/cashier/compare/v14.12.8...v14.12.9) - 2023-10-24
 
