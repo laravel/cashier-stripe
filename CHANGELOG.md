@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.10...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.11...14.x)
+
+## [v14.12.11](https://github.com/laravel/cashier/compare/v14.12.10...v14.12.11) - 2023-10-31
+
+- Remove unique index from items table by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1594
 
 ## [v14.12.10](https://github.com/laravel/cashier/compare/v14.12.9...v14.12.10) - 2023-10-25
 
