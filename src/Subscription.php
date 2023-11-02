@@ -699,10 +699,10 @@ class Subscription extends Model
             'ends_at' => null,
         ])->save();
 
-        $cleanup = [];
+        $subscriptionItemIds = [];
 
         foreach ($stripeSubscription->items as $item) {
-            $cleanup[] = $item->id;
+            $subscriptionItemIds[] = $item->id;
 
             $this->items()->updateOrCreate([
                 'stripe_id' => $item->id,
@@ -714,7 +714,7 @@ class Subscription extends Model
         }
 
         // Delete items that aren't attached to the subscription anymore...
-        $this->items()->whereNotIn('stripe_id', $cleanup)->delete();
+        $this->items()->whereNotIn('stripe_id', $subscriptionItemIds)->delete();
 
         $this->unsetRelation('items');
 
