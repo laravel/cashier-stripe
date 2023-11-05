@@ -120,6 +120,17 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Cancels a payment that is being held for the customer.
+     *
+     * @param  array  $options
+     * @return \Stripe\PaymentIntent
+     */
+    public function cancel(array $options = [])
+    {
+        return $this->paymentIntent->cancel($options);
+    }
+
+    /**
      * Determine if the payment was canceled.
      *
      * @return bool
