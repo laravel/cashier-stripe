@@ -120,7 +120,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Cancels a payment that is being held for the customer.
+     * Cancel the payment.
      *
      * @param  array  $options
      * @return \Stripe\PaymentIntent
