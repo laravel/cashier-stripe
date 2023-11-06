@@ -1156,6 +1156,10 @@ class Subscription extends Model
      */
     public function upcomingInvoice(array $options = [])
     {
+        if ($this->canceled()) {
+            return null;
+        }
+
         return $this->owner->upcomingInvoice(array_merge([
             'subscription' => $this->stripe_id,
         ], $options));
