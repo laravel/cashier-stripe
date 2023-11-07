@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.12.12...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.13.0...14.x)
+
+## [v14.13.0](https://github.com/laravel/cashier/compare/v14.12.12...v14.13.0) - 2023-11-07
+
+- Add support for Payment cancelation by [@jonathanroy](https://github.com/jonathanroy) in https://github.com/laravel/cashier-stripe/pull/1596
+- Early return upcoming invoice by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1597
 
 ## [v14.12.12](https://github.com/laravel/cashier/compare/v14.12.11...v14.12.12) - 2023-11-02
 
