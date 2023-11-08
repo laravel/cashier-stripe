@@ -287,7 +287,7 @@ class WebhookController extends Controller
             return $this->successMethod();
         }
 
-        if ($payload['data']['object']['metadata']['on_session_checkout'] ?? false) {
+        if ($payload['data']['object']['metadata']['is_on_session_checkout'] ?? false) {
             return $this->successMethod();
         }
 
