@@ -71,7 +71,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
     public static function create($owner, array $sessionOptions = [], array $customerOptions = [])
     {
         $data = array_merge([
-            'mode' => 'payment',
+            'mode' => Session::MODE_PAYMENT,
             'success_url' => $sessionOptions['success_url'] ?? route('home').'?checkout=success',
             'cancel_url' => $sessionOptions['cancel_url'] ?? route('home').'?checkout=cancelled',
         ], $sessionOptions);
@@ -88,6 +88,12 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
         if (isset($data['customer']) && ($data['tax_id_collection']['enabled'] ?? false)) {
             $data['customer_update']['address'] = 'auto';
             $data['customer_update']['name'] = 'auto';
+        }
+
+        if ($data['mode'] === Session::MODE_PAYMENT && ($data['invoice_creation']['enabled'] ?? false)) {
+            $data['invoice_creation']['invoice_data']['metadata']['is_on_session_checkout'] = true;
+        } elseif ($data['mode'] === Session::MODE_SUBSCRIPTION) {
+            $data['subscription_data']['metadata']['is_on_session_checkout'] = true;
         }
 
         $session = $stripe->checkout->sessions->create($data);

@@ -287,6 +287,14 @@ class WebhookController extends Controller
             return $this->successMethod();
         }
 
+        if ($payload['data']['object']['metadata']['is_on_session_checkout'] ?? false) {
+            return $this->successMethod();
+        }
+
+        if ($payload['data']['object']['subscription_details']['metadata']['is_on_session_checkout'] ?? false) {
+            return $this->successMethod();
+        }
+
         if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
             if (in_array(Notifiable::class, class_uses_recursive($user))) {
                 $payment = new Payment($user->stripe()->paymentIntents->retrieve(
