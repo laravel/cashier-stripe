@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Money\Currencies\ISOCurrencies;
 use Money\Currency;
 use Money\Formatter\IntlMoneyFormatter;
@@ -107,7 +108,13 @@ class Cashier
     {
         $stripeId = $stripeId instanceof StripeCustomer ? $stripeId->id : $stripeId;
 
-        return $stripeId ? static::$customerModel::withTrashed()->where('stripe_id', $stripeId)->first() : null;
+        $model = static::$customerModel;
+
+        $builder = in_array(SoftDeletes::class, class_uses_recursive($model))
+            ? $model::withTrashed()
+            : new $model;
+
+        return $stripeId ? $builder->where('stripe_id', $stripeId)->first() : null;
     }
 
     /**
