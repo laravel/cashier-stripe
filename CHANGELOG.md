@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.13.0...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.13.1...14.x)
+
+## [v14.13.1](https://github.com/laravel/cashier/compare/v14.13.0...v14.13.1) - 2023-11-08
+
+- [14.x] Prevent confirm email when in Checkout by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1600
+- [14.x] Fix soft deleted customers by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1599
 
 ## [v14.13.0](https://github.com/laravel/cashier/compare/v14.12.12...v14.13.0) - 2023-11-07
 
