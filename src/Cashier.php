@@ -107,7 +107,7 @@ class Cashier
     {
         $stripeId = $stripeId instanceof StripeCustomer ? $stripeId->id : $stripeId;
 
-        return $stripeId ? (new static::$customerModel)->where('stripe_id', $stripeId)->first() : null;
+        return $stripeId ? static::$customerModel::withTrashed()->where('stripe_id', $stripeId)->first() : null;
     }
 
     /**
