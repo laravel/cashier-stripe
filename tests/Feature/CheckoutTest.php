@@ -147,4 +147,26 @@ class CheckoutTest extends FeatureTestCase
 
         $this->assertInstanceOf(Checkout::class, $checkout);
     }
+
+    public function test_customers_can_start_an_embedded_product_checkout_session()
+    {
+        $user = $this->createCustomer('customers_can_start_an_embedded_product_checkout_session');
+
+        $shirtPrice = self::stripe()->prices->create([
+            'currency' => 'USD',
+            'product_data' => [
+                'name' => 'T-shirt',
+            ],
+            'unit_amount' => 1500,
+        ]);
+
+        $items = [$shirtPrice->id => 5];
+
+        $checkout = $user->checkout($items, [
+            'ui_mode' => 'embedded',
+            'return_url' => 'http://example.com',
+        ]);
+
+        $this->assertInstanceOf(Checkout::class, $checkout);
+    }
 }
