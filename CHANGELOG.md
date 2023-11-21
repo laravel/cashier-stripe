@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.13.1...14.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v14.14.0...14.x)
+
+## [v14.14.0](https://github.com/laravel/cashier/compare/v14.13.1...v14.14.0) - 2023-11-21
+
+- Update PaymentMethod.php method return type by [@jwjenkin](https://github.com/jwjenkin) in https://github.com/laravel/cashier-stripe/pull/1601
+- [14.x] Allow creation of checkouts with ui_mode=embedded by [@delassiter](https://github.com/delassiter) in https://github.com/laravel/cashier-stripe/pull/1605
 
 ## [v14.13.1](https://github.com/laravel/cashier/compare/v14.13.0...v14.13.1) - 2023-11-08
 
