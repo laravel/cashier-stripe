@@ -7,10 +7,13 @@ use InvalidArgumentException;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\CashierServiceProvider;
 use Laravel\Cashier\Tests\Fixtures\User;
+use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase
 {
+    use WithWorkbench;
+
     protected function getEnvironmentSetUp($app)
     {
         $apiKey = config('cashier.secret');
