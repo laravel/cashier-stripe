@@ -43,6 +43,13 @@ class Cashier
     protected static $formatCurrencyUsing;
 
     /**
+     * Indicates if Cashier migrations will be run.
+     *
+     * @var bool
+     */
+    public static $runsMigrations = true;
+
+    /**
      * Indicates if Cashier routes will be registered.
      *
      * @var bool
@@ -164,6 +171,18 @@ class Cashier
         $moneyFormatter = new IntlMoneyFormatter($numberFormatter, new ISOCurrencies());
 
         return $moneyFormatter->format($money);
+    }
+
+    /**
+     * Configure Cashier to not register its migrations.
+     *
+     * @return static
+     */
+    public static function ignoreMigrations()
+    {
+        static::$runsMigrations = false;
+
+        return new static;
     }
 
     /**

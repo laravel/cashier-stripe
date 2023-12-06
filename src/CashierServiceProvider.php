@@ -22,6 +22,7 @@ class CashierServiceProvider extends ServiceProvider
         $this->registerLogger();
         $this->registerRoutes();
         $this->registerResources();
+        $this->registerMigrations();
         $this->registerPublishing();
         $this->registerCommands();
 
@@ -123,6 +124,18 @@ class CashierServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register the package migrations.
+     *
+     * @return void
+     */
+    protected function registerMigrations()
+    {
+        if (Cashier::$runsMigrations && $this->app->runningInConsole()) {
+            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        }
+    }
+
+    /**
      * Register the package's publishable resources.
      *
      * @return void
@@ -134,9 +147,7 @@ class CashierServiceProvider extends ServiceProvider
                 __DIR__.'/../config/cashier.php' => $this->app->configPath('cashier.php'),
             ], 'cashier-config');
 
-            $method = method_exists($this, 'publishesMigrations') ? 'publishesMigrations' : 'publishes';
-
-            $this->{$method}([
+            $this->publishes([
                 __DIR__.'/../database/migrations' => $this->app->databasePath('migrations'),
             ], 'cashier-migrations');
 
