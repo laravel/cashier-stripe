@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 use Laravel\Cashier\Exceptions\InvalidPaymentMethod;
+use LogicException;
 use Stripe\PaymentMethod as StripePaymentMethod;
 
 class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
@@ -35,6 +36,10 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
      */
     public function __construct($owner, StripePaymentMethod $paymentMethod)
     {
+        if (is_null($paymentMethod->customer)) {
+            throw new LogicException('The payment method is not attached to a customer.');
+        }
+
         if ($owner->stripe_id !== $paymentMethod->customer) {
             throw InvalidPaymentMethod::invalidOwner($paymentMethod, $owner);
         }
@@ -46,11 +51,11 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
     /**
      * Delete the payment method.
      *
-     * @return \Stripe\PaymentMethod
+     * @return void
      */
     public function delete()
     {
-        return $this->owner->deletePaymentMethod($this->paymentMethod);
+        $this->owner->deletePaymentMethod($this->paymentMethod);
     }
 
     /**

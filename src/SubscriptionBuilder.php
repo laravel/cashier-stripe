@@ -7,6 +7,7 @@ use DateTimeInterface;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\HandlesPaymentFailures;
@@ -18,6 +19,7 @@ use Stripe\Subscription as StripeSubscription;
 class SubscriptionBuilder
 {
     use AllowsCoupons;
+    use Conditionable;
     use HandlesPaymentFailures;
     use HandlesTaxes;
     use InteractsWithPaymentBehavior;
@@ -359,7 +361,8 @@ class SubscriptionBuilder
             ]),
         ]);
 
-        return Checkout::customer($this->owner, $this)->create([], array_merge($payload, $sessionOptions), $customerOptions);
+        return Checkout::customer($this->owner, $this)
+            ->create([], array_merge_recursive($payload, $sessionOptions), $customerOptions);
     }
 
     /**

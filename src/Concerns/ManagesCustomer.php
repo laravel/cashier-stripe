@@ -83,10 +83,14 @@ trait ManagesCustomer
             $options['preferred_locales'] = $locales;
         }
 
+        if (! array_key_exists('metadata', $options) && $metadata = $this->stripeMetadata()) {
+            $options['metadata'] = $metadata;
+        }
+
         // Here we will create the customer instance on Stripe and store the ID of the
         // user from Stripe. This ID will correspond with the Stripe user instances
         // and allow us to retrieve users from Stripe later when we need to work.
-        $customer = $this->stripe()->customers->create($options);
+        $customer = static::stripe()->customers->create($options);
 
         $this->stripe_id = $customer->id;
 
@@ -103,7 +107,7 @@ trait ManagesCustomer
      */
     public function updateStripeCustomer(array $options = [])
     {
-        return $this->stripe()->customers->update(
+        return static::stripe()->customers->update(
             $this->stripe_id, $options
         );
     }
@@ -117,7 +121,7 @@ trait ManagesCustomer
     public function createOrGetStripeCustomer(array $options = [])
     {
         if ($this->hasStripeId()) {
-            return $this->asStripeCustomer();
+            return $this->asStripeCustomer($options['expand'] ?? []);
         }
 
         return $this->createAsStripeCustomer($options);
@@ -133,7 +137,7 @@ trait ManagesCustomer
     {
         $this->assertCustomerExists();
 
-        return $this->stripe()->customers->retrieve(
+        return static::stripe()->customers->retrieve(
             $this->stripe_id, ['expand' => $expand]
         );
     }
@@ -175,6 +179,8 @@ trait ManagesCustomer
      */
     public function stripeAddress()
     {
+        return [];
+
         // return [
         //     'city' => 'Little Rock',
         //     'country' => 'US',
@@ -192,7 +198,19 @@ trait ManagesCustomer
      */
     public function stripePreferredLocales()
     {
+        return [];
+
         // return ['en'];
+    }
+
+    /**
+     * Get the metadata that should be synced to Stripe.
+     *
+     * @return array|null
+     */
+    public function stripeMetadata()
+    {
+        return [];
     }
 
     /**
@@ -208,6 +226,7 @@ trait ManagesCustomer
             'phone' => $this->stripePhone(),
             'address' => $this->stripeAddress(),
             'preferred_locales' => $this->stripePreferredLocales(),
+            'metadata' => $this->stripeMetadata(),
         ]);
     }
 
@@ -264,7 +283,7 @@ trait ManagesCustomer
      */
     public function findPromotionCode($code, array $options = [])
     {
-        $codes = $this->stripe()->promotionCodes->all(array_merge([
+        $codes = static::stripe()->promotionCodes->all(array_merge([
             'code' => $code,
             'limit' => 1,
         ], $options));
@@ -323,7 +342,7 @@ trait ManagesCustomer
             return new Collection();
         }
 
-        $transactions = $this->stripe()
+        $transactions = static::stripe()
             ->customers
             ->allBalanceTransactions($this->stripe_id, array_merge(['limit' => $limit], $options));
 
@@ -370,7 +389,7 @@ trait ManagesCustomer
     {
         $this->assertCustomerExists();
 
-        $transaction = $this->stripe()
+        $transaction = static::stripe()
             ->customers
             ->createBalanceTransaction($this->stripe_id, array_filter(array_merge([
                 'amount' => $amount,
@@ -413,7 +432,7 @@ trait ManagesCustomer
     {
         $this->assertCustomerExists();
 
-        return $this->stripe()->billingPortal->sessions->create(array_merge([
+        return static::stripe()->billingPortal->sessions->create(array_merge([
             'customer' => $this->stripeId(),
             'return_url' => $returnUrl ?? route('home'),
         ], $options))['url'];
@@ -443,7 +462,7 @@ trait ManagesCustomer
         $this->assertCustomerExists();
 
         return new Collection(
-            $this->stripe()->customers->allTaxIds($this->stripe_id, $options)->data
+            static::stripe()->customers->allTaxIds($this->stripe_id, $options)->data
         );
     }
 
@@ -457,7 +476,7 @@ trait ManagesCustomer
         $this->assertCustomerExists();
 
         try {
-            return $this->stripe()->customers->retrieveTaxId(
+            return static::stripe()->customers->retrieveTaxId(
                 $this->stripe_id, $id, []
             );
         } catch (StripeInvalidRequestException $exception) {
@@ -476,7 +495,7 @@ trait ManagesCustomer
     {
         $this->assertCustomerExists();
 
-        return $this->stripe()->customers->createTaxId($this->stripe_id, [
+        return static::stripe()->customers->createTaxId($this->stripe_id, [
             'type' => $type,
             'value' => $value,
         ]);
@@ -493,7 +512,7 @@ trait ManagesCustomer
         $this->assertCustomerExists();
 
         try {
-            $this->stripe()->customers->deleteTaxId($this->stripe_id, $id);
+            static::stripe()->customers->deleteTaxId($this->stripe_id, $id);
         } catch (StripeInvalidRequestException $exception) {
             //
         }

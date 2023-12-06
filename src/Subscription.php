@@ -699,10 +699,10 @@ class Subscription extends Model
             'ends_at' => null,
         ])->save();
 
-        $stripePrices = [];
+        $subscriptionItemIds = [];
 
         foreach ($stripeSubscription->items as $item) {
-            $stripePrices[] = $item->price->id;
+            $subscriptionItemIds[] = $item->id;
 
             $this->items()->updateOrCreate([
                 'stripe_id' => $item->id,
@@ -714,7 +714,7 @@ class Subscription extends Model
         }
 
         // Delete items that aren't attached to the subscription anymore...
-        $this->items()->whereNotIn('stripe_price', $stripePrices)->delete();
+        $this->items()->whereNotIn('stripe_id', $subscriptionItemIds)->delete();
 
         $this->unsetRelation('items');
 
@@ -1156,6 +1156,10 @@ class Subscription extends Model
      */
     public function upcomingInvoice(array $options = [])
     {
+        if ($this->canceled()) {
+            return null;
+        }
+
         return $this->owner->upcomingInvoice(array_merge([
             'subscription' => $this->stripe_id,
         ], $options));

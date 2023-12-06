@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('quantity')->nullable();
             $table->timestamps();
 
-            $table->unique(['subscription_id', 'stripe_price']);
+            $table->index(['subscription_id', 'stripe_price']);
         });
     }
 
