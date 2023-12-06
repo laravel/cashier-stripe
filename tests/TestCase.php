@@ -2,19 +2,19 @@
 
 namespace Laravel\Cashier\Tests;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\CashierServiceProvider;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase
 {
-    use WithWorkbench;
+    use RefreshDatabase, WithWorkbench;
 
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $apiKey = config('cashier.secret');
 
@@ -23,10 +23,5 @@ abstract class TestCase extends OrchestraTestCase
         }
 
         Cashier::useCustomerModel(User::class);
-    }
-
-    protected function getPackageProviders($app)
-    {
-        return [CashierServiceProvider::class];
     }
 }
