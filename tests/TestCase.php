@@ -12,7 +12,7 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase
 {
-    use RefreshDatabase, WithWorkbench;
+    use WithWorkbench;
 
     protected function defineEnvironment($app)
     {
