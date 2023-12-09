@@ -51,7 +51,7 @@
         <tr valign="top">
             <td width="160">
                 <span style="font-size: 28px;">
-                    Receipt
+                    Invoice
                 </span>
 
                 <!-- Invoice Info -->
