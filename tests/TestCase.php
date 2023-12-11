@@ -5,7 +5,6 @@ namespace Laravel\Cashier\Tests;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\CashierServiceProvider;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
