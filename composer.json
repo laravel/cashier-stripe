@@ -39,7 +39,7 @@
     "require-dev": {
         "dompdf/dompdf": "^2.0",
         "mockery/mockery": "^1.0",
-        "orchestra/testbench": "^7.0|^8.0",
+        "orchestra/testbench": "^7.14|^8.14",
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.0"
     },
