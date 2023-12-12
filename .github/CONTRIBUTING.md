@@ -10,6 +10,4 @@ Copy the default file using `cp phpunit.xml.dist phpunit.xml` and add the follow
 
     <env name="STRIPE_SECRET" value="Your Stripe Testing Secret Key"/>
 
-**Make sure to use your "testing" secret key and not your production secret key.** Please note that due to the fact that actual API requests against Stripe are being made, these tests take a few minutes to run. 
-
-While running these tests a few times after each other you may run into Stripe's rate limiting for test mode. Unfortunately there's no way around this and the only solution is to wait a bit between running the tests.
+**Make sure to use your "testing" secret key and not your production secret key.** These tests may take a few minutes to run due to the fact that actual API requests against Stripe are being made. You may also encounter rate limiting errors from Stripe while running these tests. Unfortunately, there is no work around for this except waiting for the rate limit to expire.
