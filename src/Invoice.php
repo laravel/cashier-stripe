@@ -528,7 +528,9 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function tab($description, $amount, array $options = [])
     {
-        $item = $this->owner()->tab($description, $amount, array_merge($options, ['invoice' => $this->invoice->id]));
+        $item = $this->owner()->tab($description, $amount, array_merge($options, [
+            'invoice' => $this->invoice->id,
+        ]));
 
         $this->refresh();
 

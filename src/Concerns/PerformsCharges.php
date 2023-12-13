@@ -17,11 +17,12 @@ trait PerformsCharges
      * @param  int  $amount
      * @param  string  $paymentMethod
      * @param  array  $options
+     * @param  string|null  $returnUrl
      * @return \Laravel\Cashier\Payment
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
-    public function charge($amount, $paymentMethod, array $options = [])
+    public function charge($amount, $paymentMethod, array $options = [], $returnUrl = null)
     {
         $options = array_merge([
             'confirmation_method' => 'automatic',
@@ -30,7 +31,7 @@ trait PerformsCharges
 
         $options['payment_method'] = $paymentMethod;
 
-        $payment = $this->createPayment($amount, $options);
+        $payment = $this->createPayment($amount, $options, $returnUrl);
 
         $payment->validate();
 
@@ -42,15 +43,16 @@ trait PerformsCharges
      *
      * @param  int  $amount
      * @param  array  $options
+     * @param  string|null  $returnUrl
      * @return \Laravel\Cashier\Payment
      */
-    public function pay($amount, array $options = [])
+    public function pay($amount, array $options = [], $returnUrl = null)
     {
         $options['automatic_payment_methods'] = ['enabled' => true];
 
         unset($options['payment_method_types']);
 
-        return $this->createPayment($amount, $options);
+        return $this->createPayment($amount, $options, $returnUrl);
     }
 
     /**
@@ -59,15 +61,16 @@ trait PerformsCharges
      * @param  int  $amount
      * @param  array  $paymentMethods
      * @param  array  $options
+     * @param  string|null  $returnUrl
      * @return \Laravel\Cashier\Payment
      */
-    public function payWith($amount, array $paymentMethods, array $options = [])
+    public function payWith($amount, array $paymentMethods, array $options = [], $returnUrl = null)
     {
         $options['payment_method_types'] = $paymentMethods;
 
         unset($options['automatic_payment_methods']);
 
-        return $this->createPayment($amount, $options);
+        return $this->createPayment($amount, $options, $returnUrl);
     }
 
     /**
@@ -75,9 +78,10 @@ trait PerformsCharges
      *
      * @param  int  $amount
      * @param  array  $options
+     * @param  string|null  $returnUrl
      * @return \Laravel\Cashier\Payment
      */
-    public function createPayment($amount, array $options = [])
+    public function createPayment($amount, array $options = [], $returnUrl = null)
     {
         $options = array_merge([
             'currency' => $this->preferredCurrency(),
@@ -87,6 +91,10 @@ trait PerformsCharges
 
         if ($this->hasStripeId()) {
             $options['customer'] = $this->stripe_id;
+        }
+
+        if ($options['confirm'] ?? false) {
+            $options['return_url'] ??= $returnUrl ?? url('/');
         }
 
         return new Payment(
