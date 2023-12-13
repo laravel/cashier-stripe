@@ -160,10 +160,17 @@ trait ManagesInvoices
     {
         $this->assertCustomerExists();
 
+        $stripeCustomer = $this->asStripeCustomer();
+
         $parameters = array_merge([
             'automatic_tax' => $this->automaticTaxPayload(),
             'customer' => $this->stripe_id,
+            'currency' => $stripeCustomer->currency ?? config('cashier.currency'),
         ], $options);
+
+        if (isset($parameters['subscription'])) {
+            unset($parameters['currency']);
+        }
 
         if (array_key_exists('subscription', $parameters)) {
             unset($parameters['pending_invoice_items_behavior']);
