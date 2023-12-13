@@ -50,24 +50,24 @@ trait ManagesPaymentMethods
     }
 
     /**
-     * Determines if the customer currently has at least one payment method of the given type.
+     * Determines if the customer currently has at least one payment method of an optional type.
      *
-     * @param  string  $type
+     * @param  string|null  $type
      * @return bool
      */
-    public function hasPaymentMethod($type = 'card')
+    public function hasPaymentMethod($type = null)
     {
         return $this->paymentMethods($type)->isNotEmpty();
     }
 
     /**
-     * Get a collection of the customer's payment methods of the given type.
+     * Get a collection of the customer's payment methods of an optional type.
      *
-     * @param  string  $type
+     * @param  string|null  $type
      * @param  array  $parameters
      * @return \Illuminate\Support\Collection|\Laravel\Cashier\PaymentMethod[]
      */
-    public function paymentMethods($type = 'card', $parameters = [])
+    public function paymentMethods($type = null, $parameters = [])
     {
         if (! $this->hasStripeId()) {
             return new Collection();
@@ -77,7 +77,7 @@ trait ManagesPaymentMethods
 
         // "type" is temporarily required by Stripe...
         $paymentMethods = static::stripe()->paymentMethods->all(
-            ['customer' => $this->stripe_id, 'type' => $type] + $parameters
+            array_filter(['customer' => $this->stripe_id, 'type' => $type]) + $parameters
         );
 
         return Collection::make($paymentMethods->data)->map(function ($paymentMethod) {
@@ -266,10 +266,10 @@ trait ManagesPaymentMethods
     /**
      * Deletes the customer's payment methods of the given type.
      *
-     * @param  string  $type
+     * @param  string|null  $type
      * @return void
      */
-    public function deletePaymentMethods($type = 'card')
+    public function deletePaymentMethods($type = null)
     {
         $this->paymentMethods($type)->each(function (PaymentMethod $paymentMethod) {
             $paymentMethod->delete();
