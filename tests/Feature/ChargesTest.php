@@ -12,7 +12,9 @@ class ChargesTest extends FeatureTestCase
         $user = $this->createCustomer('customer_can_be_charged');
         $user->createAsStripeCustomer();
 
-        $response = $user->charge(1000, 'pm_card_visa');
+        $response = $user->charge(1000, 'pm_card_visa', [
+            'return_url' => 'https://example.com/return',
+        ]);
 
         $this->assertInstanceOf(Payment::class, $response);
         $this->assertEquals(1000, $response->rawAmount());
@@ -23,7 +25,9 @@ class ChargesTest extends FeatureTestCase
     {
         $user = $this->createCustomer('non_stripe_customer_can_be_charged');
 
-        $response = $user->charge(1000, 'pm_card_visa');
+        $response = $user->charge(1000, 'pm_card_visa', [
+            'return_url' => 'https://example.com/return',
+        ]);
 
         $this->assertInstanceOf(Payment::class, $response);
         $this->assertEquals(1000, $response->rawAmount());
@@ -81,7 +85,9 @@ class ChargesTest extends FeatureTestCase
         $user->createAsStripeCustomer();
 
         try {
-            $user->charge(1000, 'pm_card_threeDSecure2Required');
+            $user->charge(1000, 'pm_card_threeDSecure2Required', [
+                'return_url' => 'https://example.com/return',
+            ]);
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $e) {
