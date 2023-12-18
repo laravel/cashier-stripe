@@ -24,45 +24,45 @@ trait ManagesSubscriptions
     /**
      * Determine if the Stripe model is on trial.
      *
-     * @param  string  $type
+     * @param  string|null  $type
      * @param  string|null  $price
      * @return bool
      */
-    public function onTrial($type = 'default', $price = null)
+    public function onTrial($type = null, $price = null)
     {
         if (func_num_args() === 0 && $this->onGenericTrial()) {
             return true;
         }
 
-        $subscription = $this->subscription($type);
+        return ! is_null($this->subscription($type, function (Subscription $subscription) use ($price) {
+            if (! $subscription->onTrial()) {
+                return false;
+            }
 
-        if (! $subscription || ! $subscription->onTrial()) {
-            return false;
-        }
-
-        return ! $price || $subscription->hasPrice($price);
+            return ! $price || $subscription->hasPrice($price);
+        }));
     }
 
     /**
      * Determine if the Stripe model's trial has ended.
      *
-     * @param  string  $type
+     * @param  string|null  $type
      * @param  string|null  $price
      * @return bool
      */
-    public function hasExpiredTrial($type = 'default', $price = null)
+    public function hasExpiredTrial($type = null, $price = null)
     {
         if (func_num_args() === 0 && $this->hasExpiredGenericTrial()) {
             return true;
         }
 
-        $subscription = $this->subscription($type);
+        return ! is_null($this->subscription($type, function (Subscription $subscription) use ($price) {
+            if (! $subscription->hasExpiredTrial()) {
+                return false;
+            }
 
-        if (! $subscription || ! $subscription->hasExpiredTrial()) {
-            return false;
-        }
-
-        return ! $price || $subscription->hasPrice($price);
+            return ! $price || $subscription->hasPrice($price);
+        }));
     }
 
     /**
@@ -110,16 +110,33 @@ trait ManagesSubscriptions
     /**
      * Get the ending date of the trial.
      *
-     * @param  string  $type
+     * @param  string|null  $type
      * @return \Illuminate\Support\Carbon|null
+     *
+     * @todo work out subscription type handling.
      */
-    public function trialEndsAt($type = 'default')
+    public function trialEndsAt($type = null)
     {
         if (func_num_args() === 0 && $this->onGenericTrial()) {
             return $this->trial_ends_at;
         }
 
-        if ($subscription = $this->subscription($type)) {
+        if (is_null($type)) {
+            throw_if(
+                $this->subscriptions()->groupBy('type')->count() > 1,
+                new \LogicException('Please provide a subscription type when you have multiple ones.')
+            );
+        }
+
+        $subscriptions = is_null($type)
+            ? $this->subscriptions
+            : $this->subscriptions->where('type', $type);
+
+        $subscription = $this->subscription($type, function (Subscription $subscription) {
+            return $subscription->onTrial();
+        });
+
+        if ($subscription) {
             return $subscription->trial_ends_at;
         }
 
@@ -129,30 +146,35 @@ trait ManagesSubscriptions
     /**
      * Determine if the Stripe model has a given subscription.
      *
-     * @param  string  $type
+     * @param  string|null  $type
      * @param  string|null  $price
      * @return bool
      */
-    public function subscribed($type = 'default', $price = null)
+    public function subscribed($type = null, $price = null)
     {
-        $subscription = $this->subscription($type);
+        return ! is_null($this->subscription($type, function (Subscription $subscription) use ($price) {
+            if (! $subscription->valid()) {
+                return false;
+            }
 
-        if (! $subscription || ! $subscription->valid()) {
-            return false;
-        }
-
-        return ! $price || $subscription->hasPrice($price);
+            return ! $price || $subscription->hasPrice($price);
+        }));
     }
 
     /**
-     * Get a subscription instance by $type.
+     * Get a subscription instance optionally filtered by their $type and a callback.
      *
-     * @param  string  $type
+     * @param  string|null  $type
+     * @param  callable|null  $callback
      * @return \Laravel\Cashier\Subscription|null
      */
-    public function subscription($type = 'default')
+    public function subscription($type = null, callable $callback = null)
     {
-        return $this->subscriptions->where('type', $type)->first();
+        $subscriptions = is_null($type)
+            ? $this->subscriptions
+            : $this->subscriptions->where('type', $type);
+
+        return $subscriptions->first($callback);
     }
 
     /**
@@ -166,66 +188,64 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Determine if the customer's subscription has an incomplete payment.
+     * Determine if any of the customer's subscriptions has an incomplete payment.
      *
-     * @param  string  $type
+     * @param  string|null  $type
      * @return bool
      */
-    public function hasIncompletePayment($type = 'default')
+    public function hasIncompletePayment($type = null)
     {
-        if ($subscription = $this->subscription($type)) {
+        return ! is_null($this->subscription($type, function (Subscription $subscription) {
             return $subscription->hasIncompletePayment();
-        }
-
-        return false;
+        }));
     }
 
     /**
      * Determine if the Stripe model is actively subscribed to one of the given products.
      *
      * @param  string|string[]  $products
-     * @param  string  $type
+     * @param  string|null  $type
      * @return bool
      */
-    public function subscribedToProduct($products, $type = 'default')
+    public function subscribedToProduct($products, $type = null)
     {
-        $subscription = $this->subscription($type);
-
-        if (! $subscription || ! $subscription->valid()) {
-            return false;
-        }
-
-        foreach ((array) $products as $product) {
-            if ($subscription->hasProduct($product)) {
-                return true;
+        return ! is_null($this->subscription($type, function (Subscription $subscription) use ($products) {
+            if (! $subscription->valid()) {
+                return false;
             }
-        }
 
-        return false;
+            foreach ((array) $products as $product) {
+                if ($subscription->hasProduct($product)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }));
     }
 
     /**
      * Determine if the Stripe model is actively subscribed to one of the given prices.
      *
      * @param  string|string[]  $prices
-     * @param  string  $type
+     * @param  string|null  $type
      * @return bool
      */
-    public function subscribedToPrice($prices, $type = 'default')
+    public function subscribedToPrice($prices, $type = null)
     {
-        $subscription = $this->subscription($type);
-
-        if (! $subscription || ! $subscription->valid()) {
-            return false;
-        }
-
-        foreach ((array) $prices as $price) {
-            if ($subscription->hasPrice($price)) {
-                return true;
+        return ! is_null($this->subscription($type, function (Subscription $subscription) use ($prices) {
+            if (! $subscription->valid()) {
+                return false;
             }
-        }
 
-        return false;
+            foreach ((array) $prices as $price) {
+                if ($subscription->hasPrice($price)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }));
     }
 
     /**
