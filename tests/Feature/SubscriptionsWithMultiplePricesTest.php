@@ -329,7 +329,7 @@ class SubscriptionsWithMultiplePricesTest extends FeatureTestCase
     {
         /** @var \Laravel\Cashier\Subscription $subscription */
         $subscription = $user->subscriptions()->create([
-            'name' => 'main',
+            'type' => 'main',
             'stripe_id' => 'sub_foo',
             'stripe_price' => self::$priceId,
             'quantity' => 1,

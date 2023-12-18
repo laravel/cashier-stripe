@@ -72,7 +72,7 @@ class WebhooksTest extends FeatureTestCase
         ])->assertOk();
 
         $this->assertDatabaseHas('subscriptions', [
-            'name' => 'default',
+            'type' => 'default',
             'user_id' => $user->id,
             'stripe_id' => 'sub_foo',
             'stripe_status' => 'active',
@@ -92,7 +92,7 @@ class WebhooksTest extends FeatureTestCase
         $user = $this->createCustomer('subscriptions_are_updated', ['stripe_id' => 'cus_foo']);
 
         $subscription = $user->subscriptions()->create([
-            'name' => 'main',
+            'type' => 'main',
             'stripe_id' => 'sub_foo',
             'stripe_price' => 'price_foo',
             'stripe_status' => StripeSubscription::STATUS_ACTIVE,
@@ -150,7 +150,7 @@ class WebhooksTest extends FeatureTestCase
         $cancelDate = Carbon::now()->addMonths(6);
 
         $subscription = $user->subscriptions()->create([
-            'name' => 'main',
+            'type' => 'main',
             'stripe_id' => 'sub_foo',
             'stripe_price' => 'price_foo',
             'stripe_status' => StripeSubscription::STATUS_ACTIVE,

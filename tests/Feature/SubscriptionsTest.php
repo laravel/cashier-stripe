@@ -759,7 +759,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         // Start with an incomplete subscription.
         $subscription = $user->subscriptions()->create([
-            'name' => 'yearly',
+            'type' => 'yearly',
             'stripe_id' => 'xxxx',
             'stripe_status' => StripeSubscription::STATUS_INCOMPLETE,
             'stripe_price' => 'stripe-yearly',
@@ -897,7 +897,7 @@ class SubscriptionsTest extends FeatureTestCase
         $user = $this->createCustomer('subscriptions_with_options_can_be_created');
 
         $subscription = $user->subscriptions()->create([
-            'name' => 'default',
+            'type' => 'default',
             'stripe_id' => 'sub_'.Str::random(10),
             'stripe_status' => 'active',
             'stripe_price' => 'price_xxx',
@@ -915,7 +915,7 @@ class SubscriptionsTest extends FeatureTestCase
         $subscription->markAsCanceled();
 
         $user->subscriptions()->create([
-            'name' => 'default',
+            'type' => 'default',
             'stripe_id' => 'sub_'.Str::random(10),
             'stripe_status' => 'active',
             'stripe_price' => 'price_xxx',
