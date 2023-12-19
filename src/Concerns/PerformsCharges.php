@@ -89,10 +89,6 @@ trait PerformsCharges
             $options['customer'] = $this->stripe_id;
         }
 
-        if ($options['confirm'] ?? false) {
-            $options['return_url'] ??= route('home');
-        }
-
         return new Payment(
             static::stripe()->paymentIntents->create($options)
         );
