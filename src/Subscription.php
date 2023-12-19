@@ -290,7 +290,7 @@ class Subscription extends Model
      */
     public function canceled()
     {
-        return ! is_null($this->ends_at);
+        return ! is_null($this->ends_at) || $this->stripe_status == StripeSubscription::STATUS_CANCELED;
     }
 
     /**
