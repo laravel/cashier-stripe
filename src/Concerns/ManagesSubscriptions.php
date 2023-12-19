@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionBuilder;
+use LogicException;
 
 trait ManagesSubscriptions
 {
@@ -112,8 +113,6 @@ trait ManagesSubscriptions
      *
      * @param  string|null  $type
      * @return \Illuminate\Support\Carbon|null
-     *
-     * @todo work out subscription type handling.
      */
     public function trialEndsAt($type = null)
     {
@@ -121,22 +120,13 @@ trait ManagesSubscriptions
             return $this->trial_ends_at;
         }
 
-        if (is_null($type)) {
-            throw_if(
-                $this->subscriptions()->groupBy('type')->count() > 1,
-                new \LogicException('Please provide a subscription type when you have multiple ones.')
-            );
-        }
+        // Require a subscription type if there are multiple subscriptions types.
+        throw_if(
+            is_null($type) && $this->subscriptions()->groupBy('type')->count() > 1,
+            new LogicException('Please provide a subscription type when you have multiple ones.')
+        );
 
-        $subscriptions = is_null($type)
-            ? $this->subscriptions
-            : $this->subscriptions->where('type', $type);
-
-        $subscription = $this->subscription($type, function (Subscription $subscription) {
-            return $subscription->onTrial();
-        });
-
-        if ($subscription) {
+        if ($subscription = $this->subscription($type)) {
             return $subscription->trial_ends_at;
         }
 
@@ -144,7 +134,7 @@ trait ManagesSubscriptions
     }
 
     /**
-     * Determine if the Stripe model has a given subscription.
+     * Determine if the Stripe model has a valid subscription, optionally filtered by a price ID.
      *
      * @param  string|null  $type
      * @param  string|null  $price
@@ -170,11 +160,15 @@ trait ManagesSubscriptions
      */
     public function subscription($type = null, callable $callback = null)
     {
+        /** @var \Illuminate\Database\Eloquent\Collection */
         $subscriptions = is_null($type)
             ? $this->subscriptions
             : $this->subscriptions->where('type', $type);
 
-        return $subscriptions->first($callback);
+        return $subscriptions
+            ->groupBy('type')
+            ->map(fn ($results) => $results->first())
+            ->first($callback);
     }
 
     /**
