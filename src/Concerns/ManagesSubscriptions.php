@@ -46,7 +46,7 @@ trait ManagesSubscriptions
 
     /**
      * Determine if the Stripe model's trial has ended.
-     *
+     
      * @param  string|null  $type
      * @param  string|null  $price
      * @return bool
