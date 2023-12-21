@@ -2,13 +2,105 @@
 
 ## Upgrading To 15.0 From 14.x
 
-### Migration Changes
+### Minimum Versions
+
+The following required dependency versions have been updated:
+
+- The minimum PHP version is now v8.1
+- The minimum Laravel version is now v10.0
+
+### Stripe SDK Version
+
+PR: https://github.com/laravel/cashier-stripe/pull/1615
+
+The Stripe SDK version is now fixed at v13.x.
+
+### Stripe API Version
+
+PR: https://github.com/laravel/cashier-stripe/pull/1615
+
+The default Stripe API version for Cashier 15 is `2023-10-16`. If this is the latest Stripe API version when you upgrade to this Cashier version, then we recommend you also upgrade your Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
+
+If you use the Stripe PHP SDK directly, make sure to properly test your integration after updating.
+
+#### Upgrading Your Webhook
+
+You should ensure your webhook operates on the same API version as Cashier. To do so, you may use the `cashier:webhook` command from your production environment to create a new webhook that matches Cashier's Stripe API version:
+
+```bash
+php artisan cashier:webhook --disabled
+```
+
+This will create a new webhook [in your Stripe dashboard](https://dashboard.stripe.com/webhooks) with the same Stripe API version as Cashier. The webhook will be immediately disabled so it doesn't interfere with your existing production application until you are ready to enable it. By default, the webhook will be created using the `APP_URL` environment variable to determine the proper URL for your application. If you need to use a different URL, you can use the `--url` flag when invoking the command:
+
+```bash
+php artisan cashier:webhook --disabled --url "http://example.com/stripe/webhook"
+```
+
+You may use the following upgrade checklist to properly enable the new webhook:
+
+1. If you have webhook signature verification enabled, disable it on production by temporarily removing the `STRIPE_WEBHOOK_SECRET` environment variable.
+2. Add any extra Stripe events your application requires to the new webhook in your Stripe dashboard.
+3. Disable the old webhook in your Stripe dashboard.
+4. Enable the new webhook in your Stripe dashboard.
+5. Re-enable the new webhook secret by re-adding the `STRIPE_WEBHOOK_SECRET` environment variable in production with the secret from the new webhook.
+6. Remove the old webhook in your Stripe dashboard.
+
+After following this process, your new webhook will be active and ready to receive events.
+
+### Publishing Migrations
 
 Cashier 15.0 no longer automatically loads migrations from its own migrations directory. Instead, you should run the following command to publish Cashier's migrations to your application:
 
 ```bash
 php artisan vendor:publish --tag=cashier-migrations
 ```
+
+### Renamed "Name" Column To "Type"
+
+PR: https://github.com/laravel/cashier-stripe/pull/1620
+
+To better indicate the purpose of this column, we've rename the `name` column on the `subscriptions` table to `type`. The purpose of this change is to resolve confusion surrouding the `name` column as many users believed it needed to be a customer-facing, user friendly "name", when in reality the column is mainly used to differentiate the different "types" of subscriptions your application may offer and is only used internally by Cashier. You should define the following schema change in a migration when upgrading:
+
+```php
+Schema::table('subscriptions', function (Blueprint $table) {
+    $table->renameColumn('name', 'type');
+});
+```
+
+### Rename Receipt To Invoice
+
+PR: https://github.com/laravel/cashier-stripe/pull/1609
+
+The `receipt.blade.php` view was renamed to `invoice.blade.php`. If you exported Cashier's views you should rename this view manually. This view is typically located in `resources/views/vendor/laravel/cashier-stripe`.
+
+### Fetch All Payment Methods
+
+PR: https://github.com/laravel/cashier-stripe/pull/1617
+
+Retrieving payment methods is no longer limited to a single payment method type. Instead, by default, payment method related methods will now fetch all attached methods regardless of their type. However, to maintain the previous behavior of fetching card payment methods, you may provide the payment method type to the `hasPaymentMethod`, `paymentMethods`, and `deletePaymentMethods` methods:
+
+```php
+---$billable->hasPaymentMethod();
+---$billable->paymentMethods();
+---$billable->deletePaymentMethods();
+
++++$billable->hasPaymentMethod('card');
++++$billable->paymentMethods('card');
++++$billable->deletePaymentMethods('card');
+```
+
+### Always End Subscription Trial When Canceling
+
+PR: https://github.com/laravel/cashier-stripe/pull/1465
+
+Previously, when a subscription was canceled, any lingering trial on the subscription did not end. In Cashier v15, the trial for a subscription is always ended when the subscription is canceled.
+
+### `isDeleted` Method On Invoice Removed
+
+PR: https://github.com/laravel/cashier-stripe/pull/1529
+
+The `deleted` status on invoices no longer exists and therefore its corresponding method has been removed.
 
 ## Upgrading To 14.12.2 From 14.12
 
