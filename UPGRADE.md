@@ -13,7 +13,7 @@ The following required dependency versions have been updated:
 
 PR: https://github.com/laravel/cashier-stripe/pull/1615
 
-The Stripe SDK version is now fixed at v13.x. This is because it's the version of Stripe's SDK that's compatible with the API version we support.
+The Stripe SDK version is now fixed at v13.x.
 
 ### Stripe API Version
 
@@ -48,7 +48,7 @@ You may use the following upgrade checklist to properly enable the new webhook:
 
 After following this process, your new webhook will be active and ready to receive events.
 
-### Migration Changes
+### Publishing Migrations
 
 Cashier 15.0 no longer automatically loads migrations from its own migrations directory. Instead, you should run the following command to publish Cashier's migrations to your application:
 
@@ -56,11 +56,11 @@ Cashier 15.0 no longer automatically loads migrations from its own migrations di
 php artisan vendor:publish --tag=cashier-migrations
 ```
 
-### Renamed Name Column To Type
+### Renamed "Name" Column To "Type"
 
 PR: https://github.com/laravel/cashier-stripe/pull/1620
 
-To better indicate what this column does, we've decided to rename the `name` column on the `subscriptions` table to `type`. You should add the following migration when upgrading:
+To better indicate the purpose of this column, we've rename the `name` column on the `subscriptions` table to `type`. The purpose of this change is to resolve confusion surrouding the `name` column as many users believed it needed to be a customer-facing, user friendly "name", when in reality the column is mainly used to differentiate the different "types" of subscriptions your application may offer and is only used internally by Cashier. You should define the following schema change in a migration when upgrading:
 
 ```php
 Schema::table('subscriptions', function (Blueprint $table) {
@@ -72,13 +72,13 @@ Schema::table('subscriptions', function (Blueprint $table) {
 
 PR: https://github.com/laravel/cashier-stripe/pull/1609
 
-The `receipt.blade.php` view was renamed to `invoice.blade.php`. If you exported Cashier's views you'll need to rename this view manually in `resources/views/vendor/laravel/cashier-stripe`.
+The `receipt.blade.php` view was renamed to `invoice.blade.php`. If you exported Cashier's views you should rename this view manually. This view is typically located in `resources/views/vendor/laravel/cashier-stripe`.
 
 ### Fetch All Payment Methods
 
 PR: https://github.com/laravel/cashier-stripe/pull/1617
 
-An update was made to no longer limit the payment method calls to a single payment method type. Instead, by default, these payment methods will now fetch all attached methods regardless from there types. If you want to keep the previous behavior of fetching cards by default, make these adjustments:
+Retrieving payment methods is no longer limited to a single payment method type. Instead, by default, payment method related methods will now fetch all attached methods regardless of their type. However, to maintain the previous behavior of fetching card payment methods, you may provide the payment method type to the `hasPaymentMethod`, `paymentMethods`, and `deletePaymentMethods` methods:
 
 ```php
 ---$billable->hasPaymentMethod();
@@ -94,13 +94,13 @@ An update was made to no longer limit the payment method calls to a single payme
 
 PR: https://github.com/laravel/cashier-stripe/pull/1465
 
-Before, when a subscription was cancelled from the dashboard, any lingering trial on it didn't end. In v15 the trial for a subscription is always ended when the subscription is canceled.
+Previously, when a subscription was canceled, any lingering trial on the subscription did not end. In Cashier v15, the trial for a subscription is always ended when the subscription is canceled.
 
 ### `isDeleted` Method On Invoice Removed
 
 PR: https://github.com/laravel/cashier-stripe/pull/1529
 
-The `deleted` status on invoices no longer exists and therefor its subsequent method is removed as well.
+The `deleted` status on invoices no longer exists and therefore its corresponding method has been removed.
 
 ## Upgrading To 14.12.2 From 14.12
 
