@@ -125,11 +125,13 @@ class Cashier
      */
     public static function stripe(array $options = [])
     {
-        return new StripeClient(array_merge([
+        $config = array_merge([
             'api_key' => $options['api_key'] ?? config('cashier.secret'),
             'stripe_version' => static::STRIPE_VERSION,
             'api_base' => static::$apiBaseUrl,
-        ], $options));
+        ], $options);
+
+        return app(StripeClient::class, ['config' => $config]);
     }
 
     /**
