@@ -1,6 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v14.14.0...master)
+## [Unreleased](https://github.com/laravel/cashier/compare/v15.0.0...15.x)
+
+## [v15.0.0](https://github.com/laravel/cashier/compare/v14.14.0...v15.0.0) - 2023-12-22
+
+* [15.x] Always end trial when subscription is cancelled by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1465
+* [15.x] Remove isDeleted method by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1529
+* Added expand option to Subscription latestInvoice() by [@quantumwebco](https://github.com/quantumwebco) in https://github.com/laravel/cashier-stripe/pull/1549
+* [15.x] Rename receipt to invoice by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1609
+* [15.x] Stops using `loadMigrationsFrom` by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/cashier-stripe/pull/1613
+* [15.x] Stripe API and SDK update by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1615
+* [15.x] Bump Laravel and PHP versions by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1616
+* [15.x] Fetch all payment methods by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1617
+* [15.x] Change "name" column to "type" by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1620
+* [14.x] Use container to resolve `StripeClient` by [@orkhanahmadov](https://github.com/orkhanahmadov) in https://github.com/laravel/cashier-stripe/pull/1624
 
 ## [v14.14.0](https://github.com/laravel/cashier/compare/v14.13.1...v14.14.0) - 2023-11-21
 
