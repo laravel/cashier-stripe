@@ -56,6 +56,8 @@ Cashier 15.0 no longer automatically loads migrations from its own migrations di
 php artisan vendor:publish --tag=cashier-migrations
 ```
 
+Because of this change, the `Cashier::ignoreMigrations` method has been removed.
+
 ### Renamed "Name" Column To "Type"
 
 PR: https://github.com/laravel/cashier-stripe/pull/1620
