@@ -17,7 +17,10 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.1, 8.2, 8.3]
-        laravel: [10]
+        laravel: [10, 11]
+        exclude:
+          - php: 8.1
+            laravel: 11
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
 
@@ -40,6 +43,6 @@ jobs:
           composer update --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+        run: vendor/bin/phpunit
         env:
           STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
