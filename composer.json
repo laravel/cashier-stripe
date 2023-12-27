@@ -33,7 +33,7 @@
         "moneyphp/money": "^4.0",
         "nesbot/carbon": "^2.0",
         "stripe/stripe-php": "^13.0",
-        "symfony/http-kernel": "^6.0",
+        "symfony/http-kernel": "^6.0|^7.0",
         "symfony/polyfill-intl-icu": "^1.22.1"
     },
     "require-dev": {
