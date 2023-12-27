@@ -40,6 +40,7 @@
         "dompdf/dompdf": "^2.0",
         "mockery/mockery": "^1.0",
         "orchestra/testbench": "^8.14|^9.0",
+        "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.0|^10.4"
     },
     "suggest": {
