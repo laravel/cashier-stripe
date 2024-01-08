@@ -99,7 +99,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
             $data['return_url'] = $sessionOptions['return_url'] ?? route('home');
 
             // Remove return URL for embedded UI mode when no redirection is desired on completion...
-            if(isset($data['redirect_on_completion']) && $data['redirect_on_completion'] === 'never') {
+            if (isset($data['redirect_on_completion']) && $data['redirect_on_completion'] === 'never') {
                 unset($data['return_url']);
             }
         } else {
