@@ -6,6 +6,14 @@ use Laravel\Cashier\Checkout;
 
 class CheckoutTest extends FeatureTestCase
 {
+    /**
+     * @param  \Illuminate\Routing\Router  $router
+     */
+    protected function defineRoutes($router): void
+    {
+        $router->get('/home', fn () => 'Hello World!')->name('home');
+    }
+
     public function test_customers_can_start_a_product_checkout_session()
     {
         $user = $this->createCustomer('customers_can_start_a_product_checkout_session');
