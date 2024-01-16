@@ -1,6 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v15.0.0...15.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v15.1.1...15.x)
+
+## [v15.1.1](https://github.com/laravel/cashier/compare/v15.1.0...v15.1.1) - 2024-01-12
+
+* [15.x] Fix cancelation handling by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1633
+
+## [v15.1.0](https://github.com/laravel/cashier/compare/v15.0.0...v15.1.0) - 2024-01-09
+
+* [15.x] Clear the generic trial upon subscription creation by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1628
+* [15.x] Fix unset 'return_url' for embedded UI without redirection by [@lowbits](https://github.com/lowbits) in https://github.com/laravel/cashier-stripe/pull/1631
 
 ## [v15.0.0](https://github.com/laravel/cashier/compare/v14.14.0...v15.0.0) - 2023-12-22
 

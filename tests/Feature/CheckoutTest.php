@@ -6,6 +6,14 @@ use Laravel\Cashier\Checkout;
 
 class CheckoutTest extends FeatureTestCase
 {
+    /**
+     * @param  \Illuminate\Routing\Router  $router
+     */
+    protected function defineRoutes($router): void
+    {
+        $router->get('/home', fn () => 'Hello World!')->name('home');
+    }
+
     public function test_customers_can_start_a_product_checkout_session()
     {
         $user = $this->createCustomer('customers_can_start_a_product_checkout_session');
@@ -165,6 +173,28 @@ class CheckoutTest extends FeatureTestCase
         $checkout = $user->checkout($items, [
             'ui_mode' => 'embedded',
             'return_url' => 'http://example.com',
+        ]);
+
+        $this->assertInstanceOf(Checkout::class, $checkout);
+    }
+
+    public function test_customers_can_start_an_embedded_product_checkout_session_without_a_redirect()
+    {
+        $user = $this->createCustomer('customers_can_start_an_embedded_product_checkout_session');
+
+        $shirtPrice = self::stripe()->prices->create([
+            'currency' => 'USD',
+            'product_data' => [
+                'name' => 'T-shirt',
+            ],
+            'unit_amount' => 1500,
+        ]);
+
+        $items = [$shirtPrice->id => 5];
+
+        $checkout = $user->checkout($items, [
+            'ui_mode' => 'embedded',
+            'redirect_on_completion' => 'never',
         ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
