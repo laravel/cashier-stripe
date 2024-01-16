@@ -19,7 +19,7 @@ class Cashier
      *
      * @var string
      */
-    const VERSION = '15.1.1';
+    const VERSION = '15.2.0';
 
     /**
      * The Stripe API version.
