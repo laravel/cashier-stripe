@@ -231,7 +231,7 @@ trait ManagesPaymentMethods
      */
     protected function fillPaymentMethodDetails($paymentMethod)
     {
-        if ($paymentMethod->type === 'card') {
+        if ($paymentMethod->type == 'card') {
             $this->pm_type = $paymentMethod->card->brand;
             $this->pm_last_four = $paymentMethod->card->last4;
         } else {
