@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/15.2.1...15.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v15.2.1...15.x)
+
+## [v15.2.1](https://github.com/laravel/cashier/compare/15.2.1...v15.2.1) - 2024-01-30
+
+* Carbon v3 by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1643
 
 ## [15.2.1](https://github.com/laravel/cashier/compare/v15.2.0...15.2.1) - 2024-01-30
 
