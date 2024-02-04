@@ -319,6 +319,23 @@ class SubscriptionsWithMultiplePricesTest extends FeatureTestCase
         $this->assertEquals(2000, $user->upcomingInvoice()->rawTotal());
     }
 
+    public function test_subscription_item_quantity_change_can_be_thrown()
+    {
+        $user = $this->createCustomer('subscription_item_quantity_change_can_be_thrown');
+
+        $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])
+            ->quantity(1, self::$otherPriceId)
+            ->create('pm_card_visa');
+
+        $this->assertEquals(2000, ($invoice1 = $user->invoices()->first())->rawTotal());
+
+        $user->updateDefaultPaymentMethod('pm_card_chargeCustomerFail');
+
+        $this->expectException(\Stripe\Exception\CardException::class);
+
+        $subscription->errorIfPaymentFails()->alwaysInvoice()->updateQuantity(2, self::$otherPriceId);
+    }
+
     /**
      * Create a subscription with a single price.
      *
