@@ -70,4 +70,17 @@ trait InteractsWithPaymentBehavior
     {
         return $this->paymentBehavior;
     }
+
+    /**
+     * Set the payment behavior for any subscription updates.
+     *
+     * @param  string  $paymentBehavior
+     * @return $this
+     */
+    public function setPaymentBehavior($paymentBehavior)
+    {
+        $this->paymentBehavior = $paymentBehavior;
+
+        return $this;
+    }
 }

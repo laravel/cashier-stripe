@@ -435,7 +435,10 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($price) {
-            $this->findItemOrFail($price)->setProrationBehavior($this->prorationBehavior)->incrementQuantity($count);
+            $this->findItemOrFail($price)
+                ->setPaymentBehavior($this->paymentBehavior)
+                ->setProrationBehavior($this->prorationBehavior)
+                ->incrementQuantity($count);
 
             return $this->refresh();
         }
@@ -478,7 +481,10 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($price) {
-            $this->findItemOrFail($price)->setProrationBehavior($this->prorationBehavior)->decrementQuantity($count);
+            $this->findItemOrFail($price)
+                ->setPaymentBehavior($this->paymentBehavior)
+                ->setProrationBehavior($this->prorationBehavior)
+                ->decrementQuantity($count);
 
             return $this->refresh();
         }
@@ -502,7 +508,10 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($price) {
-            $this->findItemOrFail($price)->setProrationBehavior($this->prorationBehavior)->updateQuantity($quantity);
+            $this->findItemOrFail($price)
+                ->setPaymentBehavior($this->paymentBehavior)
+                ->setProrationBehavior($this->prorationBehavior)
+                ->updateQuantity($quantity);
 
             return $this->refresh();
         }
