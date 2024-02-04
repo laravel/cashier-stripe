@@ -13,6 +13,7 @@ use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\HandlesPaymentFailures;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
+use Laravel\Cashier\Concerns\ProratesDate;
 use Laravel\Cashier\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
@@ -29,6 +30,7 @@ class Subscription extends Model
     use HasFactory;
     use InteractsWithPaymentBehavior;
     use Prorates;
+    use ProratesDate;
 
     /**
      * The attributes that are not mass assignable.
@@ -435,7 +437,10 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($price) {
-            $this->findItemOrFail($price)->setProrationBehavior($this->prorationBehavior)->incrementQuantity($count);
+            $this->findItemOrFail($price)
+                ->setProrationBehavior($this->prorationBehavior)
+                ->prorateDate($this->prorationDate)
+                ->incrementQuantity($count);
 
             return $this->refresh();
         }
@@ -478,7 +483,10 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($price) {
-            $this->findItemOrFail($price)->setProrationBehavior($this->prorationBehavior)->decrementQuantity($count);
+            $this->findItemOrFail($price)
+                ->setProrationBehavior($this->prorationBehavior)
+                ->prorateDate($this->prorationDate)
+                ->decrementQuantity($count);
 
             return $this->refresh();
         }
@@ -502,19 +510,23 @@ class Subscription extends Model
         $this->guardAgainstIncomplete();
 
         if ($price) {
-            $this->findItemOrFail($price)->setProrationBehavior($this->prorationBehavior)->updateQuantity($quantity);
+            $this->findItemOrFail($price)
+                ->setProrationBehavior($this->prorationBehavior)
+                ->prorateDate($this->prorationDate)
+                ->updateQuantity($quantity);
 
             return $this->refresh();
         }
 
         $this->guardAgainstMultiplePrices();
 
-        $stripeSubscription = $this->updateStripeSubscription([
+        $stripeSubscription = $this->updateStripeSubscription(array_filter([
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
+            'proration_date' => $this->prorationDate,
             'quantity' => $quantity,
             'expand' => ['latest_invoice.payment_intent'],
-        ]);
+        ]));
 
         $this->fill([
             'stripe_status' => $stripeSubscription->status,
@@ -626,10 +638,11 @@ class Subscription extends Model
             return $this;
         }
 
-        $this->updateStripeSubscription([
+        $this->updateStripeSubscription(array_filter([
             'trial_end' => 'now',
             'proration_behavior' => $this->prorateBehavior(),
-        ]);
+            'proration_date' => $this->prorationDate,
+        ]));
 
         $this->trial_ends_at = null;
 
@@ -650,10 +663,11 @@ class Subscription extends Model
             throw new InvalidArgumentException("Extending a subscription's trial requires a date in the future.");
         }
 
-        $this->updateStripeSubscription([
+        $this->updateStripeSubscription(array_filter([
             'trial_end' => $date->getTimestamp(),
             'proration_behavior' => $this->prorateBehavior(),
-        ]);
+            'proration_date' => $this->prorationDate,
+        ]));
 
         $this->trial_ends_at = $date;
 
@@ -811,6 +825,7 @@ class Subscription extends Model
             'payment_behavior' => $this->paymentBehavior(),
             'promotion_code' => $this->promotionCodeId,
             'proration_behavior' => $this->prorateBehavior(),
+            'proration_date' => $this->prorationDate,
             'expand' => ['latest_invoice.payment_intent'],
         ]);
 
@@ -857,6 +872,7 @@ class Subscription extends Model
                 'tax_rates' => $this->getPriceTaxRatesForPayload($price),
                 'payment_behavior' => $this->paymentBehavior(),
                 'proration_behavior' => $this->prorateBehavior(),
+                'proration_date' => $this->prorationDate,
             ], $options)));
 
         $this->items()->create([
@@ -952,6 +968,7 @@ class Subscription extends Model
         $stripeItem->delete(array_filter([
             'clear_usage' => $stripeItem->price->recurring->usage_type === 'metered' ? true : null,
             'proration_behavior' => $this->prorateBehavior(),
+            'proration_date' => $this->prorationDate,
         ]));
 
         $this->items()->where('stripe_price', $price)->delete();
@@ -1011,10 +1028,11 @@ class Subscription extends Model
             $endsAt = $endsAt->getTimestamp();
         }
 
-        $stripeSubscription = $this->updateStripeSubscription([
+        $stripeSubscription = $this->updateStripeSubscription(array_filter([
             'cancel_at' => $endsAt,
             'proration_behavior' => $this->prorateBehavior(),
-        ]);
+            'proration_date' => $this->prorationDate,
+        ]));
 
         $this->stripe_status = $stripeSubscription->status;
 
@@ -1190,6 +1208,7 @@ class Subscription extends Model
                 'cancel_at_period_end',
                 'items',
                 'proration_behavior',
+                'proration_date',
                 'trial_end',
             ])
             ->mapWithKeys(function ($value, $key) {

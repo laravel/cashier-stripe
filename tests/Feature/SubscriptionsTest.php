@@ -656,6 +656,36 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertEquals(0, $user->upcomingInvoice()->rawTotal());
     }
 
+    public function test_subscription_changes_can_be_prorated_on_date()
+    {
+        $user = $this->createCustomer('subscription_changes_can_be_prorated_on_date');
+
+        $subscription = $user->newSubscription('main', static::$premiumPriceId)->create('pm_card_visa');
+        $stripeSubscription = $subscription->asStripeSubscription();
+
+        $this->assertEquals(2000, ($invoice = $user->invoices()->first())->rawTotal());
+
+        $subscription->noProrate()->prorateDate()->swap(static::$priceId);
+
+        // Assert that no new invoice was created because of no prorating and not affected by date.
+        $this->assertEquals($invoice->id, $user->invoices()->first()->id);
+        $this->assertEquals(1000, $user->upcomingInvoice()->rawTotal());
+
+        $subscription->swapAndInvoice(static::$premiumPriceId);
+
+        // Assert that a new invoice was created because of immediate invoicing.
+        $this->assertNotSame($invoice->id, ($invoice = $user->invoices()->first())->id);
+        $this->assertEquals(1000, $invoice->rawTotal());
+        $this->assertEquals(2000, $user->upcomingInvoice()->rawTotal());
+
+        // Prorate with timestamp.
+        $halfwayPoint = $stripeSubscription->current_period_start + ($stripeSubscription->current_period_end - $stripeSubscription->current_period_start) / 2;
+        $subscription->prorate()->prorateDate($halfwayPoint)->swap(static::$priceId);
+
+        // Get back from unused time on premium price on next invoice.
+        $this->assertEquals(500, $user->upcomingInvoice()->rawTotal());
+    }
+
     public function test_trial_remains_when_customer_is_invoiced_immediately_on_swap()
     {
         $user = $this->createCustomer('trial_remains_when_customer_is_invoiced_immediately_on_swap');

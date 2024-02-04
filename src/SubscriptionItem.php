@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Laravel\Cashier\Concerns\HandlesPaymentFailures;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
+use Laravel\Cashier\Concerns\ProratesDate;
 use Laravel\Cashier\Database\Factories\SubscriptionItemFactory;
 
 /**
@@ -20,6 +21,7 @@ class SubscriptionItem extends Model
     use HasFactory;
     use InteractsWithPaymentBehavior;
     use Prorates;
+    use ProratesDate;
 
     /**
      * The attributes that are not mass assignable.
@@ -109,11 +111,12 @@ class SubscriptionItem extends Model
     {
         $this->subscription->guardAgainstIncomplete();
 
-        $stripeSubscriptionItem = $this->updateStripeSubscriptionItem([
+        $stripeSubscriptionItem = $this->updateStripeSubscriptionItem(array_filter([
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
+            'proration_date' => $this->prorationDate,
             'quantity' => $quantity,
-        ]);
+        ]));
 
         $this->fill([
             'quantity' => $stripeSubscriptionItem->quantity,
@@ -155,6 +158,7 @@ class SubscriptionItem extends Model
                 'quantity' => $this->quantity,
                 'payment_behavior' => $this->paymentBehavior(),
                 'proration_behavior' => $this->prorateBehavior(),
+                'proration_date' => $this->prorationDate,
                 'tax_rates' => $this->subscription->getPriceTaxRatesForPayload($price),
             ], function ($value) {
                 return ! is_null($value);

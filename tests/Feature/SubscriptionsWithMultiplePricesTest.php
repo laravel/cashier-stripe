@@ -304,6 +304,33 @@ class SubscriptionsWithMultiplePricesTest extends FeatureTestCase
         $this->assertEquals(2000, $user->upcomingInvoice()->rawTotal());
     }
 
+    public function test_subscription_item_changes_can_be_prorated_on_date()
+    {
+        $user = $this->createCustomer('subscription_item_changes_can_be_prorated_on_date');
+
+        $subscription = $user->newSubscription('main', static::$premiumPriceId)->create('pm_card_visa');
+
+        $stripeSubscription = $subscription->asStripeSubscription();
+        $quarterSeconds = ($stripeSubscription->current_period_end - $stripeSubscription->current_period_start) / 4;
+        $quarterPoint = $stripeSubscription->current_period_start + $quarterSeconds;
+        $halfwayPoint = $stripeSubscription->current_period_start + $quarterSeconds * 2;
+
+        $this->assertEquals(2000, ($invoice1 = $user->invoices()->first())->rawTotal());
+
+        $subscription->prorate()->prorateDate($quarterPoint)->addPriceAndInvoice(self::$priceId);
+
+        // Assert that a new invoice was created because of prorating.
+        $this->assertNotEquals($invoice1->id, ($invoice2 = $user->invoices()->first())->id);
+        $this->assertEquals(750, $invoice2->rawTotal());
+        $this->assertEquals(3000, $user->upcomingInvoice()->rawTotal());
+
+        $subscription->prorate()->prorateDate($halfwayPoint)->removePrice(self::$premiumPriceId);
+
+        // Assert that no new invoice was created because of prorating.
+        $this->assertEquals($invoice2->id, $user->invoices()->first()->id);
+        $this->assertEquals(0, $user->upcomingInvoice()->rawTotal());
+    }
+
     public function test_subscription_item_quantity_changes_can_be_prorated()
     {
         $user = $this->createCustomer('subscription_item_quantity_changes_can_be_prorated');
@@ -317,6 +344,26 @@ class SubscriptionsWithMultiplePricesTest extends FeatureTestCase
         $subscription->noProrate()->updateQuantity(1, self::$otherPriceId);
 
         $this->assertEquals(2000, $user->upcomingInvoice()->rawTotal());
+    }
+
+    public function test_subscription_item_quantity_changes_can_be_prorated_on_date()
+    {
+        $user = $this->createCustomer('subscription_item_quantity_changes_can_be_prorated_on_date');
+
+        $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])
+            ->quantity(1, self::$otherPriceId)
+            ->create('pm_card_visa');
+
+        $this->assertEquals(2000, ($invoice = $user->invoices()->first())->rawTotal());
+
+        $stripeSubscription = $subscription->asStripeSubscription();
+        $halfSeconds = ($stripeSubscription->current_period_end - $stripeSubscription->current_period_start) / 2;
+        $halfPoint = $stripeSubscription->current_period_start + $halfSeconds;
+
+        $subscription->prorate()->prorateDate($halfPoint)->updateQuantity(2, self::$otherPriceId);
+
+        // $10(price) + $20(otherPrice x2) + $5(half 2nd otherPrice) = $35
+        $this->assertEquals(3500, $user->upcomingInvoice()->rawTotal());
     }
 
     /**
