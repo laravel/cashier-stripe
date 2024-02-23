@@ -7,7 +7,7 @@ trait HasStripeId
     /**
      * Get the name of the model's "stripe_id" column.
      *
-     * @return  string
+     * @return string
      */
     public static function stripeIdColumn()
     {
