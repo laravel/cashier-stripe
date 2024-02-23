@@ -70,7 +70,7 @@ class WebhookController extends Controller
         if ($user) {
             $data = $payload['data']['object'];
 
-            if (! $user->subscriptions->contains('stripe_id', $data['id'])) {
+            if (! $user->subscriptions->contains(Cashier::$subscriptionModel::$stripeIdColumn, $data['id'])) {
                 if (isset($data['trial_end'])) {
                     $trialEndsAt = Carbon::createFromTimestamp($data['trial_end']);
                 } else {
@@ -82,7 +82,7 @@ class WebhookController extends Controller
 
                 $subscription = $user->subscriptions()->create([
                     'type' => $data['metadata']['type'] ?? $data['metadata']['name'] ?? $this->newSubscriptionType($payload),
-                    'stripe_id' => $data['id'],
+                    Cashier::$subscriptionModel::$stripeIdColumn => $data['id'],
                     'stripe_status' => $data['status'],
                     'stripe_price' => $isSinglePrice ? $firstItem['price']['id'] : null,
                     'quantity' => $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null,
@@ -92,7 +92,7 @@ class WebhookController extends Controller
 
                 foreach ($data['items']['data'] as $item) {
                     $subscription->items()->create([
-                        'stripe_id' => $item['id'],
+                        Cashier::$subscriptionItemModel::$stripeIdColumn => $item['id'],
                         'stripe_product' => $item['price']['product'],
                         'stripe_price' => $item['price']['id'],
                         'quantity' => $item['quantity'] ?? null,
@@ -131,7 +131,7 @@ class WebhookController extends Controller
         if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
             $data = $payload['data']['object'];
 
-            $subscription = $user->subscriptions()->firstOrNew(['stripe_id' => $data['id']]);
+            $subscription = $user->subscriptions()->firstOrNew([Cashier::$subscriptionModel::$stripeIdColumn => $data['id']]);
 
             if (
                 isset($data['status']) &&
@@ -189,7 +189,7 @@ class WebhookController extends Controller
                     $subscriptionItemIds[] = $item['id'];
 
                     $subscription->items()->updateOrCreate([
-                        'stripe_id' => $item['id'],
+                        Cashier::$subscriptionItemModel::$stripeIdColumn => $item['id'],
                     ], [
                         'stripe_product' => $item['price']['product'],
                         'stripe_price' => $item['price']['id'],
@@ -198,7 +198,7 @@ class WebhookController extends Controller
                 }
 
                 // Delete items that aren't attached to the subscription anymore...
-                $subscription->items()->whereNotIn('stripe_id', $subscriptionItemIds)->delete();
+                $subscription->items()->whereNotIn(Cashier::$subscriptionItemModel::$stripeIdColumn, $subscriptionItemIds)->delete();
             }
         }
 
@@ -215,7 +215,7 @@ class WebhookController extends Controller
     {
         if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
             $user->subscriptions->filter(function ($subscription) use ($payload) {
-                return $subscription->stripe_id === $payload['data']['object']['id'];
+                return $subscription->stripeId() === $payload['data']['object']['id'];
             })->each(function ($subscription) {
                 $subscription->skipTrial()->markAsCanceled();
             });
@@ -253,7 +253,7 @@ class WebhookController extends Controller
             });
 
             $user->forceFill([
-                'stripe_id' => null,
+                $user::$stripeIdColumn => null,
                 'trial_ends_at' => null,
                 'pm_type' => null,
                 'pm_last_four' => null,

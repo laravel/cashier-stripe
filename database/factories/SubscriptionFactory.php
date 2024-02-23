@@ -31,7 +31,7 @@ class SubscriptionFactory extends Factory
         return [
             (new $model)->getForeignKey() => ($model)::factory(),
             'type' => 'default',
-            'stripe_id' => 'sub_'.Str::random(40),
+            $this->model::$stripeIdColumn => 'sub_'.Str::random(40),
             'stripe_status' => StripeSubscription::STATUS_ACTIVE,
             'stripe_price' => null,
             'quantity' => null,

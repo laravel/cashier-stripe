@@ -16,7 +16,7 @@ class SubscriptionUpdateFailure extends Exception
     public static function incompleteSubscription(Subscription $subscription)
     {
         return new static(
-            "The subscription \"{$subscription->stripe_id}\" cannot be updated because its payment is incomplete."
+            "The subscription \"{$subscription->stripeId()}\" cannot be updated because its payment is incomplete."
         );
     }
 
@@ -30,7 +30,7 @@ class SubscriptionUpdateFailure extends Exception
     public static function duplicatePrice(Subscription $subscription, $price)
     {
         return new static(
-            "The price \"$price\" is already attached to subscription \"{$subscription->stripe_id}\"."
+            "The price \"$price\" is already attached to subscription \"{$subscription->stripeId()}\"."
         );
     }
 
@@ -43,7 +43,7 @@ class SubscriptionUpdateFailure extends Exception
     public static function cannotDeleteLastPrice(Subscription $subscription)
     {
         return new static(
-            "The price on subscription \"{$subscription->stripe_id}\" cannot be removed because it is the last one."
+            "The price on subscription \"{$subscription->stripeId()}\" cannot be removed because it is the last one."
         );
     }
 }

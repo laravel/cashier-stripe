@@ -113,7 +113,7 @@ class InvoicesTest extends FeatureTestCase
 
         $this->expectException(InvalidInvoice::class);
         $this->expectExceptionMessage(
-            "The invoice `{$invoice->id}` does not belong to this customer `$otherUser->stripe_id`."
+            "The invoice `{$invoice->id}` does not belong to this customer `{$otherUser->stripeId()}`."
         );
 
         $otherUser->findInvoice($invoice->id);

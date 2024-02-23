@@ -32,7 +32,7 @@ class CustomerBalanceTransaction
      */
     public function __construct($owner, StripeCustomerBalanceTransaction $transaction)
     {
-        if ($owner->stripe_id !== $transaction->customer) {
+        if ($owner->stripeId() !== $transaction->customer) {
             throw InvalidCustomerBalanceTransaction::invalidOwner($transaction, $owner);
         }
 

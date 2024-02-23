@@ -18,7 +18,7 @@ class InvoiceLineItemTest extends TestCase
     public function test_we_can_calculate_the_inclusive_tax_percentage()
     {
         $customer = new User();
-        $customer->stripe_id = 'foo';
+        $customer->{$customer::$stripeIdColumn} = 'foo';
 
         $stripeInvoice = new StripeInvoice();
         $stripeInvoice->customer_tax_exempt = StripeCustomer::TAX_EXEMPT_NONE;
@@ -43,7 +43,7 @@ class InvoiceLineItemTest extends TestCase
     public function test_we_can_calculate_the_exclusive_tax_percentage()
     {
         $customer = new User();
-        $customer->stripe_id = 'foo';
+        $customer->{$customer::$stripeIdColumn} = 'foo';
 
         $stripeInvoice = new StripeInvoice();
         $stripeInvoice->customer_tax_exempt = StripeCustomer::TAX_EXEMPT_NONE;

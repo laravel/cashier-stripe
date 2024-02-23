@@ -16,23 +16,13 @@ use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
 trait ManagesCustomer
 {
     /**
-     * Retrieve the Stripe customer ID.
-     *
-     * @return string|null
-     */
-    public function stripeId()
-    {
-        return $this->stripe_id;
-    }
-
-    /**
      * Determine if the customer has a Stripe customer ID.
      *
      * @return bool
      */
     public function hasStripeId()
     {
-        return ! is_null($this->stripe_id);
+        return ! is_null($this->stripeId());
     }
 
     /**
@@ -92,7 +82,7 @@ trait ManagesCustomer
         // and allow us to retrieve users from Stripe later when we need to work.
         $customer = static::stripe()->customers->create($options);
 
-        $this->stripe_id = $customer->id;
+        $this->{$this::$stripeIdColumn} = $customer->id;
 
         $this->save();
 
@@ -108,7 +98,7 @@ trait ManagesCustomer
     public function updateStripeCustomer(array $options = [])
     {
         return static::stripe()->customers->update(
-            $this->stripe_id, $options
+            $this->stripeId(), $options
         );
     }
 
@@ -138,7 +128,7 @@ trait ManagesCustomer
         $this->assertCustomerExists();
 
         return static::stripe()->customers->retrieve(
-            $this->stripe_id, ['expand' => $expand]
+            $this->stripeId(), ['expand' => $expand]
         );
     }
 
@@ -344,7 +334,7 @@ trait ManagesCustomer
 
         $transactions = static::stripe()
             ->customers
-            ->allBalanceTransactions($this->stripe_id, array_merge(['limit' => $limit], $options));
+            ->allBalanceTransactions($this->stripeId(), array_merge(['limit' => $limit], $options));
 
         return Collection::make($transactions->data)->map(function ($transaction) {
             return new CustomerBalanceTransaction($this, $transaction);
@@ -391,7 +381,7 @@ trait ManagesCustomer
 
         $transaction = static::stripe()
             ->customers
-            ->createBalanceTransaction($this->stripe_id, array_filter(array_merge([
+            ->createBalanceTransaction($this->stripeId(), array_filter(array_merge([
                 'amount' => $amount,
                 'currency' => $this->preferredCurrency(),
                 'description' => $description,
@@ -462,7 +452,7 @@ trait ManagesCustomer
         $this->assertCustomerExists();
 
         return new Collection(
-            static::stripe()->customers->allTaxIds($this->stripe_id, $options)->data
+            static::stripe()->customers->allTaxIds($this->stripeId(), $options)->data
         );
     }
 
@@ -477,7 +467,7 @@ trait ManagesCustomer
 
         try {
             return static::stripe()->customers->retrieveTaxId(
-                $this->stripe_id, $id, []
+                $this->stripeId(), $id, []
             );
         } catch (StripeInvalidRequestException $exception) {
             //
@@ -495,7 +485,7 @@ trait ManagesCustomer
     {
         $this->assertCustomerExists();
 
-        return static::stripe()->customers->createTaxId($this->stripe_id, [
+        return static::stripe()->customers->createTaxId($this->stripeId(), [
             'type' => $type,
             'value' => $value,
         ]);
@@ -512,7 +502,7 @@ trait ManagesCustomer
         $this->assertCustomerExists();
 
         try {
-            static::stripe()->customers->deleteTaxId($this->stripe_id, $id);
+            static::stripe()->customers->deleteTaxId($this->stripeId(), $id);
         } catch (StripeInvalidRequestException $exception) {
             //
         }

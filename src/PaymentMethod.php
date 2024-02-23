@@ -40,7 +40,7 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
             throw new LogicException('The payment method is not attached to a customer.');
         }
 
-        if ($owner->stripe_id !== $paymentMethod->customer) {
+        if ($owner->stripeId() !== $paymentMethod->customer) {
             throw InvalidPaymentMethod::invalidOwner($paymentMethod, $owner);
         }
 

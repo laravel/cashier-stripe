@@ -20,7 +20,7 @@ trait ManagesPaymentMethods
     public function createSetupIntent(array $options = [])
     {
         if ($this->hasStripeId()) {
-            $options['customer'] = $this->stripe_id;
+            $options['customer'] = $this->stripeId();
         }
 
         return static::stripe()->setupIntents->create($options);
@@ -77,7 +77,7 @@ trait ManagesPaymentMethods
 
         // "type" is temporarily required by Stripe...
         $paymentMethods = static::stripe()->paymentMethods->all(
-            array_filter(['customer' => $this->stripe_id, 'type' => $type]) + $parameters
+            array_filter(['customer' => $this->stripeId(), 'type' => $type]) + $parameters
         );
 
         return Collection::make($paymentMethods->data)->map(function ($paymentMethod) {
@@ -97,9 +97,9 @@ trait ManagesPaymentMethods
 
         $stripePaymentMethod = $this->resolveStripePaymentMethod($paymentMethod);
 
-        if ($stripePaymentMethod->customer !== $this->stripe_id) {
+        if ($stripePaymentMethod->customer !== $this->stripeId()) {
             $stripePaymentMethod = $stripePaymentMethod->attach(
-                ['customer' => $this->stripe_id]
+                ['customer' => $this->stripeId()]
             );
         }
 
@@ -118,7 +118,7 @@ trait ManagesPaymentMethods
 
         $stripePaymentMethod = $this->resolveStripePaymentMethod($paymentMethod);
 
-        if ($stripePaymentMethod->customer !== $this->stripe_id) {
+        if ($stripePaymentMethod->customer !== $this->stripeId()) {
             return;
         }
 

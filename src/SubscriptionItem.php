@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Concerns\HandlesPaymentFailures;
+use Laravel\Cashier\Concerns\HasStripeId;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionItemFactory;
@@ -18,6 +19,7 @@ class SubscriptionItem extends Model
 {
     use HandlesPaymentFailures;
     use HasFactory;
+    use HasStripeId;
     use InteractsWithPaymentBehavior;
     use Prorates;
 
@@ -213,7 +215,7 @@ class SubscriptionItem extends Model
     {
         $timestamp = $timestamp instanceof DateTimeInterface ? $timestamp->getTimestamp() : $timestamp;
 
-        return $this->subscription->owner->stripe()->subscriptionItems->createUsageRecord($this->stripe_id, [
+        return $this->subscription->owner->stripe()->subscriptionItems->createUsageRecord($this->stripeId(), [
             'quantity' => $quantity,
             'action' => $timestamp ? 'set' : 'increment',
             'timestamp' => $timestamp ?? time(),
@@ -229,7 +231,7 @@ class SubscriptionItem extends Model
     public function usageRecords($options = [])
     {
         return new Collection($this->subscription->owner->stripe()->subscriptionItems->allUsageRecordSummaries(
-            $this->stripe_id, $options
+            $this->stripeId(), $options
         )->data);
     }
 
@@ -242,7 +244,7 @@ class SubscriptionItem extends Model
     public function updateStripeSubscriptionItem(array $options = [])
     {
         return $this->subscription->owner->stripe()->subscriptionItems->update(
-            $this->stripe_id, $options
+            $this->stripeId(), $options
         );
     }
 
@@ -255,7 +257,7 @@ class SubscriptionItem extends Model
     public function asStripeSubscriptionItem(array $expand = [])
     {
         return $this->subscription->owner->stripe()->subscriptionItems->retrieve(
-            $this->stripe_id, ['expand' => $expand]
+            $this->stripeId(), ['expand' => $expand]
         );
     }
 

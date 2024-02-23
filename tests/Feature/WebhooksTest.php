@@ -110,7 +110,7 @@ class WebhooksTest extends FeatureTestCase
             'type' => 'customer.subscription.updated',
             'data' => [
                 'object' => [
-                    'id' => $subscription->stripe_id,
+                    'id' => $subscription->stripeId(),
                     'customer' => 'cus_foo',
                     'cancel_at_period_end' => false,
                     'items' => [
@@ -168,7 +168,7 @@ class WebhooksTest extends FeatureTestCase
             'type' => 'customer.subscription.updated',
             'data' => [
                 'object' => [
-                    'id' => $subscription->stripe_id,
+                    'id' => $subscription->stripeId(),
                     'customer' => 'cus_foo',
                     'cancel_at' => $cancelDate->timestamp,
                     'cancel_at_period_end' => false,
@@ -216,12 +216,12 @@ class WebhooksTest extends FeatureTestCase
             'type' => 'customer.subscription.updated',
             'data' => [
                 'object' => [
-                    'id' => $subscription->stripe_id,
-                    'customer' => $user->stripe_id,
+                    'id' => $subscription->stripeId(),
+                    'customer' => $user->stripeId(),
                     'cancel_at_period_end' => false,
                     'items' => [
                         'data' => [[
-                            'id' => $subscription->items()->first()->stripe_id,
+                            'id' => $subscription->items()->first()->stripeId(),
                             'price' => ['id' => static::$priceId, 'product' => static::$productId],
                             'quantity' => 1,
                         ]],
@@ -245,8 +245,8 @@ class WebhooksTest extends FeatureTestCase
             'type' => 'customer.subscription.deleted',
             'data' => [
                 'object' => [
-                    'id' => $subscription->stripe_id,
-                    'customer' => $user->stripe_id,
+                    'id' => $subscription->stripeId(),
+                    'customer' => $user->stripeId(),
                     'quantity' => 1,
                 ],
             ],
@@ -267,8 +267,8 @@ class WebhooksTest extends FeatureTestCase
             'type' => 'customer.subscription.updated',
             'data' => [
                 'object' => [
-                    'id' => $subscription->stripe_id,
-                    'customer' => $user->stripe_id,
+                    'id' => $subscription->stripeId(),
+                    'customer' => $user->stripeId(),
                     'status' => StripeSubscription::STATUS_INCOMPLETE_EXPIRED,
                     'quantity' => 1,
                 ],
@@ -295,7 +295,7 @@ class WebhooksTest extends FeatureTestCase
                 'data' => [
                     'object' => [
                         'id' => 'foo',
-                        'customer' => $user->stripe_id,
+                        'customer' => $user->stripeId(),
                         'payment_intent' => $exception->payment->id,
                     ],
                 ],

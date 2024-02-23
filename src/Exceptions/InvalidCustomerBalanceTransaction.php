@@ -16,6 +16,6 @@ class InvalidCustomerBalanceTransaction extends Exception
      */
     public static function invalidOwner(StripeCustomerBalanceTransaction $transaction, $owner)
     {
-        return new static("The transaction `{$transaction->id}` does not belong to customer `$owner->stripe_id`.");
+        return new static("The transaction `{$transaction->id}` does not belong to customer `{$owner->stripeId()}`.");
     }
 }

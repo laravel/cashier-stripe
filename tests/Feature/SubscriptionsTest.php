@@ -117,7 +117,7 @@ class SubscriptionsTest extends FeatureTestCase
             ->create('pm_card_visa');
 
         $this->assertEquals(1, count($user->subscriptions));
-        $this->assertNotNull(($subscription = $user->subscription('main'))->stripe_id);
+        $this->assertNotNull(($subscription = $user->subscription('main'))->stripeId());
         $this->assertSame($metadata, $subscription->asStripeSubscription()->metadata->toArray());
 
         $this->assertTrue($user->subscribed('main'));

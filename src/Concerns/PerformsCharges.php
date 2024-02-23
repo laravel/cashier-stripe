@@ -86,7 +86,7 @@ trait PerformsCharges
         $options['amount'] = $amount;
 
         if ($this->hasStripeId()) {
-            $options['customer'] = $this->stripe_id;
+            $options['customer'] = $this->stripeId();
         }
 
         return new Payment(

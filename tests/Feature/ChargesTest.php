@@ -18,7 +18,7 @@ class ChargesTest extends FeatureTestCase
 
         $this->assertInstanceOf(Payment::class, $response);
         $this->assertEquals(1000, $response->rawAmount());
-        $this->assertEquals($user->stripe_id, $response->customer);
+        $this->assertEquals($user->stripeId(), $response->customer);
     }
 
     public function test_non_stripe_customer_can_be_charged()
@@ -43,7 +43,7 @@ class ChargesTest extends FeatureTestCase
 
         $this->assertInstanceOf(Payment::class, $response);
         $this->assertEquals(1000, $response->rawAmount());
-        $this->assertEquals($user->stripe_id, $response->customer);
+        $this->assertEquals($user->stripeId(), $response->customer);
         $this->assertTrue($response->requiresPaymentMethod());
         $this->assertTrue($response->automatic_payment_methods->enabled);
 
