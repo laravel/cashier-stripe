@@ -107,7 +107,7 @@ class Cashier
             ? $model::withTrashed()
             : new $model;
 
-        return $stripeId ? $builder->where($model::$stripeIdColumn, $stripeId)->first() : null;
+        return $stripeId ? $builder->where($model::stripeIdColumn(), $stripeId)->first() : null;
     }
 
     /**

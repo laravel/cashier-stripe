@@ -716,7 +716,7 @@ class Subscription extends Model
             $subscriptionItemIds[] = $item->id;
 
             $this->items()->updateOrCreate([
-                Cashier::$subscriptionItemModel::$stripeIdColumn => $item->id,
+                Cashier::$subscriptionItemModel::stripeIdColumn() => $item->id,
             ], [
                 'stripe_product' => $item->price->product,
                 'stripe_price' => $item->price->id,
@@ -725,7 +725,7 @@ class Subscription extends Model
         }
 
         // Delete items that aren't attached to the subscription anymore...
-        $this->items()->whereNotIn(Cashier::$subscriptionItemModel::$stripeIdColumn, $subscriptionItemIds)->delete();
+        $this->items()->whereNotIn(Cashier::$subscriptionItemModel::stripeIdColumn(), $subscriptionItemIds)->delete();
 
         $this->unsetRelation('items');
 
@@ -871,7 +871,7 @@ class Subscription extends Model
             ], $options)));
 
         $this->items()->create([
-            Cashier::$subscriptionItemModel::$stripeIdColumn => $stripeSubscriptionItem->id,
+            Cashier::$subscriptionItemModel::stripeIdColumn() => $stripeSubscriptionItem->id,
             'stripe_product' => $stripeSubscriptionItem->price->product,
             'stripe_price' => $stripeSubscriptionItem->price->id,
             'quantity' => $stripeSubscriptionItem->quantity ?? null,

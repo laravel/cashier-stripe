@@ -82,7 +82,7 @@ trait ManagesCustomer
         // and allow us to retrieve users from Stripe later when we need to work.
         $customer = static::stripe()->customers->create($options);
 
-        $this->{$this::$stripeIdColumn} = $customer->id;
+        $this->{$this::stripeIdColumn()} = $customer->id;
 
         $this->save();
 

@@ -67,7 +67,7 @@ class CustomerTest extends TestCase
     public function test_stripe_customer_cannot_be_created_when_stripe_id_is_already_set()
     {
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $this->expectException(CustomerAlreadyCreated::class);
 

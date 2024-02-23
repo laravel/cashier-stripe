@@ -30,7 +30,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->created = 1560541724;
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -47,7 +47,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->created = 1560541724;
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -65,7 +65,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->currency = 'USD';
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -82,7 +82,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->currency = 'USD';
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -100,7 +100,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->starting_balance = -450;
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -117,7 +117,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->currency = 'USD';
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -133,7 +133,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->starting_balance = -450;
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -147,7 +147,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->starting_balance = 0;
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -162,7 +162,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->currency = 'USD';
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -178,7 +178,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->currency = 'USD';
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -195,7 +195,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->currency = 'USD';
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -213,7 +213,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->currency = 'USD';
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -238,7 +238,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->discounts = [$discount, $otherDiscount];
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -256,7 +256,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->currency = 'USD';
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -271,7 +271,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->currency = 'USD';
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -287,7 +287,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->customer_tax_exempt = StripeCustomer::TAX_EXEMPT_EXEMPT;
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 
@@ -301,7 +301,7 @@ class InvoiceTest extends TestCase
         $stripeInvoice->customer_tax_exempt = StripeCustomer::TAX_EXEMPT_REVERSE;
 
         $user = new User();
-        $user->{$user::$stripeIdColumn} = 'foo';
+        $user->{$user::stripeIdColumn()} = 'foo';
 
         $invoice = new Invoice($user, $stripeInvoice);
 

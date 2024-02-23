@@ -5,11 +5,14 @@ namespace Laravel\Cashier\Concerns;
 trait HasStripeId
 {
     /**
-     * The name of the model's "stripe_id" column.
+     * Get the name of the model's "stripe_id" column.
      *
-     * @var string
+     * @return  string
      */
-    public static string $stripeIdColumn = 'stripe_id';
+    public static function stripeIdColumn()
+    {
+        return 'stripe_id';
+    }
 
     /**
      * Get the Stripe ID for the model.
@@ -18,6 +21,6 @@ trait HasStripeId
      */
     public function stripeId()
     {
-        return $this->{static::$stripeIdColumn};
+        return $this->{static::stripeIdColumn()};
     }
 }
