@@ -351,7 +351,6 @@ class SubscriptionBuilder
             $trialEnd = null;
         }
 
-        // Can not use billingCycleAnchor with trial period. It is a stripe limitation
         $billingCycleAnchor = $trialEnd === null ? $this->billingCycleAnchor : null;
 
         $payload = array_filter([
