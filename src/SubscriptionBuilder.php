@@ -351,12 +351,16 @@ class SubscriptionBuilder
             $trialEnd = null;
         }
 
+        $billingCycleAnchor = $trialEnd === null ? $this->billingCycleAnchor : null;
+
         $payload = array_filter([
             'line_items' => Collection::make($this->items)->values()->all(),
             'mode' => 'subscription',
             'subscription_data' => array_filter([
                 'default_tax_rates' => $this->getTaxRatesForPayload(),
                 'trial_end' => $trialEnd ? $trialEnd->getTimestamp() : null,
+                'billing_cycle_anchor' => $billingCycleAnchor,
+                'proration_behavior' => $billingCycleAnchor ? $this->prorateBehavior() : null,
                 'metadata' => array_merge($this->metadata, [
                     'name' => $this->type,
                     'type' => $this->type,
