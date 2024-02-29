@@ -128,6 +128,36 @@ trait ManagesCustomer
     }
 
     /**
+     * Update the Stripe customer information for the current user or create one.
+     *
+     * @param  array  $options
+     * @return \Stripe\Customer
+     */
+    public function updateOrCreateStripeCustomer(array $options = [])
+    {
+        if ($this->hasStripeId()) {
+            return $this->updateStripeCustomer($options);
+        }
+
+        return $this->createAsStripeCustomer($options);
+    }
+
+    /**
+     * Sync the customer's information to Stripe for the current user or create one.
+     *
+     * @param  array  $options
+     * @return \Stripe\Customer
+     */
+    public function syncOrCreateStripeCustomer(array $options = [])
+    {
+        if ($this->hasStripeId()) {
+            return $this->syncStripeCustomerDetails();
+        }
+
+        return $this->createAsStripeCustomer($options);
+    }
+
+    /**
      * Get the Stripe customer for the model.
      *
      * @param  array  $expand
