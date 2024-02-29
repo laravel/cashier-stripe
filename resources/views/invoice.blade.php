@@ -242,7 +242,7 @@
 
                             <tr>
                                 <td></td>
-                                <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" align="right">
+                                <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}">
                                     @if ($coupon->isPercentage())
                                         {{ $coupon->name() }} ({{ $coupon->percentOff() }}% Off)
                                     @else
@@ -259,7 +259,7 @@
                     @unless ($invoice->isNotTaxExempt())
                         <tr>
                             <td></td>
-                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}" align="right">
+                            <td colspan="{{ $invoice->hasTax() ? 3 : 2 }}">
                                 @if ($invoice->isTaxExempt())
                                     Tax is exempted
                                 @else
