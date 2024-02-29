@@ -28,7 +28,7 @@ class CustomerTest extends FeatureTestCase
     {
         $user = $this->createCustomer('customers_in_stripe_can_be_created_or_updated');
 
-        $customer = $user->createOrUpdateStripeCustomer(['description' => 'Hello World']);
+        $customer = $user->updateOrCreateStripeCustomer(['description' => 'Hello World']);
 
         // Created
         $this->assertEquals('Main Str. 1', $customer->address->line1);
@@ -36,7 +36,7 @@ class CustomerTest extends FeatureTestCase
         $this->assertEquals('72201', $customer->address->postal_code);
         $this->assertEquals('Hello World', $customer->description);
 
-        $customer = $user->createOrUpdateStripeCustomer(['description' => 'Random details']);
+        $customer = $user->updateOrCreateStripeCustomer(['description' => 'Random details']);
 
         // Updated
         $this->assertEquals('Random details', $customer->description);
@@ -65,7 +65,7 @@ class CustomerTest extends FeatureTestCase
     {
         $user = $this->createCustomer('customer_details_can_be_synced_or_created_with_stripe');
 
-        $customer = $user->createOrSyncStripeCustomer(['description' => 'Hello World']);
+        $customer = $user->syncOrCreateStripeCustomer(['description' => 'Hello World']);
 
         // Created
         $this->assertEquals('Main Str. 1', $customer->address->line1);
@@ -77,7 +77,7 @@ class CustomerTest extends FeatureTestCase
         $user->email = 'john@example.com';
         $user->phone = '+32 499 00 00 00';
 
-        $customer = $user->createOrSyncStripeCustomer();
+        $customer = $user->syncOrCreateStripeCustomer();
 
         // Synced
         $this->assertEquals('John Doe', $customer->name);

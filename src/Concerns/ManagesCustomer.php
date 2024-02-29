@@ -133,7 +133,7 @@ trait ManagesCustomer
      * @param  array  $options
      * @return \Stripe\Customer
      */
-    public function createOrUpdateStripeCustomer(array $options = [])
+    public function updateOrCreateStripeCustomer(array $options = [])
     {
         if ($this->hasStripeId()) {
             return $this->updateStripeCustomer($options);
@@ -148,7 +148,7 @@ trait ManagesCustomer
      * @param  array  $options
      * @return \Stripe\Customer
      */
-    public function createOrSyncStripeCustomer(array $options = [])
+    public function syncOrCreateStripeCustomer(array $options = [])
     {
         if ($this->hasStripeId()) {
             return $this->syncStripeCustomerDetails();
