@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v15.2.2...15.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v15.3.0...15.x)
+
+## [v15.3.0](https://github.com/laravel/cashier/compare/v15.2.2...v15.3.0) - 2024-03-05
+
+* [15.x] Fix anchorBillingCycle for subscription checkout by [@ybert](https://github.com/ybert) in https://github.com/laravel/cashier-stripe/pull/1659
+* [15.x] Better align items by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/cashier-stripe/pull/1662
+* [15.x] Create stripe customer if not exists or update/sync by [@arafatkn](https://github.com/arafatkn) in https://github.com/laravel/cashier-stripe/pull/1661
 
 ## [v15.2.2](https://github.com/laravel/cashier/compare/v15.2.1...v15.2.2) - 2024-02-13
 
