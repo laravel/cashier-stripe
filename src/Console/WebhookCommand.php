@@ -4,7 +4,9 @@ namespace Laravel\Cashier\Console;
 
 use Illuminate\Console\Command;
 use Laravel\Cashier\Cashier;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'cashier:webhook')]
 class WebhookCommand extends Command
 {
     public const DEFAULT_EVENTS = [
