@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v15.3.0...15.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v15.3.1...15.x)
+
+## [v15.3.1](https://github.com/laravel/cashier/compare/v15.3.0...v15.3.1) - 2024-03-26
+
+* [15.x] Make commands lazy by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/cashier-stripe/pull/1667
 
 ## [v15.3.0](https://github.com/laravel/cashier/compare/v15.2.2...v15.3.0) - 2024-03-05
 
