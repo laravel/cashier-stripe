@@ -314,13 +314,7 @@
                             <strong>Amount due</strong>
                         </td>
                         <td align="right">
-                            <strong>
-                                @if ($invoice->paid)
-                                    {{ Laravel\Cashier\Cashier::formatAmount(0, $invoice->currency) }}
-                                @else
-                                    {{ $invoice->amountDue() }}
-                                @endif
-                            </strong>
+                            <strong>{{ $invoice->amountDue() }}</strong>
                         </td>
                     </tr>
                 </table>
