@@ -52,6 +52,10 @@
             <td width="160">
                 <span style="font-size: 28px;">
                     Invoice
+
+                    @if ($invoice->paid)
+                        <span style="color: #0c0; font-size: 20px;">(Paid)</span>
+                    @endif
                 </span>
 
                 <!-- Invoice Info -->
