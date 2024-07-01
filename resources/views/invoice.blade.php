@@ -49,7 +49,7 @@
 <div class="container">
     <table style="margin-left: auto; margin-right: auto;" width="100%">
         <tr valign="top">
-            <td width="160">
+            <td width="180">
                 <span style="font-size: 28px;">
                     Invoice
 
