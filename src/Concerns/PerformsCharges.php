@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Concerns;
 
 use Laravel\Cashier\Checkout;
 use Laravel\Cashier\Payment;
-use LogicException;
 use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
 
 trait PerformsCharges
@@ -153,10 +152,6 @@ trait PerformsCharges
      */
     public function checkoutCharge($amount, $name, $quantity = 1, array $sessionOptions = [], array $customerOptions = [], array $productData = [])
     {
-        if ($this->isAutomaticTaxEnabled()) {
-            throw new LogicException('For now, you cannot use checkout charges in combination with automatic tax calculation.');
-        }
-
         return $this->checkout([[
             'price_data' => [
                 'currency' => $this->preferredCurrency(),
