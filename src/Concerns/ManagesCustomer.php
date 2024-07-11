@@ -485,6 +485,7 @@ trait ManagesCustomer
     /**
      * Get a collection of the customer's TaxID's.
      *
+     * @param  array  $options
      * @return \Illuminate\Support\Collection|\Stripe\TaxId[]
      */
     public function taxIds(array $options = [])
@@ -499,6 +500,7 @@ trait ManagesCustomer
     /**
      * Find a TaxID by ID.
      *
+     * @param  string  $id
      * @return \Stripe\TaxId|null
      */
     public function findTaxId($id)
