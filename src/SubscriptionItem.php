@@ -10,6 +10,9 @@ use Laravel\Cashier\Concerns\HandlesPaymentFailures;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionItemFactory;
+use Stripe\Billing\MeterEvent;
+use Stripe\Exception\ApiErrorException;
+use Stripe\StripeClient;
 
 /**
  * @property \Laravel\Cashier\Subscription|null $subscription
@@ -217,6 +220,25 @@ class SubscriptionItem extends Model
             'quantity' => $quantity,
             'action' => $timestamp ? 'set' : 'increment',
             'timestamp' => $timestamp ?? time(),
+        ]);
+    }
+
+    /**
+     * Report usage for a metered product using the new Meter Event API
+     *
+     * @param string $meter
+     * @param int $quantity
+     * @return MeterEvent
+     * @throws ApiErrorException
+     */
+    public function reportMeterUsage(string $meter, int $quantity = 1): MeterEvent
+    {
+        return $this->subscription->owner->stripe()->billing->meterEvents->create([
+            'event_name' => $meter,
+            'payload' => [
+                'value' => $quantity,
+                'stripe_customer_id' => $this->subscription->owner->stripe_id
+            ]
         ]);
     }
 

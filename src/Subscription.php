@@ -17,6 +17,8 @@ use Laravel\Cashier\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use LogicException;
+use Stripe\Billing\MeterEvent;
+use Stripe\Exception\ApiErrorException;
 use Stripe\Subscription as StripeSubscription;
 
 /**
@@ -553,6 +555,20 @@ class Subscription extends Model
     }
 
     /**
+     * Report usage for a metered product using Event Meters API.
+     *
+     * @param string $meter
+     * @param int $quantity
+     * @param string|null $price
+     * @return MeterEvent
+     * @throws ApiErrorException
+     */
+    public function reportMeterUsage(string $meter, int $quantity = 1, ?string $price = null): MeterEvent
+    {
+        return $this->findItemOrFail($price ?? $this->stripe_price)->reportMeterUsage($meter, $quantity);
+    }
+
+    /**
      * Report usage for specific price of a metered product.
      *
      * @param  string  $price
@@ -563,6 +579,21 @@ class Subscription extends Model
     public function reportUsageFor($price, $quantity = 1, $timestamp = null)
     {
         return $this->reportUsage($quantity, $timestamp, $price);
+    }
+
+
+    /**
+     * Report usage for specific price of a metered product.
+     *
+     * @param string $price
+     * @param int $quantity
+     * @param string $meter
+     * @return MeterEvent
+     * @throws ApiErrorException
+     */
+    public function reportUsageForMeter(string $meter, string $price, int $quantity = 1): MeterEvent
+    {
+        return $this->reportMeterUsage($meter, $quantity, $price);
     }
 
     /**
