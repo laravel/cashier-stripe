@@ -53,12 +53,12 @@ trait ManagesCustomer
      * Create a Stripe customer for the given model.
      *
      * @param  array  $options
-     * @param  array|null  $requestOptions
+     * @param  array  $requestOptions
      * @return \Stripe\Customer
      *
      * @throws \Laravel\Cashier\Exceptions\CustomerAlreadyCreated
      */
-    public function createAsStripeCustomer(array $options = [], array $requestOptions = null)
+    public function createAsStripeCustomer(array $options = [], array $requestOptions = [])
     {
         if ($this->hasStripeId()) {
             throw CustomerAlreadyCreated::exists($this);
@@ -117,10 +117,10 @@ trait ManagesCustomer
      * Get the Stripe customer instance for the current user or create one.
      *
      * @param  array  $options
-     * @param  array|null  $requestOptions
+     * @param  array  $requestOptions
      * @return \Stripe\Customer
      */
-    public function createOrGetStripeCustomer(array $options = [], array $requestOptions = null)
+    public function createOrGetStripeCustomer(array $options = [], array $requestOptions = [])
     {
         if ($this->hasStripeId()) {
             return $this->asStripeCustomer($options['expand'] ?? []);
