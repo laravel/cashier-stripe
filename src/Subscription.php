@@ -558,10 +558,11 @@ class Subscription extends Model
     /**
      * Report usage for a metered product using Event Meters API.
      *
-     * @param string $meter
-     * @param int $quantity
-     * @param string|null $price
+     * @param  string  $meter
+     * @param  int  $quantity
+     * @param  string|null  $price
      * @return MeterEvent
+     *
      * @throws ApiErrorException
      */
     public function reportEventUsage(string $meter, int $quantity = 1, ?string $price = null): MeterEvent
@@ -569,6 +570,7 @@ class Subscription extends Model
         if (! $price) {
             $this->guardAgainstMultiplePrices();
         }
+
         return $this->findItemOrFail($price ?? $this->stripe_price)->reportEventUsage($meter, $quantity);
     }
 
@@ -589,10 +591,11 @@ class Subscription extends Model
     /**
      * Report usage for specific price of a metered product.
      *
-     * @param string $price
-     * @param int $quantity
-     * @param string $meter
+     * @param  string  $price
+     * @param  int  $quantity
+     * @param  string  $eventName
      * @return MeterEvent
+     *
      * @throws ApiErrorException
      */
     public function reportUsageForEvent(string $eventName, string $price, int $quantity = 1): MeterEvent
@@ -620,10 +623,11 @@ class Subscription extends Model
     /**
      * Get the usage records for a meter using its ID (not name).
      *
-     * @param string $meterId
-     * @param array $options
-     * @param null $price
+     * @param  string  $meterId
+     * @param  array  $options
+     * @param  null  $price
      * @return Collection
+     *
      * @throws ApiErrorException
      */
     public function meterUsageRecords(string $meterId, array $options = [], $price = null): Collection

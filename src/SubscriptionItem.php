@@ -12,7 +12,6 @@ use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionItemFactory;
 use Stripe\Billing\MeterEvent;
 use Stripe\Exception\ApiErrorException;
-use Stripe\StripeClient;
 
 /**
  * @property \Laravel\Cashier\Subscription|null $subscription
@@ -224,11 +223,12 @@ class SubscriptionItem extends Model
     }
 
     /**
-     * Report usage for a metered product using the new Meter Event API
+     * Report usage for a metered product using the new Meter Event API.
      *
-     * @param string $meter
-     * @param int $quantity
+     * @param  string  $meter
+     * @param  int  $quantity
      * @return MeterEvent
+     *
      * @throws ApiErrorException
      */
     public function reportEventUsage(string $meter, int $quantity = 1): MeterEvent
@@ -238,7 +238,7 @@ class SubscriptionItem extends Model
             'payload' => [
                 'value' => $quantity,
                 'stripe_customer_id' => $this->subscription->owner->stripe_id
-            ]
+            ],
         ]);
     }
 
@@ -259,10 +259,10 @@ class SubscriptionItem extends Model
      * List all the metered prices for the subscription item.
      * @see https://stripe.com/docs/api/prices/list
      *
-     * @param array|null $params
-     * @param array|null $opts
-     *
+     * @param  array|null  $params
+     * @param  array|null  $opts
      * @return Collection
+     *
      * @throws ApiErrorException
      */
     public function listMeters(?array $params = [], ?array $opts = []): Collection
@@ -271,10 +271,11 @@ class SubscriptionItem extends Model
     }
 
     /**
-     * @param string $meterId
-     * @param array|null $params
-     * @param array|null $opts
+     * @param  string  $meterId
+     * @param  array|null  $params
+     * @param  array|null  $opts
      * @return Collection
+     *
      * @throws ApiErrorException
      */
     public function eventUsageRecord(string $meterId, ?array $params = [], ?array $opts = []): Collection
@@ -288,7 +289,7 @@ class SubscriptionItem extends Model
             'customer' => $this->subscription->owner->stripeId(),
             'start_time' => $startTime,
             'end_time' => $endTime,
-            ...$params
+            ...$params,
         ];
 
         return new Collection($this->subscription->owner->stripe()->billing->meters->allEventSummaries(

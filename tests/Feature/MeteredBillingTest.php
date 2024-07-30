@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Tests\Feature;
 
 use Exception;
 use InvalidArgumentException;
-use Stripe\Exception\ApiErrorException;
 use Stripe\Exception\InvalidRequestException;
 
 class MeteredBillingTest extends FeatureTestCase
@@ -61,7 +60,7 @@ class MeteredBillingTest extends FeatureTestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (!getenv('STRIPE_SECRET')) {
+        if (! getenv('STRIPE_SECRET')) {
             return;
         }
 
@@ -142,7 +141,6 @@ class MeteredBillingTest extends FeatureTestCase
             'unit_amount' => 100,
         ])->id;
 
-
         static::$otherMeteredEventPrice = self::stripe()->prices->create([
             'product' => static::$productId,
             'nickname' => 'Monthly Metered Event $2 per unit',
@@ -215,7 +213,6 @@ class MeteredBillingTest extends FeatureTestCase
         }
     }
 
-
     public function test_reporting_usage_for_legacy_metered_price_throws_exception()
     {
         $user = $this->createCustomer('reporting_usage_for_licensed_price_throws_exception');
@@ -228,7 +225,6 @@ class MeteredBillingTest extends FeatureTestCase
             $this->assertInstanceOf(InvalidRequestException::class, $e);
         }
     }
-
 
     public function test_reporting_usage_for_subscriptions_with_multiple_prices()
     {
@@ -263,7 +259,6 @@ class MeteredBillingTest extends FeatureTestCase
             $this->assertInstanceOf(InvalidRequestException::class, $e);
         }
     }
-
 
     public function test_reporting_event_usage_for_subscriptions_with_multiple_prices()
     {
@@ -302,8 +297,6 @@ class MeteredBillingTest extends FeatureTestCase
 
         $this->assertSame($summary->aggregated_value, 20.0);
     }
-
-
 
     public function test_swap_metered_price_to_different_price()
     {
