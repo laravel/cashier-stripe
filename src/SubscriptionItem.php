@@ -231,7 +231,7 @@ class SubscriptionItem extends Model
      * @return MeterEvent
      * @throws ApiErrorException
      */
-    public function reportMeterUsage(string $meter, int $quantity = 1): MeterEvent
+    public function reportEventUsage(string $meter, int $quantity = 1): MeterEvent
     {
         return $this->subscription->owner->stripe()->billing->meterEvents->create([
             'event_name' => $meter,
@@ -252,6 +252,47 @@ class SubscriptionItem extends Model
     {
         return new Collection($this->subscription->owner->stripe()->subscriptionItems->allUsageRecordSummaries(
             $this->stripe_id, $options
+        )->data);
+    }
+
+    /**
+     * List all the metered prices for the subscription item.
+     * @see https://stripe.com/docs/api/prices/list
+     *
+     * @param array|null $params
+     * @param array|null $opts
+     *
+     * @return Collection
+     * @throws ApiErrorException
+     */
+    public function listMeters(?array $params = [], ?array $opts = []): Collection
+    {
+        return new Collection($this->subscription->owner->stripe()->billing->meters->all($params, $opts)->data);
+    }
+
+    /**
+     * @param string $meterId
+     * @param array|null $params
+     * @param array|null $opts
+     * @return Collection
+     * @throws ApiErrorException
+     */
+    public function eventUsageRecord(string $meterId, ?array $params = [], ?array $opts = []): Collection
+    {
+        $startTime = $params['start_time'] ?? $this->subscription->created_at->timestamp;
+        $endTime = $params['end_time'] ?? time();
+
+        unset($params['start_time'], $params['end_time']);
+
+        $params = [
+            'customer' => $this->subscription->owner->stripeId(),
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+            ...$params
+        ];
+
+        return new Collection($this->subscription->owner->stripe()->billing->meters->allEventSummaries(
+            $meterId, $params, $opts
         )->data);
     }
 

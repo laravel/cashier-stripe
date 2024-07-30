@@ -57,6 +57,7 @@
       <data directive="@endpushif" />
       <data directive="@endpushonce" />
       <data directive="@endsection" />
+      <data directive="@endsession" />
       <data directive="@endslot" />
       <data directive="@endswitch" />
       <data directive="@endunless" />
@@ -81,6 +82,7 @@
       <data directive="@js" injection="true" prefix="&lt;?php _bladeDirective(" suffix="); ?&gt;" />
       <data directive="@json" injection="true" prefix="&lt;?php&#10;echo json_encode(" suffix=") ?&gt;" />
       <data directive="@lang" injection="true" prefix="&lt;?php&#10;echo app('translator')-&gt;get(" suffix="); ?&gt;" />
+      <data directive="@measure" />
       <data directive="@method" injection="true" prefix="&lt;?php&#10;echo method_field(" suffix="); ?&gt;" />
       <data directive="@once" />
       <data directive="@overwrite" />
@@ -93,11 +95,13 @@
       <data directive="@push" injection="true" prefix="&lt;?php&#10;$__env-&gt;startPush(" suffix="); ?&gt;" />
       <data directive="@pushif" injection="true" prefix="&lt;?php&#10;$__pushif_args = explode(','," suffix=", 2); if({$__pushif_args[0]}): $__env-&gt;startPush({$__pushif_args[1]}); ?&gt;" />
       <data directive="@pushonce" injection="true" prefix="&lt;?php&#10;$__php_storm_push_once_params = [" suffix="]; if (!$__env-&gt;hasRenderedOnce($__php_storm_push_once_params[1])): $__env-&gt;markAsRenderedOnce($__php_storm_push_once_params[1]); $__env-&gt;startPush($__php_storm_push_once_params[0]); ?&gt;" />
+      <data directive="@ray" injection="true" prefix="&lt;?php ray(" suffix="); ?&gt;" />
       <data directive="@readonly" injection="true" prefix="&lt;?php&#10;if(" suffix="): echo 'readonly'; endif; ?&gt;" />
       <data directive="@required" injection="true" prefix="&lt;?php&#10;if(" suffix="): echo 'required'; endif; ?&gt;" />
       <data directive="@section" injection="true" prefix="&lt;?php&#10;$__env-&gt;startSection(" suffix="); ?&gt;" />
       <data directive="@sectionMissing" injection="true" prefix="&lt;?php&#10;if (empty(trim($__env-&gt;yieldContent(" suffix=")))): ?&gt;" />
       <data directive="@selected" injection="true" prefix="&lt;?php if(" suffix=") {echo 'selected';}?&gt;" />
+      <data directive="@session" injection="true" prefix="&lt;?php $value = session()-&gt;get(" suffix=")?&gt;&quot;" />
       <data directive="@show" />
       <data directive="@slot" injection="true" prefix="&lt;?php&#10;$__env-&gt;slot(" suffix="); ?&gt;" />
       <data directive="@stack" injection="true" prefix="&lt;?php&#10;echo $__env-&gt;yieldPushContent(" suffix="); ?&gt;" />
@@ -111,6 +115,7 @@
       <data directive="@viteReactRefresh" />
       <data directive="@vitereactrefresh" />
       <data directive="@while" injection="true" prefix="&lt;?php&#10;while(" suffix="): ?&gt;" />
+      <data directive="@xray" />
       <data directive="@yield" injection="true" prefix="&lt;?php&#10;echo $__env-&gt;yieldContent(" suffix="); ?&gt;" />
     </directives>
   </component>
