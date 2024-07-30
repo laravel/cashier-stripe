@@ -93,7 +93,6 @@ class MeteredBillingTest extends FeatureTestCase
             'unit_amount' => 200,
         ])->id;
 
-
         self::$meterEventName = 'test-meter-1';
         self::$otherMeterEventName = 'test-meter-2';
 

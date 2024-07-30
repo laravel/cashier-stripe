@@ -586,7 +586,6 @@ class Subscription extends Model
         return $this->reportUsage($quantity, $timestamp, $price);
     }
 
-
     /**
      * Report usage for specific price of a metered product.
      *
@@ -617,7 +616,6 @@ class Subscription extends Model
 
         return $this->findItemOrFail($price ?? $this->stripe_price)->usageRecords($options);
     }
-
 
     /**
      * Get the usage records for a meter using its ID (not name).

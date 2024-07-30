@@ -237,7 +237,7 @@ class SubscriptionItem extends Model
             'event_name' => $meter,
             'payload' => [
                 'value' => $quantity,
-                'stripe_customer_id' => $this->subscription->owner->stripe_id
+                'stripe_customer_id' => $this->subscription->owner->stripe_id,
             ],
         ]);
     }
@@ -257,6 +257,7 @@ class SubscriptionItem extends Model
 
     /**
      * List all the metered prices for the subscription item.
+     *
      * @see https://stripe.com/docs/api/prices/list
      *
      * @param  array|null  $params
