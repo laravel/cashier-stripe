@@ -271,9 +271,7 @@ class SubscriptionItem extends Model
      * @param  string  $meterId
      * @param  array|null  $params
      * @param  array|null  $opts
-     * @return Collection
-     *
-     * @throws ApiErrorException
+     * @return \Illuminate\Support\Collection
      */
     public function eventUsageRecord(string $meterId, ?array $params = [], ?array $opts = []): Collection
     {
