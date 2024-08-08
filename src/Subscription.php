@@ -17,7 +17,6 @@ use Laravel\Cashier\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use LogicException;
-use Stripe\Billing\MeterEvent;
 use Stripe\Subscription as StripeSubscription;
 
 /**
@@ -600,59 +599,6 @@ class Subscription extends Model
     public function usageRecordsFor($price, array $options = [])
     {
         return $this->usageRecords($options, $price);
-    }
-
-    /**
-     * Report usage for a metered product using Event Meters API.
-     *
-     * @param  string  $meter
-     * @param  int  $quantity
-     * @param  string|null  $price
-     * @param  array  $options
-     * @param  array  $requestOptions
-     * @return \Stripe\Billing\MeterEvent
-     */
-    public function reportEventUsage(
-        string $meter,
-        int $quantity = 1,
-        array $options = [],
-        array $requestOptions = []
-    ): MeterEvent {
-        return $this->owner->stripe()->billing->meterEvents->create([
-            'event_name' => $meter,
-            'payload' => [
-                'value' => $quantity,
-                'stripe_customer_id' => $this->owner->stripe_id,
-            ],
-            ...$options,
-        ], $requestOptions);
-    }
-
-    /**
-     * Get the usage records for a meter using its ID (not name).
-     *
-     * @param  string  $meterId
-     * @param  array  $options
-     * @param  array  $requestOptions
-     * @return \Illuminate\Support\Collection
-     */
-    public function meterUsageRecords(string $meterId, array $options = [], array $requestOptions = []): Collection
-    {
-        $startTime = $options['start_time'] ?? $this->created_at->timestamp;
-        $endTime = $options['end_time'] ?? time();
-
-        unset($options['start_time'], $options['end_time']);
-
-        $options = [
-            'customer' => $this->owner->stripeId(),
-            'start_time' => $startTime,
-            'end_time' => $endTime,
-            ...$options,
-        ];
-
-        return new Collection($this->owner->stripe()->billing->meters->allEventSummaries(
-            $meterId, $options, $requestOptions
-        )->data);
     }
 
     /**
