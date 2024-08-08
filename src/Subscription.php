@@ -18,7 +18,6 @@ use Laravel\Cashier\Exceptions\IncompletePayment;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use LogicException;
 use Stripe\Billing\MeterEvent;
-use Stripe\Exception\ApiErrorException;
 use Stripe\Subscription as StripeSubscription;
 
 /**

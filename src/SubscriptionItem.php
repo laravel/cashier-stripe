@@ -11,7 +11,6 @@ use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionItemFactory;
 use Stripe\Billing\MeterEvent;
-use Stripe\Exception\ApiErrorException;
 
 /**
  * @property \Laravel\Cashier\Subscription|null $subscription
