@@ -227,9 +227,7 @@ class SubscriptionItem extends Model
      *
      * @param  string  $meter
      * @param  int  $quantity
-     * @return MeterEvent
-     *
-     * @throws ApiErrorException
+     * @return \Stripe\MeterEvent
      */
     public function reportEventUsage(string $meter, int $quantity = 1): MeterEvent
     {
