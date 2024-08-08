@@ -618,10 +618,8 @@ class Subscription extends Model
      *
      * @param  string  $meterId
      * @param  array  $options
-     * @param  null  $price
-     * @return Collection
-     *
-     * @throws ApiErrorException
+     * @param  string|null  $price
+     * @return \Illuminate\Support\Collection
      */
     public function meterUsageRecords(string $meterId, array $options = [], $price = null): Collection
     {
