@@ -209,6 +209,8 @@ class SubscriptionItem extends Model
      * @param  int  $quantity
      * @param  \DateTimeInterface|int|null  $timestamp
      * @return \Stripe\UsageRecord
+     *
+     * @deprecated Migrate to Usage Based billing instead.
      */
     public function reportUsage($quantity = 1, $timestamp = null)
     {
@@ -222,72 +224,17 @@ class SubscriptionItem extends Model
     }
 
     /**
-     * Report usage for a metered product using the new Meter Event API.
-     *
-     * @param  string  $meter
-     * @param  int  $quantity
-     * @return \Stripe\Billing\MeterEvent
-     */
-    public function reportEventUsage(string $meter, int $quantity = 1): MeterEvent
-    {
-        return $this->subscription->owner->stripe()->billing->meterEvents->create([
-            'event_name' => $meter,
-            'payload' => [
-                'value' => $quantity,
-                'stripe_customer_id' => $this->subscription->owner->stripe_id,
-            ],
-        ]);
-    }
-
-    /**
      * Get the usage records for a metered product.
      *
      * @param  array  $options
      * @return \Illuminate\Support\Collection
+     *
+     * @deprecated Migrate to Usage Based billing instead.
      */
     public function usageRecords($options = [])
     {
         return new Collection($this->subscription->owner->stripe()->subscriptionItems->allUsageRecordSummaries(
             $this->stripe_id, $options
-        )->data);
-    }
-
-    /**
-     * List all the metered prices for the subscription item.
-     *
-     * @see https://stripe.com/docs/api/prices/list
-     *
-     * @param  array  $options
-     * @param  array  $requestOptions
-     * @return \Illuminate\Support\Collection
-     */
-    public function listMeters(array $options = [], array $requestOptions = []): Collection
-    {
-        return new Collection($this->subscription->owner->stripe()->billing->meters->all($options, $requestOptions)->data);
-    }
-
-    /**
-     * @param  string  $meterId
-     * @param  array  $options
-     * @param  array  $requestOptions
-     * @return \Illuminate\Support\Collection
-     */
-    public function eventUsageRecord(string $meterId, array $options = [], array $requestOptions = []): Collection
-    {
-        $startTime = $options['start_time'] ?? $this->subscription->created_at->timestamp;
-        $endTime = $options['end_time'] ?? time();
-
-        unset($options['start_time'], $options['end_time']);
-
-        $options = [
-            'customer' => $this->subscription->owner->stripeId(),
-            'start_time' => $startTime,
-            'end_time' => $endTime,
-            ...$options,
-        ];
-
-        return new Collection($this->subscription->owner->stripe()->billing->meters->allEventSummaries(
-            $meterId, $options, $requestOptions
         )->data);
     }
 

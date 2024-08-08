@@ -543,6 +543,8 @@ class Subscription extends Model
      * @param  \DateTimeInterface|int|null  $timestamp
      * @param  string|null  $price
      * @return \Stripe\UsageRecord
+     *
+     * @deprecated Migrate to Usage Based billing instead.
      */
     public function reportUsage($quantity = 1, $timestamp = null, $price = null)
     {
@@ -554,46 +556,18 @@ class Subscription extends Model
     }
 
     /**
-     * Report usage for a metered product using Event Meters API.
-     *
-     * @param  string  $meter
-     * @param  int  $quantity
-     * @param  string|null  $price
-     * @return \Stripe\Billing\MeterEvent
-     */
-    public function reportEventUsage(string $meter, int $quantity = 1, ?string $price = null): MeterEvent
-    {
-        if (! $price) {
-            $this->guardAgainstMultiplePrices();
-        }
-
-        return $this->findItemOrFail($price ?? $this->stripe_price)->reportEventUsage($meter, $quantity);
-    }
-
-    /**
      * Report usage for specific price of a metered product.
      *
      * @param  string  $price
      * @param  int  $quantity
      * @param  \DateTimeInterface|int|null  $timestamp
      * @return \Stripe\UsageRecord
+     *
+     * @deprecated Migrate to Usage Based billing instead.
      */
     public function reportUsageFor($price, $quantity = 1, $timestamp = null)
     {
         return $this->reportUsage($quantity, $timestamp, $price);
-    }
-
-    /**
-     * Report usage for specific price of a metered product.
-     *
-     * @param  string  $price
-     * @param  int  $quantity
-     * @param  string  $eventName
-     * @return \Stripe\Billing\MeterEvent
-     */
-    public function reportUsageForEvent(string $eventName, string $price, int $quantity = 1): MeterEvent
-    {
-        return $this->reportEventUsage($eventName, $quantity, $price);
     }
 
     /**
@@ -602,6 +576,8 @@ class Subscription extends Model
      * @param  array  $options
      * @param  string|null  $price
      * @return \Illuminate\Support\Collection
+     *
+     * @deprecated Migrate to Usage Based billing instead.
      */
     public function usageRecords(array $options = [], $price = null)
     {
@@ -613,32 +589,70 @@ class Subscription extends Model
     }
 
     /**
-     * Get the usage records for a meter using its ID (not name).
-     *
-     * @param  string  $meterId
-     * @param  array  $options
-     * @param  string|null  $price
-     * @return \Illuminate\Support\Collection
-     */
-    public function meterUsageRecords(string $meterId, array $options = [], $price = null): Collection
-    {
-        if (! $price) {
-            $this->guardAgainstMultiplePrices();
-        }
-
-        return $this->findItemOrFail($price ?? $this->stripe_price)->eventUsageRecord($meterId, $options);
-    }
-
-    /**
      * Get the usage records for a specific price of a metered product.
      *
      * @param  string  $price
      * @param  array  $options
      * @return \Illuminate\Support\Collection
+     *
+     * @deprecated Migrate to Usage Based billing instead.
      */
     public function usageRecordsFor($price, array $options = [])
     {
         return $this->usageRecords($options, $price);
+    }
+
+    /**
+     * Report usage for a metered product using Event Meters API.
+     *
+     * @param  string  $meter
+     * @param  int  $quantity
+     * @param  string|null  $price
+     * @param  array  $options
+     * @param  array  $requestOptions
+     * @return \Stripe\Billing\MeterEvent
+     */
+    public function reportEventUsage(
+        string $meter,
+        int $quantity = 1,
+        array $options = [],
+        array $requestOptions = []
+    ): MeterEvent {
+        return $this->owner->stripe()->billing->meterEvents->create([
+            'event_name' => $meter,
+            'payload' => [
+                'value' => $quantity,
+                'stripe_customer_id' => $this->owner->stripe_id,
+            ],
+            ...$options,
+        ], $requestOptions);
+    }
+
+    /**
+     * Get the usage records for a meter using its ID (not name).
+     *
+     * @param  string  $meterId
+     * @param  array  $options
+     * @param  array  $requestOptions
+     * @return \Illuminate\Support\Collection
+     */
+    public function meterUsageRecords(string $meterId, array $options = [], array $requestOptions = []): Collection
+    {
+        $startTime = $options['start_time'] ?? $this->created_at->timestamp;
+        $endTime = $options['end_time'] ?? time();
+
+        unset($options['start_time'], $options['end_time']);
+
+        $options = [
+            'customer' => $this->owner->stripeId(),
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+            ...$options,
+        ];
+
+        return new Collection($this->owner->stripe()->billing->meters->allEventSummaries(
+            $meterId, $options, $requestOptions
+        )->data);
     }
 
     /**
