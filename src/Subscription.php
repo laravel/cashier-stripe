@@ -560,7 +560,7 @@ class Subscription extends Model
      * @param  string  $meter
      * @param  int  $quantity
      * @param  string|null  $price
-     * @return \Stripe\MeterEvent
+     * @return \Stripe\Billing\MeterEvent
      */
     public function reportEventUsage(string $meter, int $quantity = 1, ?string $price = null): MeterEvent
     {
@@ -590,7 +590,7 @@ class Subscription extends Model
      * @param  string  $price
      * @param  int  $quantity
      * @param  string  $eventName
-     * @return \Stripe\MeterEvent
+     * @return \Stripe\Billing\MeterEvent
      */
     public function reportUsageForEvent(string $eventName, string $price, int $quantity = 1): MeterEvent
     {

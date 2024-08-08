@@ -227,7 +227,7 @@ class SubscriptionItem extends Model
      *
      * @param  string  $meter
      * @param  int  $quantity
-     * @return \Stripe\MeterEvent
+     * @return \Stripe\Billing\MeterEvent
      */
     public function reportEventUsage(string $meter, int $quantity = 1): MeterEvent
     {
