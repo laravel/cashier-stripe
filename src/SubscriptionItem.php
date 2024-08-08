@@ -260,9 +260,7 @@ class SubscriptionItem extends Model
      *
      * @param  array|null  $params
      * @param  array|null  $opts
-     * @return Collection
-     *
-     * @throws ApiErrorException
+     * @return \Illuminate\Support\Collection
      */
     public function listMeters(?array $params = [], ?array $opts = []): Collection
     {
