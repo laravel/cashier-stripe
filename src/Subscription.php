@@ -560,9 +560,7 @@ class Subscription extends Model
      * @param  string  $meter
      * @param  int  $quantity
      * @param  string|null  $price
-     * @return MeterEvent
-     *
-     * @throws ApiErrorException
+     * @return \Stripe\MeterEvent
      */
     public function reportEventUsage(string $meter, int $quantity = 1, ?string $price = null): MeterEvent
     {
