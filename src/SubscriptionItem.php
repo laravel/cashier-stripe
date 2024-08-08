@@ -258,37 +258,37 @@ class SubscriptionItem extends Model
      *
      * @see https://stripe.com/docs/api/prices/list
      *
-     * @param  array|null  $params
-     * @param  array|null  $opts
+     * @param  array  $options
+     * @param  array  $requestOptions
      * @return \Illuminate\Support\Collection
      */
-    public function listMeters(?array $params = [], ?array $opts = []): Collection
+    public function listMeters(array $options = [], array $requestOptions = []): Collection
     {
-        return new Collection($this->subscription->owner->stripe()->billing->meters->all($params, $opts)->data);
+        return new Collection($this->subscription->owner->stripe()->billing->meters->all($options, $requestOptions)->data);
     }
 
     /**
      * @param  string  $meterId
-     * @param  array|null  $params
-     * @param  array|null  $opts
+     * @param  array  $options
+     * @param  array  $requestOptions
      * @return \Illuminate\Support\Collection
      */
-    public function eventUsageRecord(string $meterId, ?array $params = [], ?array $opts = []): Collection
+    public function eventUsageRecord(string $meterId, array $options = [], array $requestOptions = []): Collection
     {
-        $startTime = $params['start_time'] ?? $this->subscription->created_at->timestamp;
-        $endTime = $params['end_time'] ?? time();
+        $startTime = $options['start_time'] ?? $this->subscription->created_at->timestamp;
+        $endTime = $options['end_time'] ?? time();
 
-        unset($params['start_time'], $params['end_time']);
+        unset($options['start_time'], $options['end_time']);
 
-        $params = [
+        $options = [
             'customer' => $this->subscription->owner->stripeId(),
             'start_time' => $startTime,
             'end_time' => $endTime,
-            ...$params,
+            ...$options,
         ];
 
         return new Collection($this->subscription->owner->stripe()->billing->meters->allEventSummaries(
-            $meterId, $params, $opts
+            $meterId, $options, $requestOptions
         )->data);
     }
 
