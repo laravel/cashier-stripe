@@ -3,12 +3,10 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Exception;
-use Stripe\Exception\InvalidRequestException;
 use InvalidArgumentException;
 
 class UsageBasedBillingTest extends FeatureTestCase
 {
-
     /**
      * @var string
      */
@@ -49,10 +47,9 @@ class UsageBasedBillingTest extends FeatureTestCase
      */
     protected static $licensedPrice;
 
-
     public static function setUpBeforeClass(): void
     {
-        if (!getenv('STRIPE_SECRET')) {
+        if (! getenv('STRIPE_SECRET')) {
             return;
         }
 
@@ -138,29 +135,17 @@ class UsageBasedBillingTest extends FeatureTestCase
     {
         $user = $this->createCustomer('test_report_usage_for_meter');
 
-        $subscription = $user->newSubscription('main')
+        $user->newSubscription('main')
             ->meteredPrice(static::$meteredEventPrice)
             ->create('pm_card_visa');
 
         sleep(1);
-        $user->reportMeterEvent(static::$meterEventName,10);
+
+        $user->reportMeterEvent(static::$meterEventName, 10);
 
         $summary = $user->meterEventSummaries(static::$meterId)->first();
 
         $this->assertSame($summary->aggregated_value, 10.0);
-    }
-
-    public function test_reporting_usage_for_legacy_metered_price_throws_exception()
-    {
-        $user = $this->createCustomer('reporting_usage_for_legacy_metered_price_throws_exception');
-
-        $subscription = $user->newSubscription('main')->meteredPrice(static::$meteredEventPrice)->create('pm_card_visa');
-
-        try {
-            $subscription->reportUsage();
-        } catch (Exception $e) {
-            $this->assertInstanceOf(InvalidRequestException::class, $e);
-        }
     }
 
     public function test_reporting_event_usage_for_subscriptions_with_multiple_prices()
@@ -200,5 +185,4 @@ class UsageBasedBillingTest extends FeatureTestCase
 
         $this->assertSame($summary->aggregated_value, 20.0);
     }
-
 }

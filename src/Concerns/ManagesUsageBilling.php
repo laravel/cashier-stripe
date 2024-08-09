@@ -1,6 +1,7 @@
 <?php
 
 namespace Laravel\Cashier\Concerns;
+
 use Illuminate\Support\Collection;
 use Stripe\Billing\MeterEvent;
 
