@@ -4,6 +4,7 @@ namespace Laravel\Cashier\Tests\Feature;
 
 use Exception;
 use InvalidArgumentException;
+use Stripe\Exception\InvalidRequestException;
 
 class MeteredBillingTest extends FeatureTestCase
 {
@@ -61,7 +62,6 @@ class MeteredBillingTest extends FeatureTestCase
             ],
             'unit_amount' => 200,
         ])->id;
-
 
         static::$licensedPrice = self::stripe()->prices->create([
             'product' => static::$productId,
