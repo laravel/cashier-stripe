@@ -7,6 +7,8 @@ use Illuminate\Support\Arr;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Http\Middleware\VerifyRedirectUrl;
 use Laravel\Cashier\Payment;
+use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PaymentController extends Controller
 {
@@ -25,12 +27,18 @@ class PaymentController extends Controller
      *
      * @param  string  $id
      * @return \Illuminate\Contracts\View\View
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function show($id)
     {
-        $payment = new Payment(Cashier::stripe()->paymentIntents->retrieve(
-            $id, ['expand' => ['payment_method']])
-        );
+        try {
+            $payment = new Payment(Cashier::stripe()->paymentIntents->retrieve(
+                $id, ['expand' => ['payment_method']])
+            );
+        } catch (StripeInvalidRequestException $exception) {
+            throw new NotFoundHttpException;
+        }
 
         $paymentIntent = Arr::only($payment->asStripePaymentIntent()->toArray(), [
             'id', 'status', 'payment_method_types', 'client_secret', 'payment_method',
