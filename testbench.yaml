@@ -3,3 +3,9 @@ providers:
 
 migrations:
   - database/migrations
+
+workbench:
+  build:
+    - create-sqlite-db
+    - db:wipe
+    - migrate:fresh
