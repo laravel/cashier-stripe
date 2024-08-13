@@ -8,7 +8,7 @@ use Stripe\Billing\MeterEvent;
 trait ManagesUsageBilling
 {
     /**
-     * List all the billing meters.
+     * Get all of the defined billing meters.
      *
      * @param  array  $options
      * @param  array  $requestOptions
@@ -20,7 +20,7 @@ trait ManagesUsageBilling
     }
 
     /**
-     * Report usage for a metered product using Event Meters API.
+     * Report usage for a metered product.
      *
      * @param  string  $meter
      * @param  int  $quantity
@@ -48,7 +48,7 @@ trait ManagesUsageBilling
     }
 
     /**
-     * Get the usage records for a meter using its ID (not name).
+     * Get the usage records for a meter using its ID.
      *
      * @param  string  $meterId
      * @param  array  $options
@@ -60,6 +60,7 @@ trait ManagesUsageBilling
         $this->assertCustomerExists();
 
         $startTime = $options['start_time'] ?? $this->created_at->timestamp;
+
         $endTime = $options['end_time'] ?? time();
 
         unset($options['start_time'], $options['end_time']);
