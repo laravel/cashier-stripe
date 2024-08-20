@@ -34,7 +34,7 @@ class PaymentController extends Controller
                 $id, ['expand' => ['payment_method']])
             );
         } catch (StripeInvalidRequestException $exception) {
-            abort(404, 'Payment not found');
+            abort(404, 'Payment not found.');
         }
 
         $paymentIntent = Arr::only($payment->asStripePaymentIntent()->toArray(), [
