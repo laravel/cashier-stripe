@@ -102,7 +102,8 @@ class WebhookController extends Controller
 
             // Terminate the billable's generic trial if it exists...
             if (! is_null($user->trial_ends_at)) {
-                $user->update(['trial_ends_at' => null]);
+                $user->trial_ends_at = null;
+                $user->save();
             }
         }
 
