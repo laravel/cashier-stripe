@@ -1,20 +1,16 @@
 {
-    "name": "laravel/cashier",
-    "description": "Laravel Cashier provides an expressive, fluent interface to Stripe's subscription billing services.",
-    "keywords": ["laravel", "stripe", "billing"],
+    "name": "josephajibodu/cashier-paystack",
+    "description": "Laravel Cashier provides an expressive, fluent interface to Paystack's payment services.",
+    "keywords":  ["laravel", "paystack", "billing", "nigeria", "africa"],
     "license": "MIT",
     "support": {
-        "issues": "https://github.com/laravel/cashier/issues",
-        "source": "https://github.com/laravel/cashier"
+        "issues": "https://github.com/josephajibodu/cashier-paystack/issues",
+        "source": "https://github.com/josephajibodu/cashier-paystack"
     },
     "authors": [
         {
-            "name": "Taylor Otwell",
-            "email": "taylor@laravel.com"
-        },
-        {
-            "name": "Dries Vints",
-            "email": "dries@laravel.com"
+            "name": "Joseph Ajibodu",
+            "email": "josephajibodu@gmail.com"
         }
     ],
     "require": {
