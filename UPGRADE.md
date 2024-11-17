@@ -19,7 +19,7 @@ The Stripe SDK version is now fixed at v13.x.
 
 PR: https://github.com/laravel/cashier-stripe/pull/1615
 
-The default Stripe API version for Cashier 15 is `2023-10-16`. If this is the latest Stripe API version when you upgrade to this Cashier version, then we recommend you also upgrade your Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
+The default Stripe API version for Cashier 15 is `2023-08-16`. If this is the latest Stripe API version when you upgrade to this Cashier version, then we recommend you also upgrade your Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
 
 If you use the Stripe PHP SDK directly, make sure to properly test your integration after updating.
 
