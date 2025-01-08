@@ -6,6 +6,10 @@ use Illuminate\Support\Collection;
 use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\HandlesTaxes;
 
+/**
+ * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
+ * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
+ */
 class CheckoutBuilder
 {
     use AllowsCoupons;
@@ -60,9 +64,10 @@ class CheckoutBuilder
      * @param  array|string  $items
      * @param  array  $sessionOptions
      * @param  array  $customerOptions
+     * @param null|RequestOptionsArray|\Stripe\Util\RequestOptions $opts
      * @return \Laravel\Cashier\Checkout
      */
-    public function create($items, array $sessionOptions = [], array $customerOptions = [])
+    public function create($items, array $sessionOptions = [], array $customerOptions = [], $opts = null)
     {
         $payload = array_filter([
             'allow_promotion_codes' => $this->allowPromotionCodes,

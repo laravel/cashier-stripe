@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Redirect;
 use JsonSerializable;
 use Stripe\Checkout\Session;
 
+/**
+ * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
+ * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
+ */
 class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
 {
     /**
@@ -66,9 +70,10 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * @param  \Illuminate\Database\Eloquent\Model|null  $owner
      * @param  array  $sessionOptions
      * @param  array  $customerOptions
+     * @param null|RequestOptionsArray|\Stripe\Util\RequestOptions $opts
      * @return \Laravel\Cashier\Checkout
      */
-    public static function create($owner, array $sessionOptions = [], array $customerOptions = [])
+    public static function create($owner, array $sessionOptions = [], array $customerOptions = [], $opts = null)
     {
         $data = array_merge([
             'mode' => Session::MODE_PAYMENT,
@@ -107,7 +112,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
             $data['cancel_url'] = $sessionOptions['cancel_url'] ?? route('home').'?checkout=cancelled';
         }
 
-        $session = $stripe->checkout->sessions->create($data);
+        $session = $stripe->checkout->sessions->create($data, $opts);
 
         return new static($owner, $session);
     }
