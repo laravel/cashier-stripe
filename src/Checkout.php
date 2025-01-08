@@ -70,7 +70,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * @param  \Illuminate\Database\Eloquent\Model|null  $owner
      * @param  array  $sessionOptions
      * @param  array  $customerOptions
-     * @param  null|RequestOptionsArray|\Stripe\Util\RequestOptions $opts
+     * @param  null|RequestOptionsArray|\Stripe\Util\RequestOptions  $opts
      * @return \Laravel\Cashier\Checkout
      */
     public static function create($owner, array $sessionOptions = [], array $customerOptions = [], $opts = null)

@@ -64,7 +64,7 @@ class CheckoutBuilder
      * @param  array|string  $items
      * @param  array  $sessionOptions
      * @param  array  $customerOptions
-     * @param  null|RequestOptionsArray|\Stripe\Util\RequestOptions $opts
+     * @param  null|RequestOptionsArray|\Stripe\Util\RequestOptions  $opts
      * @return \Laravel\Cashier\Checkout
      */
     public function create($items, array $sessionOptions = [], array $customerOptions = [], $opts = null)
