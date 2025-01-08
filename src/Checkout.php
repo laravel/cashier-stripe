@@ -11,6 +11,7 @@ use Stripe\Checkout\Session;
 
 /**
  * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
+ *
  * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
  */
 class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
