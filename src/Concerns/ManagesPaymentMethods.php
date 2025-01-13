@@ -151,7 +151,7 @@ trait ManagesPaymentMethods
         /** @var \Stripe\Customer */
         $customer = $this->asStripeCustomer(['default_source', 'invoice_settings.default_payment_method']);
 
-        if ($customer->invoice_settings->default_payment_method) {
+        if ($customer->invoice_settings?->default_payment_method) {
             return new PaymentMethod($this, $customer->invoice_settings->default_payment_method);
         }
 
