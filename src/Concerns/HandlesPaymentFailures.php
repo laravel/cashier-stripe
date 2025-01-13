@@ -68,7 +68,7 @@ trait HandlesPaymentFailures
                     ])->save();
 
                     if ($subscription->hasIncompletePayment()) {
-                        (new Payment($paymentIntent))->validate();
+                        (new Payment($paymentIntent))->refresh(['invoice.subscription'])->validate();
                     }
                 } else {
                     throw $e;

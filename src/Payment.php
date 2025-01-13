@@ -210,6 +210,19 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Refresh the PaymentIntent instance from the Stripe API.
+     *
+     * @param  array  $expand
+     * @return $this
+     */
+    public function refresh(array $expand = [])
+    {
+        $this->paymentIntent = $this->asStripePaymentIntent($expand);
+
+        return $this;
+    }
+
+    /**
      * Get the instance as an array.
      *
      * @return array
