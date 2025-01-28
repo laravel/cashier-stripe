@@ -6,14 +6,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Tests\Fixtures\User;
 use Laravel\Cashier\Tests\TestCase;
+use Orchestra\Testbench\Attributes\RequiresEnv;
 use Orchestra\Testbench\Concerns\WithLaravelMigrations;
 use Stripe\ApiRequestor as StripeApiRequestor;
 use Stripe\HttpClient\CurlClient as StripeCurlClient;
 use Stripe\StripeClient;
 
+#[RequiresEnv('STRIPE_SECRET')]
+#[WithMigration]
 abstract class FeatureTestCase extends TestCase
 {
-    use RefreshDatabase, WithLaravelMigrations;
+    use RefreshDatabase;
+    use WithLaravelMigrations;
 
     protected function setUp(): void
     {

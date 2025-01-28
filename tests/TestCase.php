@@ -13,7 +13,7 @@ abstract class TestCase extends OrchestraTestCase
 {
     use WithWorkbench;
 
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $apiKey = config('cashier.secret');
 
