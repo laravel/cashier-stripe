@@ -62,7 +62,7 @@ Because of this change, the `Cashier::ignoreMigrations` method has been removed.
 
 PR: https://github.com/laravel/cashier-stripe/pull/1620
 
-To better indicate the purpose of this column, we've renamed the `name` column on the `subscriptions` table to `type`. The purpose of this change is to resolve confusion surrouding the `name` column as many users believed it needed to be a customer-facing, user friendly "name", when in reality the column is mainly used to differentiate the different "types" of subscriptions your application may offer and is only used internally by Cashier. You should define the following schema change in a migration when upgrading:
+To better indicate the purpose of this column, we've renamed the `name` column on the `subscriptions` table to `type`. The purpose of this change is to resolve confusion surrounding the `name` column as many users believed it needed to be a customer-facing, user friendly "name", when in reality the column is mainly used to differentiate the different "types" of subscriptions your application may offer and is only used internally by Cashier. You should define the following schema change in a migration when upgrading:
 
 ```php
 Schema::table('subscriptions', function (Blueprint $table) {
