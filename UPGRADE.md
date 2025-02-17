@@ -70,7 +70,7 @@ Schema::table('subscriptions', function (Blueprint $table) {
 });
 ```
 
-Additionally, if you're overwriting the `newSubscriptionName` method on the webhook controller, you'll need to rename this method to `newSubscriptionType`.
+Additionally, if you're overwriting the `newSubscriptionName` method on the webhook controller, you should rename this method to `newSubscriptionType`.
 
 ### Rename Receipt To Invoice
 
