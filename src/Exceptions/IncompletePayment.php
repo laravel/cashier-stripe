@@ -24,7 +24,7 @@ class IncompletePayment extends Exception
      * @param  \Throwable|null  $previous
      * @return void
      */
-    public function __construct(Payment $payment, $message = '', $code = 0, Throwable $previous = null)
+    public function __construct(Payment $payment, $message = '', $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
 

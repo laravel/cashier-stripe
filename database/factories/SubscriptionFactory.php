@@ -69,7 +69,7 @@ class SubscriptionFactory extends Factory
      *
      * @return $this
      */
-    public function trialing(DateTimeInterface $trialEndsAt = null): static
+    public function trialing(?DateTimeInterface $trialEndsAt = null): static
     {
         return $this->state([
             'stripe_status' => StripeSubscription::STATUS_TRIALING,
