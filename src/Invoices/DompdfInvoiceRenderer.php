@@ -19,6 +19,7 @@ class DompdfInvoiceRenderer implements InvoiceRenderer
         }
 
         $dompdfOptions = new Options;
+        $dompdfOptions->setIsRemoteEnabled($options['remote_enabled'] ?? false);
         $dompdfOptions->setChroot(base_path());
 
         $dompdf = new Dompdf($dompdfOptions);
