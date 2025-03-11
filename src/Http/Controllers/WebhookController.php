@@ -376,11 +376,18 @@ class WebhookController extends Controller
                 $payment->payment_method
             ));
 
-            $user->pm_type = $paymentMethod->type;
-
+            
             if ($paymentMethod->type === 'card') {
+                $card = $paymentMethod->card;
+
+                $pm_type = ucwords($card->brand) . ' '
+                    . ($card->funding === 'unknown' ? 'Credit' : ucwords($card->funding))
+                    . " exp. {$card->exp_year}-{$card->exp_month}";
+
+                $user->pm_type = $pm_type;
                 $user->pm_last_four = $paymentMethod->card->last4;
             } else {
+                $user->pm_type = $paymentMethod->type;
                 $user->pm_last_four = null;
             }
 
