@@ -12,6 +12,7 @@ use Laravel\Cashier\Events\WebhookHandled;
 use Laravel\Cashier\Events\WebhookReceived;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Cashier\Payment;
+use Laravel\Cashier\PaymentMethod;
 use Laravel\Cashier\Subscription;
 use Stripe\Stripe;
 use Stripe\Subscription as StripeSubscription;
@@ -354,5 +355,38 @@ class WebhookController extends Controller
     protected function setMaxNetworkRetries($retries = 3)
     {
         Stripe::setMaxNetworkRetries($retries);
+    }
+
+    /**
+     * Handle invoice payment succeeded.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleInvoicePaymentSucceeded(array $payload)
+    {
+        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
+
+        if ($user) {
+            $payment = new Payment($user->stripe()->paymentIntents->retrieve(
+                $payload['data']['object']['payment_intent']
+            ));
+
+            $paymentMethod = new PaymentMethod($user, $user->stripe()->paymentMethods->retrieve(
+                $payment->payment_method
+            ));
+
+            $user->pm_type = $paymentMethod->type;
+
+            if ($paymentMethod->type === 'card') {
+                $user->pm_last_four = $paymentMethod->card->last4;
+            } else {
+                $user->pm_last_four = null;
+            }
+
+            $user->save();
+        }
+
+        return $this->successMethod();
     }
 }
