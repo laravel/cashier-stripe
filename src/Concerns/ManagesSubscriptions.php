@@ -72,7 +72,7 @@ trait ManagesSubscriptions
      */
     public function onGenericTrial()
     {
-        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+        return $this->trial_ends_at && Carbon::parse($this->trial_ends_at)->isFuture();
     }
 
     /**
