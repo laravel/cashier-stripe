@@ -35,7 +35,7 @@ class WebhookCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Create the Stripe webhook to interact with Cashier.';
+    protected $description = 'Create the Stripe webhook to interact with Cashier';
 
     /**
      * Execute the console command.
