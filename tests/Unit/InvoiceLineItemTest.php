@@ -28,16 +28,16 @@ class InvoiceLineItemTest extends TestCase
 
         $stripeInvoiceLineItem = new StripeInvoiceLineItem();
         $stripeInvoiceLineItem->tax_amounts = [
-            ['inclusive' => true, 'tax_rate' => $this->inclusiveTaxRate(5.0)],
-            ['inclusive' => true, 'tax_rate' => $this->inclusiveTaxRate(15.0)],
-            ['inclusive' => false, 'tax_rate' => $this->exclusiveTaxRate(21.0)],
+            ['inclusive' => true, 'tax_rate' => $this->inclusiveTaxRate(5.24)],
+            ['inclusive' => true, 'tax_rate' => $this->inclusiveTaxRate(15.92)],
+            ['inclusive' => false, 'tax_rate' => $this->exclusiveTaxRate(21.12)],
         ];
 
         $item = new InvoiceLineItem($invoice, $stripeInvoiceLineItem);
 
         $result = $item->inclusiveTaxPercentage();
 
-        $this->assertSame(20, $result);
+        $this->assertSame(21.16, $result);
     }
 
     public function test_we_can_calculate_the_exclusive_tax_percentage()
@@ -53,16 +53,16 @@ class InvoiceLineItemTest extends TestCase
 
         $stripeInvoiceLineItem = new StripeInvoiceLineItem();
         $stripeInvoiceLineItem->tax_amounts = [
-            ['inclusive' => true, 'tax_rate' => $this->inclusiveTaxRate(5.0)],
-            ['inclusive' => false, 'tax_rate' => $this->exclusiveTaxRate(15.0)],
-            ['inclusive' => false, 'tax_rate' => $this->exclusiveTaxRate(21.0)],
+            ['inclusive' => true, 'tax_rate' => $this->inclusiveTaxRate(5.54)],
+            ['inclusive' => false, 'tax_rate' => $this->exclusiveTaxRate(15.28)],
+            ['inclusive' => false, 'tax_rate' => $this->exclusiveTaxRate(21.85)],
         ];
 
         $item = new InvoiceLineItem($invoice, $stripeInvoiceLineItem);
 
         $result = $item->exclusiveTaxPercentage();
 
-        $this->assertSame(36, $result);
+        $this->assertSame(37.13, $result);
     }
 
     /**

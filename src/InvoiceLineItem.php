@@ -72,7 +72,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
     /**
      * Get the total percentage of the default inclusive tax for the invoice line item.
      *
-     * @return int|null
+     * @return float|int|null
      */
     public function inclusiveTaxPercentage()
     {
@@ -86,7 +86,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
     /**
      * Get the total percentage of the default exclusive tax for the invoice line item.
      *
-     * @return int
+     * @return float|int
      */
     public function exclusiveTaxPercentage()
     {
@@ -101,7 +101,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      * Calculate the total tax percentage for either the inclusive or exclusive tax by tax rate.
      *
      * @param  bool  $inclusive
-     * @return int
+     * @return float|int
      */
     protected function calculateTaxPercentageByTaxRate($inclusive)
     {
@@ -109,7 +109,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
             return 0;
         }
 
-        return (int) Collection::make($this->item->tax_rates)
+        return Collection::make($this->item->tax_rates)
             ->filter(function (StripeTaxRate $taxRate) use ($inclusive) {
                 return $taxRate->inclusive === (bool) $inclusive;
             })
@@ -122,7 +122,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      * Calculate the total tax percentage for either the inclusive or exclusive tax by tax amount.
      *
      * @param  bool  $inclusive
-     * @return int
+     * @return float|int
      */
     protected function calculateTaxPercentageByTaxAmount($inclusive)
     {
@@ -130,7 +130,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
             return 0;
         }
 
-        return (int) Collection::make($this->item->tax_amounts)
+        return Collection::make($this->item->tax_amounts)
             ->filter(function (object $taxAmount) use ($inclusive) {
                 return $taxAmount->inclusive === (bool) $inclusive;
             })
