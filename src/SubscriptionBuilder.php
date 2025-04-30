@@ -402,7 +402,10 @@ class SubscriptionBuilder
             'billing_cycle_anchor' => $this->billingCycleAnchor,
             'coupon' => $this->couponId,
             'expand' => ['latest_invoice.payment_intent'],
-            'metadata' => $this->metadata,
+            'metadata' => array_merge($this->metadata, [
+                'name' => $this->type,
+                'type' => $this->type,
+            ]),
             'items' => Collection::make($this->items)->values()->all(),
             'payment_behavior' => $this->paymentBehavior(),
             'promotion_code' => $this->promotionCodeId,
