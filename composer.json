@@ -38,7 +38,7 @@
         "symfony/polyfill-intl-icu": "^1.22.1"
     },
     "require-dev": {
-        "dompdf/dompdf": "^2.0",
+        "dompdf/dompdf": "^2.0|^3.0",
         "mockery/mockery": "^1.0",
         "orchestra/testbench": "^8.18|^9.0|^10.0",
         "phpstan/phpstan": "^1.10",
@@ -46,7 +46,7 @@
     },
     "suggest": {
         "ext-intl": "Allows for more locales besides the default \"en\" when formatting money values.",
-        "dompdf/dompdf": "Required when generating and downloading invoice PDF's using Dompdf (^1.0.1|^2.0)."
+        "dompdf/dompdf": "Required when generating and downloading invoice PDF's using Dompdf (^2.0|^3.0)."
     },
     "autoload": {
         "psr-4": {
