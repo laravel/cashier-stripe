@@ -84,7 +84,11 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
 
         // Make sure to collect address and name when Tax ID collection is enabled...
         if (isset($data['customer']) && ($data['tax_id_collection']['enabled'] ?? false)) {
-            $data['customer_update']['address'] = 'auto';
+            // Use billing_address_collection instead of customer_update.address = 'auto' to
+            // prevent address lock in checkout after payment cancellation while allowing overrides
+            if (!isset($data['billing_address_collection'])) {
+                $data['billing_address_collection'] = 'required';
+            }
             $data['customer_update']['name'] = 'auto';
         }
 

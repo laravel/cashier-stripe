@@ -199,4 +199,58 @@ class CheckoutTest extends FeatureTestCase
 
         $this->assertInstanceOf(Checkout::class, $checkout);
     }
+
+    public function test_checkout_prevents_address_lock_when_tax_collection_enabled()
+    {
+        // Enable tax calculation globally
+        \Laravel\Cashier\Cashier::calculateTaxes();
+
+        try {
+            $user = $this->createCustomer('address_lock_fix');
+
+            $price = self::stripe()->prices->create([
+                'currency' => 'USD',
+                'product_data' => ['name' => 'Test Product'],
+                'unit_amount' => 1000,
+            ]);
+
+            $checkout = $user->checkout($price->id, [
+                'success_url' => 'http://example.com',
+                'cancel_url' => 'http://example.com',
+            ]);
+
+            $session = $checkout->asStripeCheckoutSession();
+
+            // Verify that address lock is prevented
+            $this->assertTrue($session->tax_id_collection['enabled']);
+            $this->assertEquals('required', $session->billing_address_collection);
+            $this->assertNotEquals('auto', $session->customer_update['address'] ?? null);
+        } finally {
+            \Laravel\Cashier\Cashier::$calculatesTaxes = false;
+        }
+    }
+
+    public function test_checkout_respects_user_overrides_when_tax_collection_enabled()
+    {
+        $user = $this->createCustomer('user_overrides_tax_collection');
+
+        $price = self::stripe()->prices->create([
+            'currency' => 'USD',
+            'product_data' => ['name' => 'Test Product'],
+            'unit_amount' => 1000,
+        ]);
+
+        // User explicitly overrides billing_address_collection
+        $checkout = $user->checkout($price->id, [
+            'success_url' => 'http://example.com',
+            'cancel_url' => 'http://example.com',
+            'tax_id_collection' => ['enabled' => true],
+            'billing_address_collection' => 'auto',  // User override
+        ]);
+
+        $session = $checkout->asStripeCheckoutSession();
+
+        // User override should be respected
+        $this->assertEquals('auto', $session->billing_address_collection);
+    }
 }
