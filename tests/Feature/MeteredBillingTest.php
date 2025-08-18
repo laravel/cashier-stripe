@@ -134,6 +134,8 @@ class MeteredBillingTest extends FeatureTestCase
 
     public function test_report_usage_for_metered_price()
     {
+        $this->markTestSkipped('Unable to use testmode key with `v2` API: https://docs.stripe.com/api-v2-overview?api-version=2025-07-30.preview&rds=1#limitations');
+
         $user = $this->createCustomer('report_usage_for_metered_price');
 
         $subscription = $user->newSubscription('main')
@@ -164,6 +166,8 @@ class MeteredBillingTest extends FeatureTestCase
 
     public function test_reporting_usage_for_licensed_price_throws_exception()
     {
+        // $this->markTestSkipped('Unable to use testmode key with `v2` API: https://docs.stripe.com/api-v2-overview?api-version=2025-07-30.preview&rds=1#limitations');
+
         $user = $this->createCustomer('reporting_usage_for_licensed_price_throws_exception');
 
         $subscription = $user->newSubscription('main', static::$licensedPrice)->create('pm_card_visa');
@@ -176,6 +180,8 @@ class MeteredBillingTest extends FeatureTestCase
 
     public function test_reporting_usage_for_subscriptions_with_multiple_prices()
     {
+        // $this->markTestSkipped('Unable to use testmode key with `v2` API: https://docs.stripe.com/api-v2-overview?api-version=2025-07-30.preview&rds=1#limitations');
+
         $user = $this->createCustomer('reporting_usage_for_subscriptions_with_multiple_prices');
 
         $subscription = $user->newSubscription('main', [static::$licensedPrice])
@@ -193,6 +199,8 @@ class MeteredBillingTest extends FeatureTestCase
 
     public function test_reporting_usage_for_specific_metered_price()
     {
+        $this->markTestSkipped('Unable to use testmode key with `v2` API: https://docs.stripe.com/api-v2-overview?api-version=2025-07-30.preview&rds=1#limitations');
+
         $user = $this->createCustomer('reporting_usage_for_specific_metered_price');
 
         $subscription = $user->newSubscription('main', [static::$licensedPrice])
@@ -302,6 +310,8 @@ class MeteredBillingTest extends FeatureTestCase
 
     public function test_cancel_metered_subscription()
     {
+        $this->markTestSkipped('Unable to use testmode key with `v2` API: https://docs.stripe.com/api-v2-overview?api-version=2025-07-30.preview&rds=1#limitations');
+
         $user = $this->createCustomer('cancel_metered_subscription');
 
         $subscription = $user->newSubscription('main')
@@ -328,6 +338,8 @@ class MeteredBillingTest extends FeatureTestCase
 
     public function test_cancel_metered_subscription_immediately()
     {
+        $this->markTestSkipped('Unable to use testmode key with `v2` API: https://docs.stripe.com/api-v2-overview?api-version=2025-07-30.preview&rds=1#limitations');
+
         $user = $this->createCustomer('cancel_metered_subscription_immediately');
 
         $subscription = $user->newSubscription('main')
