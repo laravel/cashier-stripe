@@ -42,6 +42,7 @@ jobs:
         run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
         if: matrix.php >= 8.1 && matrix.php < 8.4
         env:
+          STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
           STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
           CASHIER_TESTER_BUILD_ID: ${{ github.run_number }}
 
@@ -54,6 +55,7 @@ jobs:
         run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
         if: matrix.php >= 8.2 && matrix.php <= 8.4
         env:
+          STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
           STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
           CASHIER_TESTER_BUILD_ID: ${{ github.run_number }}
 
@@ -66,5 +68,6 @@ jobs:
         run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
         if: matrix.php >= 8.2 && matrix.php <= 8.4
         env:
+          STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
           STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
           CASHIER_TESTER_BUILD_ID: ${{ github.run_number }}
