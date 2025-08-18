@@ -61,9 +61,10 @@ class MeteredBillingTest extends FeatureTestCase
 
         // Create meters for the new billing system with unique event names
         $timestamp = hrtime(true);
+        $testerBuildId = getenv('CASHIER_TESTER_BUILD_ID') ?? 'default';
 
-        static::$meterEventName = 'api_request_'.$timestamp;
-        static::$otherMeterEventName = 'premium_api_request_'.$timestamp;
+        static::$meterEventName = implode('_', ['api_request', $testerBuildId, $timestamp]);
+        static::$otherMeterEventName = implode('_', ['premium_api_request', $testerBuildId, $timestamp]);
 
         static::$meterId = self::stripe()->billing->meters->create([
             'display_name' => 'API Requests',
