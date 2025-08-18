@@ -60,7 +60,7 @@ class MeteredBillingTest extends FeatureTestCase
         ])->id;
 
         // Create meters for the new billing system with unique event names
-        $timestamp = time();
+        $timestamp = hrtime(true);
 
         static::$meterEventName = 'api_request_'.$timestamp;
         static::$otherMeterEventName = 'premium_api_request_'.$timestamp;
