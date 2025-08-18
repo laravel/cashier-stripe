@@ -67,8 +67,6 @@ class WebhookController extends Controller
     {
         $user = $this->getUserByStripeId($payload['data']['object']['customer']);
 
-        ray($user);
-
         if ($user) {
             $data = $payload['data']['object'];
 
