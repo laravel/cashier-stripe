@@ -8,7 +8,6 @@ use Laravel\Cashier\PaymentMethod;
 use Stripe\BankAccount as StripeBankAccount;
 use Stripe\Card as StripeCard;
 use Stripe\PaymentMethod as StripePaymentMethod;
-use Stripe\SetupIntent as StripeSetupIntent;
 
 trait ManagesPaymentMethods
 {

@@ -3,7 +3,6 @@
 namespace Laravel\Cashier\Concerns;
 
 use Laravel\Cashier\Cashier;
-use Stripe\StripeClient;
 
 trait InteractsWithStripe
 {

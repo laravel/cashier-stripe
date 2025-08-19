@@ -15,7 +15,6 @@ use Laravel\Cashier\PromotionCode;
 use Laravel\Cashier\Subscription;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
-use Stripe\TaxId as StripeTaxId;
 
 trait ManagesCustomer
 {

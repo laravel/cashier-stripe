@@ -14,7 +14,6 @@ use Laravel\Cashier\Payment;
 use LogicException;
 use Stripe\Exception\CardException as StripeCardException;
 use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
-use Stripe\InvoiceItem as StripeInvoiceItem;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
