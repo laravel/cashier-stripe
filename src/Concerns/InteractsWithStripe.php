@@ -13,7 +13,7 @@ trait InteractsWithStripe
      * @param  array  $options
      * @return \Stripe\StripeClient
      */
-    public static function stripe(array $options = []): StripeClient
+    public static function stripe(array $options = [])
     {
         return Cashier::stripe($options);
     }

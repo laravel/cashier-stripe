@@ -3,6 +3,8 @@
 namespace Laravel\Cashier\Concerns;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionBuilder;
@@ -50,7 +52,7 @@ trait ManagesSubscriptions
      * @param  string|null  $price
      * @return bool
      */
-    public function hasExpiredTrial(string $type = 'default', $price = null): bool
+    public function hasExpiredTrial(string $type = 'default', ?string $price = null): bool
     {
         if (func_num_args() === 0 && $this->hasExpiredGenericTrial()) {
             return true;
@@ -78,10 +80,10 @@ trait ManagesSubscriptions
     /**
      * Filter the given query for generic trials.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Contracts\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeOnGenericTrial($query)
+    public function scopeOnGenericTrial(Builder $query): void
     {
         $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '>', Carbon::now());
     }
@@ -91,7 +93,7 @@ trait ManagesSubscriptions
      *
      * @return bool
      */
-    public function hasExpiredGenericTrial()
+    public function hasExpiredGenericTrial(): bool
     {
         return $this->trial_ends_at && $this->trial_ends_at->isPast();
     }
@@ -99,10 +101,10 @@ trait ManagesSubscriptions
     /**
      * Filter the given query for expired generic trials.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Contracts\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeHasExpiredGenericTrial($query)
+    public function scopeHasExpiredGenericTrial(Builder $query): void
     {
         $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '<', Carbon::now());
     }
@@ -113,7 +115,7 @@ trait ManagesSubscriptions
      * @param  string  $type
      * @return \Illuminate\Support\Carbon|null
      */
-    public function trialEndsAt($type = 'default')
+    public function trialEndsAt(string $type = 'default')
     {
         if (func_num_args() === 0 && $this->onGenericTrial()) {
             return $this->trial_ends_at;
@@ -133,7 +135,7 @@ trait ManagesSubscriptions
      * @param  string|null  $price
      * @return bool
      */
-    public function subscribed($type = 'default', $price = null)
+    public function subscribed(string $type = 'default', ?string $price = null): bool
     {
         $subscription = $this->subscription($type);
 
@@ -150,7 +152,7 @@ trait ManagesSubscriptions
      * @param  string  $type
      * @return \Laravel\Cashier\Subscription|null
      */
-    public function subscription($type = 'default')
+    public function subscription(string $type = 'default'): ?Subscription
     {
         return $this->subscriptions->where('type', $type)->first();
     }
@@ -160,7 +162,7 @@ trait ManagesSubscriptions
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function subscriptions()
+    public function subscriptions(): HasMany
     {
         return $this->hasMany(Cashier::$subscriptionModel, $this->getForeignKey())->orderBy('created_at', 'desc');
     }
@@ -171,7 +173,7 @@ trait ManagesSubscriptions
      * @param  string  $type
      * @return bool
      */
-    public function hasIncompletePayment($type = 'default')
+    public function hasIncompletePayment(string $type = 'default'): bool
     {
         if ($subscription = $this->subscription($type)) {
             return $subscription->hasIncompletePayment();
@@ -187,7 +189,7 @@ trait ManagesSubscriptions
      * @param  string  $type
      * @return bool
      */
-    public function subscribedToProduct($products, $type = 'default')
+    public function subscribedToProduct(string|array $products, string $type = 'default'): bool
     {
         $subscription = $this->subscription($type);
 
@@ -211,7 +213,7 @@ trait ManagesSubscriptions
      * @param  string  $type
      * @return bool
      */
-    public function subscribedToPrice($prices, $type = 'default')
+    public function subscribedToPrice(string|array $prices, $type = 'default'): bool
     {
         $subscription = $this->subscription($type);
 
@@ -234,7 +236,7 @@ trait ManagesSubscriptions
      * @param  string  $product
      * @return bool
      */
-    public function onProduct($product)
+    public function onProduct(string $product): bool
     {
         return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($product) {
             return $subscription->valid() && $subscription->hasProduct($product);
@@ -247,7 +249,7 @@ trait ManagesSubscriptions
      * @param  string  $price
      * @return bool
      */
-    public function onPrice($price)
+    public function onPrice(string $price): bool
     {
         return ! is_null($this->subscriptions->first(function (Subscription $subscription) use ($price) {
             return $subscription->valid() && $subscription->hasPrice($price);
@@ -259,7 +261,7 @@ trait ManagesSubscriptions
      *
      * @return array
      */
-    public function taxRates()
+    public function taxRates(): array
     {
         return [];
     }
@@ -269,7 +271,7 @@ trait ManagesSubscriptions
      *
      * @return array
      */
-    public function priceTaxRates()
+    public function priceTaxRates(): array
     {
         return [];
     }

@@ -31,7 +31,7 @@ trait ManagesInvoices
      * @param  array  $options
      * @return \Stripe\InvoiceItem
      */
-    public function tab(string $description, ?int $amount, array $options = []): StripeInvoiceItem
+    public function tab(string $description, ?int $amount, array $options = [])
     {
         if ($this->isAutomaticTaxEnabled() && ! array_key_exists('price_data', $options)) {
             throw new LogicException(
@@ -90,7 +90,7 @@ trait ManagesInvoices
      * @param  array  $options
      * @return \Stripe\InvoiceItem
      */
-    public function tabPrice(string $price, int $quantity = 1, array $options = []): StripeInvoiceItem
+    public function tabPrice(string $price, int $quantity = 1, array $options = [])
     {
         $this->assertCustomerExists();
 

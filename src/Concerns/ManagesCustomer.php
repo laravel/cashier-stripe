@@ -64,7 +64,7 @@ trait ManagesCustomer
      *
      * @throws \Laravel\Cashier\Exceptions\CustomerAlreadyCreated
      */
-    public function createAsStripeCustomer(array $options = [], array $requestOptions = []): StripeCustomer
+    public function createAsStripeCustomer(array $options = [], array $requestOptions = [])
     {
         if ($this->hasStripeId()) {
             throw CustomerAlreadyCreated::exists($this);
@@ -114,7 +114,7 @@ trait ManagesCustomer
      * @param  array  $options
      * @return \Stripe\Customer
      */
-    public function updateStripeCustomer(array $options = []): StripeCustomer
+    public function updateStripeCustomer(array $options = [])
     {
         /** @var \Stripe\Service\CustomerService $customersService */
         $customersService = static::stripe()->customers;
@@ -131,7 +131,7 @@ trait ManagesCustomer
      * @param  array  $requestOptions
      * @return \Stripe\Customer
      */
-    public function createOrGetStripeCustomer(array $options = [], array $requestOptions = []): StripeCustomer
+    public function createOrGetStripeCustomer(array $options = [], array $requestOptions = [])
     {
         if ($this->hasStripeId()) {
             return $this->asStripeCustomer($options['expand'] ?? []);
@@ -146,7 +146,7 @@ trait ManagesCustomer
      * @param  array  $options
      * @return \Stripe\Customer
      */
-    public function updateOrCreateStripeCustomer(array $options = []): StripeCustomer
+    public function updateOrCreateStripeCustomer(array $options = [])
     {
         if ($this->hasStripeId()) {
             return $this->updateStripeCustomer($options);
@@ -161,7 +161,7 @@ trait ManagesCustomer
      * @param  array  $options
      * @return \Stripe\Customer
      */
-    public function syncOrCreateStripeCustomer(array $options = []): StripeCustomer
+    public function syncOrCreateStripeCustomer(array $options = [])
     {
         if ($this->hasStripeId()) {
             return $this->syncStripeCustomerDetails();
@@ -176,7 +176,7 @@ trait ManagesCustomer
      * @param  array  $expand
      * @return \Stripe\Customer
      */
-    public function asStripeCustomer(array $expand = []): StripeCustomer
+    public function asStripeCustomer(array $expand = [])
     {
         $this->assertCustomerExists();
 
@@ -264,7 +264,7 @@ trait ManagesCustomer
      *
      * @return \Stripe\Customer
      */
-    public function syncStripeCustomerDetails(): StripeCustomer
+    public function syncStripeCustomerDetails()
     {
         return $this->updateStripeCustomer([
             'name' => $this->stripeName(),
@@ -654,7 +654,7 @@ trait ManagesCustomer
      * @param  string  $id
      * @return \Stripe\TaxId|null
      */
-    public function findTaxId(string $id): ?StripeTaxId
+    public function findTaxId(string $id)
     {
         $this->assertCustomerExists();
 
@@ -677,7 +677,7 @@ trait ManagesCustomer
      * @param  string  $value
      * @return \Stripe\TaxId
      */
-    public function createTaxId(string $type, string $value): StripeTaxId
+    public function createTaxId(string $type, string $value)
     {
         $this->assertCustomerExists();
 

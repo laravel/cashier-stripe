@@ -18,7 +18,7 @@ trait ManagesPaymentMethods
      * @param  array  $options
      * @return \Stripe\SetupIntent
      */
-    public function createSetupIntent(array $options = []): StripeSetupIntent
+    public function createSetupIntent(array $options = [])
     {
         if ($this->hasStripeId()) {
             $options['customer'] = $this->stripe_id;
@@ -35,7 +35,7 @@ trait ManagesPaymentMethods
      * @param  array  $options
      * @return \Stripe\SetupIntent
      */
-    public function findSetupIntent(string $id, array $params = [], array $options = []): StripeSetupIntent
+    public function findSetupIntent(string $id, array $params = [], array $options = [])
     {
         return static::stripe()->setupIntents->retrieve($id, $params, $options);
     }
@@ -143,7 +143,7 @@ trait ManagesPaymentMethods
      *
      * @return \Laravel\Cashier\PaymentMethod|\Stripe\Card|\Stripe\BankAccount|null
      */
-    public function defaultPaymentMethod(): PaymentMethod|StripeCard|StripeBankAccount|null
+    public function defaultPaymentMethod()
     {
         if (! $this->hasStripeId()) {
             return null;
@@ -283,10 +283,10 @@ trait ManagesPaymentMethods
     /**
      * Find a PaymentMethod by ID.
      *
-     * @param  string  $paymentMethod
+     * @param  \Stripe\PaymentMethod|string  $paymentMethod
      * @return \Laravel\Cashier\PaymentMethod|null
      */
-    public function findPaymentMethod($paymentMethod)
+    public function findPaymentMethod(StripePaymentMethod|string $paymentMethod): ?PaymentMethod
     {
         $stripePaymentMethod = null;
 
@@ -305,7 +305,7 @@ trait ManagesPaymentMethods
      * @param  \Stripe\PaymentMethod|string  $paymentMethod
      * @return \Stripe\PaymentMethod
      */
-    protected function resolveStripePaymentMethod($paymentMethod)
+    protected function resolveStripePaymentMethod(StripePaymentMethod|string $paymentMethod): PaymentMethod
     {
         if ($paymentMethod instanceof StripePaymentMethod) {
             return $paymentMethod;
