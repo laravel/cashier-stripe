@@ -32,9 +32,19 @@ $subscription->applyCoupon('coupon_id');
 $subscription->applyPromotionCode('promotion_code_id');
 ```
 
-In Cashier 16, you can set coupon to all subscription using `applyCouponToAllSubscriptions($couponId)` or specific subscription types
+However, Cashier 16 will apply coupon and promotion code on the primary subscription. You can set coupon to all subscription using the following:
 
-> @TODO need to add some example
+```php
+$billable->applyCouponToAllSubscriptions('coupon_id');
+$billable->applyPromotionCodeToAllSubscriptions('promotion_code_id');
+```
+
+You may also set the coupon based on subscription types:
+
+```php
+$billable->applyCoupon('coupon_id', 'default');
+$billable->applyPromotionCode('promotion_code_id', 'default');
+```
 
 ### Metered Billing Changes
 
