@@ -16,9 +16,23 @@ The default Stripe API version for Cashier 16 is `2025-07-30.basil`. If this is 
 
 If you use the Stripe PHP SDK directly, make sure to properly test your integration after updating.
 
-### Coupon without expiry date
+### Always Set Ending Date for a Coupon
 
 Basil API no longer supports setting discount coupons without an end date, any application using a coupon without an end date will trigger `Laravel\Cashier\Exceptions\InvalidCoupon` exception after updating to Cashier 16.
+
+### Apply a Coupon by Subscription Type
+
+In Cashier 15 and below, you can only set a coupon based for a billable. e.g:
+
+```php
+$user = User::whereEmail('taylor@laravel.com')->firstOrFail();
+
+$user->applyCoupon(couponId: 'zonda');
+```
+
+In Cashier 16, you can set coupon to all subscription using `applyCouponToAllSubscriptions($couponId)` or specific subscription types
+
+> @TODO need to add some example
 
 ### Database Migration Changes
 
