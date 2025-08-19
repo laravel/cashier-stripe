@@ -60,6 +60,8 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
         if (! is_null($this->coupon->amount_off)) {
             return $this->formatAmount($this->rawAmountOff());
         }
+
+        return null;
     }
 
     /**

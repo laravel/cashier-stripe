@@ -98,7 +98,7 @@ class Cashier
      * @param  \Stripe\Customer|string|null  $stripeId
      * @return \Laravel\Cashier\Billable|null
      */
-    public static function findBillable(StripeCustomer|string|null $stripeId): ?Billable
+    public static function findBillable(StripeCustomer|string|null $stripeId)
     {
         $stripeId = $stripeId instanceof StripeCustomer ? $stripeId->id : $stripeId;
 
