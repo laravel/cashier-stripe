@@ -22,12 +22,14 @@ Basil API no longer supports setting discount coupons without an end date, any a
 
 ### Apply a Coupon by Subscription Type
 
-In Cashier 15 and below, you can only set a coupon based for a billable. e.g:
+In Cashier 15 and below, you can only set a coupon or promotion code based for a billable or a subscription. e.g:
 
 ```php
-$user = User::whereEmail('taylor@laravel.com')->firstOrFail();
+$billable->applyCoupon('coupon_id');
+$billable->applyPromotionCode('promotion_code_id');
 
-$user->applyCoupon(couponId: 'zonda');
+$subscription->applyCoupon('coupon_id');
+$subscription->applyPromotionCode('promotion_code_id');
 ```
 
 In Cashier 16, you can set coupon to all subscription using `applyCouponToAllSubscriptions($couponId)` or specific subscription types
