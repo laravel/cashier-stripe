@@ -373,7 +373,7 @@ trait ManagesCustomer
      */
     public function applyCouponToAllSubscriptions(string $couponId): void
     {
-        return $this->applyCoupon($couponId, '*');
+        $this->applyCoupon($couponId, '*');
     }
 
     /**
@@ -384,7 +384,7 @@ trait ManagesCustomer
      */
     public function applyPromotionCodeToAllSubscriptions(string $promotionCodeId): void
     {
-        return $this->applyPromotionCode($promotionCodeId, '*');
+        $this->applyPromotionCode($promotionCodeId, '*');
     }
 
     /**
