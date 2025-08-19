@@ -17,7 +17,7 @@ class CustomerBalanceTransaction
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidCustomerBalanceTransaction
      */
-    public function __construct(protected Model $owner, protected StripeCustomerBalanceTransaction $transaction)
+    public function __construct(protected $owner, protected StripeCustomerBalanceTransaction $transaction)
     {
         if ($owner->stripe_id !== $transaction->customer) {
             throw InvalidCustomerBalanceTransaction::invalidOwner($transaction, $owner);

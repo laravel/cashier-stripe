@@ -21,7 +21,7 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidPaymentMethod
      */
-    public function __construct(protected Model $owner, protected StripePaymentMethod $paymentMethod)
+    public function __construct(protected $owner, protected StripePaymentMethod $paymentMethod)
     {
         if (is_null($paymentMethod->customer)) {
             throw new LogicException('The payment method is not attached to a customer.');
@@ -47,7 +47,7 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function owner(): Model
+    public function owner()
     {
         return $this->owner;
     }

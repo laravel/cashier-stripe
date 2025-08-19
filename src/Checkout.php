@@ -21,7 +21,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * @return void
      */
     public function __construct(
-        protected Model $owner,
+        protected $owner,
         protected Session $session
     ) {
         //

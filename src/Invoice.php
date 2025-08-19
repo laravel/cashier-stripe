@@ -67,7 +67,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      * @throws \Laravel\Cashier\Exceptions\InvalidInvoice
      */
     public function __construct(
-        protected Model $owner,
+        protected $owner,
         protected StripeInvoice $invoice,
         protected array $refreshData = []
     ) {
@@ -1018,7 +1018,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function owner(): Model
+    public function owner()
     {
         return $this->owner;
     }
