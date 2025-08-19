@@ -2,6 +2,12 @@
 
 ## Upgrading To 16.0 From 15.x
 
+### Stripe SDK Version
+
+PR: https://github.com/laravel/cashier-stripe/pull/1762
+
+The Stripe SDK version is now fixed at v17.x.
+
 ## Upgrading To 15.0 From 14.x
 
 ### Minimum Versions
