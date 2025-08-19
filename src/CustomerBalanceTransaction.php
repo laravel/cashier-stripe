@@ -2,25 +2,12 @@
 
 namespace Laravel\Cashier;
 
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Exceptions\InvalidCustomerBalanceTransaction;
 use Stripe\CustomerBalanceTransaction as StripeCustomerBalanceTransaction;
 
 class CustomerBalanceTransaction
 {
-    /**
-     * The Stripe model instance.
-     *
-     * @var \Illuminate\Database\Eloquent\Model
-     */
-    protected $owner;
-
-    /**
-     * The Stripe CustomerBalanceTransaction instance.
-     *
-     * @var \Stripe\CustomerBalanceTransaction
-     */
-    protected $transaction;
-
     /**
      * Create a new CustomerBalanceTransaction instance.
      *
@@ -30,14 +17,11 @@ class CustomerBalanceTransaction
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidCustomerBalanceTransaction
      */
-    public function __construct($owner, StripeCustomerBalanceTransaction $transaction)
+    public function __construct(protected Model $owner, protected StripeCustomerBalanceTransaction $transaction)
     {
         if ($owner->stripe_id !== $transaction->customer) {
             throw InvalidCustomerBalanceTransaction::invalidOwner($transaction, $owner);
         }
-
-        $this->owner = $owner;
-        $this->transaction = $transaction;
     }
 
     /**
@@ -45,7 +29,7 @@ class CustomerBalanceTransaction
      *
      * @return string
      */
-    public function amount()
+    public function amount(): string
     {
         return $this->formatAmount($this->rawAmount());
     }
@@ -55,7 +39,7 @@ class CustomerBalanceTransaction
      *
      * @return int
      */
-    public function rawAmount()
+    public function rawAmount(): int
     {
         return $this->transaction->amount;
     }
@@ -65,7 +49,7 @@ class CustomerBalanceTransaction
      *
      * @return string
      */
-    public function endingBalance()
+    public function endingBalance(): string
     {
         return $this->formatAmount($this->rawEndingBalance());
     }
@@ -75,7 +59,7 @@ class CustomerBalanceTransaction
      *
      * @return int
      */
-    public function rawEndingBalance()
+    public function rawEndingBalance(): int
     {
         return $this->transaction->ending_balance;
     }
@@ -85,7 +69,7 @@ class CustomerBalanceTransaction
      *
      * @return string|null
      */
-    public function balanceType()
+    public function balanceType(): ?string
     {
         return $this->transaction->balance_type;
     }
@@ -95,7 +79,7 @@ class CustomerBalanceTransaction
      *
      * @return string|null
      */
-    public function checkoutSession()
+    public function checkoutSession(): ?string
     {
         return $this->transaction->checkout_session;
     }
@@ -105,7 +89,7 @@ class CustomerBalanceTransaction
      *
      * @return bool
      */
-    public function isCheckoutSessionSubscriptionPayment()
+    public function isCheckoutSessionSubscriptionPayment(): bool
     {
         return $this->transaction->balance_type === 'checkout_session_subscription_payment';
     }
@@ -115,7 +99,7 @@ class CustomerBalanceTransaction
      *
      * @return bool
      */
-    public function isCheckoutSessionSubscriptionPaymentCanceled()
+    public function isCheckoutSessionSubscriptionPaymentCanceled(): bool
     {
         return $this->transaction->balance_type === 'checkout_session_subscription_payment_canceled';
     }
@@ -126,7 +110,7 @@ class CustomerBalanceTransaction
      * @param  int  $amount
      * @return string
      */
-    protected function formatAmount($amount)
+    protected function formatAmount(int $amount): string
     {
         return Cashier::formatAmount($amount, $this->transaction->currency);
     }
@@ -136,7 +120,7 @@ class CustomerBalanceTransaction
      *
      * @return \Laravel\Cashier\Invoice
      */
-    public function invoice()
+    public function invoice(): Invoice
     {
         return $this->transaction->invoice
             ? $this->owner->findInvoice($this->transaction->invoice)
@@ -191,7 +175,7 @@ class CustomerBalanceTransaction
      * @param  string  $key
      * @return mixed
      */
-    public function __get($key)
+    public function __get(string $key)
     {
         return $this->transaction->{$key};
     }
