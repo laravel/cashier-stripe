@@ -3,7 +3,6 @@
 namespace Laravel\Cashier\Exceptions;
 
 use Exception;
-use Illuminate\Database\Eloquent\Model;
 use Stripe\PaymentMethod as StripePaymentMethod;
 
 class InvalidPaymentMethod extends Exception
@@ -15,7 +14,7 @@ class InvalidPaymentMethod extends Exception
      * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @return static
      */
-    public static function invalidOwner(StripePaymentMethod $paymentMethod, Model $owner)
+    public static function invalidOwner(StripePaymentMethod $paymentMethod, $owner)
     {
         return new static(
             "The payment method `{$paymentMethod->id}`'s customer `{$paymentMethod->customer}` does not belong to this customer `$owner->stripe_id`."
