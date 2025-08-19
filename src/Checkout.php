@@ -5,6 +5,8 @@ namespace Laravel\Cashier;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use JsonSerializable;
 use Stripe\Checkout\Session;
@@ -12,30 +14,17 @@ use Stripe\Checkout\Session;
 class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
 {
     /**
-     * The Stripe model instance.
-     *
-     * @var \Illuminate\Database\Eloquent\Model|null
-     */
-    protected $owner;
-
-    /**
-     * The Stripe checkout session instance.
-     *
-     * @var \Stripe\Checkout\Session
-     */
-    protected $session;
-
-    /**
      * Create a new checkout session instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $owner
      * @param  \Stripe\Checkout\Session  $session
      * @return void
      */
-    public function __construct($owner, Session $session)
-    {
-        $this->owner = $owner;
-        $this->session = $session;
+    public function __construct(
+        protected Model $owner,
+        protected Session $session
+    ) {
+        //
     }
 
     /**
@@ -43,7 +32,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      *
      * @return \Laravel\Cashier\CheckoutBuilder
      */
-    public static function guest()
+    public static function guest(): CheckoutBuilder
     {
         return new CheckoutBuilder();
     }
@@ -55,7 +44,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * @param  object|null  $parentInstance
      * @return \Laravel\Cashier\CheckoutBuilder
      */
-    public static function customer($owner, $parentInstance = null)
+    public static function customer(Model $owner, ?object $parentInstance = null): CheckoutBuilder
     {
         return new CheckoutBuilder($owner, $parentInstance);
     }
@@ -68,7 +57,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
-    public static function create($owner, array $sessionOptions = [], array $customerOptions = [])
+    public static function create(Model $owner, array $sessionOptions = [], array $customerOptions = []): Checkout
     {
         $data = array_merge([
             'mode' => Session::MODE_PAYMENT,
@@ -120,7 +109,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function redirect()
+    public function redirect(): RedirectResponse
     {
         return Redirect::to($this->session->url, 303);
     }
@@ -184,7 +173,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * @param  string  $key
      * @return mixed
      */
-    public function __get($key)
+    public function __get(string $key)
     {
         return $this->session->{$key};
     }

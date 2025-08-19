@@ -10,21 +10,14 @@ use Stripe\Coupon as StripeCoupon;
 class Coupon implements Arrayable, Jsonable, JsonSerializable
 {
     /**
-     * The Stripe Coupon instance.
-     *
-     * @var \Stripe\Coupon
-     */
-    protected $coupon;
-
-    /**
      * Create a new Coupon instance.
      *
      * @param  \Stripe\Coupon  $coupon
      * @return void
      */
-    public function __construct(StripeCoupon $coupon)
+    public function __construct(protected StripeCoupon $coupon)
     {
-        $this->coupon = $coupon;
+        //
     }
 
     /**
@@ -32,7 +25,7 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return $this->coupon->name ?: $this->coupon->id;
     }
@@ -42,7 +35,7 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function isPercentage()
+    public function isPercentage(): bool
     {
         return ! is_null($this->coupon->percent_off);
     }
@@ -52,7 +45,7 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
      *
      * @return float|null
      */
-    public function percentOff()
+    public function percentOff(): ?float
     {
         return $this->coupon->percent_off;
     }
@@ -62,7 +55,7 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string|null
      */
-    public function amountOff()
+    public function amountOff(): ?string
     {
         if (! is_null($this->coupon->amount_off)) {
             return $this->formatAmount($this->rawAmountOff());
@@ -74,7 +67,7 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
      *
      * @return int|null
      */
-    public function rawAmountOff()
+    public function rawAmountOff(): ?int
     {
         return $this->coupon->amount_off;
     }
@@ -84,7 +77,7 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function isForeverAmountOff()
+    public function isForeverAmountOff(): bool
     {
         return ! is_null($this->coupon->amount_off) && $this->coupon->duration === 'forever';
     }
@@ -94,7 +87,7 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string
      */
-    public function duration()
+    public function duration(): string
     {
         return $this->coupon->duration;
     }
@@ -105,7 +98,7 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
      * @param  int  $amount
      * @return string
      */
-    protected function formatAmount($amount)
+    protected function formatAmount(int $amount): string
     {
         return Cashier::formatAmount($amount, $this->coupon->currency);
     }
@@ -158,7 +151,7 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
      * @param  string  $key
      * @return mixed
      */
-    public function __get($key)
+    public function __get(string $key)
     {
         return $this->coupon->{$key};
     }
