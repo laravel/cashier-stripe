@@ -516,6 +516,7 @@ class SubscriptionBuilder
     {
         if ($taxRates = $this->owner->priceTaxRates()) {
             ray($price, $taxRates);
+
             return $taxRates[$price] ?? null;
         }
 
