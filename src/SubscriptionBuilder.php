@@ -18,7 +18,6 @@ use Laravel\Cashier\Concerns\InteractsWithStripe;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Exceptions\InvalidCoupon;
 use Stripe\Subscription as StripeSubscription;
-use Stripe\PaymentMethod as StripePaymentMethod;
 
 class SubscriptionBuilder
 {
