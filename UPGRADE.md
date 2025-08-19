@@ -6,19 +6,22 @@
 
 PR: https://github.com/laravel/cashier-stripe/pull/1762
 
-The Stripe SDK version is now fixed at v17.x.
+The Stripe SDK version is now fixed at ^17.3.0 (or later minor versions within v17.x). This upgrade aligns with Stripe PHP SDK changes that introduce Basil-specific features like improved pricing models. If you have custom integrations relying on deprecated SDK methods from v16, review Stripe's SDK changelog for breaking changes.
 
 ### Stripe API Version
 
 PR: https://github.com/laravel/cashier-stripe/pull/1762
 
-The default Stripe API version for Cashier 16 is `2025-07-30.basil`. If this is the latest Stripe API version when you upgrade to this Cashier version, then we recommend you also upgrade your Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
+The default Stripe API version for Cashier 16 is `2025-07-30.basil`. If this is the latest Stripe API version when you upgrade to this Cashier version, then we recommend you also upgrade your Stripe API version settings in your Stripe dashboard to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
+Older Stripe accounts (e.g., those created before Basil previews) may encounter compatibility issues with v2 billing APIs or require manual API key upgrades in the Stripe dashboard. We recommend testing in a staging environment, as some legacy features might not migrate seamlessly. Note that `StripeApiVersion::CURRENT` is used internally, so the exact version could evolve with minor Cashier releases—lock your dashboard version post-upgrade to avoid drift.
 
 If you use the Stripe PHP SDK directly, make sure to properly test your integration after updating.
 
 ### Always Set Ending Date for a Coupon
 
 Basil API no longer supports setting discount coupons without an end date, any application using a coupon without an end date will trigger `Laravel\Cashier\Exceptions\InvalidCoupon` exception after updating to Cashier 16.
+
+For existing infinite coupons, recreate them in Stripe with a finite duration before upgrading, or handle the exception by falling back to time-bound alternatives in code.
 
 ### Apply a Coupon by Subscription Type
 
@@ -32,7 +35,9 @@ $subscription->applyCoupon('coupon_id');
 $subscription->applyPromotionCode('promotion_code_id');
 ```
 
-However, Cashier 16 will apply coupon and promotion code on the primary subscription. You can set coupon to all subscription using the following:
+However, Cashier 16 will apply coupon and promotion code on the primary subscription. This change prevents accidental application to unintended subscriptions in multi-subscription setups. If your logic assumes global application, migrate to the new methods explicitly.
+
+You can set coupon to all subscription using the following:
 
 ```php
 $billable->applyCouponToAllSubscriptions('coupon_id');
@@ -48,8 +53,9 @@ $billable->applyPromotionCode('promotion_code_id', 'default');
 
 ### Pricing and Tax changes on Invoice Item Line
 
-Basil API [replaces top-level price fields with improved price modeling](https://docs.stripe.com/changelog/basil/2025-03-31/invoice-pricing-configurations) on Invoice Items and Invoice Line Items. To support the new structure the following methods has been added to `Laravel\Cashier\InvoiceLineItem`:
+Basil API [replaces top-level price fields with improved price modeling](https://docs.stripe.com/changelog/basil/2025-03-31/invoice-pricing-configurations) on Invoice Items and Invoice Line Items. Top-level fields like `amount` or `price` on line items are deprecated in favor of nested structures, which could break custom invoice rendering or calculations if not updated.
 
+To support the new structure the following methods has been added to `Laravel\Cashier\InvoiceLineItem`:
 * `priceId()`
 * `price()`
 * `unitAmount()`
@@ -66,18 +72,32 @@ Basil API [replaces top-level price fields with improved price modeling](https:/
 * `parent()`
 * `taxBehavior()`
 
+The new `taxBehavior()` method supports Basil's enhanced tax modeling (e.g., inclusive/exclusive/reverse charge), so verify tax calculations post-upgrade if you have international customers.
+
 ### Metered Billing Changes
 
 With the introduction of Basil API, the return type for `reportUsage()` and `reportUsageFor()` method within `Laravel\Cashier\Subscription` has changed from `Stripe\UsageRecord` to `Stripe\V2\Billing\MeterEvent`.
+This affects how usage data is queried or processed—e.g., event metadata or IDs might differ. Update type hints or handling logic in custom reporting. The new `meter_id` caching in `SubscriptionItem` improves performance but requires the database migration to store it properly.
 
 ### Database Migration Changes
 
 PR: https://github.com/laravel/cashier-stripe/pull/1762
 
-To better tracks usage-based billings, we've added `meter_event_name` and  `meter_id` to `subscription_items` table. You should be able to run the following steps:
+To better track usage-based billings, we've added `meter_event_name` and `meter_id` to `subscription_items` table. The `meter_id` column is nullable and cast as a string in the model. If you have custom queries or indexes on `subscription_items`, consider adding them for these fields. Additionally, internal ID generation has changed from `uniqid()` to `Str::uuid()`, which is unlikely to affect user code but could impact extensions relying on prefix-based uniqueness.
 
-1. Run `php artisan vendor:publish --tag="cashier-migrations"`
-2. Run `php artisan migrate`
+You should be able to run the following steps:
+
+Run `php artisan vendor:publish --tag="cashier-migrations"`
+
+Run `php artisan migrate`
+
+Review file changes [here](https://github.com/laravel/cashier-stripe/pull/1762/files).
+
+### Payment Failure Handling
+The `HandlesPaymentFailures` trait no longer automatically expands `invoice.subscription` in payment intent failures. If your error-handling code assumes this data is pre-loaded, fetch it manually (e.g., via `$invoice->subscription()`).
+
+### Coupon Validation in Checkouts
+New traits like `AllowsCoupons` introduce stricter validation for coupons in checkout sessions (e.g., ensuring compatibility with Basil). If you customize checkouts, test for rejection of invalid promotions.
 
 ## Upgrading To 15.0 From 14.x
 
