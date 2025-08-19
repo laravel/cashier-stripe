@@ -46,6 +46,26 @@ $billable->applyCoupon('coupon_id', 'default');
 $billable->applyPromotionCode('promotion_code_id', 'default');
 ```
 
+### Pricing and Tax changes on Invoice Item Line
+
+Basil API [replaces top-level price fields with improved price modeling](https://docs.stripe.com/changelog/basil/2025-03-31/invoice-pricing-configurations) on Invoice Items and Invoice Line Items. To support the new structure the following methods has been added to `Laravel\Cashier\InvoiceLineItem`:
+
+* `priceId()`
+* `price()`
+* `unitAmount()`
+* `unitAmountFormatted()`
+* `taxes()`
+* `taxRateDetails()`
+* `totalTaxAmount()`
+* `isInvoiceItem()`
+* `subscriptionId()`
+* `subscriptionItemId()`
+* `invoiceItemId()`
+* `isProration()`
+* `prorationDetails()`
+* `parent()`
+* `taxBehavior()`
+
 ### Metered Billing Changes
 
 With the introduction of Basil API, the return type for `reportUsage()` and `reportUsageFor()` method within `Laravel\Cashier\Subscription` has changed from `Stripe\UsageRecord` to `Stripe\V2\Billing\MeterEvent`.
