@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier;
 
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Cashier\Exceptions\InvalidCustomerBalanceTransaction;
 use Stripe\CustomerBalanceTransaction as StripeCustomerBalanceTransaction;
 
