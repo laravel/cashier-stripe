@@ -4,7 +4,6 @@ namespace Laravel\Cashier\Concerns;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Stripe\V2\Billing\MeterEvent;
 
 trait ManagesUsageBilling
 {
