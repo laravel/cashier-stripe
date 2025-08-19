@@ -15,9 +15,8 @@ class PromotionCode implements Arrayable, Jsonable, JsonSerializable
      * @param  \Stripe\PromotionCode  $promotionCode
      * @return void
      */
-    public function __construct(
-        protected StripePromotionCode $promotionCode
-    ) {
+    public function __construct(protected StripePromotionCode $promotionCode)
+    {
         //
     }
 

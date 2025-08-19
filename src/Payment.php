@@ -14,13 +14,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     use ForwardsCalls;
 
     /**
-     * The Stripe PaymentIntent instance.
-     *
-     * @var \Stripe\PaymentIntent
-     */
-    protected $paymentIntent;
-
-    /**
      * The related customer instance.
      *
      * @var \Laravel\Cashier\Billable
@@ -33,9 +26,9 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      * @param  \Stripe\PaymentIntent  $paymentIntent
      * @return void
      */
-    public function __construct(StripePaymentIntent $paymentIntent)
+    public function __construct(protected StripePaymentIntent $paymentIntent)
     {
-        $this->paymentIntent = $paymentIntent;
+        //
     }
 
     /**
@@ -43,7 +36,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string
      */
-    public function amount()
+    public function amount(): string
     {
         return Cashier::formatAmount($this->rawAmount(), $this->paymentIntent->currency);
     }
@@ -53,7 +46,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return int
      */
-    public function rawAmount()
+    public function rawAmount(): int
     {
         return $this->paymentIntent->amount;
     }
@@ -63,7 +56,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string
      */
-    public function clientSecret()
+    public function clientSecret(): string
     {
         return $this->paymentIntent->client_secret;
     }
@@ -84,7 +77,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function requiresPaymentMethod()
+    public function requiresPaymentMethod(): bool
     {
         return $this->paymentIntent->status === StripePaymentIntent::STATUS_REQUIRES_PAYMENT_METHOD;
     }
@@ -94,7 +87,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function requiresAction()
+    public function requiresAction(): bool
     {
         return $this->paymentIntent->status === StripePaymentIntent::STATUS_REQUIRES_ACTION;
     }
@@ -104,7 +97,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function requiresConfirmation()
+    public function requiresConfirmation(): bool
     {
         return $this->paymentIntent->status === StripePaymentIntent::STATUS_REQUIRES_CONFIRMATION;
     }
@@ -114,7 +107,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function requiresCapture()
+    public function requiresCapture(): bool
     {
         return $this->paymentIntent->status === StripePaymentIntent::STATUS_REQUIRES_CAPTURE;
     }
@@ -135,7 +128,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function isCanceled()
+    public function isCanceled(): bool
     {
         return $this->paymentIntent->status === StripePaymentIntent::STATUS_CANCELED;
     }
@@ -145,7 +138,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function isSucceeded()
+    public function isSucceeded(): bool
     {
         return $this->paymentIntent->status === StripePaymentIntent::STATUS_SUCCEEDED;
     }
@@ -155,7 +148,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function isProcessing()
+    public function isProcessing(): bool
     {
         return $this->paymentIntent->status === StripePaymentIntent::STATUS_PROCESSING;
     }
@@ -167,7 +160,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
-    public function validate()
+    public function validate(): void
     {
         if ($this->requiresPaymentMethod()) {
             throw IncompletePayment::paymentMethodRequired($this);

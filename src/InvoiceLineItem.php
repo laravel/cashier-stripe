@@ -31,7 +31,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string
      */
-    public function total()
+    public function total(): string
     {
         return $this->formatAmount($this->item->amount);
     }
@@ -41,7 +41,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string
      */
-    public function unitAmountExcludingTax()
+    public function unitAmountExcludingTax(): string
     {
         return $this->formatAmount($this->item->unit_amount_excluding_tax ?? 0);
     }
@@ -51,7 +51,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return int|null
      */
-    public function unitAmount()
+    public function unitAmount(): ?int
     {
         if (! isset($this->item->pricing)) {
             return null;
@@ -78,7 +78,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string
      */
-    public function formattedUnitAmount()
+    public function formattedUnitAmount(): string
     {
         $unitAmount = $this->unitAmount();
 
@@ -90,7 +90,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function hasBothInclusiveAndExclusiveTax()
+    public function hasBothInclusiveAndExclusiveTax(): bool
     {
         return $this->inclusiveTaxPercentage() && $this->exclusiveTaxPercentage();
     }
@@ -100,7 +100,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return float|int|null
      */
-    public function inclusiveTaxPercentage()
+    public function inclusiveTaxPercentage(): float|int|null
     {
         if ($this->invoice->isNotTaxExempt()) {
             return $this->calculateTaxPercentageByTaxAmount(true);
@@ -114,7 +114,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return float|int
      */
-    public function exclusiveTaxPercentage()
+    public function exclusiveTaxPercentage(): float|int
     {
         if ($this->invoice->isNotTaxExempt()) {
             return $this->calculateTaxPercentageByTaxAmount(false);
@@ -129,7 +129,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      * @param  bool  $inclusive
      * @return float|int
      */
-    protected function calculateTaxPercentageByTaxRate($inclusive)
+    protected function calculateTaxPercentageByTaxRate(bool $inclusive): float|int
     {
         if (! isset($this->item->taxes) || empty($this->item->taxes)) {
             return 0;
@@ -158,7 +158,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      * @param  bool  $inclusive
      * @return float|int
      */
-    protected function calculateTaxPercentageByTaxAmount($inclusive)
+    protected function calculateTaxPercentageByTaxAmount(bool $inclusive): float|int
     {
         if (! isset($this->item->taxes) || empty($this->item->taxes)) {
             return 0;
@@ -186,7 +186,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function hasTaxRates()
+    public function hasTaxRates(): bool
     {
         return isset($this->item->taxes) && ! empty($this->item->taxes);
     }
@@ -196,7 +196,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return \Illuminate\Support\Collection
      */
-    public function taxes()
+    public function taxes(): Collection
     {
         if (! isset($this->item->taxes)) {
             return collect();
@@ -210,7 +210,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return \Illuminate\Support\Collection
      */
-    public function taxRateDetails()
+    public function taxRateDetails(): Collection
     {
         return $this->taxes()
             ->filter(function (object $tax) {
@@ -243,7 +243,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return int
      */
-    public function totalTaxAmount()
+    public function totalTaxAmount(): int
     {
         return $this->taxes()->sum('amount');
     }
@@ -253,7 +253,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string|null
      */
-    public function taxBehavior()
+    public function taxBehavior(): ?string
     {
         // Get the price object and return its tax_behavior...
         $price = $this->price();
@@ -266,11 +266,13 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string|null
      */
-    public function startDate()
+    public function startDate(): ?string
     {
         if ($this->hasPeriod()) {
             return $this->startDateAsCarbon()->toFormattedDateString();
         }
+
+        return null;
     }
 
     /**
@@ -278,11 +280,13 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string|null
      */
-    public function endDate()
+    public function endDate(): ?string
     {
         if ($this->hasPeriod()) {
             return $this->endDateAsCarbon()->toFormattedDateString();
         }
+
+        return null;
     }
 
     /**
@@ -290,7 +294,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return \Carbon\CarbonInterface|null
      */
-    public function startDateAsCarbon(): CarbonInterface
+    public function startDateAsCarbon(): ?CarbonInterface
     {
         if ($this->hasPeriod()) {
             return Carbon::createFromTimestampUTC($this->item->period->start);
@@ -318,7 +322,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function hasPeriod()
+    public function hasPeriod(): bool
     {
         return ! is_null($this->item->period);
     }
@@ -328,7 +332,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function periodStartAndEndAreEqual()
+    public function periodStartAndEndAreEqual(): bool
     {
         return $this->hasPeriod() ? $this->item->period->start === $this->item->period->end : false;
     }
@@ -338,7 +342,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function isSubscription()
+    public function isSubscription(): bool
     {
         return isset($this->item->parent) &&
                ($this->item->parent->type === 'subscription_details' ||
@@ -350,7 +354,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function isInvoiceItem()
+    public function isInvoiceItem(): bool
     {
         return isset($this->item->parent) &&
                $this->item->parent->type === 'invoice_item_details';
@@ -361,7 +365,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string|null
      */
-    public function subscriptionId()
+    public function subscriptionId(): ?string
     {
         if (! isset($this->item->parent)) {
             return null;
@@ -383,7 +387,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string|null
      */
-    public function subscriptionItemId()
+    public function subscriptionItemId(): ?string
     {
         if (! isset($this->item->parent)) {
             return null;
@@ -401,7 +405,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string|null
      */
-    public function invoiceItemId()
+    public function invoiceItemId(): ?string
     {
         if (! isset($this->item->parent)) {
             return null;
@@ -419,7 +423,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function isProration()
+    public function isProration(): bool
     {
         if (! isset($this->item->parent)) {
             return false;
@@ -441,7 +445,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return object|null
      */
-    public function prorationDetails()
+    public function prorationDetails(): ?object
     {
         if (! isset($this->item->parent)) {
             return null;
@@ -463,7 +467,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string|null
      */
-    public function priceId()
+    public function priceId(): ?string
     {
         // Handle the new pricing structure (Basil release)...
         if (isset($this->item->pricing) && $this->item->pricing->type === 'price_details') {
@@ -478,7 +482,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return object|null
      */
-    public function price()
+    public function price(): ?object
     {
         if (isset($this->item->price) && is_object($this->item->price) && isset($this->item->price->id)) {
             return $this->item->price;
@@ -502,7 +506,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return object|null
      */
-    public function parent()
+    public function parent(): ?object
     {
         return $this->item->parent ?? null;
     }
@@ -513,7 +517,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      * @param  int  $amount
      * @return string
      */
-    protected function formatAmount($amount)
+    protected function formatAmount(int $amount): string
     {
         return Cashier::formatAmount($amount, $this->item->currency);
     }
@@ -523,7 +527,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @return \Laravel\Cashier\Invoice
      */
-    public function invoice()
+    public function invoice(): Invoice
     {
         return $this->invoice;
     }
@@ -576,7 +580,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      * @param  string  $key
      * @return mixed
      */
-    public function __get($key)
+    public function __get(string $key)
     {
         return $this->item->{$key};
     }

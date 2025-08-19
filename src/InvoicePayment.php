@@ -10,21 +10,14 @@ use Stripe\InvoicePayment as StripeInvoicePayment;
 class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
 {
     /**
-     * The Stripe InvoicePayment instance.
-     *
-     * @var \Stripe\InvoicePayment
-     */
-    protected $invoicePayment;
-
-    /**
      * Create a new InvoicePayment instance.
      *
      * @param  \Stripe\InvoicePayment  $invoicePayment
      * @return void
      */
-    public function __construct(StripeInvoicePayment $invoicePayment)
+    public function __construct(protected StripeInvoicePayment $invoicePayment)
     {
-        $this->invoicePayment = $invoicePayment;
+        //
     }
 
     /**
@@ -32,7 +25,7 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string
      */
-    public function amount()
+    public function amount(): string
     {
         return Cashier::formatAmount($this->rawAmount(), $this->currency());
     }
@@ -42,7 +35,7 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return int
      */
-    public function rawAmount()
+    public function rawAmount(): int
     {
         return $this->invoicePayment->amount_paid ?? $this->invoicePayment->amount_requested;
     }
@@ -52,7 +45,7 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string
      */
-    public function currency()
+    public function currency(): string
     {
         return $this->invoicePayment->currency;
     }
@@ -62,7 +55,7 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return string
      */
-    public function status()
+    public function status(): string
     {
         return $this->invoicePayment->status;
     }
@@ -72,7 +65,7 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    public function isCompleted()
+    public function isCompleted(): bool
     {
         return $this->invoicePayment->status === 'paid';
     }
@@ -125,7 +118,7 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
      * @param  string  $key
      * @return mixed
      */
-    public function __get($key)
+    public function __get(string $key)
     {
         return $this->invoicePayment->{$key};
     }

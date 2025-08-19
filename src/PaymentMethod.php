@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Eloquent\Model;
 use JsonSerializable;
 use Laravel\Cashier\Exceptions\InvalidPaymentMethod;
 use LogicException;
@@ -11,20 +12,6 @@ use Stripe\PaymentMethod as StripePaymentMethod;
 
 class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
 {
-    /**
-     * The Stripe model instance.
-     *
-     * @var \Illuminate\Database\Eloquent\Model
-     */
-    protected $owner;
-
-    /**
-     * The Stripe PaymentMethod instance.
-     *
-     * @var \Stripe\PaymentMethod
-     */
-    protected $paymentMethod;
-
     /**
      * Create a new PaymentMethod instance.
      *
@@ -34,7 +21,7 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidPaymentMethod
      */
-    public function __construct($owner, StripePaymentMethod $paymentMethod)
+    public function __construct(protected Model $owner, protected StripePaymentMethod $paymentMethod)
     {
         if (is_null($paymentMethod->customer)) {
             throw new LogicException('The payment method is not attached to a customer.');
@@ -43,9 +30,6 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
         if ($owner->stripe_id !== $paymentMethod->customer) {
             throw InvalidPaymentMethod::invalidOwner($paymentMethod, $owner);
         }
-
-        $this->owner = $owner;
-        $this->paymentMethod = $paymentMethod;
     }
 
     /**
@@ -53,7 +37,7 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
      *
      * @return void
      */
-    public function delete()
+    public function delete(): void
     {
         $this->owner->deletePaymentMethod($this->paymentMethod);
     }
@@ -63,7 +47,7 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function owner()
+    public function owner(): Model
     {
         return $this->owner;
     }
@@ -116,7 +100,7 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
      * @param  string  $key
      * @return mixed
      */
-    public function __get($key)
+    public function __get(string $key)
     {
         return $this->paymentMethod->{$key};
     }
