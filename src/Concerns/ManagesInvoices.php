@@ -14,6 +14,7 @@ use Laravel\Cashier\Payment;
 use LogicException;
 use Stripe\Exception\CardException as StripeCardException;
 use Stripe\Exception\InvalidRequestException as StripeInvalidRequestException;
+use Stripe\Price as StripePrice;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -84,12 +85,12 @@ trait ManagesInvoices
     /**
      * Add an invoice item for a specific Price ID to the customer's upcoming invoice.
      *
-     * @param  string  $price
+     * @param  \Stripe\Price|string  $price
      * @param  int  $quantity
      * @param  array  $options
      * @return \Stripe\InvoiceItem
      */
-    public function tabPrice(string $price, int $quantity = 1, array $options = [])
+    public function tabPrice(StripePrice|string $price, int $quantity = 1, array $options = [])
     {
         $this->assertCustomerExists();
 
@@ -116,7 +117,7 @@ trait ManagesInvoices
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
-    public function invoicePrice(string $price, int $quantity = 1, array $tabOptions = [], array $invoiceOptions = []): Invoice
+    public function invoicePrice(StripePrice|string $price, int $quantity = 1, array $tabOptions = [], array $invoiceOptions = []): Invoice
     {
         $this->tabPrice($price, $quantity, $tabOptions);
 

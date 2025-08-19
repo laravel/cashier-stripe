@@ -16,6 +16,7 @@ use Laravel\Cashier\Contracts\InvoiceRenderer;
 use Laravel\Cashier\Exceptions\InvalidInvoice;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Invoice as StripeInvoice;
+use Stripe\Price as StripePrice;
 use Stripe\TaxRate as StripeTaxRate;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -45,9 +46,9 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     /**
      * The discounts applied to the invoice.
      *
-     * @var \Laravel\Cashier\Discount[]
+     * @var \Laravel\Cashier\Discount[]|null
      */
-    protected array $discounts = [];
+    protected ?array $discounts = null;
 
     /**
      * Indicate if the Stripe Object was refreshed with extra data.
@@ -547,12 +548,12 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     /**
      * Add an invoice item for a specific Price ID to this invoice.
      *
-     * @param  string  $price
+     * @param  \Stripe\Price|string  $price
      * @param  int  $quantity
      * @param  array  $options
      * @return \Stripe\InvoiceItem
      */
-    public function tabPrice(string $price, int $quantity = 1, array $options = [])
+    public function tabPrice(StripePrice|string $price, int $quantity = 1, array $options = [])
     {
         $item = $this->owner()->tabPrice($price, $quantity, array_merge($options, ['invoice' => $this->invoice->id]));
 

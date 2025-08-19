@@ -120,7 +120,7 @@ class SubscriptionBuilder
             $options['quantity'] = $quantity;
         }
 
-        if ($taxRates = $this->getPriceTaxRatesForPayload($options['price'])) {
+        if ($taxRates = $this->getPriceTaxRatesForPayload($price)) {
             $options['tax_rates'] = $taxRates;
         }
 
@@ -509,12 +509,13 @@ class SubscriptionBuilder
     /**
      * Get the price tax rates for the Stripe payload.
      *
-     * @param  string  $price
+     * @param  string|array  $price
      * @return array|null
      */
-    protected function getPriceTaxRatesForPayload(string $price): ?array
+    protected function getPriceTaxRatesForPayload(string|array $price): ?array
     {
         if ($taxRates = $this->owner->priceTaxRates()) {
+            ray($price, $taxRates);
             return $taxRates[$price] ?? null;
         }
 

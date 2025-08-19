@@ -60,6 +60,8 @@ class InvoicesTest extends FeatureTestCase
             'unit_amount' => 499,
         ]);
 
+        ray($price);
+
         $response = $user->invoicePrice($price, 2);
 
         $this->assertInstanceOf(Invoice::class, $response);
