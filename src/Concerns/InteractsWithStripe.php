@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Concerns;
 
 use Laravel\Cashier\Cashier;
+use Stripe\StripeClient;
 
 trait InteractsWithStripe
 {
@@ -12,7 +13,7 @@ trait InteractsWithStripe
      * @param  array  $options
      * @return \Stripe\StripeClient
      */
-    public static function stripe(array $options = [])
+    public static function stripe(array $options = []): StripeClient
     {
         return Cashier::stripe($options);
     }

@@ -11,7 +11,7 @@ trait InteractsWithPaymentBehavior
      *
      * @var string
      */
-    protected $paymentBehavior = StripeSubscription::PAYMENT_BEHAVIOR_DEFAULT_INCOMPLETE;
+    protected string $paymentBehavior = StripeSubscription::PAYMENT_BEHAVIOR_DEFAULT_INCOMPLETE;
 
     /**
      * Set any new subscription as incomplete when created.
@@ -66,7 +66,7 @@ trait InteractsWithPaymentBehavior
      *
      * @return string
      */
-    public function paymentBehavior()
+    public function paymentBehavior(): string
     {
         return $this->paymentBehavior;
     }
@@ -77,7 +77,7 @@ trait InteractsWithPaymentBehavior
      * @param  string  $paymentBehavior
      * @return $this
      */
-    public function setPaymentBehavior($paymentBehavior)
+    public function setPaymentBehavior(string $paymentBehavior)
     {
         $this->paymentBehavior = $paymentBehavior;
 
