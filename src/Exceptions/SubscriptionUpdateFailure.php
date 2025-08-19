@@ -27,7 +27,7 @@ class SubscriptionUpdateFailure extends Exception
      * @param  string  $price
      * @return static
      */
-    public static function duplicatePrice(Subscription $subscription, $price)
+    public static function duplicatePrice(Subscription $subscription, string $price)
     {
         return new static(
             "The price \"$price\" is already attached to subscription \"{$subscription->stripe_id}\"."

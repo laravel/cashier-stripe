@@ -12,7 +12,7 @@ class InvalidCoupon extends Exception
      * @param  string  $couponId
      * @return static
      */
-    public static function foreverAmountOffCouponNotAllowed($couponId)
+    public static function foreverAmountOffCouponNotAllowed(string $couponId)
     {
         return new static("Coupon [{$couponId}] with amount_off and forever duration cannot be applied to subscriptions. Apply the coupon directly to invoices instead.");
     }
@@ -23,7 +23,7 @@ class InvalidCoupon extends Exception
      * @param  string  $couponId
      * @return static
      */
-    public static function cannotApplyForeverAmountOffToSubscription($couponId)
+    public static function cannotApplyForeverAmountOffToSubscription(string $couponId)
     {
         return new static("Coupon [{$couponId}] cannot be applied to subscriptions because it has amount_off with forever duration. Use invoice-level discounts instead.");
     }
@@ -34,7 +34,7 @@ class InvalidCoupon extends Exception
      * @param  string  $couponId
      * @return static
      */
-    public static function cannotUseForeverAmountOffInCheckout($couponId)
+    public static function cannotUseForeverAmountOffInCheckout(string $couponId)
     {
         return new static("Coupon [{$couponId}] with amount_off and forever duration cannot be used in checkout sessions. Consider using time-limited coupons instead.");
     }

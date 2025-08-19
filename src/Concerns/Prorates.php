@@ -9,7 +9,7 @@ trait Prorates
      *
      * @var string
      */
-    protected $prorationBehavior = 'create_prorations';
+    protected string $prorationBehavior = 'create_prorations';
 
     /**
      * Indicate that the price change should not be prorated.
@@ -53,7 +53,7 @@ trait Prorates
      * @param  string  $prorationBehavior
      * @return $this
      */
-    public function setProrationBehavior($prorationBehavior)
+    public function setProrationBehavior(string $prorationBehavior)
     {
         $this->prorationBehavior = $prorationBehavior;
 
@@ -65,7 +65,7 @@ trait Prorates
      *
      * @return string
      */
-    public function prorateBehavior()
+    public function prorateBehavior(): string
     {
         return $this->prorationBehavior;
     }

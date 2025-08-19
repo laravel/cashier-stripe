@@ -17,7 +17,7 @@ class CashierServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->registerLogger();
         $this->registerRoutes();
@@ -37,7 +37,7 @@ class CashierServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->configure();
         $this->bindLogger();
@@ -49,7 +49,7 @@ class CashierServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->mergeConfigFrom(
             __DIR__.'/../config/cashier.php', 'cashier'
@@ -61,7 +61,7 @@ class CashierServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function bindLogger()
+    protected function bindLogger(): void
     {
         $this->app->bind(LoggerInterface::class, function ($app) {
             return new Logger(
@@ -75,7 +75,7 @@ class CashierServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function bindInvoiceRenderer()
+    protected function bindInvoiceRenderer(): void
     {
         $this->app->bind(InvoiceRenderer::class, function ($app) {
             return $app->make(config('cashier.invoices.renderer', DompdfInvoiceRenderer::class));
@@ -87,7 +87,7 @@ class CashierServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerLogger()
+    protected function registerLogger(): void
     {
         if (config('cashier.logger')) {
             Stripe::setLogger($this->app->make(LoggerInterface::class));
@@ -99,7 +99,7 @@ class CashierServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerRoutes()
+    protected function registerRoutes(): void
     {
         if (Cashier::$registersRoutes) {
             Route::group([
@@ -117,7 +117,7 @@ class CashierServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerResources()
+    protected function registerResources(): void
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'cashier');
     }
@@ -127,7 +127,7 @@ class CashierServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerPublishing()
+    protected function registerPublishing(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -153,7 +153,7 @@ class CashierServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerCommands()
+    protected function registerCommands(): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([

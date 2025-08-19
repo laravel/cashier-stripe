@@ -98,7 +98,7 @@ class Cashier
      * @param  \Stripe\Customer|string|null  $stripeId
      * @return \Laravel\Cashier\Billable|null
      */
-    public static function findBillable($stripeId)
+    public static function findBillable(StripeCustomer|string|null $stripeId): ?Billable
     {
         $stripeId = $stripeId instanceof StripeCustomer ? $stripeId->id : $stripeId;
 
@@ -148,7 +148,7 @@ class Cashier
      * @param  array  $options
      * @return string
      */
-    public static function formatAmount($amount, $currency = null, $locale = null, array $options = [])
+    public static function formatAmount(int $amount, ?string $currency = null, ?string $locale = null, array $options = []): string
     {
         if (static::$formatCurrencyUsing) {
             return call_user_func(static::$formatCurrencyUsing, $amount, $currency, $locale, $options);
@@ -220,10 +220,10 @@ class Cashier
     /**
      * Set the customer model class name.
      *
-     * @param  string  $customerModel
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $customerModel
      * @return void
      */
-    public static function useCustomerModel($customerModel)
+    public static function useCustomerModel(string $customerModel): void
     {
         static::$customerModel = $customerModel;
     }
@@ -231,10 +231,10 @@ class Cashier
     /**
      * Set the subscription model class name.
      *
-     * @param  string  $subscriptionModel
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $subscriptionModel
      * @return void
      */
-    public static function useSubscriptionModel($subscriptionModel)
+    public static function useSubscriptionModel(string $subscriptionModel): void
     {
         static::$subscriptionModel = $subscriptionModel;
     }
@@ -242,10 +242,10 @@ class Cashier
     /**
      * Set the subscription item model class name.
      *
-     * @param  string  $subscriptionItemModel
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $subscriptionItemModel
      * @return void
      */
-    public static function useSubscriptionItemModel($subscriptionItemModel)
+    public static function useSubscriptionItemModel(string $subscriptionItemModel): void
     {
         static::$subscriptionItemModel = $subscriptionItemModel;
     }
