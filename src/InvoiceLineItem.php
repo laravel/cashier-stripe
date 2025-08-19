@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
@@ -12,30 +13,17 @@ use Stripe\InvoiceLineItem as StripeInvoiceLineItem;
 class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 {
     /**
-     * The Cashier Invoice instance.
-     *
-     * @var \Laravel\Cashier\Invoice
-     */
-    protected $invoice;
-
-    /**
-     * The Stripe invoice line item instance.
-     *
-     * @var \Stripe\InvoiceLineItem
-     */
-    protected $item;
-
-    /**
      * Create a new invoice line item instance.
      *
      * @param  \Laravel\Cashier\Invoice  $invoice
      * @param  \Stripe\InvoiceLineItem  $item
      * @return void
      */
-    public function __construct(Invoice $invoice, StripeInvoiceLineItem $item)
-    {
-        $this->invoice = $invoice;
-        $this->item = $item;
+    public function __construct(
+        protected Invoice $invoice,
+        protected StripeInvoiceLineItem $item
+    ) {
+        //
     }
 
     /**
@@ -300,9 +288,9 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
     /**
      * Get a Carbon instance for the start date.
      *
-     * @return \Carbon\Carbon|null
+     * @return \Carbon\CarbonInterface|null
      */
-    public function startDateAsCarbon()
+    public function startDateAsCarbon(): CarbonInterface
     {
         if ($this->hasPeriod()) {
             return Carbon::createFromTimestampUTC($this->item->period->start);
@@ -312,9 +300,9 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
     /**
      * Get a Carbon instance for the end date.
      *
-     * @return \Carbon\Carbon|null
+     * @return \Carbon\CarbonInterface|null
      */
-    public function endDateAsCarbon()
+    public function endDateAsCarbon(): ?CarbonInterface
     {
         if ($this->hasPeriod()) {
             return Carbon::createFromTimestampUTC($this->item->period->end);

@@ -57,7 +57,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
-    public static function create(Model $owner, array $sessionOptions = [], array $customerOptions = []): Checkout
+    public static function create(?Model $owner, array $sessionOptions = [], array $customerOptions = []): Checkout
     {
         $data = array_merge([
             'mode' => Session::MODE_PAYMENT,

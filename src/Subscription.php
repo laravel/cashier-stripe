@@ -5,6 +5,7 @@ namespace Laravel\Cashier;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
+use DateTimeZone;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -1180,10 +1181,10 @@ class Subscription extends Model
      *
      * For multi-item subscriptions, returns the earliest start date.
      *
-     * @param  string|null  $timezone
-     * @return \Carbon\Carbon|null
+     * @param  \DateTimeZone|string|int|null  $timezone
+     * @return \Carbon\CarbonInterface|null
      */
-    public function currentPeriodStart(?string $timezone = null)
+    public function currentPeriodStart(DateTimeZone|string|int|null $timezone = null): ?CarbonInterface
     {
         $items = $this->items;
 
@@ -1209,10 +1210,10 @@ class Subscription extends Model
      *
      * For multi-item subscriptions, returns the latest end date.
      *
-     * @param  string|null  $timezone
-     * @return \Carbon\Carbon|null
+     * @param  \DateTimeZone|string|int|null  $timezone
+     * @return \Carbon\CarbonInterface|null
      */
-    public function currentPeriodEnd(?string $timezone = null)
+    public function currentPeriodEnd(DateTimeZone|string|int|null $timezone = null): ?CarbonInterface
     {
         $items = $this->items;
 
