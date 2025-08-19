@@ -894,7 +894,7 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function addPrice(string $price, int $quantity = 1, array $options = [])
+    public function addPrice(string $price, ?int $quantity = 1, array $options = [])
     {
         $this->guardAgainstIncomplete();
 
