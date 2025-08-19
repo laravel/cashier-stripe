@@ -34,6 +34,10 @@ In Cashier 16, you can set coupon to all subscription using `applyCouponToAllSub
 
 > @TODO need to add some example
 
+### Metered Billing Changes
+
+With the introduction of Basil API, the return type for `reportUsage()` and `reportUsageFor()` method within `Laravel\Cashier\Subscription` has changed from `Stripe\UsageRecord` to `Stripe\V2\Billing\MeterEvent`.
+
 ### Database Migration Changes
 
 PR: https://github.com/laravel/cashier-stripe/pull/1762
