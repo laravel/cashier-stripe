@@ -2,7 +2,6 @@
 
 namespace Laravel\Cashier;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\HandlesTaxes;
@@ -19,7 +18,7 @@ class CheckoutBuilder
      * @param  object|null  $parentInstance
      * @return void
      */
-    public function __construct(protected ?Model $owner = null, ?object $parentInstance = null)
+    public function __construct(protected $owner = null, ?object $parentInstance = null)
     {
         if ($parentInstance && in_array(AllowsCoupons::class, class_uses_recursive($parentInstance))) {
             $this->couponId = $parentInstance->couponId;
@@ -41,7 +40,7 @@ class CheckoutBuilder
      * @param  object|null  $instance
      * @return \Laravel\Cashier\CheckoutBuilder
      */
-    public static function make(?Model $owner = null, ?object $instance = null)
+    public static function make($owner = null, ?object $instance = null)
     {
         return new static($owner, $instance);
     }
