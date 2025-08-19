@@ -10,11 +10,24 @@ The Stripe SDK version is now fixed at v17.x.
 
 ### Stripe API Version
 
-PR: https://github.com/laravel/cashier-stripe/pull/1615
+PR: https://github.com/laravel/cashier-stripe/pull/1762
 
-The default Stripe API version for Cashier 15 is `2025-07-30.basil`. If this is the latest Stripe API version when you upgrade to this Cashier version, then we recommend you also upgrade your Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
+The default Stripe API version for Cashier 16 is `2025-07-30.basil`. If this is the latest Stripe API version when you upgrade to this Cashier version, then we recommend you also upgrade your Stripe API version settings [in your Stripe dashboard](https://dashboard.stripe.com/developers) to this version after deploying the Cashier upgrade. If this is no longer the latest Stripe API version, we recommend you do not modify your Stripe API version settings.
 
 If you use the Stripe PHP SDK directly, make sure to properly test your integration after updating.
+
+### Coupon without expiry date
+
+Basil API no longer supports setting discount coupons without an end date, any application using a coupon without an end date will trigger `Laravel\Cashier\Exceptions\InvalidCoupon` exception after updating to Cashier 16.
+
+### Database Migration Changes
+
+PR: https://github.com/laravel/cashier-stripe/pull/1762
+
+To better tracks usage-based billings, we've added `meter_event_name` and  `meter_id` to `subscription_items` table. You should be able to run the following steps:
+
+1. Run `php artisan vendor:publish --tag="cashier-migrations"`
+2. Run `php artisan migrate`
 
 ## Upgrading To 15.0 From 14.x
 
