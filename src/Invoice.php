@@ -102,6 +102,8 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
 
             return $timezone ? $carbon->setTimezone($timezone) : $carbon;
         }
+
+        return null;
     }
 
     /**
