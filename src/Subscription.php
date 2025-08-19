@@ -5,8 +5,11 @@ namespace Laravel\Cashier;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
@@ -61,21 +64,21 @@ class Subscription extends Model
      *
      * @var string|null
      */
-    protected $billingCycleAnchor = null;
+    protected ?string $billingCycleAnchor = null;
 
     /**
      * The billing thresholds for the subscription.
      *
      * @var array|null
      */
-    protected $billingThresholds = null;
+    protected ?array $billingThresholds = null;
 
     /**
      * Get the user that owns the subscription.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->owner();
     }
@@ -85,7 +88,7 @@ class Subscription extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function owner()
+    public function owner(): BelongsTo
     {
         $model = Cashier::$customerModel;
 
@@ -97,7 +100,7 @@ class Subscription extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function items()
+    public function items(): HasMany
     {
         return $this->hasMany(Cashier::$subscriptionItemModel);
     }
@@ -107,7 +110,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function hasMultiplePrices()
+    public function hasMultiplePrices(): bool
     {
         return is_null($this->stripe_price);
     }
@@ -117,7 +120,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function hasSinglePrice()
+    public function hasSinglePrice(): bool
     {
         return ! $this->hasMultiplePrices();
     }
@@ -128,7 +131,7 @@ class Subscription extends Model
      * @param  string  $product
      * @return bool
      */
-    public function hasProduct($product)
+    public function hasProduct(string $product): bool
     {
         return $this->items->contains(function (SubscriptionItem $item) use ($product) {
             return $item->stripe_product === $product;
@@ -141,7 +144,7 @@ class Subscription extends Model
      * @param  string  $price
      * @return bool
      */
-    public function hasPrice($price)
+    public function hasPrice(string $price): bool
     {
         if ($this->hasMultiplePrices()) {
             return $this->items->contains(function (SubscriptionItem $item) use ($price) {
@@ -160,7 +163,7 @@ class Subscription extends Model
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findItemOrFail($price)
+    public function findItemOrFail(string $price): SubscriptionItem
     {
         return $this->items()->where('stripe_price', $price)->firstOrFail();
     }
@@ -170,7 +173,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->active() || $this->onTrial() || $this->onGracePeriod();
     }
@@ -180,7 +183,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function incomplete()
+    public function incomplete(): bool
     {
         return $this->stripe_status === StripeSubscription::STATUS_INCOMPLETE;
     }
@@ -191,7 +194,7 @@ class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeIncomplete($query)
+    public function scopeIncomplete(Builder $query): void
     {
         $query->where('stripe_status', StripeSubscription::STATUS_INCOMPLETE);
     }
@@ -201,7 +204,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function pastDue()
+    public function pastDue(): bool
     {
         return $this->stripe_status === StripeSubscription::STATUS_PAST_DUE;
     }
@@ -212,7 +215,7 @@ class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopePastDue($query)
+    public function scopePastDue(Builder $query): void
     {
         $query->where('stripe_status', StripeSubscription::STATUS_PAST_DUE);
     }
@@ -222,7 +225,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function active()
+    public function active(): bool
     {
         return ! $this->ended() &&
             (! Cashier::$deactivateIncomplete || $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE) &&
@@ -237,7 +240,7 @@ class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): void
     {
         $query->where(function ($query) {
             $query->whereNull('ends_at')
@@ -261,7 +264,7 @@ class Subscription extends Model
      *
      * @return void
      */
-    public function syncStripeStatus()
+    public function syncStripeStatus(): void
     {
         $subscription = $this->asStripeSubscription();
 
@@ -275,7 +278,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function recurring()
+    public function recurring(): bool
     {
         return ! $this->onTrial() && ! $this->canceled();
     }
@@ -286,7 +289,7 @@ class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeRecurring($query)
+    public function scopeRecurring(Builder $query): void
     {
         $query->notOnTrial()->notCanceled();
     }
@@ -296,7 +299,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function canceled()
+    public function canceled(): bool
     {
         return ! is_null($this->ends_at);
     }
@@ -307,7 +310,7 @@ class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeCanceled($query)
+    public function scopeCanceled(Builder $query): void
     {
         $query->whereNotNull('ends_at');
     }
@@ -318,7 +321,7 @@ class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeNotCanceled($query)
+    public function scopeNotCanceled(Builder $query): void
     {
         $query->whereNull('ends_at');
     }
@@ -328,7 +331,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function ended()
+    public function ended(): bool
     {
         return $this->canceled() && ! $this->onGracePeriod();
     }
@@ -339,7 +342,7 @@ class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeEnded($query)
+    public function scopeEnded(Builder $query): void
     {
         $query->canceled()->notOnGracePeriod();
     }
@@ -349,7 +352,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function onTrial()
+    public function onTrial(): bool
     {
         return $this->trial_ends_at && $this->trial_ends_at->isFuture();
     }
@@ -360,7 +363,7 @@ class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeOnTrial($query)
+    public function scopeOnTrial(Builder $query): void
     {
         $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '>', Carbon::now());
     }
@@ -370,7 +373,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function hasExpiredTrial()
+    public function hasExpiredTrial(): bool
     {
         return $this->trial_ends_at && $this->trial_ends_at->isPast();
     }
@@ -381,7 +384,7 @@ class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeExpiredTrial($query)
+    public function scopeExpiredTrial(Builder $query): void
     {
         $query->whereNotNull('trial_ends_at')->where('trial_ends_at', '<', Carbon::now());
     }
@@ -392,7 +395,7 @@ class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeNotOnTrial($query)
+    public function scopeNotOnTrial(Builder $query): void
     {
         $query->whereNull('trial_ends_at')->orWhere('trial_ends_at', '<=', Carbon::now());
     }
@@ -402,7 +405,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function onGracePeriod()
+    public function onGracePeriod(): bool
     {
         return $this->ends_at && $this->ends_at->isFuture();
     }
@@ -413,7 +416,7 @@ class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeOnGracePeriod($query)
+    public function scopeOnGracePeriod(Builder $query): void
     {
         $query->whereNotNull('ends_at')->where('ends_at', '>', Carbon::now());
     }
@@ -424,7 +427,7 @@ class Subscription extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeNotOnGracePeriod($query)
+    public function scopeNotOnGracePeriod(Builder $query): void
     {
         $query->whereNull('ends_at')->orWhere('ends_at', '<=', Carbon::now());
     }
@@ -438,7 +441,7 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function incrementQuantity($count = 1, $price = null)
+    public function incrementQuantity(int $count = 1, ?string $price = null)
     {
         $this->guardAgainstIncomplete();
 
@@ -466,7 +469,7 @@ class Subscription extends Model
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function incrementAndInvoice($count = 1, $price = null)
+    public function incrementAndInvoice(int $count = 1, ?string $price = null)
     {
         $this->guardAgainstIncomplete();
 
@@ -484,7 +487,7 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function decrementQuantity($count = 1, $price = null)
+    public function decrementQuantity(int $count = 1, ?string $price = null)
     {
         $this->guardAgainstIncomplete();
 
@@ -511,7 +514,7 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function updateQuantity($quantity, $price = null)
+    public function updateQuantity(int $quantity, ?string $price = null)
     {
         $this->guardAgainstIncomplete();
 
@@ -551,7 +554,7 @@ class Subscription extends Model
      * @param  string|null  $price
      * @return \Stripe\V2\Billing\MeterEvent
      */
-    public function reportUsage($quantity = 1, $timestamp = null, $price = null)
+    public function reportUsage(int $quantity = 1, DateTimeInterface|int|null $timestamp = null, ?string $price = null)
     {
         if (! $price) {
             $this->guardAgainstMultiplePrices();
@@ -568,7 +571,7 @@ class Subscription extends Model
      * @param  \DateTimeInterface|int|null  $timestamp
      * @return \Stripe\V2\Billing\MeterEvent
      */
-    public function reportUsageFor($price, $quantity = 1, $timestamp = null)
+    public function reportUsageFor(string $price, int $quantity = 1, DateTimeInterface|int|null $timestamp = null)
     {
         return $this->reportUsage($quantity, $timestamp, $price);
     }
@@ -580,7 +583,7 @@ class Subscription extends Model
      * @param  string|null  $price
      * @return \Illuminate\Support\Collection
      */
-    public function usageRecords(array $options = [], $price = null)
+    public function usageRecords(array $options = [], ?string $price = null): Collection
     {
         if (! $price) {
             $this->guardAgainstMultiplePrices();
@@ -596,7 +599,7 @@ class Subscription extends Model
      * @param  array  $options
      * @return \Illuminate\Support\Collection
      */
-    public function usageRecordsFor($price, array $options = [])
+    public function usageRecordsFor(string $price, array $options = []): Collection
     {
         return $this->usageRecords($options, $price);
     }
@@ -607,7 +610,7 @@ class Subscription extends Model
      * @param  \DateTimeInterface|int|string  $date
      * @return $this
      */
-    public function anchorBillingCycleOn($date = 'now')
+    public function anchorBillingCycleOn(DateTimeInterface|int|string $date = 'now')
     {
         if ($date instanceof DateTimeInterface) {
             $date = $date->getTimestamp();
@@ -702,7 +705,7 @@ class Subscription extends Model
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function swap($prices, array $options = [])
+    public function swap(string|array $prices, array $options = [])
     {
         if (empty($prices = (array) $prices)) {
             throw new InvalidArgumentException('Please provide at least one price when swapping.');
@@ -774,7 +777,7 @@ class Subscription extends Model
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function swapAndInvoice($prices, array $options = [])
+    public function swapAndInvoice(string|array $prices, array $options = [])
     {
         $this->alwaysInvoice();
 
@@ -787,7 +790,7 @@ class Subscription extends Model
      * @param  array  $prices
      * @return \Illuminate\Support\Collection
      */
-    protected function parseSwapPrices(array $prices)
+    protected function parseSwapPrices(array $prices): Collection
     {
         $isSinglePriceSwap = $this->hasSinglePrice() && count($prices) === 1;
 
@@ -818,7 +821,7 @@ class Subscription extends Model
      * @param  \Illuminate\Support\Collection  $items
      * @return \Illuminate\Support\Collection
      */
-    protected function mergeItemsThatShouldBeDeletedDuringSwap(Collection $items)
+    protected function mergeItemsThatShouldBeDeletedDuringSwap(Collection $items): Collection
     {
         /** @var \Stripe\SubscriptionItem $stripeSubscriptionItem */
         foreach ($this->asStripeSubscription()->items->data as $stripeSubscriptionItem) {
@@ -845,7 +848,7 @@ class Subscription extends Model
      * @param  array  $options
      * @return array
      */
-    protected function getSwapOptions(Collection $items, array $options = [])
+    protected function getSwapOptions(Collection $items, array $options = []): array
     {
         $payload = array_filter([
             'items' => $items->values()->all(),
@@ -890,7 +893,7 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function addPrice($price, $quantity = 1, array $options = [])
+    public function addPrice(string $price, int $quantity = 1, array $options = [])
     {
         $this->guardAgainstIncomplete();
 
@@ -959,7 +962,7 @@ class Subscription extends Model
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function addPriceAndInvoice($price, $quantity = 1, array $options = [])
+    public function addPriceAndInvoice(string $price, int $quantity = 1, array $options = [])
     {
         $this->alwaysInvoice();
 
@@ -975,7 +978,7 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function addMeteredPrice($price, array $options = [])
+    public function addMeteredPrice(string $price, array $options = [])
     {
         return $this->addPrice($price, null, $options);
     }
@@ -990,7 +993,7 @@ class Subscription extends Model
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function addMeteredPriceAndInvoice($price, array $options = [])
+    public function addMeteredPriceAndInvoice(string $price, array $options = [])
     {
         return $this->addPriceAndInvoice($price, null, $options);
     }
@@ -1003,7 +1006,7 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function removePrice($price)
+    public function removePrice(string $price)
     {
         if ($this->hasSinglePrice()) {
             throw SubscriptionUpdateFailure::cannotDeleteLastPrice($this);
@@ -1065,7 +1068,7 @@ class Subscription extends Model
      * @param  \DateTimeInterface|int  $endsAt
      * @return $this
      */
-    public function cancelAt($endsAt)
+    public function cancelAt(DateTimeInterface|int $endsAt)
     {
         if ($endsAt instanceof DateTimeInterface) {
             $endsAt = $endsAt->getTimestamp();
@@ -1125,7 +1128,7 @@ class Subscription extends Model
      *
      * @internal
      */
-    public function markAsCanceled()
+    public function markAsCanceled(): void
     {
         $this->fill([
             'stripe_status' => StripeSubscription::STATUS_CANCELED,
@@ -1167,7 +1170,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function pending()
+    public function pending(): bool
     {
         return ! is_null($this->asStripeSubscription()->pending_update);
     }
@@ -1180,7 +1183,7 @@ class Subscription extends Model
      * @param  string|null  $timezone
      * @return \Carbon\Carbon|null
      */
-    public function currentPeriodStart($timezone = null)
+    public function currentPeriodStart(?string $timezone = null)
     {
         $items = $this->items;
 
@@ -1209,7 +1212,7 @@ class Subscription extends Model
      * @param  string|null  $timezone
      * @return \Carbon\Carbon|null
      */
-    public function currentPeriodEnd($timezone = null)
+    public function currentPeriodEnd(?string $timezone = null)
     {
         $items = $this->items;
 
@@ -1238,7 +1241,7 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
-    public function invoice(array $options = [])
+    public function invoice(array $options = []): Invoice
     {
         try {
             return $this->user->invoice(array_merge($options, ['subscription' => $this->stripe_id]));
@@ -1257,13 +1260,15 @@ class Subscription extends Model
      *
      * @return \Laravel\Cashier\Invoice|null
      */
-    public function latestInvoice(array $expand = [])
+    public function latestInvoice(array $expand = []): ?Invoice
     {
         $stripeSubscription = $this->asStripeSubscription(['latest_invoice', ...$expand]);
 
         if ($stripeSubscription->latest_invoice) {
             return new Invoice($this->owner, $stripeSubscription->latest_invoice);
         }
+
+        return null;
     }
 
     /**
@@ -1272,7 +1277,7 @@ class Subscription extends Model
      * @param  array  $options
      * @return \Laravel\Cashier\Invoice|null
      */
-    public function upcomingInvoice(array $options = [])
+    public function upcomingInvoice(array $options = []): ?Invoice
     {
         if ($this->canceled()) {
             return null;
@@ -1290,7 +1295,7 @@ class Subscription extends Model
      * @param  array  $options
      * @return \Laravel\Cashier\Invoice|null
      */
-    public function previewInvoice($prices, array $options = [])
+    public function previewInvoice(string|array $prices, array $options = []): ?Invoice
     {
         if (empty($prices = (array) $prices)) {
             throw new InvalidArgumentException('Please provide at least one price when swapping.');
@@ -1325,9 +1330,9 @@ class Subscription extends Model
      *
      * @param  bool  $includePending
      * @param  array  $parameters
-     * @return \Illuminate\Support\Collection|\Laravel\Cashier\Invoice[]
+     * @return \Illuminate\Support\Collection<int, \Laravel\Cashier\Invoice>
      */
-    public function invoices($includePending = false, $parameters = [])
+    public function invoices(bool $includePending = false, array $parameters = []): Collection
     {
         return $this->owner->invoices(
             $includePending, array_merge($parameters, ['subscription' => $this->stripe_id])
@@ -1338,9 +1343,9 @@ class Subscription extends Model
      * Get an array of the subscription's invoices, including pending invoices.
      *
      * @param  array  $parameters
-     * @return \Illuminate\Support\Collection|\Laravel\Cashier\Invoice[]
+     * @return \Illuminate\Support\Collection<int, \Laravel\Cashier\Invoice>
      */
-    public function invoicesIncludingPending(array $parameters = [])
+    public function invoicesIncludingPending(array $parameters = []): Collection
     {
         return $this->invoices(true, $parameters);
     }
@@ -1350,7 +1355,7 @@ class Subscription extends Model
      *
      * @return void
      */
-    public function syncTaxRates()
+    public function syncTaxRates(): void
     {
         $this->updateStripeSubscription([
             'default_tax_rates' => $this->user->taxRates() ?: null,
@@ -1371,11 +1376,13 @@ class Subscription extends Model
      * @param  string  $price
      * @return array|null
      */
-    public function getPriceTaxRatesForPayload($price)
+    public function getPriceTaxRatesForPayload(string $price): ?array
     {
         if ($taxRates = $this->owner->priceTaxRates()) {
             return $taxRates[$price] ?? null;
         }
+
+        return null;
     }
 
     /**
@@ -1383,7 +1390,7 @@ class Subscription extends Model
      *
      * @return bool
      */
-    public function hasIncompletePayment()
+    public function hasIncompletePayment(): bool
     {
         return $this->pastDue() || $this->incomplete();
     }
@@ -1393,7 +1400,7 @@ class Subscription extends Model
      *
      * @return \Laravel\Cashier\Payment|null
      */
-    public function latestPayment()
+    public function latestPayment(): ?Payment
     {
         $subscription = $this->asStripeSubscription(['latest_invoice.payments']);
 
@@ -1417,7 +1424,7 @@ class Subscription extends Model
      *
      * @return \Laravel\Cashier\Discount|null
      */
-    public function discount()
+    public function discount(): ?Discount
     {
         $subscription = $this->asStripeSubscription(['discounts.promotion_code']);
 
@@ -1433,7 +1440,7 @@ class Subscription extends Model
      *
      * @return \Illuminate\Support\Collection<int, \Laravel\Cashier\Discount>
      */
-    public function discounts()
+    public function discounts(): Collection
     {
         $subscription = $this->asStripeSubscription(['discounts.promotion_code']);
 
@@ -1449,19 +1456,19 @@ class Subscription extends Model
     /**
      * Apply a coupon to the subscription.
      *
-     * @param  string  $coupon
+     * @param  string  $couponId
      * @return void
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidCoupon
      * @throws \Stripe\Exception\InvalidRequestException
      */
-    public function applyCoupon($coupon)
+    public function applyCoupon(string $couponId): void
     {
         // Validate the coupon to ensure it's not a forever amount_off coupon...
-        $this->validateCouponForSubscriptionApplication($coupon);
+        $this->validateCouponForSubscriptionApplication($couponId);
 
         $this->updateStripeSubscription([
-            'discounts' => [['coupon' => $coupon]],
+            'discounts' => [['coupon' => $couponId]],
         ]);
 
         // Clear any cached discount data to ensure fresh data is retrieved...
@@ -1477,7 +1484,7 @@ class Subscription extends Model
      * @throws \Laravel\Cashier\Exceptions\InvalidCoupon
      * @throws \Stripe\Exception\ApiErrorException
      */
-    protected function validateCouponForSubscriptionApplication($couponId)
+    protected function validateCouponForSubscriptionApplication(string $couponId): void
     {
         $stripeCoupon = $this->owner::stripe()->coupons->retrieve($couponId);
         $coupon = new Coupon($stripeCoupon);
@@ -1493,7 +1500,7 @@ class Subscription extends Model
      * @param  string  $promotionCodeId
      * @return void
      */
-    public function applyPromotionCode($promotionCodeId)
+    public function applyPromotionCode(string $promotionCodeId): void
     {
         $this->updateStripeSubscription([
             'discounts' => [['promotion_code' => $promotionCodeId]],
@@ -1510,7 +1517,7 @@ class Subscription extends Model
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      */
-    public function guardAgainstIncomplete()
+    public function guardAgainstIncomplete(): void
     {
         if ($this->incomplete()) {
             throw SubscriptionUpdateFailure::incompleteSubscription($this);
@@ -1524,7 +1531,7 @@ class Subscription extends Model
      *
      * @throws \InvalidArgumentException
      */
-    public function guardAgainstMultiplePrices()
+    public function guardAgainstMultiplePrices(): void
     {
         if ($this->hasMultiplePrices()) {
             throw new InvalidArgumentException(

@@ -3,6 +3,7 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Support\Arr;
@@ -17,6 +18,7 @@ use Laravel\Cashier\Concerns\InteractsWithStripe;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Exceptions\InvalidCoupon;
 use Stripe\Subscription as StripeSubscription;
+use Stripe\PaymentMethod as StripePaymentMethod;
 
 class SubscriptionBuilder
 {
@@ -40,49 +42,49 @@ class SubscriptionBuilder
      *
      * @var string
      */
-    protected $type;
+    protected string $type;
 
     /**
      * The prices the customer is being subscribed to.
      *
      * @var array
      */
-    protected $items = [];
+    protected array $items = [];
 
     /**
      * The date and time the trial will expire.
      *
-     * @var \Carbon\Carbon|\Carbon\CarbonInterface|null
+     * @var \Carbon\CarbonInterface|null
      */
-    protected $trialExpires;
+    protected ?CarbonInterface $trialExpires = null;
 
     /**
      * Indicates that the trial should end immediately.
      *
      * @var bool
      */
-    protected $skipTrial = false;
+    protected bool $skipTrial = false;
 
     /**
      * The date on which the billing cycle should be anchored.
      *
      * @var int|null
      */
-    protected $billingCycleAnchor = null;
+    protected ?int $billingCycleAnchor = null;
 
     /**
      * The billing thresholds for the subscription.
      *
      * @var array|null
      */
-    protected $billingThresholds = null;
+    protected ?array $billingThresholds = null;
 
     /**
      * The metadata to apply to the subscription.
      *
      * @var array
      */
-    protected $metadata = [];
+    protected array $metadata = [];
 
     /**
      * Create a new subscription builder instance.
@@ -92,7 +94,7 @@ class SubscriptionBuilder
      * @param  string|string[]|array[]  $prices
      * @return void
      */
-    public function __construct($owner, $type, $prices = [])
+    public function __construct($owner, string $type, string|array $prices = [])
     {
         $this->type = $type;
         $this->owner = $owner;
@@ -109,7 +111,7 @@ class SubscriptionBuilder
      * @param  int|null  $quantity
      * @return $this
      */
-    public function price($price, $quantity = 1)
+    public function price(string|array $price, ?int $quantity = 1)
     {
         $options = is_array($price) ? $price : ['price' => $price];
 
@@ -138,7 +140,7 @@ class SubscriptionBuilder
      * @param  string  $price
      * @return $this
      */
-    public function meteredPrice($price)
+    public function meteredPrice(string $price)
     {
         return $this->price($price, null);
     }
@@ -150,7 +152,7 @@ class SubscriptionBuilder
      * @param  string|null  $price
      * @return $this
      */
-    public function quantity($quantity, $price = null)
+    public function quantity(?int $quantity, ?string $price = null)
     {
         if (is_null($price)) {
             if (empty($this->items)) {
@@ -173,7 +175,7 @@ class SubscriptionBuilder
      * @param  int  $trialDays
      * @return $this
      */
-    public function trialDays($trialDays)
+    public function trialDays(int $trialDays)
     {
         $this->trialExpires = Carbon::now()->addDays($trialDays);
 
@@ -186,7 +188,7 @@ class SubscriptionBuilder
      * @param  \Carbon\Carbon|\Carbon\CarbonInterface  $trialUntil
      * @return $this
      */
-    public function trialUntil($trialUntil)
+    public function trialUntil(CarbonInterface $trialUntil)
     {
         $this->trialExpires = $trialUntil;
 
@@ -211,7 +213,7 @@ class SubscriptionBuilder
      * @param  \DateTimeInterface|int  $date
      * @return $this
      */
-    public function anchorBillingCycleOn($date)
+    public function anchorBillingCycleOn(DateTimeInterface|int $date)
     {
         if ($date instanceof DateTimeInterface) {
             $date = $date->getTimestamp();
@@ -241,7 +243,7 @@ class SubscriptionBuilder
      * @param  array  $metadata
      * @return $this
      */
-    public function withMetadata($metadata)
+    public function withMetadata(array $metadata)
     {
         $this->metadata = (array) $metadata;
 
@@ -257,7 +259,7 @@ class SubscriptionBuilder
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
-    public function add(array $customerOptions = [], array $subscriptionOptions = [])
+    public function add(array $customerOptions = [], array $subscriptionOptions = []): Subscription
     {
         return $this->create(null, $customerOptions, $subscriptionOptions);
     }
@@ -273,7 +275,7 @@ class SubscriptionBuilder
      * @throws \Exception
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
-    public function create($paymentMethod = null, array $customerOptions = [], array $subscriptionOptions = [])
+    public function create($paymentMethod = null, array $customerOptions = [], array $subscriptionOptions = []): Subscription
     {
         if (empty($this->items)) {
             throw new Exception('At least one price is required when starting subscriptions.');
@@ -433,7 +435,7 @@ class SubscriptionBuilder
      *
      * @return array
      */
-    protected function buildPayload()
+    protected function buildPayload(): array
     {
         $payload = array_filter([
             'automatic_tax' => $this->automaticTaxPayload(),
@@ -478,7 +480,7 @@ class SubscriptionBuilder
      *
      * @return int|string|null
      */
-    protected function getTrialEndForPayload()
+    protected function getTrialEndForPayload(): int|string|null
     {
         if ($this->skipTrial) {
             return 'now';
@@ -487,6 +489,8 @@ class SubscriptionBuilder
         if ($this->trialExpires) {
             return $this->trialExpires->getTimestamp();
         }
+
+        return null;
     }
 
     /**
@@ -494,11 +498,13 @@ class SubscriptionBuilder
      *
      * @return array|null
      */
-    protected function getTaxRatesForPayload()
+    protected function getTaxRatesForPayload(): ?array
     {
         if ($taxRates = $this->owner->taxRates()) {
             return $taxRates;
         }
+
+        return null;
     }
 
     /**
@@ -507,11 +513,13 @@ class SubscriptionBuilder
      * @param  string  $price
      * @return array|null
      */
-    protected function getPriceTaxRatesForPayload($price)
+    protected function getPriceTaxRatesForPayload(string $price): ?array
     {
         if ($taxRates = $this->owner->priceTaxRates()) {
             return $taxRates[$price] ?? null;
         }
+
+        return null;
     }
 
     /**
@@ -523,7 +531,7 @@ class SubscriptionBuilder
      * @throws \Laravel\Cashier\Exceptions\InvalidCoupon
      * @throws \Stripe\Exception\ApiErrorException
      */
-    protected function validateCouponForSubscriptionApplication($couponId)
+    protected function validateCouponForSubscriptionApplication(string $couponId): void
     {
         /** @var \Stripe\Service\CouponService $couponsService */
         $couponsService = $this->owner::stripe()->coupons;
@@ -542,7 +550,7 @@ class SubscriptionBuilder
      *
      * @return array
      */
-    public function getItems()
+    public function getItems(): array
     {
         return $this->items;
     }
