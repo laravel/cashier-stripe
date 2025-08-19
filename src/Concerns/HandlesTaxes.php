@@ -11,28 +11,29 @@ trait HandlesTaxes
      *
      * @var string|null
      */
-    public $customerIpAddress;
+    public ?string $customerIpAddress = null;
 
     /**
      * The pre-collected billing address used to estimate tax rates when performing "one-off" charges.
      *
      * @var array
      */
-    public $estimationBillingAddress = [];
+    public array $estimationBillingAddress = [];
 
     /**
      * Indicates if Tax IDs should be collected during a Stripe Checkout session.
      *
      * @var bool
      */
-    public $collectTaxIds = false;
+    public bool $collectTaxIds = false;
 
     /**
      * Set the IP address of the customer used to determine the tax location.
      *
+     * @param  string  $ipAddress
      * @return $this
      */
-    public function withTaxIpAddress($ipAddress)
+    public function withTaxIpAddress(string $ipAddress)
     {
         $this->customerIpAddress = $ipAddress;
 
@@ -47,7 +48,7 @@ trait HandlesTaxes
      * @param  string|null  $state
      * @return $this
      */
-    public function withTaxAddress($country, $postalCode = null, $state = null)
+    public function withTaxAddress(string $country, ?string $postalCode = null, ?string $state = null)
     {
         $this->estimationBillingAddress = array_filter([
             'country' => $country,
@@ -63,7 +64,7 @@ trait HandlesTaxes
      *
      * @return array|null
      */
-    protected function automaticTaxPayload()
+    protected function automaticTaxPayload(): ?array
     {
         return array_filter([
             'customer_ip_address' => $this->customerIpAddress,
@@ -77,7 +78,7 @@ trait HandlesTaxes
      *
      * @return bool
      */
-    protected function isAutomaticTaxEnabled()
+    protected function isAutomaticTaxEnabled(): bool
     {
         return Cashier::$calculatesTaxes;
     }

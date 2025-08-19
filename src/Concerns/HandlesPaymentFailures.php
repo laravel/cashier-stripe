@@ -35,7 +35,7 @@ trait HandlesPaymentFailures
      *
      * @internal
      */
-    public function handlePaymentFailure(Subscription $subscription, $paymentMethod = null)
+    public function handlePaymentFailure(Subscription $subscription, StripePaymentMethod|string|null $paymentMethod = null): void
     {
         if ($this->confirmIncompletePayment && $subscription->hasIncompletePayment()) {
             try {

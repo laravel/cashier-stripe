@@ -14,14 +14,14 @@ trait AllowsCoupons
      *
      * @var string|null
      */
-    public ?string $couponId;
+    public ?string $couponId = null;
 
     /**
      * The promotion code ID being applied.
      *
      * @var string|null
      */
-    public ?string $promotionCodeId;
+    public ?string $promotionCodeId = null;
 
     /**
      * Determines if user redeemable promotion codes are available in Stripe Checkout.
