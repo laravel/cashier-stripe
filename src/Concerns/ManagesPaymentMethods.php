@@ -304,7 +304,7 @@ trait ManagesPaymentMethods
      * @param  \Stripe\PaymentMethod|string  $paymentMethod
      * @return \Stripe\PaymentMethod
      */
-    protected function resolveStripePaymentMethod(StripePaymentMethod|string $paymentMethod): PaymentMethod
+    protected function resolveStripePaymentMethod(StripePaymentMethod|string $paymentMethod)
     {
         if ($paymentMethod instanceof StripePaymentMethod) {
             return $paymentMethod;
