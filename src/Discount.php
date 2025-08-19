@@ -13,13 +13,6 @@ use Stripe\PromotionCode as StripePromotionCode;
 class Discount implements Arrayable, Jsonable, JsonSerializable
 {
     /**
-     * The Stripe Discount instance.
-     *
-     * @var \Stripe\Discount
-     */
-    protected $discount;
-
-    /**
      * Create a new Discount instance.
      *
      * @param  \Stripe\Discount  $discount
@@ -27,7 +20,7 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
      */
     public function __construct(protected StripeDiscount $discount)
     {
-        $this->discount = $discount;
+        //
     }
 
     /**
