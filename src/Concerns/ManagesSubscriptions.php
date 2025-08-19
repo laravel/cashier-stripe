@@ -16,7 +16,7 @@ trait ManagesSubscriptions
      * @param  string|string[]  $prices
      * @return \Laravel\Cashier\SubscriptionBuilder
      */
-    public function newSubscription($type, $prices = [])
+    public function newSubscription(string $type, string|array $prices = []): SubscriptionBuilder
     {
         return new SubscriptionBuilder($this, $type, $prices);
     }
@@ -28,7 +28,7 @@ trait ManagesSubscriptions
      * @param  string|null  $price
      * @return bool
      */
-    public function onTrial($type = 'default', $price = null)
+    public function onTrial(string $type = 'default', ?string $price = null): bool
     {
         if (func_num_args() === 0 && $this->onGenericTrial()) {
             return true;
@@ -50,7 +50,7 @@ trait ManagesSubscriptions
      * @param  string|null  $price
      * @return bool
      */
-    public function hasExpiredTrial($type = 'default', $price = null)
+    public function hasExpiredTrial(string $type = 'default', $price = null): bool
     {
         if (func_num_args() === 0 && $this->hasExpiredGenericTrial()) {
             return true;
@@ -70,7 +70,7 @@ trait ManagesSubscriptions
      *
      * @return bool
      */
-    public function onGenericTrial()
+    public function onGenericTrial(): bool
     {
         return $this->trial_ends_at && $this->trial_ends_at->isFuture();
     }

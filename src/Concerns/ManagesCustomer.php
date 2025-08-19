@@ -457,6 +457,8 @@ trait ManagesCustomer
         if ($codes && $promotionCode = $codes->first()) {
             return new PromotionCode($promotionCode);
         }
+
+        return null;
     }
 
     /**

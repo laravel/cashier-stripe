@@ -27,11 +27,11 @@ trait ManagesInvoices
      * Add an invoice item to the customer's upcoming invoice.
      *
      * @param  string  $description
-     * @param  int  $amount
+     * @param  int|null  $amount
      * @param  array  $options
      * @return \Stripe\InvoiceItem
      */
-    public function tab(string $description, int $amount, array $options = []): StripeInvoiceItem
+    public function tab(string $description, ?int $amount, array $options = []): StripeInvoiceItem
     {
         if ($this->isAutomaticTaxEnabled() && ! array_key_exists('price_data', $options)) {
             throw new LogicException(
