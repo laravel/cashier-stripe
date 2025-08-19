@@ -295,6 +295,8 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
         if ($this->hasPeriod()) {
             return Carbon::createFromTimestampUTC($this->item->period->start);
         }
+
+        return null;
     }
 
     /**
@@ -307,6 +309,8 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
         if ($this->hasPeriod()) {
             return Carbon::createFromTimestampUTC($this->item->period->end);
         }
+
+        return null;
     }
 
     /**
