@@ -5,7 +5,6 @@ namespace Laravel\Cashier;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use JsonSerializable;
@@ -44,7 +43,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * @param  object|null  $parentInstance
      * @return \Laravel\Cashier\CheckoutBuilder
      */
-    public static function customer(Model $owner, ?object $parentInstance = null): CheckoutBuilder
+    public static function customer($owner, ?object $parentInstance = null): CheckoutBuilder
     {
         return new CheckoutBuilder($owner, $parentInstance);
     }
@@ -57,7 +56,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
-    public static function create(?Model $owner, array $sessionOptions = [], array $customerOptions = []): Checkout
+    public static function create($owner, array $sessionOptions = [], array $customerOptions = []): Checkout
     {
         $data = array_merge([
             'mode' => Session::MODE_PAYMENT,
