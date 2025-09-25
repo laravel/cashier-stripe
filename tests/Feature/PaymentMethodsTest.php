@@ -118,6 +118,13 @@ class PaymentMethodsTest extends FeatureTestCase
         $this->assertEquals('4242', $paymentMethod->card->last4);
         $this->assertTrue($user->hasDefaultPaymentMethod());
 
+        $paymentMethod = $user->updateDefaultPaymentMethod($paymentMethod->asStripePaymentMethod());
+
+        $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);
+        $this->assertEquals('visa', $paymentMethod->card->brand);
+        $this->assertEquals('4242', $paymentMethod->card->last4);
+        $this->assertTrue($user->hasDefaultPaymentMethod());
+
         $paymentMethod = $user->defaultPaymentMethod();
 
         $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);

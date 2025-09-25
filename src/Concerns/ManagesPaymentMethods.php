@@ -171,13 +171,16 @@ trait ManagesPaymentMethods
 
         $customer = $this->asStripeCustomer();
 
-        $stripePaymentMethod = $this->resolveStripePaymentMethod($paymentMethod);
+        $stripePaymentMethod = $paymentMethod instanceof StripePaymentMethod
+            ? $paymentMethod
+            : $this->resolveStripePaymentMethod($paymentMethod);
 
         // If the customer already has the payment method as their default, we can bail out
         // of the call now. We don't need to keep adding the same payment method to this
         // model's account every single time we go through this specific process call.
+        // We will return current PaymentMethod set in invoice settings
         if ($stripePaymentMethod->id === $customer->invoice_settings->default_payment_method) {
-            return null;
+            return new PaymentMethod($this, $stripePaymentMethod);
         }
 
         $paymentMethod = $this->addPaymentMethod($stripePaymentMethod);
