@@ -97,6 +97,7 @@ class SubscriptionBuilder
     {
         $this->type = $type;
         $this->owner = $owner;
+        $this->allowsMultipleCoupons = true;
 
         foreach ((array) $prices as $price) {
             $this->price($price);
@@ -450,18 +451,26 @@ class SubscriptionBuilder
         ]);
 
         // Apply discounts using new discounts array (supports multiple discounts)...
-        if ($this->couponId || $this->promotionCodeId) {
+        if ($this->coupons || $this->promotionCodes) {
             $discounts = [];
 
-            if ($this->couponId) {
-                // Validate the coupon before applying...
-                $this->validateCouponForSubscriptionApplication($this->couponId);
+            if ( isset($this->coupons) ) {
+                foreach ($this->coupons as $couponId) {
+                    if ($couponId) {
+                        // Validate the coupon before applying...
+                        $this->validateCouponForSubscriptionApplication($couponId);
 
-                $discounts[] = ['coupon' => $this->couponId];
+                        $discounts[] = ['coupon' => $couponId];
+                    }
+                }
             }
 
-            if ($this->promotionCodeId) {
-                $discounts[] = ['promotion_code' => $this->promotionCodeId];
+            if ( isset($this->promotionCodes) ) {
+                foreach ($this->promotionCodes as $promotionCodeId) {
+                    if ($promotionCodeId) {
+                        $discounts[] = ['promotion_code' => $promotionCodeId];
+                    }
+                }
             }
 
             $payload['discounts'] = $discounts;

@@ -29,6 +29,11 @@ class DiscountTest extends FeatureTestCase
     /**
      * @var string
      */
+    protected static $thirdCouponId;
+
+    /**
+     * @var string
+     */
     protected static $promotionCodeId;
 
     /**
@@ -76,6 +81,13 @@ class DiscountTest extends FeatureTestCase
         static::$promotionCodeId = self::stripe()->promotionCodes->create([
             'coupon' => static::$secondCouponId,
             'code' => static::$promotionCodeCode = Str::random(16),
+        ])->id;
+
+        static::$thirdCouponId = self::stripe()->coupons->create([
+            'duration' => 'repeating',
+            'amount_off' => 200,
+            'duration_in_months' => 3,
+            'currency' => 'USD',
         ])->id;
     }
 
@@ -167,6 +179,21 @@ class DiscountTest extends FeatureTestCase
         $this->assertEquals(static::$promotionCodeId, $subscription->discount()->promotionCode()->id);
         $this->assertEquals(static::$secondCouponId, $subscription->discount()->promotionCode()->coupon()->id);
         $this->assertEquals(static::$promotionCodeCode, $subscription->discount()->promotionCode()->code);
+    }
+
+    public function test_applying_multiple_discounts_directly_to_subscriptions()
+    {
+        $user = $this->createCustomer('applying_coupons_to_subscription_directly');
+        $subscriptionBuilder = $user->newSubscription('main', static::$priceId)
+            ->withCoupon(static::$couponId)
+            ->withCoupon(static::$thirdCouponId);
+
+        // Create subscription
+        $subscription = $subscriptionBuilder->create('pm_card_visa');
+
+        $this->assertEquals(2, $subscription->discounts()->count());
+        $this->assertEquals(static::$couponId, $subscription->discount()->coupon()->id);
+        $this->assertEquals(static::$thirdCouponId, $subscription->discount(1)->coupon()->id);
     }
 
     public function test_customers_can_retrieve_a_promotion_code()

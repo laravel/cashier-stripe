@@ -31,6 +31,27 @@ trait AllowsCoupons
     public bool $allowPromotionCodes = false;
 
     /**
+     * The coupon IDs being applied.
+     *
+     * @var array|null
+     */
+    public ?array $coupons = null;
+
+    /**
+     * The promotion code IDs being applied.
+     *
+     * @var array|null
+     */
+    public ?array $promotionCodes = null;
+
+    /**
+     * Does the object allow multiple coupons
+     *
+     * @var bool
+     */
+    public bool $allowsMultipleCoupons = false;
+
+    /**
      * The coupon ID to be applied.
      *
      * @param  string  $couponId
@@ -39,6 +60,9 @@ trait AllowsCoupons
     public function withCoupon(string $couponId)
     {
         $this->couponId = $couponId;
+        if ( $this->allowsMultipleCoupons ) {
+            $this->coupons[] = $couponId;
+        }
 
         return $this;
     }
@@ -52,6 +76,9 @@ trait AllowsCoupons
     public function withPromotionCode(string $promotionCodeId)
     {
         $this->promotionCodeId = $promotionCodeId;
+        if ( $this->allowsMultipleCoupons ) {
+            $this->promotionCodes[] = $promotionCodeId;
+        }
 
         return $this;
     }

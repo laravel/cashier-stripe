@@ -280,7 +280,7 @@ trait ManagesCustomer
      *
      * @return \Laravel\Cashier\Discount|null
      */
-    public function discount(): ?Discount
+    public function discount(int $index = 0): ?Discount
     {
         // Customer-level discounts are no longer supported, check any active subscription...
         // Try default subscription first, then any active subscription...
@@ -294,8 +294,8 @@ trait ManagesCustomer
         // Use the same expansion logic as the subscription's discount method...
         $stripeSubscription = $subscription->asStripeSubscription(['discounts.promotion_code']);
 
-        if (isset($stripeSubscription->discounts) && ! empty($stripeSubscription->discounts)) {
-            return new Discount($stripeSubscription->discounts[0]);
+        if (isset($stripeSubscription->discounts) && ! empty($stripeSubscription->discounts) && isset($stripeSubscription->discounts[$index])) {
+            return new Discount($stripeSubscription->discounts[$index]);
         }
 
         return null;
