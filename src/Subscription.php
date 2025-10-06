@@ -1424,7 +1424,6 @@ class Subscription extends Model
      * The discount that applies to the subscription, if applicable.
      *
      * @param  int  $index
-     *
      * @return \Laravel\Cashier\Discount|null
      */
     public function discount(int $index = 0): ?Discount

@@ -45,7 +45,7 @@ trait AllowsCoupons
     public ?array $promotionCodes = null;
 
     /**
-     * Does the object allow multiple coupons
+     * Does the object allow multiple coupons.
      *
      * @var bool
      */
@@ -60,7 +60,7 @@ trait AllowsCoupons
     public function withCoupon(string $couponId)
     {
         $this->couponId = $couponId;
-        if ( $this->allowsMultipleCoupons ) {
+        if ($this->allowsMultipleCoupons) {
             $this->coupons[] = $couponId;
         }
 
@@ -76,7 +76,7 @@ trait AllowsCoupons
     public function withPromotionCode(string $promotionCodeId)
     {
         $this->promotionCodeId = $promotionCodeId;
-        if ( $this->allowsMultipleCoupons ) {
+        if ($this->allowsMultipleCoupons) {
             $this->promotionCodes[] = $promotionCodeId;
         }
 

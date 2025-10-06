@@ -454,7 +454,7 @@ class SubscriptionBuilder
         if ($this->coupons || $this->promotionCodes) {
             $discounts = [];
 
-            if ( isset($this->coupons) ) {
+            if (isset($this->coupons)) {
                 foreach ($this->coupons as $couponId) {
                     if ($couponId) {
                         // Validate the coupon before applying...
@@ -465,7 +465,7 @@ class SubscriptionBuilder
                 }
             }
 
-            if ( isset($this->promotionCodes) ) {
+            if (isset($this->promotionCodes)) {
                 foreach ($this->promotionCodes as $promotionCodeId) {
                     if ($promotionCodeId) {
                         $discounts[] = ['promotion_code' => $promotionCodeId];
