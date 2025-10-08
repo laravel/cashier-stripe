@@ -237,7 +237,7 @@ trait ManagesInvoices
 
             return new Invoice($this, $stripeInvoice, $parameters);
         } catch (StripeInvalidRequestException $exception) {
-            //
+            return null;
         }
     }
 

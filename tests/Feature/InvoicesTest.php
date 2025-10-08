@@ -158,4 +158,14 @@ class InvoicesTest extends FeatureTestCase
         $this->assertEquals('1000', $response->pricing->unit_amount_decimal);
         $this->assertEquals(2, $response->quantity);
     }
+
+    public function test_upcoming_invoice_returns_null_when_stripe_api_fails()
+    {
+        $user = $this->createCustomer('upcoming_invoice_api_failure');
+        $user->createAsStripeCustomer();
+
+        $result = $user->upcomingInvoice();
+
+        $this->assertNull($result);
+    }
 }
