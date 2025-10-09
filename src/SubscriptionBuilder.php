@@ -515,8 +515,6 @@ class SubscriptionBuilder
     protected function getPriceTaxRatesForPayload(string|array $price): ?array
     {
         if ($taxRates = $this->owner->priceTaxRates()) {
-            ray($price, $taxRates);
-
             return $taxRates[$price] ?? null;
         }
 
