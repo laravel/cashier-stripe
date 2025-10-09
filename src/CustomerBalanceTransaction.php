@@ -90,7 +90,7 @@ class CustomerBalanceTransaction
      */
     public function isCheckoutSessionSubscriptionPayment(): bool
     {
-        return $this->transaction->balance_type === 'checkout_session_subscription_payment';
+        return $this->transaction->balance_type === StripeCustomerBalanceTransaction::TYPE_CHECKOUT_SESSION_SUBSCRIPTION_PAYMENT;
     }
 
     /**
@@ -100,7 +100,7 @@ class CustomerBalanceTransaction
      */
     public function isCheckoutSessionSubscriptionPaymentCanceled(): bool
     {
-        return $this->transaction->balance_type === 'checkout_session_subscription_payment_canceled';
+        return $this->transaction->balance_type === StripeCustomerBalanceTransaction::TYPE_CHECKOUT_SESSION_SUBSCRIPTION_PAYMENT_CANCELED;
     }
 
     /**

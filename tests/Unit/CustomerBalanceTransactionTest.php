@@ -13,7 +13,7 @@ class CustomerBalanceTransactionTest extends TestCase
         $stripeTransaction = StripeCustomerBalanceTransaction::constructFrom([
             'id' => 'cbtxn_test_123',
             'object' => 'customer_balance_transaction',
-            'balance_type' => 'checkout_session_subscription_payment',
+            'balance_type' => StripeCustomerBalanceTransaction::TYPE_CHECKOUT_SESSION_SUBSCRIPTION_PAYMENT,
             'checkout_session' => 'cs_test_123',
             'amount' => 1000,
             'currency' => 'usd',
@@ -28,7 +28,7 @@ class CustomerBalanceTransactionTest extends TestCase
 
         $transaction = new CustomerBalanceTransaction($owner, $stripeTransaction);
 
-        $this->assertSame('checkout_session_subscription_payment', $transaction->balanceType());
+        $this->assertSame(StripeCustomerBalanceTransaction::TYPE_CHECKOUT_SESSION_SUBSCRIPTION_PAYMENT, $transaction->balanceType());
         $this->assertSame('cs_test_123', $transaction->checkoutSession());
         $this->assertTrue($transaction->isCheckoutSessionSubscriptionPayment());
         $this->assertFalse($transaction->isCheckoutSessionSubscriptionPaymentCanceled());
