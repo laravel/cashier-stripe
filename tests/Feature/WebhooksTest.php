@@ -204,7 +204,6 @@ class WebhooksTest extends FeatureTestCase
         ]);
     }
 
-
     public function test_subscription_updated_before_created()
     {
         $user = $this->createCustomer('canceled_subscription_is_properly_reactivated');
