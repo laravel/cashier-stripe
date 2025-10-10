@@ -204,6 +204,39 @@ class WebhooksTest extends FeatureTestCase
         ]);
     }
 
+
+    public function test_subscription_updated_before_created()
+    {
+        $user = $this->createCustomer('canceled_subscription_is_properly_reactivated');
+        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+
+        $subscriptionStripeId = $subscription->stripe_id;
+        $userStripeId = $user->stripe_id;
+
+        $subscription->forceDelete();
+
+        $this->postJson('stripe/webhook', [
+            'id' => 'foo',
+            'type' => 'customer.subscription.updated',
+            'data' => [
+                'object' => [
+                    'id' => $subscriptionStripeId,
+                    'customer' => $userStripeId,
+                    'price' => ['id' => 'price_foo', 'product' => 'prod_bar'],
+                    'quantity' => 5,
+                    'status' => StripeSubscription::STATUS_INCOMPLETE_EXPIRED,
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseMissing('subscription_items', [
+            'subscription_id' => $subscriptionStripeId,
+            'stripe_product' => 'prod_bar',
+            'stripe_price' => 'price_foo',
+            'quantity' => 5,
+        ]);
+    }
+
     public function test_canceled_subscription_is_properly_reactivated()
     {
         $user = $this->createCustomer('canceled_subscription_is_properly_reactivated');
