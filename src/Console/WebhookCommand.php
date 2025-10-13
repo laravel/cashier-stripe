@@ -17,7 +17,7 @@ class WebhookCommand extends Command
         'customer.deleted',
         'payment_method.automatically_updated',
         'invoice.payment_action_required',
-        'invoice.payment_succeeded',
+        'invoice.paid',
     ];
 
     /**
