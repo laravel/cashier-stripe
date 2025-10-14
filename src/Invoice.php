@@ -32,9 +32,9 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
     /**
      * The taxes applied to the invoice.
      *
-     * @var \Laravel\Cashier\Tax[]
+     * @var \Laravel\Cashier\Tax[]|null
      */
-    protected array $taxes = [];
+    protected array $taxes = null;
 
     /**
      * The payments associated with the invoice.
