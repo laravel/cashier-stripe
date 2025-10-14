@@ -34,7 +34,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      *
      * @var \Laravel\Cashier\Tax[]|null
      */
-    protected array $taxes = null;
+    protected ?array $taxes = null;
 
     /**
      * The payments associated with the invoice.
