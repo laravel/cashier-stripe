@@ -93,7 +93,7 @@ class Tax
      */
     public function __get(string $key)
     {
-        return $this->taxRate instanceof StripeTaxRate && property_exists($this->TaxRate, $key)
+        return $this->taxRate instanceof StripeTaxRate && in_array($key, $this->taxRate->keys())
             ? $this->taxRate->{$key}
             : null;
     }
