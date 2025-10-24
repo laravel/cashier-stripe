@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
@@ -235,11 +236,11 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
             return $taxRateDetails->tax_rate;
         }
 
-        // If tax_rate is just an ID string, fetch it from Stripe
+        // If tax_rate is just an ID string, fetch it from Stripe...
         if (isset($taxRateDetails->tax_rate) && is_string($taxRateDetails->tax_rate)) {
             try {
                 return $this->invoice->owner()->stripe()->taxRates->retrieve($taxRateDetails->tax_rate);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return null;
             }
         }
