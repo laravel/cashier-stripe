@@ -176,7 +176,7 @@ class Subscription extends Model
      */
     public function valid(): bool
     {
-        return $this->active() || $this->onTrial() || $this->onGracePeriod();
+        return !$this->canceled() && ($this->active() || $this->onTrial() || $this->onGracePeriod());
     }
 
     /**
@@ -302,7 +302,7 @@ class Subscription extends Model
      */
     public function canceled(): bool
     {
-        return ! is_null($this->ends_at);
+        return ($this->stripe_status == StripeSubscription::STATUS_CANCELED) || (!is_null($this->ends_at) && !$this->ends_at->isFuture())
     }
 
     /**
