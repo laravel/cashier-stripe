@@ -224,7 +224,7 @@ class SubscriptionItem extends Model
      * Get the usage records for a metered product.
      *
      * @param  array  $options
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Stripe\UsageRecordSummary>
      */
     public function usageRecords($options = [])
     {

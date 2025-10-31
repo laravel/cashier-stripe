@@ -364,7 +364,7 @@ trait ManagesCustomer
      *
      * @param  int  $limit
      * @param  array  $options
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, CustomerBalanceTransaction>
      */
     public function balanceTransactions($limit = 10, array $options = [])
     {
