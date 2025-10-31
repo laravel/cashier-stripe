@@ -570,7 +570,7 @@ class Subscription extends Model
      *
      * @param  array  $options
      * @param  string|null  $price
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Stripe\UsageRecordSummary>
      */
     public function usageRecords(array $options = [], $price = null)
     {
@@ -586,7 +586,7 @@ class Subscription extends Model
      *
      * @param  string  $price
      * @param  array  $options
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Stripe\UsageRecordSummary>
      */
     public function usageRecordsFor($price, array $options = [])
     {
