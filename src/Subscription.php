@@ -356,8 +356,8 @@ class Subscription extends Model
      */
     public function onTrial(): bool
     {
-        return $this->trial_ends_at && 
-               $this->trial_ends_at->isFuture() && 
+        return $this->trial_ends_at &&
+               $this->trial_ends_at->isFuture() &&
                $this->stripe_status !== StripeSubscription::STATUS_CANCELED &&
                ! ($this->ends_at && ! $this->ends_at->isFuture());
     }
