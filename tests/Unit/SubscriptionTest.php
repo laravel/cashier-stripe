@@ -184,20 +184,20 @@ class SubscriptionTest extends TestCase
 
     public function test_canceled_returns_true_when_ends_at_is_set()
     {
-        $subscription = new Subscription([
-            'stripe_status' => StripeSubscription::STATUS_ACTIVE,
-            'ends_at' => now()->addDay(),
-        ]);
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_ACTIVE;
+        $subscription->ends_at = now()->addDay();
 
         $this->assertTrue($subscription->canceled());
     }
 
     public function test_canceled_returns_true_when_both_status_and_ends_at_are_set()
     {
-        $subscription = new Subscription([
-            'stripe_status' => StripeSubscription::STATUS_CANCELED,
-            'ends_at' => now()->addDay(),
-        ]);
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_CANCELED;
+        $subscription->ends_at = now()->addDay();
 
         $this->assertTrue($subscription->canceled());
     }
@@ -214,10 +214,10 @@ class SubscriptionTest extends TestCase
 
     public function test_active_returns_false_when_stripe_status_is_canceled_with_ends_at()
     {
-        $subscription = new Subscription([
-            'stripe_status' => StripeSubscription::STATUS_CANCELED,
-            'ends_at' => now()->addDay(),
-        ]);
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_CANCELED;
+        $subscription->ends_at = now()->addDay();
 
         $this->assertFalse($subscription->active());
     }
@@ -315,10 +315,10 @@ class SubscriptionTest extends TestCase
 
     public function test_valid_returns_false_when_stripe_status_is_canceled_with_ends_at()
     {
-        $subscription = new Subscription([
-            'stripe_status' => StripeSubscription::STATUS_CANCELED,
-            'ends_at' => now()->addDay(),
-        ]);
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_CANCELED;
+        $subscription->ends_at = now()->addDay();
 
         $this->assertFalse($subscription->valid());
     }
