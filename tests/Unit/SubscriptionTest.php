@@ -171,4 +171,196 @@ class SubscriptionTest extends TestCase
         $this->assertTrue($subscription->hasMultiplePrices());
         $this->assertFalse($subscription->hasSinglePrice());
     }
+
+    public function test_canceled_returns_true_when_stripe_status_is_canceled()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_CANCELED,
+            'ends_at' => null,
+        ]);
+
+        $this->assertTrue($subscription->canceled());
+    }
+
+    public function test_canceled_returns_true_when_ends_at_is_set()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_ACTIVE,
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $this->assertTrue($subscription->canceled());
+    }
+
+    public function test_canceled_returns_true_when_both_status_and_ends_at_are_set()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_CANCELED,
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $this->assertTrue($subscription->canceled());
+    }
+
+    public function test_active_returns_false_when_stripe_status_is_canceled()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_CANCELED,
+            'ends_at' => null,
+        ]);
+
+        $this->assertFalse($subscription->active());
+    }
+
+    public function test_active_returns_false_when_stripe_status_is_canceled_with_ends_at()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_CANCELED,
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $this->assertFalse($subscription->active());
+    }
+
+    public function test_on_trial_returns_false_when_stripe_status_is_canceled()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_CANCELED;
+        $subscription->trial_ends_at = now()->addDay();
+
+        $this->assertFalse($subscription->onTrial());
+    }
+
+    public function test_on_trial_returns_false_when_stripe_status_is_canceled_even_without_trial()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_CANCELED,
+            'trial_ends_at' => null,
+        ]);
+
+        $this->assertFalse($subscription->onTrial());
+    }
+
+    public function test_on_grace_period_returns_false_when_stripe_status_is_canceled()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_CANCELED;
+        $subscription->ends_at = now()->addDay();
+
+        $this->assertFalse($subscription->onGracePeriod());
+    }
+
+    public function test_on_grace_period_returns_false_when_stripe_status_is_canceled_even_without_ends_at()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_CANCELED,
+            'ends_at' => null,
+        ]);
+
+        $this->assertFalse($subscription->onGracePeriod());
+    }
+
+    public function test_on_grace_period_returns_true_when_ends_at_is_future_and_status_is_active()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_ACTIVE;
+        $subscription->ends_at = now()->addDay();
+
+        // Should be on grace period when ends_at is in future and not STATUS_CANCELED
+        $this->assertTrue($subscription->onGracePeriod());
+        $this->assertTrue($subscription->canceled()); // Scheduled for cancellation
+        $this->assertTrue($subscription->valid()); // But still valid due to grace period
+    }
+
+    public function test_on_trial_returns_false_when_subscription_is_canceled_with_past_ends_at()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_ACTIVE;
+        $subscription->trial_ends_at = now()->addDay();
+        $subscription->ends_at = now()->subDay(); // Canceled in the past
+
+        // Should not be on trial if canceled (ends_at in past)
+        $this->assertFalse($subscription->onTrial());
+        $this->assertTrue($subscription->canceled());
+        $this->assertFalse($subscription->valid());
+    }
+
+    public function test_on_trial_returns_false_when_canceled_now_with_trial()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_CANCELED;
+        $subscription->trial_ends_at = now()->addDay();
+        $subscription->ends_at = now(); // Canceled now (current time)
+
+        // Should not be on trial if canceled immediately
+        $this->assertFalse($subscription->onTrial());
+        $this->assertTrue($subscription->canceled());
+        $this->assertFalse($subscription->valid());
+    }
+
+    public function test_valid_returns_false_when_stripe_status_is_canceled()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_CANCELED,
+            'ends_at' => null,
+        ]);
+
+        $this->assertFalse($subscription->valid());
+    }
+
+    public function test_valid_returns_false_when_stripe_status_is_canceled_with_ends_at()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_CANCELED,
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $this->assertFalse($subscription->valid());
+    }
+
+    public function test_valid_returns_false_when_stripe_status_is_canceled_with_trial()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_CANCELED;
+        $subscription->trial_ends_at = now()->addDay();
+
+        $this->assertFalse($subscription->valid());
+    }
+
+    public function test_ended_returns_true_when_stripe_status_is_canceled()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_CANCELED,
+            'ends_at' => null,
+        ]);
+
+        $this->assertTrue($subscription->ended());
+    }
+
+    public function test_ended_returns_true_when_stripe_status_is_canceled_with_past_ends_at()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_CANCELED;
+        $subscription->ends_at = now()->subDay();
+
+        $this->assertTrue($subscription->ended());
+    }
+
+    public function test_ended_returns_false_when_canceled_via_ends_at_but_still_on_grace_period()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_ACTIVE;
+        $subscription->ends_at = now()->addDay();
+
+        // Should not be ended because it's on grace period (canceled via ends_at, not STATUS_CANCELED)
+        $this->assertFalse($subscription->ended());
+    }
 }

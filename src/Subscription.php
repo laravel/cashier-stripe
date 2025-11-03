@@ -229,6 +229,7 @@ class Subscription extends Model
     public function active(): bool
     {
         return ! $this->ended() &&
+            $this->stripe_status !== StripeSubscription::STATUS_CANCELED &&
             (! Cashier::$deactivateIncomplete || $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE) &&
             $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE_EXPIRED &&
             (! Cashier::$deactivatePastDue || $this->stripe_status !== StripeSubscription::STATUS_PAST_DUE) &&
@@ -302,7 +303,7 @@ class Subscription extends Model
      */
     public function canceled(): bool
     {
-        return ! is_null($this->ends_at);
+        return ! is_null($this->ends_at) || $this->stripe_status === StripeSubscription::STATUS_CANCELED;
     }
 
     /**
@@ -355,7 +356,10 @@ class Subscription extends Model
      */
     public function onTrial(): bool
     {
-        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+        return $this->trial_ends_at && 
+               $this->trial_ends_at->isFuture() && 
+               $this->stripe_status !== StripeSubscription::STATUS_CANCELED &&
+               ! ($this->ends_at && ! $this->ends_at->isFuture());
     }
 
     /**
@@ -408,7 +412,7 @@ class Subscription extends Model
      */
     public function onGracePeriod(): bool
     {
-        return $this->ends_at && $this->ends_at->isFuture();
+        return $this->ends_at && $this->ends_at->isFuture() && $this->stripe_status !== StripeSubscription::STATUS_CANCELED;
     }
 
     /**
