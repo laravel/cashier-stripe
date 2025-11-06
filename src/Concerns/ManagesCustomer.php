@@ -308,7 +308,7 @@ trait ManagesCustomer
      */
     public function discounts(): Collection
     {
-        return $this->subscriptions()->map(function ($subscription) {
+        return $this->subscriptions->map(function ($subscription) {
             return $subscription->discounts();
         })->flatten();
     }
