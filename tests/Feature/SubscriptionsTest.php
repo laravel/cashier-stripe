@@ -975,4 +975,24 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertSame('paid', $invoice->status);
         $this->assertSame(2000, $invoice->total);
     }
+
+    public function test_updating_single_price_subscription_quantity_updates_the_quantity_of_the_subscription_item(){
+        $user = $this->createCustomer('invoice_subscription_directly');
+        
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->create('pm_card_visa');
+
+        $subscription->updateQuantity(2);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'quantity' => 2,
+        ]);
+        
+        $this->assertDatabaseHas('subscription_items', [
+            'subscription_id' => $subscription->id,
+            'stripe_price' => static::$priceId,
+            'quantity' => 2,
+        ]);
+    }
 }
