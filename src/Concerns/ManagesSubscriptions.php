@@ -135,15 +135,25 @@ trait ManagesSubscriptions
      * @param  string|null  $price
      * @return bool
      */
-    public function subscribed(string $type = 'default', ?string $price = null): bool
+    public function subscribed(string $type = 'default', ?string $price = null, $any = false): bool
     {
-        $subscription = $this->subscription($type);
-
-        if (! $subscription || ! $subscription->valid()) {
-            return false;
+        if (! $any) {
+            $subscription = $this->subscription($type);
+    
+            if (! $subscription || ! $subscription->valid()) {
+                return false;
+            }
+    
+            return ! $price || $subscription->hasPrice($price);
         }
 
-        return ! $price || $subscription->hasPrice($price);
+        return (bool) $this->subscriptions->where('type', $type)->first(function (Subscription $subscription) use ($price) {
+            if (! $subscription->valid()) {
+                return false;
+            }
+
+            return ! $price || $subscription->hasPrice($price);
+        });
     }
 
     /**
