@@ -139,11 +139,11 @@ trait ManagesSubscriptions
     {
         if (! $any) {
             $subscription = $this->subscription($type);
-    
+
             if (! $subscription || ! $subscription->valid()) {
                 return false;
             }
-    
+
             return ! $price || $subscription->hasPrice($price);
         }
 

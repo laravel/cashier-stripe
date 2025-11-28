@@ -996,4 +996,39 @@ class SubscriptionsTest extends FeatureTestCase
             'quantity' => 2,
         ]);
     }
+
+    public function test_subscribed_check_with_multiple_subscriptions()
+    {
+        $user = $this->createCustomer('test_subscribed_check_with_multiple_subscriptions');
+
+        // Case 1 & 2: Newest Active, Oldest Inactive
+        $subscriptionOld = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscriptionOld->cancelNow();
+
+        $subscriptionNew = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+
+        $user->refresh();
+
+        // 1. Two subscriptions do not use any, newest active, oldest inactive, should result in true
+        $this->assertTrue($user->subscribed('main'));
+
+        // 2. Two subscriptions do use any, newest active, oldest inactive, should result in true
+        $this->assertTrue($user->subscribed('main', null, true));
+
+        // Case 3 & 4: Newest Inactive, Oldest Active
+        $user = $this->createCustomer('test_subscribed_check_with_multiple_subscriptions_2');
+
+        $subscriptionOld = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+
+        $subscriptionNew = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $subscriptionNew->cancelNow();
+
+        $user->refresh();
+
+        // 3. Two subscriptions do not use any, Newest is inactive, oldest is active, should result in false
+        $this->assertFalse($user->subscribed('main'));
+
+        // 4. Tow subscriptions does use any, Newest is inactive, oldest is active, should result in true
+        $this->assertTrue($user->subscribed('main', null, true));
+    }
 }
