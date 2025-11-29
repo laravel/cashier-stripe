@@ -29,7 +29,6 @@ class ConfirmPayment extends Notification implements ShouldQueue
     /**
      * Create a new payment confirmation notification.
      *
-     * @param  \Laravel\Cashier\Payment  $payment
      * @return void
      */
     public function __construct(Payment $payment)

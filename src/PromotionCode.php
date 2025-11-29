@@ -12,7 +12,6 @@ class PromotionCode implements Arrayable, Jsonable, JsonSerializable
     /**
      * Create a new PromotionCode instance.
      *
-     * @param  \Stripe\PromotionCode  $promotionCode
      * @return void
      */
     public function __construct(protected StripePromotionCode $promotionCode)
@@ -22,8 +21,6 @@ class PromotionCode implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the coupon that belongs to the promotion code.
-     *
-     * @return \Laravel\Cashier\Coupon
      */
     public function coupon(): Coupon
     {
@@ -32,8 +29,6 @@ class PromotionCode implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the Stripe PromotionCode instance.
-     *
-     * @return \Stripe\PromotionCode
      */
     public function asStripePromotionCode(): StripePromotionCode
     {
@@ -75,7 +70,6 @@ class PromotionCode implements Arrayable, Jsonable, JsonSerializable
     /**
      * Dynamically get values from the Stripe object.
      *
-     * @param  string  $key
      * @return mixed
      */
     public function __get(string $key)

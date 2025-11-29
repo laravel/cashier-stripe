@@ -10,7 +10,6 @@ class InvalidInvoice extends Exception
     /**
      * Create a new InvalidInvoice instance.
      *
-     * @param  \Stripe\Invoice  $invoice
      * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @return static
      */

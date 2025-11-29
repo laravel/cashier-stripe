@@ -17,16 +17,16 @@ class InvoiceLineItemTest extends TestCase
 {
     public function test_we_can_calculate_the_inclusive_tax_percentage()
     {
-        $customer = new User();
+        $customer = new User;
         $customer->stripe_id = 'foo';
 
-        $stripeInvoice = new StripeInvoice();
+        $stripeInvoice = new StripeInvoice;
         $stripeInvoice->customer_tax_exempt = StripeCustomer::TAX_EXEMPT_NONE;
         $stripeInvoice->customer = 'foo';
 
         $invoice = new Invoice($customer, $stripeInvoice);
 
-        $stripeInvoiceLineItem = new StripeInvoiceLineItem();
+        $stripeInvoiceLineItem = new StripeInvoiceLineItem;
         $stripeInvoiceLineItem->taxes = [
             $this->createTaxObject(100, $this->inclusiveTaxRate(5.24)),
             $this->createTaxObject(200, $this->inclusiveTaxRate(15.92)),
@@ -42,16 +42,16 @@ class InvoiceLineItemTest extends TestCase
 
     public function test_we_can_calculate_the_exclusive_tax_percentage()
     {
-        $customer = new User();
+        $customer = new User;
         $customer->stripe_id = 'foo';
 
-        $stripeInvoice = new StripeInvoice();
+        $stripeInvoice = new StripeInvoice;
         $stripeInvoice->customer_tax_exempt = StripeCustomer::TAX_EXEMPT_NONE;
         $stripeInvoice->customer = 'foo';
 
         $invoice = new Invoice($customer, $stripeInvoice);
 
-        $stripeInvoiceLineItem = new StripeInvoiceLineItem();
+        $stripeInvoiceLineItem = new StripeInvoiceLineItem;
         $stripeInvoiceLineItem->taxes = [
             $this->createTaxObject(100, $this->inclusiveTaxRate(5.54)),
             $this->createTaxObject(200, $this->exclusiveTaxRate(15.28)),
@@ -67,17 +67,17 @@ class InvoiceLineItemTest extends TestCase
 
     public function test_price_uses_expanded_object_when_available()
     {
-        $customer = new User();
+        $customer = new User;
         $customer->stripe_id = 'foo';
 
-        $stripeInvoice = new StripeInvoice();
+        $stripeInvoice = new StripeInvoice;
         $stripeInvoice->customer = 'foo';
 
         $invoice = new Invoice($customer, $stripeInvoice);
 
         $expandedPrice = (object) ['id' => 'price_test'];
 
-        $stripeInvoiceLineItem = new StripeInvoiceLineItem();
+        $stripeInvoiceLineItem = new StripeInvoiceLineItem;
         $stripeInvoiceLineItem->price = $expandedPrice;
 
         $item = new InvoiceLineItem($invoice, $stripeInvoiceLineItem);
@@ -89,7 +89,6 @@ class InvoiceLineItemTest extends TestCase
      * Create a tax object in the new structure.
      *
      * @param  int  $amount
-     * @param  \Stripe\TaxRate  $taxRate
      * @return object
      */
     protected function createTaxObject($amount, StripeTaxRate $taxRate)

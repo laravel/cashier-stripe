@@ -43,8 +43,6 @@ class SubscriptionItem extends Model
 
     /**
      * Get the subscription that the item belongs to.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function subscription(): BelongsTo
     {
@@ -56,7 +54,6 @@ class SubscriptionItem extends Model
     /**
      * Increment the quantity of the subscription item.
      *
-     * @param  int  $count
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
@@ -71,7 +68,6 @@ class SubscriptionItem extends Model
     /**
      *  Increment the quantity of the subscription item, and invoice immediately.
      *
-     * @param  int  $count
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
@@ -89,7 +85,6 @@ class SubscriptionItem extends Model
     /**
      * Decrement the quantity of the subscription item.
      *
-     * @param  int  $count
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
@@ -104,7 +99,6 @@ class SubscriptionItem extends Model
     /**
      * Update the quantity of the subscription item.
      *
-     * @param  int  $quantity
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
@@ -143,8 +137,6 @@ class SubscriptionItem extends Model
     /**
      * Swap the subscription item to a new Stripe price.
      *
-     * @param  string  $price
-     * @param  array  $options
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
@@ -205,8 +197,6 @@ class SubscriptionItem extends Model
     /**
      * Swap the subscription item to a new Stripe price, and invoice immediately.
      *
-     * @param  string  $price
-     * @param  array  $options
      * @return $this
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
@@ -222,8 +212,6 @@ class SubscriptionItem extends Model
     /**
      * Report usage for a metered product.
      *
-     * @param  int  $quantity
-     * @param  \DateTimeInterface|int|null  $timestamp
      * @return \Stripe\V2\Billing\MeterEvent
      */
     public function reportUsage(int $quantity = 1, DateTimeInterface|int|null $timestamp = null)
@@ -257,7 +245,7 @@ class SubscriptionItem extends Model
         } elseif (is_int($timestamp)) {
             $rfc3339Timestamp = (new \DateTime('@'.$timestamp))->format('c');
         } else {
-            $rfc3339Timestamp = (new \DateTime())->format('c');
+            $rfc3339Timestamp = (new \DateTime)->format('c');
         }
 
         return $this->subscription->owner->stripe()->v2->billing->meterEvents->create([
@@ -273,9 +261,6 @@ class SubscriptionItem extends Model
 
     /**
      * Get the usage records for a metered product.
-     *
-     * @param  array  $options
-     * @return \Illuminate\Support\Collection
      */
     public function usageRecords(array $options = []): Collection
     {
@@ -310,7 +295,6 @@ class SubscriptionItem extends Model
     /**
      * Get the current period start date for this subscription item.
      *
-     * @param  string|null  $timezone
      * @return \Illuminate\Support\Carbon|null
      */
     public function currentPeriodStart(?string $timezone = null)
@@ -329,7 +313,6 @@ class SubscriptionItem extends Model
     /**
      * Get the current period end date for this subscription item.
      *
-     * @param  string|null  $timezone
      * @return \Illuminate\Support\Carbon|null
      */
     public function currentPeriodEnd(?string $timezone = null)
@@ -347,8 +330,6 @@ class SubscriptionItem extends Model
 
     /**
      * Determine if the subscription item is currently within its trial period.
-     *
-     * @return bool
      */
     public function onTrial(): bool
     {
@@ -357,8 +338,6 @@ class SubscriptionItem extends Model
 
     /**
      * Determine if the subscription item is on a grace period after cancellation.
-     *
-     * @return bool
      */
     public function onGracePeriod(): bool
     {
@@ -368,7 +347,6 @@ class SubscriptionItem extends Model
     /**
      * Update the underlying Stripe subscription item information for the model.
      *
-     * @param  array  $options
      * @return \Stripe\SubscriptionItem
      */
     public function updateStripeSubscriptionItem(array $options = [])
@@ -381,7 +359,6 @@ class SubscriptionItem extends Model
     /**
      * Get the subscription as a Stripe subscription item object.
      *
-     * @param  array  $expand
      * @return \Stripe\SubscriptionItem
      */
     public function asStripeSubscriptionItem(array $expand = [])

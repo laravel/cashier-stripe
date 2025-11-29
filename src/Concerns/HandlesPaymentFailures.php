@@ -12,24 +12,18 @@ trait HandlesPaymentFailures
 {
     /**
      * Indicates if incomplete payments should be confirmed automatically.
-     *
-     * @var bool
      */
     protected bool $confirmIncompletePayment = true;
 
     /**
      * The options to be used when confirming a payment intent.
-     *
-     * @var array
      */
     protected array $paymentConfirmationOptions = [];
 
     /**
      * Handle a failed payment for the given subscription.
      *
-     * @param  \Laravel\Cashier\Subscription  $subscription
      * @param  \Stripe\PaymentMethod|string|null  $paymentMethod
-     * @return void
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      *
@@ -94,7 +88,6 @@ trait HandlesPaymentFailures
     /**
      * Specify the options to be used when confirming a payment intent.
      *
-     * @param  array  $options
      * @return $this
      */
     public function withPaymentConfirmationOptions(array $options)

@@ -15,7 +15,6 @@ class CheckoutBuilder
      * Create a new checkout builder instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $owner
-     * @param  object|null  $parentInstance
      * @return void
      */
     public function __construct(protected $owner = null, ?object $parentInstance = null)
@@ -37,7 +36,6 @@ class CheckoutBuilder
      * Create a new checkout builder instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $owner
-     * @param  object|null  $instance
      * @return \Laravel\Cashier\CheckoutBuilder
      */
     public static function make($owner = null, ?object $instance = null)
@@ -47,11 +45,6 @@ class CheckoutBuilder
 
     /**
      * Create a new checkout session.
-     *
-     * @param  array|string  $items
-     * @param  array  $sessionOptions
-     * @param  array  $customerOptions
-     * @return \Laravel\Cashier\Checkout
      */
     public function create(string|array $items, array $sessionOptions = [], array $customerOptions = []): Checkout
     {

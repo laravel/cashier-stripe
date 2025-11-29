@@ -10,7 +10,6 @@ class Logger implements StripeLogger
     /**
      * Create a new Logger instance.
      *
-     * @param  \Psr\Log\LoggerInterface  $logger
      * @return void
      */
     public function __construct(protected LoggerInterface $logger)

@@ -38,50 +38,36 @@ class SubscriptionBuilder
 
     /**
      * The type of the subscription.
-     *
-     * @var string
      */
     protected string $type;
 
     /**
      * The prices the customer is being subscribed to.
-     *
-     * @var array
      */
     protected array $items = [];
 
     /**
      * The date and time the trial will expire.
-     *
-     * @var \Carbon\CarbonInterface|null
      */
     protected ?CarbonInterface $trialExpires = null;
 
     /**
      * Indicates that the trial should end immediately.
-     *
-     * @var bool
      */
     protected bool $skipTrial = false;
 
     /**
      * The date on which the billing cycle should be anchored.
-     *
-     * @var int|null
      */
     protected ?int $billingCycleAnchor = null;
 
     /**
      * The billing thresholds for the subscription.
-     *
-     * @var array|null
      */
     protected ?array $billingThresholds = null;
 
     /**
      * The metadata to apply to the subscription.
-     *
-     * @var array
      */
     protected array $metadata = [];
 
@@ -89,7 +75,6 @@ class SubscriptionBuilder
      * Create a new subscription builder instance.
      *
      * @param  mixed  $owner
-     * @param  string  $type
      * @param  string|string[]|array[]  $prices
      * @return void
      */
@@ -106,8 +91,6 @@ class SubscriptionBuilder
     /**
      * Set a price on the subscription builder.
      *
-     * @param  string|array  $price
-     * @param  int|null  $quantity
      * @return $this
      */
     public function price(string|array $price, ?int $quantity = 1)
@@ -136,7 +119,6 @@ class SubscriptionBuilder
     /**
      * Set a metered price on the subscription builder.
      *
-     * @param  string  $price
      * @return $this
      */
     public function meteredPrice(string $price)
@@ -147,8 +129,6 @@ class SubscriptionBuilder
     /**
      * Specify the quantity of a subscription item.
      *
-     * @param  int|null  $quantity
-     * @param  string|null  $price
      * @return $this
      */
     public function quantity(?int $quantity, ?string $price = null)
@@ -171,7 +151,6 @@ class SubscriptionBuilder
     /**
      * Specify the number of days of the trial.
      *
-     * @param  int  $trialDays
      * @return $this
      */
     public function trialDays(int $trialDays)
@@ -209,7 +188,6 @@ class SubscriptionBuilder
     /**
      * Change the billing cycle anchor on a subscription creation.
      *
-     * @param  \DateTimeInterface|int  $date
      * @return $this
      */
     public function anchorBillingCycleOn(DateTimeInterface|int $date)
@@ -239,7 +217,6 @@ class SubscriptionBuilder
     /**
      * The metadata to apply to a new subscription.
      *
-     * @param  array  $metadata
      * @return $this
      */
     public function withMetadata(array $metadata)
@@ -252,9 +229,6 @@ class SubscriptionBuilder
     /**
      * Add a new Stripe subscription to the Stripe model.
      *
-     * @param  array  $customerOptions
-     * @param  array  $subscriptionOptions
-     * @return \Laravel\Cashier\Subscription
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
@@ -267,9 +241,6 @@ class SubscriptionBuilder
      * Create a new Stripe subscription.
      *
      * @param  \Stripe\PaymentMethod|string|null  $paymentMethod
-     * @param  array  $customerOptions
-     * @param  array  $subscriptionOptions
-     * @return \Laravel\Cashier\Subscription
      *
      * @throws \Exception
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
@@ -298,8 +269,6 @@ class SubscriptionBuilder
     /**
      * Create a new Stripe subscription and send an invoice to the customer.
      *
-     * @param  array  $customerOptions
-     * @param  array  $subscriptionOptions
      * @return \Laravel\Cashier\Subscription
      *
      * @throws \Exception
@@ -317,7 +286,6 @@ class SubscriptionBuilder
     /**
      * Create the Eloquent Subscription.
      *
-     * @param  \Stripe\Subscription  $stripeSubscription
      * @return \Laravel\Cashier\Subscription
      */
     protected function createSubscription(StripeSubscription $stripeSubscription)
@@ -368,8 +336,6 @@ class SubscriptionBuilder
     /**
      * Begin a new Checkout Session.
      *
-     * @param  array  $sessionOptions
-     * @param  array  $customerOptions
      * @return \Laravel\Cashier\Checkout
      */
     public function checkout(array $sessionOptions = [], array $customerOptions = [])
@@ -415,7 +381,6 @@ class SubscriptionBuilder
      * Get the Stripe customer instance for the current user and payment method.
      *
      * @param  \Stripe\PaymentMethod|string|null  $paymentMethod
-     * @param  array  $options
      * @return \Stripe\Customer
      */
     protected function getStripeCustomer($paymentMethod = null, array $options = [])
@@ -431,8 +396,6 @@ class SubscriptionBuilder
 
     /**
      * Build the payload for subscription creation.
-     *
-     * @return array
      */
     protected function buildPayload(): array
     {
@@ -476,8 +439,6 @@ class SubscriptionBuilder
 
     /**
      * Get the trial ending date for the Stripe payload.
-     *
-     * @return int|string|null
      */
     protected function getTrialEndForPayload(): int|string|null
     {
@@ -494,8 +455,6 @@ class SubscriptionBuilder
 
     /**
      * Get the tax rates for the Stripe payload.
-     *
-     * @return array|null
      */
     protected function getTaxRatesForPayload(): ?array
     {
@@ -508,9 +467,6 @@ class SubscriptionBuilder
 
     /**
      * Get the price tax rates for the Stripe payload.
-     *
-     * @param  string|array  $price
-     * @return array|null
      */
     protected function getPriceTaxRatesForPayload(string|array $price): ?array
     {
@@ -524,8 +480,6 @@ class SubscriptionBuilder
     /**
      * Validate that a coupon can be applied to a subscription.
      *
-     * @param  string  $couponId
-     * @return void
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidCoupon
      * @throws \Stripe\Exception\ApiErrorException
@@ -546,8 +500,6 @@ class SubscriptionBuilder
 
     /**
      * Get the items set on the subscription builder.
-     *
-     * @return array
      */
     public function getItems(): array
     {

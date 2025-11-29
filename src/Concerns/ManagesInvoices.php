@@ -26,9 +26,6 @@ trait ManagesInvoices
     /**
      * Add an invoice item to the customer's upcoming invoice.
      *
-     * @param  string  $description
-     * @param  int|null  $amount
-     * @param  array  $options
      * @return \Stripe\InvoiceItem
      */
     public function tab(string $description, ?int $amount, array $options = [])
@@ -67,11 +64,6 @@ trait ManagesInvoices
     /**
      * Invoice the customer for the given amount and generate an invoice immediately.
      *
-     * @param  string  $description
-     * @param  int  $amount
-     * @param  array  $tabOptions
-     * @param  array  $invoiceOptions
-     * @return \Laravel\Cashier\Invoice
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
@@ -85,9 +77,6 @@ trait ManagesInvoices
     /**
      * Add an invoice item for a specific Price ID to the customer's upcoming invoice.
      *
-     * @param  \Stripe\Price|string  $price
-     * @param  int  $quantity
-     * @param  array  $options
      * @return \Stripe\InvoiceItem
      */
     public function tabPrice(StripePrice|string $price, int $quantity = 1, array $options = [])
@@ -110,10 +99,6 @@ trait ManagesInvoices
      * Invoice the customer for the given Price ID and generate an invoice immediately.
      *
      * @param  string  $price
-     * @param  int  $quantity
-     * @param  array  $tabOptions
-     * @param  array  $invoiceOptions
-     * @return \Laravel\Cashier\Invoice
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
@@ -127,8 +112,6 @@ trait ManagesInvoices
     /**
      * Invoice the customer outside of the regular billing cycle.
      *
-     * @param  array  $options
-     * @return \Laravel\Cashier\Invoice
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
@@ -177,9 +160,6 @@ trait ManagesInvoices
 
     /**
      * Create an invoice within Stripe.
-     *
-     * @param  array  $options
-     * @return \Laravel\Cashier\Invoice
      */
     public function createInvoice(array $options = []): Invoice
     {
@@ -208,9 +188,6 @@ trait ManagesInvoices
 
     /**
      * Get the customer's upcoming invoice.
-     *
-     * @param  array  $options
-     * @return \Laravel\Cashier\Invoice|null
      */
     public function upcomingInvoice(array $options = []): ?Invoice
     {
@@ -243,9 +220,6 @@ trait ManagesInvoices
 
     /**
      * Check if the parameters contain the required details for the Create Preview Invoice API.
-     *
-     * @param  array  $parameters
-     * @return bool
      */
     protected function hasRequiredPreviewDetails(array $parameters): bool
     {
@@ -258,9 +232,6 @@ trait ManagesInvoices
 
     /**
      * Find an invoice by ID.
-     *
-     * @param  string  $id
-     * @return \Laravel\Cashier\Invoice|null
      */
     public function findInvoice(string $id): ?Invoice
     {
@@ -278,8 +249,6 @@ trait ManagesInvoices
     /**
      * Find an invoice or throw a 404 or 403 error.
      *
-     * @param  string  $id
-     * @return \Laravel\Cashier\Invoice
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -301,11 +270,6 @@ trait ManagesInvoices
 
     /**
      * Create an invoice download Response.
-     *
-     * @param  string  $id
-     * @param  array  $data
-     * @param  string  $filename
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function downloadInvoice(string $id, array $data = [], ?string $filename = null): SymfonyResponse
     {
@@ -317,14 +281,12 @@ trait ManagesInvoices
     /**
      * Get a collection of the customer's invoices.
      *
-     * @param  bool  $includePending
-     * @param  array  $parameters
      * @return \Illuminate\Support\Collection<int, \Laravel\Cashier\Invoice>
      */
     public function invoices(bool $includePending = false, array $parameters = []): Collection
     {
         if (! $this->hasStripeId()) {
-            return new Collection();
+            return new Collection;
         }
 
         $invoices = [];
@@ -354,7 +316,6 @@ trait ManagesInvoices
     /**
      * Get an array of the customer's invoices, including pending invoices.
      *
-     * @param  array  $parameters
      * @return \Illuminate\Support\Collection<int, \Laravel\Cashier\Invoice>
      */
     public function invoicesIncludingPending(array $parameters = []): Collection
@@ -365,10 +326,6 @@ trait ManagesInvoices
     /**
      * Get a cursor paginator for the customer's invoices.
      *
-     * @param  int|null  $perPage
-     * @param  array  $parameters
-     * @param  string  $cursorName
-     * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
      */
     public function cursorPaginateInvoices(
@@ -407,7 +364,6 @@ trait ManagesInvoices
     /**
      * Get invoice payments for a specific payment intent.
      *
-     * @param  string  $paymentIntentId
      * @return \Illuminate\Support\Collection<int, \Laravel\Cashier\InvoicePayment>
      */
     public function invoicePaymentsForPaymentIntent(string $paymentIntentId): Collection
@@ -427,7 +383,6 @@ trait ManagesInvoices
     /**
      * Get invoice payments for a specific invoice.
      *
-     * @param  string  $invoiceId
      * @return \Illuminate\Support\Collection<int, \Laravel\Cashier\InvoicePayment>
      */
     public function invoicePaymentsForInvoice(string $invoiceId): Collection

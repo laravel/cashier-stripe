@@ -11,10 +11,6 @@ trait ManagesUsageBilling
 
     /**
      * Get all of the defined billing meters.
-     *
-     * @param  array  $options
-     * @param  array  $requestOptions
-     * @return \Illuminate\Support\Collection
      */
     public function meters(array $options = [], array $requestOptions = []): Collection
     {
@@ -24,11 +20,7 @@ trait ManagesUsageBilling
     /**
      * Report usage for a metered product.
      *
-     * @param  string  $meter
-     * @param  int  $quantity
      * @param  string|null  $price
-     * @param  array  $options
-     * @param  array  $requestOptions
      * @return \Stripe\V2\Billing\MeterEvent
      */
     public function reportMeterEvent(string $meter, int $quantity = 1, array $options = [], array $requestOptions = [])
@@ -51,11 +43,6 @@ trait ManagesUsageBilling
 
     /**
      * Get the usage records for a meter using its ID.
-     *
-     * @param  string  $meterId
-     * @param  array  $options
-     * @param  array  $requestOptions
-     * @return \Illuminate\Support\Collection
      */
     public function meterEventSummaries(string $meterId, int $startTime = 1, ?int $endTime = null, array $options = [], array $requestOptions = []): Collection
     {

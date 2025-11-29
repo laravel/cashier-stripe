@@ -23,7 +23,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     /**
      * Create a new Payment instance.
      *
-     * @param  \Stripe\PaymentIntent  $paymentIntent
      * @return void
      */
     public function __construct(protected StripePaymentIntent $paymentIntent)
@@ -33,8 +32,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the total amount that will be paid.
-     *
-     * @return string
      */
     public function amount(): string
     {
@@ -43,8 +40,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the raw total amount that will be paid.
-     *
-     * @return int
      */
     public function rawAmount(): int
     {
@@ -53,8 +48,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * The Stripe PaymentIntent client secret.
-     *
-     * @return string
      */
     public function clientSecret(): string
     {
@@ -64,7 +57,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     /**
      * Capture a payment that is being held for the customer.
      *
-     * @param  array  $options
      * @return \Stripe\PaymentIntent
      */
     public function capture(array $options = [])
@@ -74,8 +66,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the payment needs a valid payment method.
-     *
-     * @return bool
      */
     public function requiresPaymentMethod(): bool
     {
@@ -84,8 +74,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the payment needs an extra action like 3D Secure.
-     *
-     * @return bool
      */
     public function requiresAction(): bool
     {
@@ -94,8 +82,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the payment needs to be confirmed.
-     *
-     * @return bool
      */
     public function requiresConfirmation(): bool
     {
@@ -104,8 +90,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the payment needs to be captured.
-     *
-     * @return bool
      */
     public function requiresCapture(): bool
     {
@@ -115,7 +99,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     /**
      * Cancel the payment.
      *
-     * @param  array  $options
      * @return \Stripe\PaymentIntent
      */
     public function cancel(array $options = [])
@@ -125,8 +108,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the payment was canceled.
-     *
-     * @return bool
      */
     public function isCanceled(): bool
     {
@@ -135,8 +116,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the payment was successful.
-     *
-     * @return bool
      */
     public function isSucceeded(): bool
     {
@@ -145,8 +124,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the payment is processing.
-     *
-     * @return bool
      */
     public function isProcessing(): bool
     {
@@ -156,7 +133,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     /**
      * Validate if the payment intent was successful and throw an exception if not.
      *
-     * @return void
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
@@ -188,7 +164,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     /**
      * The Stripe PaymentIntent instance.
      *
-     * @param  array  $expand
      * @return \Stripe\PaymentIntent
      */
     public function asStripePaymentIntent(array $expand = [])
@@ -205,7 +180,6 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     /**
      * Refresh the PaymentIntent instance from the Stripe API.
      *
-     * @param  array  $expand
      * @return $this
      */
     public function refresh(array $expand = [])

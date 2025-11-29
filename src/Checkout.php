@@ -16,7 +16,6 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * Create a new checkout session instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $owner
-     * @param  \Stripe\Checkout\Session  $session
      * @return void
      */
     public function __construct(
@@ -28,20 +27,16 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
 
     /**
      * Begin a new guest checkout session.
-     *
-     * @return \Laravel\Cashier\CheckoutBuilder
      */
     public static function guest(): CheckoutBuilder
     {
-        return new CheckoutBuilder();
+        return new CheckoutBuilder;
     }
 
     /**
      * Begin a new customer checkout session.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  object|null  $parentInstance
-     * @return \Laravel\Cashier\CheckoutBuilder
      */
     public static function customer($owner, ?object $parentInstance = null): CheckoutBuilder
     {
@@ -52,9 +47,6 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
      * Begin a new checkout session.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $owner
-     * @param  array  $sessionOptions
-     * @param  array  $customerOptions
-     * @return \Laravel\Cashier\Checkout
      */
     public static function create($owner, array $sessionOptions = [], array $customerOptions = []): Checkout
     {
@@ -105,8 +97,6 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
 
     /**
      * Redirect to the checkout session.
-     *
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function redirect(): RedirectResponse
     {
@@ -169,7 +159,6 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
     /**
      * Dynamically get values from the Stripe object.
      *
-     * @param  string  $key
      * @return mixed
      */
     public function __get(string $key)

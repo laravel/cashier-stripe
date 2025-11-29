@@ -11,7 +11,6 @@ class CustomerBalanceTransaction
      * Create a new CustomerBalanceTransaction instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  \Stripe\CustomerBalanceTransaction  $transaction
      * @return void
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidCustomerBalanceTransaction
@@ -25,8 +24,6 @@ class CustomerBalanceTransaction
 
     /**
      * Get the total transaction amount.
-     *
-     * @return string
      */
     public function amount(): string
     {
@@ -35,8 +32,6 @@ class CustomerBalanceTransaction
 
     /**
      * Get the raw total transaction amount.
-     *
-     * @return int
      */
     public function rawAmount(): int
     {
@@ -45,8 +40,6 @@ class CustomerBalanceTransaction
 
     /**
      * Get the ending balance.
-     *
-     * @return string
      */
     public function endingBalance(): string
     {
@@ -55,8 +48,6 @@ class CustomerBalanceTransaction
 
     /**
      * Get the raw ending balance.
-     *
-     * @return int
      */
     public function rawEndingBalance(): int
     {
@@ -65,8 +56,6 @@ class CustomerBalanceTransaction
 
     /**
      * Get the balance type of the transaction.
-     *
-     * @return string|null
      */
     public function balanceType(): ?string
     {
@@ -75,8 +64,6 @@ class CustomerBalanceTransaction
 
     /**
      * Get the checkout session ID for this transaction.
-     *
-     * @return string|null
      */
     public function checkoutSession(): ?string
     {
@@ -85,8 +72,6 @@ class CustomerBalanceTransaction
 
     /**
      * Determine if this transaction is a checkout session subscription payment.
-     *
-     * @return bool
      */
     public function isCheckoutSessionSubscriptionPayment(): bool
     {
@@ -95,8 +80,6 @@ class CustomerBalanceTransaction
 
     /**
      * Determine if this transaction is a canceled checkout session subscription payment.
-     *
-     * @return bool
      */
     public function isCheckoutSessionSubscriptionPaymentCanceled(): bool
     {
@@ -105,9 +88,6 @@ class CustomerBalanceTransaction
 
     /**
      * Format the given amount into a displayable currency.
-     *
-     * @param  int  $amount
-     * @return string
      */
     protected function formatAmount(int $amount): string
     {
@@ -116,8 +96,6 @@ class CustomerBalanceTransaction
 
     /**
      * Return the related invoice for this transaction.
-     *
-     * @return \Laravel\Cashier\Invoice
      */
     public function invoice(): Invoice
     {
@@ -171,7 +149,6 @@ class CustomerBalanceTransaction
     /**
      * Dynamically get values from the Stripe object.
      *
-     * @param  string  $key
      * @return mixed
      */
     public function __get(string $key)

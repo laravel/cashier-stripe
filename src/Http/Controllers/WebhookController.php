@@ -34,7 +34,6 @@ class WebhookController extends Controller
     /**
      * Handle a Stripe webhook call.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handleWebhook(Request $request)
@@ -60,7 +59,6 @@ class WebhookController extends Controller
     /**
      * Handle customer subscription created.
      *
-     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleCustomerSubscriptionCreated(array $payload)
@@ -115,7 +113,6 @@ class WebhookController extends Controller
     /**
      * Determines the type that should be used when new subscriptions are created from the Stripe dashboard.
      *
-     * @param  array  $payload
      * @return string
      */
     protected function newSubscriptionType(array $payload)
@@ -126,7 +123,6 @@ class WebhookController extends Controller
     /**
      * Handle customer subscription updated.
      *
-     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response|null
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
@@ -211,7 +207,6 @@ class WebhookController extends Controller
     /**
      * Handle the cancellation of a customer subscription.
      *
-     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleCustomerSubscriptionDeleted(array $payload)
@@ -230,7 +225,6 @@ class WebhookController extends Controller
     /**
      * Handle customer updated.
      *
-     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleCustomerUpdated(array $payload)
@@ -245,7 +239,6 @@ class WebhookController extends Controller
     /**
      * Handle deleted customer.
      *
-     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleCustomerDeleted(array $payload)
@@ -269,7 +262,6 @@ class WebhookController extends Controller
     /**
      * Handle payment method automatically updated by vendor.
      *
-     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handlePaymentMethodAutomaticallyUpdated(array $payload)
@@ -284,7 +276,6 @@ class WebhookController extends Controller
     /**
      * Handle payment action required for invoice.
      *
-     * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleInvoicePaymentActionRequired(array $payload)

@@ -11,7 +11,7 @@ class PaymentTest extends TestCase
 {
     public function test_it_can_return_its_requires_payment_method_status()
     {
-        $paymentIntent = new PaymentIntent();
+        $paymentIntent = new PaymentIntent;
         $paymentIntent->status = 'requires_payment_method';
         $payment = new Payment($paymentIntent);
 
@@ -20,7 +20,7 @@ class PaymentTest extends TestCase
 
     public function test_it_can_return_its_requires_action_status()
     {
-        $paymentIntent = new PaymentIntent();
+        $paymentIntent = new PaymentIntent;
         $paymentIntent->status = 'requires_action';
         $payment = new Payment($paymentIntent);
 
@@ -29,7 +29,7 @@ class PaymentTest extends TestCase
 
     public function test_it_can_return_its_canceled_status()
     {
-        $paymentIntent = new PaymentIntent();
+        $paymentIntent = new PaymentIntent;
         $paymentIntent->status = StripeSubscription::STATUS_CANCELED;
         $payment = new Payment($paymentIntent);
 
@@ -38,7 +38,7 @@ class PaymentTest extends TestCase
 
     public function test_it_can_return_its_succeeded_status()
     {
-        $paymentIntent = new PaymentIntent();
+        $paymentIntent = new PaymentIntent;
         $paymentIntent->status = 'succeeded';
         $payment = new Payment($paymentIntent);
 
@@ -47,7 +47,7 @@ class PaymentTest extends TestCase
 
     public function test_method_calls_are_forward_to_the_stripe_object()
     {
-        $payment = new Payment(new PaymentIntent());
+        $payment = new Payment(new PaymentIntent);
 
         $this->assertTrue($payment->cancel()->cancelled);
     }
@@ -58,7 +58,7 @@ class PaymentIntent extends StripePaymentIntent
     public $cancelled = false;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function cancel($params = null, $opts = null)
     {

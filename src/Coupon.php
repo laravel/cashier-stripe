@@ -12,7 +12,6 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
     /**
      * Create a new Coupon instance.
      *
-     * @param  \Stripe\Coupon  $coupon
      * @return void
      */
     public function __construct(protected StripeCoupon $coupon)
@@ -22,8 +21,6 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the readable name for the Coupon.
-     *
-     * @return string
      */
     public function name(): string
     {
@@ -32,8 +29,6 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the coupon is a percentage.
-     *
-     * @return bool
      */
     public function isPercentage(): bool
     {
@@ -42,8 +37,6 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the discount percentage for the invoice.
-     *
-     * @return float|null
      */
     public function percentOff(): ?float
     {
@@ -52,8 +45,6 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the amount off for the coupon.
-     *
-     * @return string|null
      */
     public function amountOff(): ?string
     {
@@ -66,8 +57,6 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the raw amount off for the coupon.
-     *
-     * @return int|null
      */
     public function rawAmountOff(): ?int
     {
@@ -76,8 +65,6 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if this is an amount_off coupon with forever duration.
-     *
-     * @return bool
      */
     public function isForeverAmountOff(): bool
     {
@@ -86,8 +73,6 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the duration of the coupon.
-     *
-     * @return string
      */
     public function duration(): string
     {
@@ -96,9 +81,6 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Format the given amount into a displayable currency.
-     *
-     * @param  int  $amount
-     * @return string
      */
     protected function formatAmount(int $amount): string
     {
@@ -150,7 +132,6 @@ class Coupon implements Arrayable, Jsonable, JsonSerializable
     /**
      * Dynamically get values from the Stripe object.
      *
-     * @param  string  $key
      * @return mixed
      */
     public function __get(string $key)

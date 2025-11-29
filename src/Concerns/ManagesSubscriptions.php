@@ -14,9 +14,7 @@ trait ManagesSubscriptions
     /**
      * Begin creating a new subscription.
      *
-     * @param  string  $type
      * @param  string|string[]  $prices
-     * @return \Laravel\Cashier\SubscriptionBuilder
      */
     public function newSubscription(string $type, string|array $prices = []): SubscriptionBuilder
     {
@@ -25,10 +23,6 @@ trait ManagesSubscriptions
 
     /**
      * Determine if the Stripe model is on trial.
-     *
-     * @param  string  $type
-     * @param  string|null  $price
-     * @return bool
      */
     public function onTrial(string $type = 'default', ?string $price = null): bool
     {
@@ -47,10 +41,6 @@ trait ManagesSubscriptions
 
     /**
      * Determine if the Stripe model's trial has ended.
-     *
-     * @param  string  $type
-     * @param  string|null  $price
-     * @return bool
      */
     public function hasExpiredTrial(string $type = 'default', ?string $price = null): bool
     {
@@ -69,8 +59,6 @@ trait ManagesSubscriptions
 
     /**
      * Determine if the Stripe model is on a "generic" trial at the model level.
-     *
-     * @return bool
      */
     public function onGenericTrial(): bool
     {
@@ -79,9 +67,6 @@ trait ManagesSubscriptions
 
     /**
      * Filter the given query for generic trials.
-     *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder  $query
-     * @return void
      */
     public function scopeOnGenericTrial(Builder $query): void
     {
@@ -90,8 +75,6 @@ trait ManagesSubscriptions
 
     /**
      * Determine if the Stripe model's "generic" trial at the model level has expired.
-     *
-     * @return bool
      */
     public function hasExpiredGenericTrial(): bool
     {
@@ -100,9 +83,6 @@ trait ManagesSubscriptions
 
     /**
      * Filter the given query for expired generic trials.
-     *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder  $query
-     * @return void
      */
     public function scopeHasExpiredGenericTrial(Builder $query): void
     {
@@ -112,7 +92,6 @@ trait ManagesSubscriptions
     /**
      * Get the ending date of the trial.
      *
-     * @param  string  $type
      * @return \Illuminate\Support\Carbon|null
      */
     public function trialEndsAt(string $type = 'default')
@@ -130,10 +109,6 @@ trait ManagesSubscriptions
 
     /**
      * Determine if the Stripe model has a given subscription.
-     *
-     * @param  string  $type
-     * @param  string|null  $price
-     * @return bool
      */
     public function subscribed(string $type = 'default', ?string $price = null): bool
     {
@@ -148,9 +123,6 @@ trait ManagesSubscriptions
 
     /**
      * Get a subscription instance by $type.
-     *
-     * @param  string  $type
-     * @return \Laravel\Cashier\Subscription|null
      */
     public function subscription(string $type = 'default'): ?Subscription
     {
@@ -159,8 +131,6 @@ trait ManagesSubscriptions
 
     /**
      * Get all of the subscriptions for the Stripe model.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function subscriptions(): HasMany
     {
@@ -169,9 +139,6 @@ trait ManagesSubscriptions
 
     /**
      * Determine if the customer's subscription has an incomplete payment.
-     *
-     * @param  string  $type
-     * @return bool
      */
     public function hasIncompletePayment(string $type = 'default'): bool
     {
@@ -186,8 +153,6 @@ trait ManagesSubscriptions
      * Determine if the Stripe model is actively subscribed to one of the given products.
      *
      * @param  string|string[]  $products
-     * @param  string  $type
-     * @return bool
      */
     public function subscribedToProduct(string|array $products, string $type = 'default'): bool
     {
@@ -211,7 +176,6 @@ trait ManagesSubscriptions
      *
      * @param  string|string[]  $prices
      * @param  string  $type
-     * @return bool
      */
     public function subscribedToPrice(string|array $prices, $type = 'default'): bool
     {
@@ -232,9 +196,6 @@ trait ManagesSubscriptions
 
     /**
      * Determine if the customer has a valid subscription on the given product.
-     *
-     * @param  string  $product
-     * @return bool
      */
     public function onProduct(string $product): bool
     {
@@ -245,9 +206,6 @@ trait ManagesSubscriptions
 
     /**
      * Determine if the customer has a valid subscription on the given price.
-     *
-     * @param  string  $price
-     * @return bool
      */
     public function onPrice(string $price): bool
     {
@@ -258,8 +216,6 @@ trait ManagesSubscriptions
 
     /**
      * Get the tax rates to apply to the subscription.
-     *
-     * @return array
      */
     public function taxRates(): array
     {
@@ -268,8 +224,6 @@ trait ManagesSubscriptions
 
     /**
      * Get the tax rates to apply to individual subscription items.
-     *
-     * @return array
      */
     public function priceTaxRates(): array
     {

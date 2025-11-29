@@ -18,10 +18,6 @@ class IncompletePayment extends Exception
     /**
      * Create a new IncompletePayment instance.
      *
-     * @param  \Laravel\Cashier\Payment  $payment
-     * @param  string  $message
-     * @param  int  $code
-     * @param  \Throwable|null  $previous
      * @return void
      */
     public function __construct(Payment $payment, string $message = '', int $code = 0, ?Throwable $previous = null)
@@ -34,7 +30,6 @@ class IncompletePayment extends Exception
     /**
      * Create a new IncompletePayment instance with a `payment_action_required` type.
      *
-     * @param  \Laravel\Cashier\Payment  $payment
      * @return static
      */
     public static function paymentMethodRequired(Payment $payment)
@@ -48,7 +43,6 @@ class IncompletePayment extends Exception
     /**
      * Create a new IncompletePayment instance with a `requires_action` type.
      *
-     * @param  \Laravel\Cashier\Payment  $payment
      * @return static
      */
     public static function requiresAction(Payment $payment)
@@ -62,7 +56,6 @@ class IncompletePayment extends Exception
     /**
      * Create a new IncompletePayment instance with a `requires_confirmation` type.
      *
-     * @param  \Laravel\Cashier\Payment  $payment
      * @return static
      */
     public static function requiresConfirmation(Payment $payment)

@@ -14,8 +14,6 @@ class CashierServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any package services.
-     *
-     * @return void
      */
     public function boot(): void
     {
@@ -34,8 +32,6 @@ class CashierServiceProvider extends ServiceProvider
 
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -46,8 +42,6 @@ class CashierServiceProvider extends ServiceProvider
 
     /**
      * Setup the configuration for Cashier.
-     *
-     * @return void
      */
     protected function configure(): void
     {
@@ -58,8 +52,6 @@ class CashierServiceProvider extends ServiceProvider
 
     /**
      * Bind the Stripe logger interface to the Cashier logger.
-     *
-     * @return void
      */
     protected function bindLogger(): void
     {
@@ -72,8 +64,6 @@ class CashierServiceProvider extends ServiceProvider
 
     /**
      * Bind the default invoice renderer.
-     *
-     * @return void
      */
     protected function bindInvoiceRenderer(): void
     {
@@ -84,8 +74,6 @@ class CashierServiceProvider extends ServiceProvider
 
     /**
      * Register the Stripe logger.
-     *
-     * @return void
      */
     protected function registerLogger(): void
     {
@@ -96,8 +84,6 @@ class CashierServiceProvider extends ServiceProvider
 
     /**
      * Register the package routes.
-     *
-     * @return void
      */
     protected function registerRoutes(): void
     {
@@ -114,8 +100,6 @@ class CashierServiceProvider extends ServiceProvider
 
     /**
      * Register the package resources.
-     *
-     * @return void
      */
     protected function registerResources(): void
     {
@@ -124,8 +108,6 @@ class CashierServiceProvider extends ServiceProvider
 
     /**
      * Register the package's publishable resources.
-     *
-     * @return void
      */
     protected function registerPublishing(): void
     {
@@ -150,8 +132,6 @@ class CashierServiceProvider extends ServiceProvider
 
     /**
      * Register the package's commands.
-     *
-     * @return void
      */
     protected function registerCommands(): void
     {

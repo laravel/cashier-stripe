@@ -20,7 +20,7 @@ class VerifyWebhookSignatureTest extends TestCase
      */
     protected $timestamp;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +35,7 @@ class VerifyWebhookSignatureTest extends TestCase
         $this->withTimestamp(time());
         $this->withSignedSignature('secret');
 
-        $response = (new VerifyWebhookSignature())
+        $response = (new VerifyWebhookSignature)
             ->handle($this->request, function ($request) {
                 return new Response('OK');
             });
@@ -48,7 +48,7 @@ class VerifyWebhookSignatureTest extends TestCase
         $this->withTimestamp(time() - 300);
         $this->withSignedSignature('secret');
 
-        $response = (new VerifyWebhookSignature())
+        $response = (new VerifyWebhookSignature)
             ->handle($this->request, function ($request) {
                 return new Response('OK');
             });
@@ -64,9 +64,8 @@ class VerifyWebhookSignatureTest extends TestCase
         $this->expectException(AccessDeniedHttpException::class);
         $this->expectExceptionMessage('Timestamp outside the tolerance zone');
 
-        $response = (new VerifyWebhookSignature())
-            ->handle($this->request, function ($request) {
-            });
+        $response = (new VerifyWebhookSignature)
+            ->handle($this->request, function ($request) {});
     }
 
     public function test_app_aborts_when_timestamp_is_invalid()
@@ -77,9 +76,8 @@ class VerifyWebhookSignatureTest extends TestCase
         $this->expectException(AccessDeniedHttpException::class);
         $this->expectExceptionMessage('Unable to extract timestamp and signatures from header');
 
-        $response = (new VerifyWebhookSignature())
-            ->handle($this->request, function ($request) {
-            });
+        $response = (new VerifyWebhookSignature)
+            ->handle($this->request, function ($request) {});
     }
 
     public function test_app_aborts_when_secret_does_not_match()
@@ -90,9 +88,8 @@ class VerifyWebhookSignatureTest extends TestCase
         $this->expectException(AccessDeniedHttpException::class);
         $this->expectExceptionMessage('No signatures found matching the expected signature for payload');
 
-        (new VerifyWebhookSignature())
-            ->handle($this->request, function ($request) {
-            });
+        (new VerifyWebhookSignature)
+            ->handle($this->request, function ($request) {});
     }
 
     public function test_app_aborts_when_no_secret_was_provided()
@@ -103,9 +100,8 @@ class VerifyWebhookSignatureTest extends TestCase
         $this->expectException(AccessDeniedHttpException::class);
         $this->expectExceptionMessage('No signatures found matching the expected signature for payload');
 
-        (new VerifyWebhookSignature())
-            ->handle($this->request, function ($request) {
-            });
+        (new VerifyWebhookSignature)
+            ->handle($this->request, function ($request) {});
     }
 
     public function withTimestamp($timestamp)

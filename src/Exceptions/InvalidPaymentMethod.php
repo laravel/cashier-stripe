@@ -10,7 +10,6 @@ class InvalidPaymentMethod extends Exception
     /**
      * Create a new InvalidPaymentMethod instance.
      *
-     * @param  \Stripe\PaymentMethod  $paymentMethod
      * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @return static
      */

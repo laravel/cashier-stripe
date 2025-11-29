@@ -16,8 +16,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
     /**
      * Create a new invoice line item instance.
      *
-     * @param  \Laravel\Cashier\Invoice  $invoice
-     * @param  \Stripe\InvoiceLineItem  $item
      * @return void
      */
     public function __construct(
@@ -29,8 +27,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the total for the invoice line item.
-     *
-     * @return string
      */
     public function total(): string
     {
@@ -39,8 +35,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the unit amount excluding tax for the invoice line item.
-     *
-     * @return string
      */
     public function unitAmountExcludingTax(): string
     {
@@ -49,8 +43,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the unit amount from the pricing structure.
-     *
-     * @return int|null
      */
     public function unitAmount(): ?int
     {
@@ -76,8 +68,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the formatted unit amount.
-     *
-     * @return string
      */
     public function formattedUnitAmount(): string
     {
@@ -88,8 +78,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the line item has both inclusive and exclusive tax.
-     *
-     * @return bool
      */
     public function hasBothInclusiveAndExclusiveTax(): bool
     {
@@ -98,8 +86,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the total percentage of the default inclusive tax for the invoice line item.
-     *
-     * @return float|int|null
      */
     public function inclusiveTaxPercentage(): float|int|null
     {
@@ -112,8 +98,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the total percentage of the default exclusive tax for the invoice line item.
-     *
-     * @return float|int
      */
     public function exclusiveTaxPercentage(): float|int
     {
@@ -126,9 +110,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Calculate the total tax percentage for either the inclusive or exclusive tax by tax rate.
-     *
-     * @param  bool  $inclusive
-     * @return float|int
      */
     protected function calculateTaxPercentageByTaxRate(bool $inclusive): float|int
     {
@@ -155,9 +136,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Calculate the total tax percentage for either the inclusive or exclusive tax by tax amount.
-     *
-     * @param  bool  $inclusive
-     * @return float|int
      */
     protected function calculateTaxPercentageByTaxAmount(bool $inclusive): float|int
     {
@@ -184,8 +162,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the invoice line item has tax rates.
-     *
-     * @return bool
      */
     public function hasTaxRates(): bool
     {
@@ -194,8 +170,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get all taxes applied to this line item.
-     *
-     * @return \Illuminate\Support\Collection
      */
     public function taxes(): Collection
     {
@@ -208,8 +182,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get tax rate details from the taxes array.
-     *
-     * @return \Illuminate\Support\Collection
      */
     public function taxRateDetails(): Collection
     {
@@ -250,8 +222,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the total tax amount for this line item.
-     *
-     * @return int
      */
     public function totalTaxAmount(): int
     {
@@ -260,8 +230,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the tax behavior from the pricing structure.
-     *
-     * @return string|null
      */
     public function taxBehavior(): ?string
     {
@@ -273,8 +241,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get a human readable date for the start date.
-     *
-     * @return string|null
      */
     public function startDate(): ?string
     {
@@ -287,8 +253,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get a human readable date for the end date.
-     *
-     * @return string|null
      */
     public function endDate(): ?string
     {
@@ -301,8 +265,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get a Carbon instance for the start date.
-     *
-     * @return \Carbon\CarbonInterface|null
      */
     public function startDateAsCarbon(): ?CarbonInterface
     {
@@ -315,8 +277,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get a Carbon instance for the end date.
-     *
-     * @return \Carbon\CarbonInterface|null
      */
     public function endDateAsCarbon(): ?CarbonInterface
     {
@@ -329,8 +289,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the invoice line item has a defined period.
-     *
-     * @return bool
      */
     public function hasPeriod(): bool
     {
@@ -339,8 +297,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the invoice line item has a period with the same start and end date.
-     *
-     * @return bool
      */
     public function periodStartAndEndAreEqual(): bool
     {
@@ -349,8 +305,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the invoice line item is for a subscription.
-     *
-     * @return bool
      */
     public function isSubscription(): bool
     {
@@ -361,8 +315,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the invoice line item is for an invoice item.
-     *
-     * @return bool
      */
     public function isInvoiceItem(): bool
     {
@@ -372,8 +324,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the subscription ID associated with this line item.
-     *
-     * @return string|null
      */
     public function subscriptionId(): ?string
     {
@@ -394,8 +344,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the subscription item ID associated with this line item.
-     *
-     * @return string|null
      */
     public function subscriptionItemId(): ?string
     {
@@ -412,8 +360,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the invoice item ID associated with this line item.
-     *
-     * @return string|null
      */
     public function invoiceItemId(): ?string
     {
@@ -430,8 +376,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if this line item is a proration.
-     *
-     * @return bool
      */
     public function isProration(): bool
     {
@@ -452,8 +396,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get proration details for this line item.
-     *
-     * @return object|null
      */
     public function prorationDetails(): ?object
     {
@@ -474,8 +416,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the price ID from the pricing structure.
-     *
-     * @return string|null
      */
     public function priceId(): ?string
     {
@@ -489,8 +429,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the full price object from Stripe.
-     *
-     * @return object|null
      */
     public function price(): ?object
     {
@@ -513,8 +451,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the parent information for this line item.
-     *
-     * @return object|null
      */
     public function parent(): ?object
     {
@@ -523,9 +459,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Format the given amount into a displayable currency.
-     *
-     * @param  int  $amount
-     * @return string
      */
     protected function formatAmount(int $amount): string
     {
@@ -534,8 +467,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the Stripe model instance.
-     *
-     * @return \Laravel\Cashier\Invoice
      */
     public function invoice(): Invoice
     {
@@ -587,7 +518,6 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
     /**
      * Dynamically access the Stripe invoice line item instance.
      *
-     * @param  string  $key
      * @return mixed
      */
     public function __get(string $key)

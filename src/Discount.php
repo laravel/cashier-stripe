@@ -15,7 +15,6 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
     /**
      * Create a new Discount instance.
      *
-     * @param  \Stripe\Discount  $discount
      * @return void
      */
     public function __construct(protected StripeDiscount $discount)
@@ -25,8 +24,6 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the coupon applied to the discount.
-     *
-     * @return \Laravel\Cashier\Coupon
      */
     public function coupon(): Coupon
     {
@@ -35,8 +32,6 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the promotion code applied to create this discount.
-     *
-     * @return \Laravel\Cashier\PromotionCode|null
      */
     public function promotionCode(): ?PromotionCode
     {
@@ -61,8 +56,6 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the date that the coupon was applied.
-     *
-     * @return \Carbon\CarbonInterface
      */
     public function start(): CarbonInterface
     {
@@ -71,8 +64,6 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the date that this discount will end.
-     *
-     * @return \Carbon\CarbonInterface|null
      */
     public function end(): ?CarbonInterface
     {
@@ -128,7 +119,6 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
     /**
      * Dynamically get values from the Stripe object.
      *
-     * @param  string  $key
      * @return mixed
      */
     public function __get(string $key)

@@ -10,7 +10,6 @@ class InvalidCustomerBalanceTransaction extends Exception
     /**
      * Create a new CustomerBalanceTransaction instance.
      *
-     * @param  \Stripe\CustomerBalanceTransaction  $transaction
      * @param  \Illuminate\Database\Eloquent\Model  $owner
      * @return static
      */

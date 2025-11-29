@@ -9,7 +9,6 @@ class InvalidCoupon extends Exception
     /**
      * Create a new InvalidCoupon instance.
      *
-     * @param  string  $couponId
      * @return static
      */
     public static function foreverAmountOffCouponNotAllowed(string $couponId)
@@ -20,7 +19,6 @@ class InvalidCoupon extends Exception
     /**
      * Create a new InvalidCoupon instance for subscription context.
      *
-     * @param  string  $couponId
      * @return static
      */
     public static function cannotApplyForeverAmountOffToSubscription(string $couponId)
@@ -31,7 +29,6 @@ class InvalidCoupon extends Exception
     /**
      * Create a new InvalidCoupon instance for checkout context.
      *
-     * @param  string  $couponId
      * @return static
      */
     public static function cannotUseForeverAmountOffInCheckout(string $couponId)

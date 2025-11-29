@@ -95,7 +95,6 @@ class Cashier
     /**
      * Get the customer instance by its Stripe ID.
      *
-     * @param  \Stripe\Customer|string|null  $stripeId
      * @return \Laravel\Cashier\Billable|null
      */
     public static function findBillable(StripeCustomer|string|null $stripeId)
@@ -114,7 +113,6 @@ class Cashier
     /**
      * Get the Stripe SDK client.
      *
-     * @param  array  $options
      * @return \Stripe\StripeClient
      */
     public static function stripe(array $options = [])
@@ -131,7 +129,6 @@ class Cashier
     /**
      * Set the custom currency formatter.
      *
-     * @param  callable  $callback
      * @return void
      */
     public static function formatCurrencyUsing(callable $callback)
@@ -141,12 +138,6 @@ class Cashier
 
     /**
      * Format the given amount into a displayable currency.
-     *
-     * @param  int  $amount
-     * @param  string|null  $currency
-     * @param  string|null  $locale
-     * @param  array  $options
-     * @return string
      */
     public static function formatAmount(int $amount, ?string $currency = null, ?string $locale = null, array $options = []): string
     {
@@ -164,7 +155,7 @@ class Cashier
             $numberFormatter->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $options['min_fraction_digits']);
         }
 
-        $moneyFormatter = new IntlMoneyFormatter($numberFormatter, new ISOCurrencies());
+        $moneyFormatter = new IntlMoneyFormatter($numberFormatter, new ISOCurrencies);
 
         return $moneyFormatter->format($money);
     }
@@ -221,7 +212,6 @@ class Cashier
      * Set the customer model class name.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $customerModel
-     * @return void
      */
     public static function useCustomerModel(string $customerModel): void
     {
@@ -232,7 +222,6 @@ class Cashier
      * Set the subscription model class name.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $subscriptionModel
-     * @return void
      */
     public static function useSubscriptionModel(string $subscriptionModel): void
     {
@@ -243,7 +232,6 @@ class Cashier
      * Set the subscription item model class name.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $subscriptionItemModel
-     * @return void
      */
     public static function useSubscriptionItemModel(string $subscriptionItemModel): void
     {

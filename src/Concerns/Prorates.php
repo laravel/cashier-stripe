@@ -6,8 +6,6 @@ trait Prorates
 {
     /**
      * Indicates if the price change should be prorated.
-     *
-     * @var string
      */
     protected string $prorationBehavior = 'create_prorations';
 
@@ -50,7 +48,6 @@ trait Prorates
     /**
      * Set the prorating behavior.
      *
-     * @param  string  $prorationBehavior
      * @return $this
      */
     public function setProrationBehavior(string $prorationBehavior)
@@ -62,8 +59,6 @@ trait Prorates
 
     /**
      * Determine the prorating behavior when updating the subscription.
-     *
-     * @return string
      */
     public function prorateBehavior(): string
     {

@@ -10,7 +10,6 @@ class SubscriptionUpdateFailure extends Exception
     /**
      * Create a new SubscriptionUpdateFailure instance.
      *
-     * @param  \Laravel\Cashier\Subscription  $subscription
      * @return static
      */
     public static function incompleteSubscription(Subscription $subscription)
@@ -23,8 +22,6 @@ class SubscriptionUpdateFailure extends Exception
     /**
      * Create a new SubscriptionUpdateFailure instance.
      *
-     * @param  \Laravel\Cashier\Subscription  $subscription
-     * @param  string  $price
      * @return static
      */
     public static function duplicatePrice(Subscription $subscription, string $price)
@@ -37,7 +34,6 @@ class SubscriptionUpdateFailure extends Exception
     /**
      * Create a new SubscriptionUpdateFailure instance.
      *
-     * @param  \Laravel\Cashier\Subscription  $subscription
      * @return static
      */
     public static function cannotDeleteLastPrice(Subscription $subscription)

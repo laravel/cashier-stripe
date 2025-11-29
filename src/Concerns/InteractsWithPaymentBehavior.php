@@ -8,8 +8,6 @@ trait InteractsWithPaymentBehavior
 {
     /**
      * Set the payment behavior for any subscription updates.
-     *
-     * @var string
      */
     protected string $paymentBehavior = StripeSubscription::PAYMENT_BEHAVIOR_DEFAULT_INCOMPLETE;
 
@@ -63,8 +61,6 @@ trait InteractsWithPaymentBehavior
 
     /**
      * Determine the payment behavior when updating the subscription.
-     *
-     * @return string
      */
     public function paymentBehavior(): string
     {
@@ -74,7 +70,6 @@ trait InteractsWithPaymentBehavior
     /**
      * Set the payment behavior for any subscription updates.
      *
-     * @param  string  $paymentBehavior
      * @return $this
      */
     public function setPaymentBehavior(string $paymentBehavior)

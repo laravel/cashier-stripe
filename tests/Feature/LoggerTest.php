@@ -15,7 +15,7 @@ class LoggerTest extends TestCase
     /** @var string|null */
     protected $channel;
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         config(['cashier.logger' => null]);
 

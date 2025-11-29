@@ -16,7 +16,6 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
      * Create a new PaymentMethod instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $owner
-     * @param  \Stripe\PaymentMethod  $paymentMethod
      * @return void
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidPaymentMethod
@@ -34,8 +33,6 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Delete the payment method.
-     *
-     * @return void
      */
     public function delete(): void
     {
@@ -97,7 +94,6 @@ class PaymentMethod implements Arrayable, Jsonable, JsonSerializable
     /**
      * Dynamically get values from the Stripe object.
      *
-     * @param  string  $key
      * @return mixed
      */
     public function __get(string $key)

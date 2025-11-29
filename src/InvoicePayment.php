@@ -12,7 +12,6 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
     /**
      * Create a new InvoicePayment instance.
      *
-     * @param  \Stripe\InvoicePayment  $invoicePayment
      * @return void
      */
     public function __construct(protected StripeInvoicePayment $invoicePayment)
@@ -22,8 +21,6 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the allocated amount.
-     *
-     * @return string
      */
     public function amount(): string
     {
@@ -32,8 +29,6 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the raw allocated amount.
-     *
-     * @return int
      */
     public function rawAmount(): int
     {
@@ -42,8 +37,6 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the currency of the payment.
-     *
-     * @return string
      */
     public function currency(): string
     {
@@ -52,8 +45,6 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the payment status.
-     *
-     * @return string
      */
     public function status(): string
     {
@@ -62,8 +53,6 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Determine if the payment is completed.
-     *
-     * @return bool
      */
     public function isCompleted(): bool
     {
@@ -115,7 +104,6 @@ class InvoicePayment implements Arrayable, Jsonable, JsonSerializable
     /**
      * Dynamically get values from the Stripe object.
      *
-     * @param  string  $key
      * @return mixed
      */
     public function __get(string $key)

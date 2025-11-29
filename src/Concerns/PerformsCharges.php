@@ -14,10 +14,6 @@ trait PerformsCharges
     /**
      * Make a "one off" charge on the customer for the given amount.
      *
-     * @param  int  $amount
-     * @param  string  $paymentMethod
-     * @param  array  $options
-     * @return \Laravel\Cashier\Payment
      *
      * @throws \Laravel\Cashier\Exceptions\IncompletePayment
      */
@@ -39,10 +35,6 @@ trait PerformsCharges
 
     /**
      * Create a new PaymentIntent instance.
-     *
-     * @param  int  $amount
-     * @param  array  $options
-     * @return \Laravel\Cashier\Payment
      */
     public function pay(int $amount, array $options = []): Payment
     {
@@ -55,11 +47,6 @@ trait PerformsCharges
 
     /**
      * Create a new PaymentIntent instance for the given payment method types.
-     *
-     * @param  int  $amount
-     * @param  array  $paymentMethods
-     * @param  array  $options
-     * @return \Laravel\Cashier\Payment
      */
     public function payWith(int $amount, array $paymentMethods, array $options = []): Payment
     {
@@ -72,10 +59,6 @@ trait PerformsCharges
 
     /**
      * Create a new Payment instance with a Stripe PaymentIntent.
-     *
-     * @param  int  $amount
-     * @param  array  $options
-     * @return \Laravel\Cashier\Payment
      */
     public function createPayment(int $amount, array $options = []): Payment
     {
@@ -99,9 +82,6 @@ trait PerformsCharges
 
     /**
      * Find a payment intent by ID.
-     *
-     * @param  string  $id
-     * @return \Laravel\Cashier\Payment|null
      */
     public function findPayment(string $id): ?Payment
     {
@@ -122,8 +102,6 @@ trait PerformsCharges
     /**
      * Refund a customer for a charge.
      *
-     * @param  string  $paymentIntent
-     * @param  array  $options
      * @return \Stripe\Refund
      */
     public function refund(string $paymentIntent, array $options = [])
@@ -138,11 +116,6 @@ trait PerformsCharges
 
     /**
      * Begin a new checkout session for existing prices.
-     *
-     * @param  array|string  $items
-     * @param  array  $sessionOptions
-     * @param  array  $customerOptions
-     * @return \Laravel\Cashier\Checkout
      */
     public function checkout(string|array $items, array $sessionOptions = [], array $customerOptions = []): Checkout
     {
@@ -151,14 +124,6 @@ trait PerformsCharges
 
     /**
      * Begin a new checkout session for a "one-off" charge.
-     *
-     * @param  int  $amount
-     * @param  string  $name
-     * @param  int  $quantity
-     * @param  array  $sessionOptions
-     * @param  array  $customerOptions
-     * @param  array  $productData
-     * @return \Laravel\Cashier\Checkout
      */
     public function checkoutCharge(
         int $amount,

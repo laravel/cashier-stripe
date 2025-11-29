@@ -11,29 +11,22 @@ trait AllowsCoupons
 
     /**
      * The coupon ID being applied.
-     *
-     * @var string|null
      */
     public ?string $couponId = null;
 
     /**
      * The promotion code ID being applied.
-     *
-     * @var string|null
      */
     public ?string $promotionCodeId = null;
 
     /**
      * Determines if user redeemable promotion codes are available in Stripe Checkout.
-     *
-     * @var bool
      */
     public bool $allowPromotionCodes = false;
 
     /**
      * The coupon ID to be applied.
      *
-     * @param  string  $couponId
      * @return $this
      */
     public function withCoupon(string $couponId)
@@ -46,7 +39,6 @@ trait AllowsCoupons
     /**
      * The promotion code ID to apply.
      *
-     * @param  string  $promotionCodeId
      * @return $this
      */
     public function withPromotionCode(string $promotionCodeId)
@@ -95,8 +87,6 @@ trait AllowsCoupons
     /**
      * Validate that a coupon can be used in checkout sessions.
      *
-     * @param  string  $couponId
-     * @return void
      *
      * @throws \Laravel\Cashier\Exceptions\InvalidCoupon
      * @throws \Stripe\Exception\ApiErrorException
