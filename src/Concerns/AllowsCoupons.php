@@ -33,10 +33,9 @@ trait AllowsCoupons
     /**
      * The coupon ID to be applied.
      *
-     * @param  string  $couponId
      * @return $this
      */
-    public function withCoupon(string $couponId)
+    public function withCoupon(string|null $couponId)
     {
         $this->couponId = $couponId;
 
@@ -46,10 +45,9 @@ trait AllowsCoupons
     /**
      * The promotion code ID to apply.
      *
-     * @param  string  $promotionCodeId
      * @return $this
      */
-    public function withPromotionCode(string $promotionCodeId)
+    public function withPromotionCode(string|null $promotionCodeId)
     {
         $this->promotionCodeId = $promotionCodeId;
 
