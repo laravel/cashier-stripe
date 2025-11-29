@@ -11,15 +11,11 @@ trait AllowsCoupons
 
     /**
      * The coupon ID being applied.
-     *
-     * @var string|null
      */
     public ?string $couponId = null;
 
     /**
      * The promotion code ID being applied.
-     *
-     * @var string|null
      */
     public ?string $promotionCodeId = null;
 
@@ -35,7 +31,7 @@ trait AllowsCoupons
      *
      * @return $this
      */
-    public function withCoupon(string|null $couponId)
+    public function withCoupon(?string $couponId)
     {
         $this->couponId = $couponId;
 
@@ -47,7 +43,7 @@ trait AllowsCoupons
      *
      * @return $this
      */
-    public function withPromotionCode(string|null $promotionCodeId)
+    public function withPromotionCode(?string $promotionCodeId)
     {
         $this->promotionCodeId = $promotionCodeId;
 
