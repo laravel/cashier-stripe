@@ -405,9 +405,6 @@ class SubscriptionBuilder
                     'type' => $this->type,
                 ]),
             ]),
-            'billing_mode' => [
-                'type' => 'classic',
-            ],
         ]);
 
         return Checkout::customer($this->owner, $this)
@@ -450,6 +447,9 @@ class SubscriptionBuilder
             'proration_behavior' => $this->prorateBehavior(),
             'trial_end' => $this->getTrialEndForPayload(),
             'off_session' => true,
+            'billing_mode' => [
+                'type' => 'classic',
+            ],
         ]);
 
         // Apply discounts using new discounts array (supports multiple discounts)...
