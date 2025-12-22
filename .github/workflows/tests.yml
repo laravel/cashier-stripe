@@ -71,3 +71,29 @@ jobs:
           STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
           STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
           CASHIER_TESTER_BUILD_ID: ${{ github.run_number }}
+
+      - name: Install dependencies (Stripe API 18)
+        run: |
+          composer update --prefer-dist --no-interaction --no-progress --with="stripe/stripe-php:^18.0"
+        if: matrix.php == 8.4
+
+      - name: Execute tests (Stripe API 18)
+        run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
+        if: matrix.php == 8.4
+        env:
+          STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
+          STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
+          CASHIER_TESTER_BUILD_ID: ${{ github.run_number }}
+
+      - name: Install dependencies (Stripe API 17)
+        run: |
+          composer update --prefer-dist --no-interaction --no-progress --with="stripe/stripe-php:^17.0"
+        if: matrix.php == 8.3
+
+      - name: Execute tests (Stripe API 17)
+        run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
+        if: matrix.php == 8.3
+        env:
+          STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
+          STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
+          CASHIER_TESTER_BUILD_ID: ${{ github.run_number }}
