@@ -405,6 +405,9 @@ class SubscriptionBuilder
                     'type' => $this->type,
                 ]),
             ]),
+            'billing_mode' => [
+                'type' => 'classic',
+            ],
         ]);
 
         return Checkout::customer($this->owner, $this)
