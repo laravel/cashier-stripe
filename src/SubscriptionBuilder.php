@@ -447,9 +447,9 @@ class SubscriptionBuilder
             'proration_behavior' => $this->prorateBehavior(),
             'trial_end' => $this->getTrialEndForPayload(),
             'off_session' => true,
-            'billing_mode' => [
-                'type' => 'classic',
-            ],
+            // 'billing_mode' => [
+            //     'type' => 'classic',
+            // ],
         ]);
 
         // Apply discounts using new discounts array (supports multiple discounts)...
