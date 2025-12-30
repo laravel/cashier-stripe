@@ -207,7 +207,7 @@ class CheckoutTest extends FeatureTestCase
         $shirtPrice = self::stripe()->prices->create([
             'currency' => 'USD',
             'product_data' => [
-                'name' => 'T-shirt',
+                'name' => 'T-Shirt',
             ],
             'unit_amount' => 1500,
         ]);
