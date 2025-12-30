@@ -85,8 +85,8 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
             $data['subscription_data']['metadata']['is_on_session_checkout'] = true;
         }
 
-        // Remove success and cancel URLs if "ui_mode" is "embedded"...
-        if (isset($data['ui_mode']) && $data['ui_mode'] === 'embedded') {
+        // Remove success and cancel URLs if "ui_mode" is "embedded" or "custom"...
+        if (isset($data['ui_mode']) && in_array($data['ui_mode'], ['embedded', 'custom'])) {
             $data['return_url'] = $sessionOptions['return_url'] ?? route('home');
 
             // Remove return URL for embedded UI mode when no redirection is desired on completion...
