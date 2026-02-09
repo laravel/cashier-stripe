@@ -1023,7 +1023,7 @@ class Subscription extends Model
         $stripeItem = $this->findItemOrFail($price)->asStripeSubscriptionItem();
 
         $stripeItem->delete(array_filter([
-            'clear_usage' => $stripeItem->price->recurring->usage_type === 'metered' && !$this->usesFlexibleBilling() ? true : null,
+            'clear_usage' => $stripeItem->price->recurring->usage_type === 'metered' && ! $this->usesFlexibleBilling() ? true : null,
             'proration_behavior' => $this->prorateBehavior(),
         ]));
 
@@ -1585,15 +1585,14 @@ class Subscription extends Model
     }
 
     /**
-     * Ascertain if the subscription uses the new flexible billing mode
+     * Ascertain if the subscription uses the new flexible billing mode.
      *
-     * @param StripeSubscription|null $subscription
-     *
+     * @param  StripeSubscription|null  $subscription
      * @return bool
      */
     public function usesFlexibleBilling(?StripeSubscription $subscription = null): bool
     {
-        if (!$subscription) {
+        if (! $subscription) {
             $subscription = $this->asStripeSubscription();
         }
 
