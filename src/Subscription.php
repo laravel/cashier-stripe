@@ -831,6 +831,7 @@ class Subscription extends Model
     protected function mergeItemsThatShouldBeDeletedDuringSwap(Collection $items): Collection
     {
         $stripeSubscription = $this->asStripeSubscription();
+
         /** @var \Stripe\SubscriptionItem $stripeSubscriptionItem */
         foreach ($stripeSubscription->items->data as $stripeSubscriptionItem) {
             $price = $stripeSubscriptionItem->price;
@@ -1575,16 +1576,6 @@ class Subscription extends Model
     }
 
     /**
-     * Create a new factory instance for the model.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
-     */
-    protected static function newFactory()
-    {
-        return SubscriptionFactory::new();
-    }
-
-    /**
      * Ascertain if the subscription uses the new flexible billing mode.
      *
      * @param  StripeSubscription|null  $subscription
@@ -1597,5 +1588,15 @@ class Subscription extends Model
         }
 
         return $subscription->billing_mode->type == 'flexible';
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
+    {
+        return SubscriptionFactory::new();
     }
 }
