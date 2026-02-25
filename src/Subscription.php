@@ -839,7 +839,7 @@ class Subscription extends Model
             if (! $item = $items->get($price->id, [])) {
                 $item['deleted'] = true;
 
-                if ($price->recurring->usage_type == 'metered' && $this->usesFlexibleBilling($stripeSubscription)) {
+                if ($price->recurring->usage_type == 'metered' && ! $this->usesFlexibleBilling($stripeSubscription)) {
                     $item['clear_usage'] = true;
                 }
             }
