@@ -343,4 +343,55 @@ class WebhooksTest extends FeatureTestCase
             });
         }
     }
+
+    public function test_trial_ends_at_is_cleared_when_trial_end_is_null()
+    {
+        $user = $this->createCustomer('trial_ends_at_cleared', ['stripe_id' => 'cus_foo']);
+
+        $trialEndsAt = Carbon::now()->addDays(7);
+
+        $subscription = $user->subscriptions()->create([
+            'type' => 'main',
+            'stripe_id' => 'sub_foo',
+            'stripe_price' => 'price_foo',
+            'stripe_status' => StripeSubscription::STATUS_ACTIVE,
+            'trial_ends_at' => $trialEndsAt,
+        ]);
+
+        $subscription->items()->create([
+            'stripe_id' => 'it_'.Str::random(10),
+            'stripe_product' => 'prod_bar',
+            'stripe_price' => 'price_foo',
+            'quantity' => 1,
+        ]);
+
+        $this->assertTrue($subscription->onTrial());
+
+        $this->postJson('stripe/webhook', [
+            'id' => 'foo',
+            'type' => 'customer.subscription.updated',
+            'data' => [
+                'object' => [
+                    'id' => $subscription->stripe_id,
+                    'customer' => 'cus_foo',
+                    'cancel_at_period_end' => false,
+                    'trial_end' => null,
+                    'items' => [
+                        'data' => [[
+                            'id' => 'bar',
+                            'price' => ['id' => 'price_foo', 'product' => 'prod_bar'],
+                            'quantity' => 1,
+                        ]],
+                    ],
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'trial_ends_at' => null,
+        ]);
+
+        $this->assertFalse($subscription->fresh()->onTrial());
+    }
 }
