@@ -1,6 +1,6 @@
 ---
 name: cashier-stripe-development
-description: "Handles Laravel Cashier Stripe integration including subscriptions, webhooks, Stripe Checkout, invoices, and payment failure handling. Activates when installing Cashier, configuring billable models, setting up subscriptions or webhooks, handling SCA/3DS payment failures, working with Stripe Checkout or invoices, or when the user mentions Cashier, Billable, IncompletePayment, stripe_id, or Stripe subscriptions."
+description: "Handles Laravel Cashier Stripe integration including subscriptions, webhooks, Stripe Checkout, invoices, charges, refunds, trials, coupons, metered billing, and payment failure handling. Activates when installing Cashier, configuring billable models, setting up subscriptions or webhooks, handling SCA/3DS payment failures, working with Stripe Checkout or invoices, testing billing scenarios with Stripe test cards, or when the user mentions Cashier, Billable, IncompletePayment, stripe_id, newSubscription, Stripe subscriptions, or billing."
 license: MIT
 metadata:
   author: laravel
@@ -16,10 +16,10 @@ metadata:
 Activate this skill when:
 
 - Installing or configuring Laravel Cashier Stripe
-- Setting up subscriptions, trials, or plan swapping
+- Setting up subscriptions, trials, quantities, or plan swapping
 - Handling webhooks or SCA/3DS payment failures
 - Working with Stripe Checkout, invoices, or charges
-- Writing tests for billing functionality
+- Testing billing scenarios with Stripe test cards or tokens
 
 ## Documentation
 
@@ -42,6 +42,7 @@ STRIPE_KEY=pk_test_...
 STRIPE_SECRET=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 CASHIER_CURRENCY=usd
+CASHIER_CURRENCY_LOCALE=en_US  # optional, for formatting
 ```
 
 Add the `Billable` trait to the customer model:
@@ -55,12 +56,15 @@ class User extends Authenticatable
 }
 @endboostsnippet
 
-For a non-User billable model, use `Cashier::useCustomerModel()` in a service provider (not a `CASHIER_MODEL` env var):
+For a non-User billable model, register in a service provider (not a `CASHIER_MODEL` env var):
 
 @boostsnippet("Custom Billable Model", "php")
 use Laravel\Cashier\Cashier;
 
+// In AppServiceProvider::boot()
 Cashier::useCustomerModel(Team::class);
+Cashier::useSubscriptionModel(CustomSubscription::class);       // optional
+Cashier::useSubscriptionItemModel(CustomSubscriptionItem::class); // optional
 @endboostsnippet
 
 ## Subscriptions
@@ -82,8 +86,16 @@ Status reference:
 | `->ended()` | Canceled AND grace period expired |
 | `->incomplete()` | Awaiting SCA/3DS confirmation |
 | `->pastDue()` | Payment overdue |
+| `->recurring()` | Active and not on trial |
 
-`subscribed()` returns `false` for `incomplete` and `past_due` by default.
+`subscribed()` returns `false` for `incomplete` and `past_due` by default. It returns `true` during the grace period.
+
+Check by product or price:
+
+@boostsnippet("Check Product / Price", "php")
+$user->subscribedToProduct('prod_premium', 'default');
+$user->subscribedToPrice('price_monthly', 'default');
+@endboostsnippet
 
 ### SCA / 3DS — Incomplete Payments
 
@@ -99,7 +111,9 @@ try {
 }
 @endboostsnippet
 
-The `cashier.payment` route is auto-registered and renders a built-in 3DS confirmation page.
+The `cashier.payment` route is auto-registered and renders a built-in 3DS confirmation page. For already-stuck subscriptions use `$user->hasIncompletePayment('default')`.
+
+**Gotcha:** Prices cannot be swapped and quantity cannot be updated while a subscription has an incomplete payment.
 
 ## Webhooks
 
@@ -148,6 +162,29 @@ Event::listen(WebhookReceived::class, function (WebhookReceived $event) {
 });
 @endboostsnippet
 
+## Testing
+
+Use Stripe test cards for browser-based flows and `pm_card_*` tokens for direct API / feature tests:
+
+| Card Number | Token | Behavior |
+|---|---|---|
+| `4242 4242 4242 4242` | `pm_card_visa` | Succeeds immediately |
+| `4000 0025 0000 3155` | `pm_card_threeDSecure2Required` | Requires SCA/3DS |
+| `4000 0000 0000 9995` | `pm_card_chargeDeclinedInsufficientFunds` | Declined — insufficient funds |
+| `4000 0000 0000 0002` | `pm_card_chargeDeclined` | Declined |
+| `4000 0027 6000 3184` | `pm_card_authenticationRequired` | Requires authentication |
+
+Use expiry `12/34`, any CVC, any ZIP for card numbers. Use the `pm_card_*` token strings directly in feature tests that call the Stripe API:
+
+@boostsnippet("Feature Test Example", "php")
+$user->newSubscription('default', 'price_xxxx')
+    ->create('pm_card_visa');
+
+$this->assertTrue($user->subscribed('default'));
+@endboostsnippet
+
+Use `search-docs` for full test setup patterns including seeding payment methods and configuring Stripe test mode keys.
+
 ## Common Pitfalls
 
 - **Wrong publish tag**: use `cashier-migrations`, not `cashier`
@@ -155,6 +192,10 @@ Event::listen(WebhookReceived::class, function (WebhookReceived $event) {
 - **CLI secret ≠ Dashboard secret**: mixing them causes signature verification failures (419/403)
 - **CSRF not excluded**: webhook POSTs are rejected with 419 without `stripe/*` exclusion
 - **`canceled()` ≠ ended**: `canceled()` is true during the grace period; use `ended()` to confirm access is revoked
+- **`subscribed()` during grace period**: returns `true` even though the subscription is canceled — gate access with `ended()` if needed
 - **`Cashier::ignoreRoutes()` required**: when extending `WebhookController`, call this in a service provider to avoid duplicate route registration
 - **Custom model registration**: use `Cashier::useCustomerModel()`, not a `CASHIER_MODEL` env var
 - **Trial dates stored locally**: `trial_ends_at` syncs via webhooks — stale if webhooks are not configured
+- **`stripe_id` collation**: in MySQL, the `stripe_id` column must use `utf8_bin` collation to avoid case-sensitivity issues
+- **`noProrate()` + `swapAndInvoice()`**: `noProrate()` has no effect on `swapAndInvoice()` — it always prorates
+- **Promotion code vs coupon ID**: methods like `withPromotionCode()` require the Stripe API ID (`promo_xxxx`), not the customer-facing code (`SUMMERSALE`) — use `findPromotionCode()` to resolve
