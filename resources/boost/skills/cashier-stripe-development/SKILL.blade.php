@@ -86,7 +86,7 @@ Always wrap subscription creation in a try/catch for `IncompletePayment`. When a
 ## Verification
 
 1. Run migrations and confirm `stripe_id`, `pm_type`, `pm_last_four`, and `trial_ends_at` columns exist on the billable model table
-2. Test the webhook endpoint with `stripe listen --forward-to localhost/stripe/webhook`
+2. Test the webhook endpoint with `stripe listen --forward-to localhost/stripe/webhook` if you use the default path, or swap `stripe` for your configured `CASHIER_PATH`
 3. Confirm `$user->subscribed('default')` returns the expected value for active and incomplete subscriptions
 
 ## Common Pitfalls
@@ -94,12 +94,12 @@ Always wrap subscription creation in a try/catch for `IncompletePayment`. When a
 - The migration publish tag is `cashier-migrations`, not `cashier`. Running `migrate` before publishing results in missing columns and tables.
 - `CASHIER_CURRENCY` must be set explicitly. It defaults to USD, which silently breaks non-US apps.
 - The Stripe CLI generates its own webhook signing secret. It is different from the Dashboard endpoint secret. Using the wrong one causes signature verification failures.
-- The webhook route must be excluded from CSRF verification. Without this, all Stripe POST requests are rejected with a 419.
+- The webhook route must be excluded from CSRF verification using your configured `cashier.path`. If you change `CASHIER_PATH` from `stripe` to `billing`, exclude `billing/*`, not `stripe/*`.
 - `canceled()` returns true as soon as `cancel()` is called, but the user still has access during the grace period. Use `ended()` to confirm access is fully revoked.
 - `subscribed()` returns true during the grace period even though the subscription is canceled.
 - `subscribed()` returns false for `incomplete` and `past_due` subscriptions by default.
 - Prices cannot be swapped and quantity cannot be updated while a subscription has an incomplete payment.
-- When extending `WebhookController`, call `Cashier::ignoreRoutes()` in a service provider to prevent duplicate route registration.
+- When extending `WebhookController`, call `Cashier::ignoreRoutes()` in a service provider and re-register both `cashier.payment` and `cashier.webhook` under the configured `cashier.path`.
 - Use `Cashier::useCustomerModel()` in a service provider to set a custom billable model. There is no `CASHIER_MODEL` env var.
 - `trial_ends_at` is a local database column synced via webhooks. It will be stale if webhooks are not configured in production.
 - In MySQL, the `stripe_id` column must use `utf8_bin` collation to avoid case-sensitivity issues.
