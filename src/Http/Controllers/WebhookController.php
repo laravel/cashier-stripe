@@ -158,7 +158,7 @@ class WebhookController extends Controller
             $subscription->quantity = $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null;
 
             // Trial ending date...
-            if (array_key_exists('trial_end', $data) && !is_null($data['trial_end'])) {
+            if (array_key_exists('trial_end', $data) && ! is_null($data['trial_end'])) {
                 $trialEnd = Carbon::createFromTimestamp($data['trial_end']);
 
                 if (! $subscription->trial_ends_at || $subscription->trial_ends_at->ne($trialEnd)) {
