@@ -1,7 +1,11 @@
 {
     "name": "laravel/cashier",
     "description": "Laravel Cashier provides an expressive, fluent interface to Stripe's subscription billing services.",
-    "keywords": ["laravel", "stripe", "billing"],
+    "keywords": [
+        "laravel",
+        "stripe",
+        "billing"
+    ],
     "license": "MIT",
     "support": {
         "issues": "https://github.com/laravel/cashier/issues",
@@ -20,19 +24,19 @@
     "require": {
         "php": "^8.1",
         "ext-json": "*",
-        "illuminate/console": "^10.0|^11.0|^12.0",
-        "illuminate/contracts": "^10.0|^11.0|^12.0",
-        "illuminate/database": "^10.0|^11.0|^12.0",
-        "illuminate/http": "^10.0|^11.0|^12.0",
-        "illuminate/log": "^10.0|^11.0|^12.0",
-        "illuminate/notifications": "^10.0|^11.0|^12.0",
-        "illuminate/pagination": "^10.0|^11.0|^12.0",
-        "illuminate/routing": "^10.0|^11.0|^12.0",
-        "illuminate/support": "^10.0|^11.0|^12.0",
-        "illuminate/view": "^10.0|^11.0|^12.0",
+        "illuminate/console": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/contracts": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/database": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/http": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/log": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/notifications": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/pagination": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/routing": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/view": "^10.0|^11.0|^12.0|^13.0",
         "moneyphp/money": "^4.0",
         "nesbot/carbon": "^2.0|^3.0",
-        "stripe/stripe-php": "^17.3.0",
+        "stripe/stripe-php": "^17.3.0|^19.4",
         "symfony/console": "^6.0|^7.0",
         "symfony/http-kernel": "^6.0|^7.0",
         "symfony/polyfill-intl-icu": "^1.22.1",
@@ -40,8 +44,8 @@
     },
     "require-dev": {
         "dompdf/dompdf": "^2.0|^3.0",
-        "orchestra/testbench": "^8.36|^9.15|^10.8",
-        "phpstan/phpstan": "^1.10",
+        "orchestra/testbench": "^8.36|^9.15|^10.8|^11.0",
+        "phpstan/phpstan": "^1.10|^2.1",
         "spatie/laravel-ray": "^1.40"
     },
     "suggest": {
