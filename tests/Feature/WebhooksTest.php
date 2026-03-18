@@ -87,6 +87,80 @@ class WebhooksTest extends FeatureTestCase
         ]);
     }
 
+    public function test_subscription_type_is_set_from_metadata()
+    {
+        $user = $this->createCustomer('subscription_type_from_metadata', ['stripe_id' => 'cus_foo']);
+
+        $this->postJson('stripe/webhook', [
+            'id' => 'foo',
+            'type' => 'customer.subscription.created',
+            'data' => [
+                'object' => [
+                    'id' => 'sub_foo',
+                    'customer' => 'cus_foo',
+                    'cancel_at_period_end' => false,
+                    'quantity' => 10,
+                    'metadata' => [
+                        'name' => 'premium',
+                        'type' => 'premium',
+                    ],
+                    'items' => [
+                        'data' => [[
+                            'id' => 'bar',
+                            'price' => ['id' => 'price_foo', 'product' => 'prod_bar'],
+                            'quantity' => 10,
+                        ]],
+                    ],
+                    'status' => 'active',
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'type' => 'premium',
+            'user_id' => $user->id,
+            'stripe_id' => 'sub_foo',
+            'stripe_status' => 'active',
+        ]);
+    }
+
+    public function test_subscription_type_from_metadata_on_update()
+    {
+        $user = $this->createCustomer('subscription_type_from_metadata_on_update', ['stripe_id' => 'cus_foo']);
+
+        // Simulate webhook arriving before the SubscriptionBuilder writes the record.
+        // The "updated" webhook should use the type from metadata when creating a new record.
+        $this->postJson('stripe/webhook', [
+            'id' => 'foo',
+            'type' => 'customer.subscription.updated',
+            'data' => [
+                'object' => [
+                    'id' => 'sub_foo',
+                    'customer' => 'cus_foo',
+                    'cancel_at_period_end' => false,
+                    'metadata' => [
+                        'name' => 'premium',
+                        'type' => 'premium',
+                    ],
+                    'items' => [
+                        'data' => [[
+                            'id' => 'bar',
+                            'price' => ['id' => 'price_foo', 'product' => 'prod_bar'],
+                            'quantity' => 10,
+                        ]],
+                    ],
+                    'status' => 'active',
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'type' => 'premium',
+            'user_id' => $user->id,
+            'stripe_id' => 'sub_foo',
+        ]);
+    }
+
     public function test_subscriptions_are_updated()
     {
         $user = $this->createCustomer('subscriptions_are_updated', ['stripe_id' => 'cus_foo']);

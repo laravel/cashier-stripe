@@ -441,7 +441,10 @@ class SubscriptionBuilder
             'billing_cycle_anchor' => $this->billingCycleAnchor,
             'billing_thresholds' => $this->billingThresholds,
             'expand' => ['latest_invoice.confirmation_secret'],
-            'metadata' => $this->metadata,
+            'metadata' => array_merge($this->metadata, [
+                'name' => $this->type,
+                'type' => $this->type,
+            ]),
             'items' => Collection::make($this->items)->values()->all(),
             'payment_behavior' => $this->paymentBehavior(),
             'proration_behavior' => $this->prorateBehavior(),
