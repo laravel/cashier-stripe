@@ -319,6 +319,79 @@ class WebhookController extends Controller
     }
 
     /**
+     * Handle invoice payment failed.
+     *
+     * When a subscription update invoice fails payment (e.g. from swapAndInvoice),
+     * Stripe may revert the subscription to its previous state while the local
+     * database still reflects the new (failed) price. This handler detects that
+     * scenario and syncs the local subscription back to Stripe's actual state.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleInvoicePaymentFailed(array $payload)
+    {
+        $invoice = $payload['data']['object'];
+
+        // Only reconcile when the failed invoice was for a subscription update
+        // (i.e. a mid-cycle price change like swapAndInvoice).
+        if (($invoice['billing_reason'] ?? null) !== 'subscription_update') {
+            return $this->successMethod();
+        }
+
+        $subscriptionId = $invoice['subscription'] ?? null;
+
+        if (! $subscriptionId) {
+            return $this->successMethod();
+        }
+
+        if (! $user = $this->getUserByStripeId($invoice['customer'])) {
+            return $this->successMethod();
+        }
+
+        $subscription = $user->subscriptions()->where('stripe_id', $subscriptionId)->first();
+
+        if (! $subscription) {
+            return $this->successMethod();
+        }
+
+        // Fetch the actual current subscription state from Stripe.
+        $stripeSubscription = $user->stripe()->subscriptions->retrieve(
+            $subscriptionId, ['expand' => ['items.data.price']]
+        );
+
+        // Sync the local subscription to match Stripe's actual state.
+        $firstItem = $stripeSubscription->items->first();
+        $isSinglePrice = $stripeSubscription->items->count() === 1;
+
+        $subscription->fill([
+            'stripe_status' => $stripeSubscription->status,
+            'stripe_price' => $isSinglePrice ? $firstItem->price->id : null,
+            'quantity' => $isSinglePrice ? ($firstItem->quantity ?? null) : null,
+        ])->save();
+
+        // Sync subscription items to match Stripe.
+        $subscriptionItemIds = [];
+
+        foreach ($stripeSubscription->items as $item) {
+            $subscriptionItemIds[] = $item->id;
+
+            $subscription->items()->updateOrCreate([
+                'stripe_id' => $item->id,
+            ], [
+                'stripe_product' => $item->price->product,
+                'stripe_price' => $item->price->id,
+                'quantity' => $item->quantity ?? null,
+            ]);
+        }
+
+        // Remove any local items that no longer exist on Stripe.
+        $subscription->items()->whereNotIn('stripe_id', $subscriptionItemIds)->delete();
+
+        return $this->successMethod();
+    }
+
+    /**
      * Get the customer instance by Stripe ID.
      *
      * @param  string|null  $stripeId
