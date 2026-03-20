@@ -2,8 +2,11 @@
 
 namespace Laravel\Cashier\Concerns;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
+use Laravel\Cashier\UsageThreshold;
 
 trait ManagesUsageBilling
 {
@@ -78,5 +81,70 @@ trait ManagesUsageBilling
             ],
             $requestOptions
         )->data);
+    }
+
+    /**
+     * Get all usage thresholds for this customer.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function usageThresholds(): HasMany
+    {
+        return $this->hasMany(UsageThreshold::class, $this->getForeignKey());
+    }
+
+    /**
+     * Set a usage threshold for a meter.
+     *
+     * @param  string  $meterId
+     * @param  int  $threshold
+     * @param  string  $period
+     * @param  array  $alertOptions
+     * @return \Laravel\Cashier\UsageThreshold
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setUsageThreshold(string $meterId, int $threshold, string $period = 'billing_cycle', array $alertOptions = []): UsageThreshold
+    {
+        if ($threshold <= 0) {
+            throw new InvalidArgumentException('Usage threshold must be a positive integer.');
+        }
+
+        $validPeriods = ['billing_cycle', 'monthly', 'daily', 'weekly'];
+
+        if (! in_array($period, $validPeriods)) {
+            throw new InvalidArgumentException('Invalid period. Must be one of: '.implode(', ', $validPeriods));
+        }
+
+        return $this->usageThresholds()->updateOrCreate(
+            ['meter_id' => $meterId],
+            [
+                'threshold' => $threshold,
+                'period' => $period,
+                'alert_options' => ! empty($alertOptions) ? $alertOptions : null,
+            ]
+        );
+    }
+
+    /**
+     * Get the usage threshold for a specific meter.
+     *
+     * @param  string  $meterId
+     * @return \Laravel\Cashier\UsageThreshold|null
+     */
+    public function getUsageThreshold(string $meterId): ?UsageThreshold
+    {
+        return $this->usageThresholds()->where('meter_id', $meterId)->first();
+    }
+
+    /**
+     * Remove the usage threshold for a meter.
+     *
+     * @param  string  $meterId
+     * @return bool
+     */
+    public function removeUsageThreshold(string $meterId): bool
+    {
+        return $this->usageThresholds()->where('meter_id', $meterId)->delete() > 0;
     }
 }
