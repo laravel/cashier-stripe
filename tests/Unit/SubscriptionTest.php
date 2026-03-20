@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests\Unit;
 
 use InvalidArgumentException;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use Laravel\Cashier\Subscription;
 use PHPUnit\Framework\TestCase;
@@ -170,5 +171,53 @@ class SubscriptionTest extends TestCase
 
         $this->assertTrue($subscription->hasMultiplePrices());
         $this->assertFalse($subscription->hasSinglePrice());
+    }
+
+    public function test_with_billing_mode_returns_subscription_instance()
+    {
+        $subscription = new Subscription;
+
+        $result = $subscription->withBillingMode('flexible');
+
+        $this->assertSame($subscription, $result);
+    }
+
+    public function test_with_billing_mode_rejects_invalid_type()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $subscription = new Subscription;
+        $subscription->withBillingMode('invalid');
+    }
+
+    public function test_incomplete_subscriptions_cannot_migrate_billing_mode()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_INCOMPLETE,
+        ]);
+
+        $this->expectException(SubscriptionUpdateFailure::class);
+
+        $subscription->migrateToFlexibleBillingMode();
+    }
+
+    public function test_canceled_subscriptions_cannot_migrate_billing_mode()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->stripe_status = StripeSubscription::STATUS_ACTIVE;
+        $subscription->ends_at = now()->subDay();
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unable to migrate a canceled subscription');
+
+        $subscription->migrateToFlexibleBillingMode();
+    }
+
+    protected function tearDown(): void
+    {
+        Cashier::$defaultBillingMode = 'classic';
+
+        parent::tearDown();
     }
 }

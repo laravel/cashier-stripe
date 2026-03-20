@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use InvalidArgumentException;
 use Laravel\Cashier\Concerns\InteractsWithStripe;
 use Laravel\Cashier\Database\Factories\SubscriptionScheduleFactory;
 use Stripe\SubscriptionSchedule as StripeSubscriptionSchedule;
