@@ -1636,7 +1636,7 @@ class Subscription extends Model
             $subscription = $this->asStripeSubscription();
         }
 
-        return $subscription->billing_mode->type == 'flexible';
+        return isset($subscription->billing_mode) && $subscription->billing_mode->type === 'flexible';
     }
 
     /**

@@ -26,8 +26,9 @@ class UsageThresholdFactory extends Factory
 
         return [
             (new $model)->getForeignKey() => ($model)::factory(),
-            'metric' => 'api_calls',
+            'meter_id' => 'meter_'.$this->faker->word(),
             'threshold' => 1000,
+            'period' => 'billing_cycle',
             'alert_options' => null,
         ];
     }

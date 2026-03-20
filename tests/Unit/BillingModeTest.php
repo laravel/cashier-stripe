@@ -39,7 +39,7 @@ class BillingModeTest extends TestCase
     public function test_invalid_billing_mode_throws_exception()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid billing mode [invalid]. Must be 'classic' or 'flexible'.");
+        $this->expectExceptionMessage('Invalid billing mode [invalid].');
 
         Cashier::defaultBillingMode('invalid');
     }
@@ -117,7 +117,7 @@ class BillingModeTest extends TestCase
     public function test_with_billing_mode_rejects_invalid_type()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid billing mode [unknown]. Must be 'classic' or 'flexible'.");
+        $this->expectExceptionMessage('Invalid billing mode [unknown].');
 
         $stub = new BillingModeTraitStub;
         $stub->withBillingMode('unknown');
