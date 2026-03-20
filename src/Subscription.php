@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\HandlesPaymentFailures;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
+use Laravel\Cashier\Concerns\ManagesBillingMode;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Exceptions\IncompletePayment;
@@ -33,6 +34,7 @@ class Subscription extends Model
     use HandlesPaymentFailures;
     use HasFactory;
     use InteractsWithPaymentBehavior;
+    use ManagesBillingMode;
     use Prorates;
 
     /**
@@ -642,6 +644,41 @@ class Subscription extends Model
     }
 
     /**
+     * Migrate this subscription to flexible billing mode.
+     *
+     * @param  array  $options
+     * @return $this
+     *
+     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
+     */
+    public function migrateToFlexibleBillingMode(array $options = [])
+    {
+        $this->guardAgainstIncomplete();
+
+        if ($this->canceled()) {
+            throw new LogicException('Unable to migrate a canceled subscription to flexible billing mode.');
+        }
+
+        if ($this->usesFlexibleBilling()) {
+            return $this;
+        }
+
+        $stripeSubscription = $this->owner->stripe()->subscriptions->migrate(
+            $this->stripe_id,
+            array_merge([
+                'billing_mode' => ['type' => 'flexible'],
+            ], $options)
+        );
+
+        $this->fill([
+            'stripe_status' => $stripeSubscription->status,
+            'billing_mode' => 'flexible',
+        ])->save();
+
+        return $this;
+    }
+
+    /**
      * Force the trial to end immediately.
      *
      * This method must be combined with swap, resume, etc.
@@ -880,6 +917,9 @@ class Subscription extends Model
         if (! is_null($this->billingCycleAnchor)) {
             $payload['billing_cycle_anchor'] = $this->billingCycleAnchor;
         }
+
+        // Note: billing_mode cannot be changed via subscription update.
+        // Use migrateToFlexibleBillingMode() to change billing mode.
 
         if (! is_null($this->billingThresholds)) {
             $payload['billing_thresholds'] = $this->billingThresholds;
@@ -1578,11 +1618,20 @@ class Subscription extends Model
     /**
      * Ascertain if the subscription uses the new flexible billing mode.
      *
+     * Checks the local billing_mode column first to avoid an API call.
+     * Falls back to retrieving the subscription from Stripe if the local
+     * column is not set.
+     *
      * @param  StripeSubscription|null  $subscription
      * @return bool
      */
     public function usesFlexibleBilling(?StripeSubscription $subscription = null): bool
     {
+        // Check the local column first to avoid an API call...
+        if (! is_null($this->billing_mode)) {
+            return $this->billing_mode === 'flexible';
+        }
+
         if (! $subscription) {
             $subscription = $this->asStripeSubscription();
         }

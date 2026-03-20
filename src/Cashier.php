@@ -93,6 +93,27 @@ class Cashier
     public static $subscriptionItemModel = SubscriptionItem::class;
 
     /**
+     * The subscription schedule model class name.
+     *
+     * @var string
+     */
+    public static $subscriptionScheduleModel = SubscriptionSchedule::class;
+
+    /**
+     * The quote model class name.
+     *
+     * @var string
+     */
+    public static $quoteModel = Quote::class;
+
+    /**
+     * The default billing mode for new subscriptions.
+     *
+     * @var string
+     */
+    public static string $defaultBillingMode = 'classic';
+
+    /**
      * Get the customer instance by its Stripe ID.
      *
      * @param  \Stripe\Customer|string|null  $stripeId
@@ -248,5 +269,44 @@ class Cashier
     public static function useSubscriptionItemModel(string $subscriptionItemModel): void
     {
         static::$subscriptionItemModel = $subscriptionItemModel;
+    }
+
+    /**
+     * Set the subscription schedule model class name.
+     *
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $subscriptionScheduleModel
+     * @return void
+     */
+    public static function useSubscriptionScheduleModel(string $subscriptionScheduleModel): void
+    {
+        static::$subscriptionScheduleModel = $subscriptionScheduleModel;
+    }
+
+    /**
+     * Set the quote model class name.
+     *
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $quoteModel
+     * @return void
+     */
+    public static function useQuoteModel(string $quoteModel): void
+    {
+        static::$quoteModel = $quoteModel;
+    }
+
+    /**
+     * Set the default billing mode for new subscriptions.
+     *
+     * @param  'classic'|'flexible'  $mode
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function defaultBillingMode(string $mode): void
+    {
+        if (! in_array($mode, ['classic', 'flexible'])) {
+            throw new \InvalidArgumentException("Invalid billing mode [{$mode}]. Must be 'classic' or 'flexible'.");
+        }
+
+        static::$defaultBillingMode = $mode;
     }
 }

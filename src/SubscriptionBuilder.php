@@ -15,6 +15,7 @@ use Laravel\Cashier\Concerns\HandlesPaymentFailures;
 use Laravel\Cashier\Concerns\HandlesTaxes;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\InteractsWithStripe;
+use Laravel\Cashier\Concerns\ManagesBillingMode;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Exceptions\InvalidCoupon;
 use Stripe\Subscription as StripeSubscription;
@@ -27,6 +28,7 @@ class SubscriptionBuilder
     use HandlesTaxes;
     use InteractsWithPaymentBehavior;
     use InteractsWithStripe;
+    use ManagesBillingMode;
     use Prorates;
 
     /**
@@ -280,6 +282,8 @@ class SubscriptionBuilder
             throw new Exception('At least one price is required when starting subscriptions.');
         }
 
+        $this->validateFlexibleBillingCompatibility();
+
         $stripeCustomer = $this->getStripeCustomer($paymentMethod, $customerOptions);
 
         $stripeSubscription = $this->owner->stripe()->subscriptions->create(array_merge(
@@ -337,6 +341,9 @@ class SubscriptionBuilder
             'stripe_status' => $stripeSubscription->status,
             'stripe_price' => $isSinglePrice ? $firstItem->price->id : null,
             'quantity' => $isSinglePrice ? ($firstItem->quantity ?? null) : null,
+            'billing_mode' => isset($stripeSubscription->billing_mode)
+                ? $stripeSubscription->billing_mode->type
+                : null,
             'trial_ends_at' => ! $this->skipTrial ? $this->trialExpires : null,
             'ends_at' => null,
         ]);
@@ -378,6 +385,8 @@ class SubscriptionBuilder
             throw new Exception('At least one price is required when starting subscriptions.');
         }
 
+        $this->validateFlexibleBillingCompatibility();
+
         if (! $this->skipTrial && $this->trialExpires) {
             // Checkout Sessions are active for 24 hours after their creation and within that time frame the customer
             // can complete the payment at any time. Stripe requires the trial end at least 48 hours in the future
@@ -396,6 +405,7 @@ class SubscriptionBuilder
             'line_items' => Collection::make($this->items)->values()->all(),
             'mode' => 'subscription',
             'subscription_data' => array_filter([
+                'billing_mode' => $this->getBillingModeForPayload(),
                 'default_tax_rates' => $this->getTaxRatesForPayload(),
                 'trial_end' => $trialEnd?->getTimestamp(),
                 'billing_cycle_anchor' => $billingCycleAnchor,
@@ -439,6 +449,7 @@ class SubscriptionBuilder
         $payload = array_filter([
             'automatic_tax' => $this->automaticTaxPayload(),
             'billing_cycle_anchor' => $this->billingCycleAnchor,
+            'billing_mode' => $this->getBillingModeForPayload(),
             'billing_thresholds' => $this->billingThresholds,
             'expand' => ['latest_invoice.confirmation_secret'],
             'metadata' => $this->metadata,
@@ -552,5 +563,26 @@ class SubscriptionBuilder
     public function getItems(): array
     {
         return $this->items;
+    }
+
+    /**
+     * Validate that the current configuration is compatible with flexible billing mode.
+     *
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function validateFlexibleBillingCompatibility(): void
+    {
+        if ($this->getEffectiveBillingMode() !== 'flexible') {
+            return;
+        }
+
+        if (! is_null($this->billingThresholds)) {
+            throw new InvalidArgumentException(
+                'Flexible billing mode is not compatible with billing thresholds. '.
+                'Remove billing thresholds or use classic billing mode.'
+            );
+        }
     }
 }

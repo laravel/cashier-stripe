@@ -5,11 +5,13 @@ namespace Laravel\Cashier;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Concerns\AllowsCoupons;
 use Laravel\Cashier\Concerns\HandlesTaxes;
+use Laravel\Cashier\Concerns\ManagesBillingMode;
 
 class CheckoutBuilder
 {
     use AllowsCoupons;
     use HandlesTaxes;
+    use ManagesBillingMode;
 
     /**
      * Create a new checkout builder instance.
@@ -30,6 +32,10 @@ class CheckoutBuilder
             $this->customerIpAddress = $parentInstance->customerIpAddress;
             $this->estimationBillingAddress = $parentInstance->estimationBillingAddress;
             $this->collectTaxIds = $parentInstance->collectTaxIds;
+        }
+
+        if ($parentInstance && in_array(ManagesBillingMode::class, class_uses_recursive($parentInstance))) {
+            $this->billingMode = $parentInstance->billingMode;
         }
     }
 
@@ -75,6 +81,18 @@ class CheckoutBuilder
                 : [],
         ]);
 
-        return Checkout::create($this->owner, array_merge($payload, $sessionOptions), $customerOptions);
+        $merged = array_merge($payload, $sessionOptions);
+
+        // Inject billing_mode into subscription_data for subscription checkout sessions.
+        if (($merged['mode'] ?? null) === 'subscription') {
+            if ($billingMode = $this->getBillingModeForPayload()) {
+                $merged['subscription_data'] = array_merge(
+                    $merged['subscription_data'] ?? [],
+                    ['billing_mode' => $billingMode]
+                );
+            }
+        }
+
+        return Checkout::create($this->owner, $merged, $customerOptions);
     }
 }
