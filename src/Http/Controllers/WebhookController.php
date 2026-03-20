@@ -8,6 +8,14 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Events\QuoteAccepted;
+use Laravel\Cashier\Events\QuoteCanceled;
+use Laravel\Cashier\Events\QuoteFinalized;
+use Laravel\Cashier\Events\SubscriptionScheduleCanceled;
+use Laravel\Cashier\Events\SubscriptionScheduleCompleted;
+use Laravel\Cashier\Events\SubscriptionScheduleCreated;
+use Laravel\Cashier\Events\SubscriptionScheduleReleased;
+use Laravel\Cashier\Events\SubscriptionScheduleUpdated;
 use Laravel\Cashier\Events\WebhookHandled;
 use Laravel\Cashier\Events\WebhookReceived;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
@@ -87,6 +95,7 @@ class WebhookController extends Controller
                     'stripe_status' => $data['status'],
                     'stripe_price' => $isSinglePrice ? $firstItem['price']['id'] : null,
                     'quantity' => $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null,
+                    'billing_mode' => $data['billing_mode']['type'] ?? null,
                     'trial_ends_at' => $trialEndsAt,
                     'ends_at' => null,
                 ]);
@@ -180,6 +189,11 @@ class WebhookController extends Controller
             // Status...
             if (isset($data['status'])) {
                 $subscription->stripe_status = $data['status'];
+            }
+
+            // Billing mode...
+            if (isset($data['billing_mode']['type'])) {
+                $subscription->billing_mode = $data['billing_mode']['type'];
             }
 
             $subscription->save();
@@ -312,6 +326,243 @@ class WebhookController extends Controller
 
                     $user->notify(new $notification($payment));
                 }
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle quote finalized.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleQuoteFinalized(array $payload)
+    {
+        $data = $payload['data']['object'];
+
+        if ($user = $this->getUserByStripeId($data['customer'])) {
+            $quote = $user->quotes()->where('stripe_id', $data['id'])->first();
+
+            if ($quote) {
+                $quote->fill([
+                    'status' => $data['status'],
+                    'number' => $data['number'] ?? null,
+                    'amount_subtotal' => $data['amount_subtotal'] ?? null,
+                    'amount_total' => $data['amount_total'] ?? null,
+                    'finalized_at' => isset($data['status_transitions']['finalized_at'])
+                        ? Carbon::createFromTimestamp($data['status_transitions']['finalized_at'])
+                        : null,
+                ])->save();
+
+                QuoteFinalized::dispatch($user, $quote);
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle quote accepted.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleQuoteAccepted(array $payload)
+    {
+        $data = $payload['data']['object'];
+
+        if ($user = $this->getUserByStripeId($data['customer'])) {
+            $quote = $user->quotes()->where('stripe_id', $data['id'])->first();
+
+            if ($quote) {
+                $quote->fill([
+                    'status' => 'accepted',
+                    'accepted_at' => isset($data['status_transitions']['accepted_at'])
+                        ? Carbon::createFromTimestamp($data['status_transitions']['accepted_at'])
+                        : Carbon::now(),
+                ])->save();
+
+                QuoteAccepted::dispatch($user, $quote);
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle quote canceled.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleQuoteCanceled(array $payload)
+    {
+        $data = $payload['data']['object'];
+
+        if ($user = $this->getUserByStripeId($data['customer'])) {
+            $quote = $user->quotes()->where('stripe_id', $data['id'])->first();
+
+            if ($quote) {
+                $quote->fill([
+                    'status' => 'canceled',
+                    'canceled_at' => isset($data['status_transitions']['canceled_at'])
+                        ? Carbon::createFromTimestamp($data['status_transitions']['canceled_at'])
+                        : Carbon::now(),
+                ])->save();
+
+                QuoteCanceled::dispatch($user, $quote);
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle subscription schedule created.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleSubscriptionScheduleCreated(array $payload)
+    {
+        $data = $payload['data']['object'];
+
+        if ($user = $this->getUserByStripeId($data['customer'])) {
+            $schedule = $user->subscriptionSchedules()->updateOrCreate(
+                ['stripe_id' => $data['id']],
+                [
+                    'type' => $data['metadata']['type'] ?? 'default',
+                    'stripe_status' => $data['status'],
+                    'subscription_id' => $data['subscription'] ?? null,
+                ]
+            );
+
+            SubscriptionScheduleCreated::dispatch($user, $schedule);
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle subscription schedule updated.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleSubscriptionScheduleUpdated(array $payload)
+    {
+        $data = $payload['data']['object'];
+
+        if ($user = $this->getUserByStripeId($data['customer'])) {
+            $schedule = $user->subscriptionSchedules()
+                ->where('stripe_id', $data['id'])
+                ->first();
+
+            if ($schedule) {
+                $schedule->fill([
+                    'stripe_status' => $data['status'],
+                    'subscription_id' => $data['subscription'] ?? null,
+                    'current_phase_started_at' => isset($data['current_phase']['start_date'])
+                        ? Carbon::createFromTimestamp($data['current_phase']['start_date'])
+                        : null,
+                    'current_phase_ends_at' => isset($data['current_phase']['end_date'])
+                        ? Carbon::createFromTimestamp($data['current_phase']['end_date'])
+                        : null,
+                ])->save();
+
+                SubscriptionScheduleUpdated::dispatch($user, $schedule);
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle subscription schedule canceled.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleSubscriptionScheduleCanceled(array $payload)
+    {
+        $data = $payload['data']['object'];
+
+        if ($user = $this->getUserByStripeId($data['customer'])) {
+            $schedule = $user->subscriptionSchedules()
+                ->where('stripe_id', $data['id'])
+                ->first();
+
+            if ($schedule) {
+                $schedule->fill([
+                    'stripe_status' => 'canceled',
+                    'canceled_at' => isset($data['canceled_at'])
+                        ? Carbon::createFromTimestamp($data['canceled_at'])
+                        : Carbon::now(),
+                ])->save();
+
+                SubscriptionScheduleCanceled::dispatch($user, $schedule);
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle subscription schedule completed.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleSubscriptionScheduleCompleted(array $payload)
+    {
+        $data = $payload['data']['object'];
+
+        if ($user = $this->getUserByStripeId($data['customer'])) {
+            $schedule = $user->subscriptionSchedules()
+                ->where('stripe_id', $data['id'])
+                ->first();
+
+            if ($schedule) {
+                $schedule->fill([
+                    'stripe_status' => 'completed',
+                    'completed_at' => isset($data['completed_at'])
+                        ? Carbon::createFromTimestamp($data['completed_at'])
+                        : Carbon::now(),
+                ])->save();
+
+                SubscriptionScheduleCompleted::dispatch($user, $schedule);
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle subscription schedule released.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleSubscriptionScheduleReleased(array $payload)
+    {
+        $data = $payload['data']['object'];
+
+        if ($user = $this->getUserByStripeId($data['customer'])) {
+            $schedule = $user->subscriptionSchedules()
+                ->where('stripe_id', $data['id'])
+                ->first();
+
+            if ($schedule) {
+                $schedule->fill([
+                    'stripe_status' => 'released',
+                    'released_at' => isset($data['released_at'])
+                        ? Carbon::createFromTimestamp($data['released_at'])
+                        : Carbon::now(),
+                ])->save();
+
+                SubscriptionScheduleReleased::dispatch($user, $schedule);
             }
         }
 
