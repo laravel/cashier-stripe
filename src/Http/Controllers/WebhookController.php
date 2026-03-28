@@ -322,9 +322,21 @@ class WebhookController extends Controller
      * Handle invoice payment failed.
      *
      * When a subscription update invoice fails payment (e.g. from swapAndInvoice),
-     * Stripe may revert the subscription to its previous state while the local
-     * database still reflects the new (failed) price. This handler detects that
-     * scenario and syncs the local subscription back to Stripe's actual state.
+     * the local database may be out of sync with Stripe's actual subscription state.
+     * This handler fetches Stripe's current state and reconciles the local record.
+     *
+     * This covers both payment behavior modes:
+     *
+     * - **pending_if_incomplete**: Stripe reverts the subscription to the previous
+     *   price/items via Pending Updates. The local DB still shows the new price
+     *   from the optimistic swap() call, so this handler syncs it back to the
+     *   reverted (original) state.
+     *
+     * - **default_incomplete** (Cashier's default): Stripe applies the price change
+     *   immediately but marks the subscription as `past_due`. The local DB may still
+     *   show `active` status if the exception was caught before status was persisted.
+     *   This handler syncs the `past_due` status so `$subscription->active()` returns
+     *   false, preventing access to upgraded features without successful payment.
      *
      * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
