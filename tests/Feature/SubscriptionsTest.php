@@ -118,7 +118,10 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertEquals(1, count($user->subscriptions));
         $this->assertNotNull(($subscription = $user->subscription('main'))->stripe_id);
-        $this->assertSame($metadata, $subscription->asStripeSubscription()->metadata->toArray());
+        $this->assertSame(
+            ['name' => 'main', 'order_id' => '8', 'type' => 'main'],
+            $subscription->asStripeSubscription()->metadata->toArray()
+        );
 
         $this->assertTrue($user->subscribed('main'));
         $this->assertTrue($user->subscribedToProduct(static::$productId, 'main'));
