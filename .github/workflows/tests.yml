@@ -65,3 +65,14 @@ jobs:
         if: matrix.php >= 8.2 && matrix.php <= 8.4
         env:
           STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
+
+      - name: Install dependencies (Laravel 13)
+        run: |
+          composer update --prefer-dist --no-interaction --no-progress --with="illuminate/contracts:^12"
+        if: matrix.php >= 8.3 && matrix.php <= 8.4
+
+      - name: Execute tests (Laravel 13)
+        run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
+        if: matrix.php >= 8.3 && matrix.php <= 8.4
+        env:
+          STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
