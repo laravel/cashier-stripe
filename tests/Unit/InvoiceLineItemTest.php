@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Laravel\Cashier\Tests\Unit;
 
 use App\Models\User;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Invoice;
 use Laravel\Cashier\InvoiceLineItem;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Invoice as StripeInvoice;
 use Stripe\InvoiceLineItem as StripeInvoiceLineItem;
@@ -15,6 +17,21 @@ use Stripe\TaxRate as StripeTaxRate;
 
 class InvoiceLineItemTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Cashier::formatCurrencyUsing(fn ($amount) => '$'.number_format($amount / 100, 2));
+    }
+
+    protected function tearDown(): void
+    {
+        $property = new ReflectionProperty(Cashier::class, 'formatCurrencyUsing');
+        $property->setValue(null, null);
+
+        parent::tearDown();
+    }
+
     public function test_we_can_calculate_the_inclusive_tax_percentage()
     {
         $customer = new User();
@@ -63,6 +80,122 @@ class InvoiceLineItemTest extends TestCase
         $result = $item->exclusiveTaxPercentage();
 
         $this->assertSame(37.13, $result);
+    }
+
+    public function test_unit_amount_excluding_tax_with_no_taxes()
+    {
+        $customer = new User();
+        $customer->stripe_id = 'foo';
+
+        $stripeInvoice = new StripeInvoice();
+        $stripeInvoice->customer = 'foo';
+
+        $invoice = new Invoice($customer, $stripeInvoice);
+
+        $stripeInvoiceLineItem = StripeInvoiceLineItem::constructFrom([
+            'currency' => 'usd',
+            'quantity' => 1,
+            'taxes' => [],
+            'pricing' => [
+                'type' => 'price_details',
+                'unit_amount_decimal' => '1000',
+            ],
+        ]);
+
+        $item = new InvoiceLineItem($invoice, $stripeInvoiceLineItem);
+
+        $this->assertSame('$10.00', $item->unitAmountExcludingTax());
+    }
+
+    public function test_unit_amount_excluding_tax_with_inclusive_tax()
+    {
+        $customer = new User();
+        $customer->stripe_id = 'foo';
+
+        $stripeInvoice = new StripeInvoice();
+        $stripeInvoice->customer = 'foo';
+
+        $invoice = new Invoice($customer, $stripeInvoice);
+
+        $stripeInvoiceLineItem = StripeInvoiceLineItem::constructFrom([
+            'currency' => 'usd',
+            'quantity' => 1,
+            'taxes' => [
+                [
+                    'type' => 'tax_rate_details',
+                    'amount' => 9,
+                    'tax_behavior' => 'inclusive',
+                    'taxable_amount' => 91,
+                    'tax_rate_details' => ['tax_rate' => 'txr_test'],
+                ],
+            ],
+        ]);
+
+        $item = new InvoiceLineItem($invoice, $stripeInvoiceLineItem);
+
+        $this->assertSame('$0.91', $item->unitAmountExcludingTax());
+    }
+
+    public function test_unit_amount_excluding_tax_with_exclusive_tax()
+    {
+        $customer = new User();
+        $customer->stripe_id = 'foo';
+
+        $stripeInvoice = new StripeInvoice();
+        $stripeInvoice->customer = 'foo';
+
+        $invoice = new Invoice($customer, $stripeInvoice);
+
+        $stripeInvoiceLineItem = StripeInvoiceLineItem::constructFrom([
+            'currency' => 'usd',
+            'quantity' => 1,
+            'taxes' => [
+                [
+                    'type' => 'tax_rate_details',
+                    'amount' => 200,
+                    'tax_behavior' => 'exclusive',
+                    'taxable_amount' => 1000,
+                    'tax_rate_details' => ['tax_rate' => 'txr_test'],
+                ],
+            ],
+            'pricing' => [
+                'type' => 'price_details',
+                'unit_amount_decimal' => '1000',
+            ],
+        ]);
+
+        $item = new InvoiceLineItem($invoice, $stripeInvoiceLineItem);
+
+        $this->assertSame('$10.00', $item->unitAmountExcludingTax());
+    }
+
+    public function test_unit_amount_excluding_tax_divides_by_quantity_for_inclusive_tax()
+    {
+        $customer = new User();
+        $customer->stripe_id = 'foo';
+
+        $stripeInvoice = new StripeInvoice();
+        $stripeInvoice->customer = 'foo';
+
+        $invoice = new Invoice($customer, $stripeInvoice);
+
+        $stripeInvoiceLineItem = StripeInvoiceLineItem::constructFrom([
+            'currency' => 'usd',
+            'quantity' => 2,
+            'taxes' => [
+                [
+                    'type' => 'tax_rate_details',
+                    'amount' => 18,
+                    'tax_behavior' => 'inclusive',
+                    'taxable_amount' => 182,
+                    'tax_rate_details' => ['tax_rate' => 'txr_test'],
+                ],
+            ],
+        ]);
+
+        $item = new InvoiceLineItem($invoice, $stripeInvoiceLineItem);
+
+        $this->assertSame('$0.91', $item->unitAmountExcludingTax());
     }
 
     public function test_price_uses_expanded_object_when_available()
