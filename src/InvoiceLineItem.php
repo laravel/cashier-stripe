@@ -44,7 +44,7 @@ class InvoiceLineItem implements Arrayable, Jsonable, JsonSerializable
      */
     public function unitAmountExcludingTax(): string
     {
-        // taxable_amount is the pre-tax total when tax is inclusive.
+        // taxable_amount is the pre-tax total when tax is inclusive...
         $inclusiveTax = $this->taxes()
             ->first(fn (object $tax) => ($tax->tax_behavior ?? null) === 'inclusive');
 
