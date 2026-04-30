@@ -247,12 +247,23 @@
                         this.paymentMethod = this.paymentMethods.filter(
                             paymentMethod => paymentMethod.type === type
                         )[0];
+
+                        // Fallback to the first available payment method if the resolved type
+                        // is not in the supported list (e.g. "link", "amazon_pay")...
+                        if (! this.paymentMethod) {
+                            this.paymentMethod = this.paymentMethods[0] ?? null;
+                        }
                     }
                 },
 
                 configureStripeElements: function () {
                     // Stripe Elements are only needed when a payment method is required.
                     if (this.paymentIntent.status !== 'requires_payment_method') {
+                        return;
+                    }
+
+                    // If no supported payment method is available, skip element creation...
+                    if (! this.paymentMethod) {
                         return;
                     }
 
@@ -278,6 +289,11 @@
                 },
 
                 confirmPaymentMethod: function () {
+                    if (! this.paymentMethod) {
+                        this.errorMessage = 'No supported payment method available. Please try a different payment method.';
+                        return;
+                    }
+
                     this.isPaymentProcessing = true;
                     this.errorMessage = '';
 
