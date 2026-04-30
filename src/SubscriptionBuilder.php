@@ -86,6 +86,13 @@ class SubscriptionBuilder
     protected array $metadata = [];
 
     /**
+     * The billing mode for the subscription.
+     *
+     * @var array|null
+     */
+    protected $billingMode = null;
+
+    /**
      * Create a new subscription builder instance.
      *
      * @param  mixed  $owner
@@ -250,6 +257,19 @@ class SubscriptionBuilder
     }
 
     /**
+     * Set the billing mode for the subscription.
+     *
+     * @param  string  $type
+     * @return $this
+     */
+    public function withBillingMode($type = 'flexible')
+    {
+        $this->billingMode = ['type' => $type];
+
+        return $this;
+    }
+
+    /**
      * Add a new Stripe subscription to the Stripe model.
      *
      * @param  array  $customerOptions
@@ -396,6 +416,7 @@ class SubscriptionBuilder
             'line_items' => Collection::make($this->items)->values()->all(),
             'mode' => 'subscription',
             'subscription_data' => array_filter([
+                'billing_mode' => $this->getBillingModeForPayload(),
                 'default_tax_rates' => $this->getTaxRatesForPayload(),
                 'trial_end' => $trialEnd?->getTimestamp(),
                 'billing_cycle_anchor' => $billingCycleAnchor,
@@ -439,6 +460,7 @@ class SubscriptionBuilder
         $payload = array_filter([
             'automatic_tax' => $this->automaticTaxPayload(),
             'billing_cycle_anchor' => $this->billingCycleAnchor,
+            'billing_mode' => $this->getBillingModeForPayload(),
             'billing_thresholds' => $this->billingThresholds,
             'expand' => ['latest_invoice.confirmation_secret'],
             'metadata' => $this->metadata,
@@ -519,6 +541,92 @@ class SubscriptionBuilder
         }
 
         return null;
+    }
+
+    /**
+     * Get the default billing mode from config.
+     *
+     * @return string
+     */
+    protected function getDefaultBillingMode()
+    {
+        return config('cashier.default_billing_mode', 'classic');
+    }
+
+    /**
+     * Get the effective billing mode.
+     *
+     * @return string
+     */
+    protected function getEffectiveBillingMode()
+    {
+        return $this->billingMode['type'] ?? $this->getDefaultBillingMode();
+    }
+
+    /**
+     * Get the billing mode for the Stripe payload.
+     *
+     * @return array|null
+     */
+    protected function getBillingModeForPayload()
+    {
+        $effectiveMode = $this->getEffectiveBillingMode();
+
+        // Only include billing_mode in payload if it's flexible
+        // Classic mode is Stripe's default, so we omit it for backwards compatibility
+        if ($effectiveMode === 'flexible') {
+            $this->validateFlexibleBillingSupport();
+
+            return ['type' => 'flexible'];
+        }
+
+        return null;
+    }
+
+    /**
+     * Validate that flexible billing mode is supported by the current API version.
+     *
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function validateFlexibleBillingSupport()
+    {
+        $apiVersion = config('cashier.stripe.api_version') ?? \Stripe\Stripe::getApiVersion();
+
+        if ($apiVersion && version_compare($apiVersion, '2025-06-30', '<')) {
+            throw new \InvalidArgumentException(
+                'Flexible billing mode requires Stripe API version 2025-06-30.basil or later. '.
+                'Current version: '.$apiVersion.'. Please update your API version.'
+            );
+        }
+
+        // Validate flexible billing mode limitations
+        $this->validateFlexibleBillingCompatibility();
+    }
+
+    /**
+     * Validate that the subscription configuration is compatible with flexible billing mode.
+     *
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function validateFlexibleBillingCompatibility()
+    {
+        // Check for incompatible billing thresholds
+        if ($this->billingThresholds !== null) {
+            throw new \InvalidArgumentException(
+                'Flexible billing mode is not compatible with billing thresholds. '.
+                'Remove billing thresholds before using flexible billing mode.'
+            );
+        }
+
+        // Warn about trial limitations (flexible mode doesn't support paid trials)
+        if ($this->trialExpires && ! $this->skipTrial) {
+            // This is just a warning as free trials are supported, but paid trials are not
+            // The actual validation would need to check if the trial is paid, which is complex
+        }
     }
 
     /**

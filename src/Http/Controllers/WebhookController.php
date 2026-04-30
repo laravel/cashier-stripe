@@ -12,6 +12,7 @@ use Laravel\Cashier\Events\WebhookHandled;
 use Laravel\Cashier\Events\WebhookReceived;
 use Laravel\Cashier\Http\Middleware\VerifyWebhookSignature;
 use Laravel\Cashier\Payment;
+use Laravel\Cashier\Quote;
 use Laravel\Cashier\Subscription;
 use Stripe\Stripe;
 use Stripe\Subscription as StripeSubscription;
@@ -312,6 +313,183 @@ class WebhookController extends Controller
 
                     $user->notify(new $notification($payment));
                 }
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle quote finalized webhook.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleQuoteFinalized(array $payload)
+    {
+        $stripeQuote = $payload['data']['object'];
+
+        if ($customer = $this->getUserByStripeId($stripeQuote['customer'])) {
+            $quote = $customer->quotes()->where('stripe_id', $stripeQuote['id'])->first();
+
+            if ($quote) {
+                $quote->syncWithStripe();
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle quote accepted webhook.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleQuoteAccepted(array $payload)
+    {
+        $stripeQuote = $payload['data']['object'];
+
+        if ($customer = $this->getUserByStripeId($stripeQuote['customer'])) {
+            $quote = $customer->quotes()->where('stripe_id', $stripeQuote['id'])->first();
+
+            if ($quote) {
+                $quote->syncWithStripe();
+
+                // Handle subscription creation if quote creates a subscription
+                if (isset($stripeQuote['subscription']) && $stripeQuote['subscription']) {
+                    // Sync subscription state - will be handled by subscription webhooks
+                }
+
+                // Handle subscription schedule creation if quote creates a schedule
+                if (isset($stripeQuote['subscription_schedule']) && $stripeQuote['subscription_schedule']) {
+                    // Sync subscription schedule state - will be handled by subscription schedule webhooks
+                }
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle quote canceled webhook.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleQuoteCanceled(array $payload)
+    {
+        $stripeQuote = $payload['data']['object'];
+
+        if ($customer = $this->getUserByStripeId($stripeQuote['customer'])) {
+            $quote = $customer->quotes()->where('stripe_id', $stripeQuote['id'])->first();
+
+            if ($quote) {
+                $quote->syncWithStripe();
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle subscription schedule created webhook.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleSubscriptionScheduleCreated(array $payload)
+    {
+        $stripeSchedule = $payload['data']['object'];
+
+        if ($customer = $this->getUserByStripeId($stripeSchedule['customer'])) {
+            // Create or update the subscription schedule
+            $schedule = $customer->subscriptionSchedules()->updateOrCreate([
+                'stripe_id' => $stripeSchedule['id'],
+            ], [
+                'stripe_status' => $stripeSchedule['status'],
+            ]);
+
+            $schedule->syncWithStripe();
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle subscription schedule updated webhook.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleSubscriptionScheduleUpdated(array $payload)
+    {
+        $stripeSchedule = $payload['data']['object'];
+
+        if ($customer = $this->getUserByStripeId($stripeSchedule['customer'])) {
+            $schedule = $customer->subscriptionSchedules()->where('stripe_id', $stripeSchedule['id'])->first();
+            if ($schedule) {
+                $schedule->syncWithStripe();
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle subscription schedule canceled webhook.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleSubscriptionScheduleCanceled(array $payload)
+    {
+        $stripeSchedule = $payload['data']['object'];
+
+        if ($customer = $this->getUserByStripeId($stripeSchedule['customer'])) {
+            $schedule = $customer->subscriptionSchedules()->where('stripe_id', $stripeSchedule['id'])->first();
+            if ($schedule) {
+                $schedule->syncWithStripe();
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle subscription schedule completed webhook.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleSubscriptionScheduleCompleted(array $payload)
+    {
+        $stripeSchedule = $payload['data']['object'];
+
+        if ($customer = $this->getUserByStripeId($stripeSchedule['customer'])) {
+            $schedule = $customer->subscriptionSchedules()->where('stripe_id', $stripeSchedule['id'])->first();
+            if ($schedule) {
+                $schedule->syncWithStripe();
+            }
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle subscription schedule released webhook.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleSubscriptionScheduleReleased(array $payload)
+    {
+        $stripeSchedule = $payload['data']['object'];
+
+        if ($customer = $this->getUserByStripeId($stripeSchedule['customer'])) {
+            $schedule = $customer->subscriptionSchedules()->where('stripe_id', $stripeSchedule['id'])->first();
+            if ($schedule) {
+                $schedule->syncWithStripe();
             }
         }
 

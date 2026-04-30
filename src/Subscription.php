@@ -68,6 +68,13 @@ class Subscription extends Model
     protected ?string $billingCycleAnchor = null;
 
     /**
+     * The billing mode for the subscription.
+     *
+     * @var array|null
+     */
+    protected $billingMode = null;
+
+    /**
      * The billing thresholds for the subscription.
      *
      * @var array|null
@@ -629,6 +636,69 @@ class Subscription extends Model
     }
 
     /**
+     * Set the billing mode for subscription operations.
+     *
+     * @param  string  $type
+     * @return $this
+     */
+    public function withBillingMode($type = 'flexible')
+    {
+        $this->billingMode = ['type' => $type];
+
+        return $this;
+    }
+
+    /**
+     * Migrate this subscription to flexible billing mode.
+     *
+     * @param  array  $options
+     * @return $this
+     *
+     * @throws \Stripe\Exception\ApiErrorException
+     * @throws \InvalidArgumentException
+     */
+    public function migrateBillingMode(array $options = [])
+    {
+        $this->guardAgainstIncomplete();
+        $this->validateFlexibleBillingSupport();
+
+        $payload = array_merge([
+            'billing_mode' => ['type' => 'flexible'],
+        ], $options);
+
+        // Use Stripe's migration API endpoint
+        $stripeSubscription = $this->owner->stripe()->subscriptions->migrate(
+            $this->stripe_id,
+            $payload
+        );
+
+        $this->fill([
+            'stripe_status' => $stripeSubscription->status,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Validate that flexible billing mode is supported by the current API version.
+     *
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function validateFlexibleBillingSupport()
+    {
+        $apiVersion = config('cashier.stripe.api_version') ?? \Stripe\Stripe::getApiVersion();
+
+        if ($apiVersion && version_compare($apiVersion, '2025-06-30', '<')) {
+            throw new \InvalidArgumentException(
+                'Flexible billing mode requires Stripe API version 2025-06-30.basil or later. '.
+                'Current version: '.$apiVersion.'. Please update your API version.'
+            );
+        }
+    }
+
+    /**
      * Set billing thresholds for the subscription.
      *
      * @param  array  $thresholds
@@ -877,6 +947,10 @@ class Subscription extends Model
 
         if (! is_null($this->billingCycleAnchor)) {
             $payload['billing_cycle_anchor'] = $this->billingCycleAnchor;
+        }
+
+        if (! is_null($this->billingMode)) {
+            $payload['billing_mode'] = $this->billingMode;
         }
 
         if (! is_null($this->billingThresholds)) {
@@ -1317,6 +1391,7 @@ class Subscription extends Model
         $swapOptions = Collection::make($this->getSwapOptions($items))
             ->only([
                 'billing_cycle_anchor',
+                'billing_mode',
                 'cancel_at_period_end',
                 'items',
                 'proration_behavior',

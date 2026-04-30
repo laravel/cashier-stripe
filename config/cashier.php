@@ -124,4 +124,19 @@ return [
 
     'logger' => env('CASHIER_LOGGER'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Default Billing Mode
+    |--------------------------------------------------------------------------
+    |
+    | This setting defines the default billing mode for new subscriptions.
+    | The billing mode can be either "classic" (default) or "flexible".
+    | Flexible mode enables more flexible subscription behavior including
+    | improved prorations, consolidated invoicing, and mixed intervals.
+    | Requires Stripe API version 2025-06-30.basil or later.
+    |
+    */
+
+    'default_billing_mode' => env('CASHIER_DEFAULT_BILLING_MODE', 'classic'),
+
 ];

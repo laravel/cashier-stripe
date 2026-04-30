@@ -55,6 +55,142 @@ class WebhookControllerTest extends TestCase
         $this->assertSame('Missing event type: foo.bar', $response->getContent());
     }
 
+    public function test_quote_finalized_webhook_is_handled()
+    {
+        $request = $this->request('quote.finalized');
+
+        Event::fake([
+            WebhookHandled::class,
+            WebhookReceived::class,
+        ]);
+
+        $response = (new WebhookControllerTestStub)->handleWebhook($request);
+
+        Event::assertDispatched(WebhookReceived::class);
+        Event::assertDispatched(WebhookHandled::class);
+
+        $this->assertEquals('Quote Webhook Handled', $response->getContent());
+    }
+
+    public function test_quote_accepted_webhook_is_handled()
+    {
+        $request = $this->request('quote.accepted');
+
+        Event::fake([
+            WebhookHandled::class,
+            WebhookReceived::class,
+        ]);
+
+        $response = (new WebhookControllerTestStub)->handleWebhook($request);
+
+        Event::assertDispatched(WebhookReceived::class);
+        Event::assertDispatched(WebhookHandled::class);
+
+        $this->assertEquals('Quote Webhook Handled', $response->getContent());
+    }
+
+    public function test_quote_canceled_webhook_is_handled()
+    {
+        $request = $this->request('quote.canceled');
+
+        Event::fake([
+            WebhookHandled::class,
+            WebhookReceived::class,
+        ]);
+
+        $response = (new WebhookControllerTestStub)->handleWebhook($request);
+
+        Event::assertDispatched(WebhookReceived::class);
+        Event::assertDispatched(WebhookHandled::class);
+
+        $this->assertEquals('Quote Webhook Handled', $response->getContent());
+    }
+
+    public function test_subscription_schedule_created_webhook_is_handled()
+    {
+        $request = $this->request('subscription_schedule.created');
+
+        Event::fake([
+            WebhookHandled::class,
+            WebhookReceived::class,
+        ]);
+
+        $response = (new WebhookControllerTestStub)->handleWebhook($request);
+
+        Event::assertDispatched(WebhookReceived::class);
+        Event::assertDispatched(WebhookHandled::class);
+
+        $this->assertEquals('Subscription Schedule Webhook Handled', $response->getContent());
+    }
+
+    public function test_subscription_schedule_updated_webhook_is_handled()
+    {
+        $request = $this->request('subscription_schedule.updated');
+
+        Event::fake([
+            WebhookHandled::class,
+            WebhookReceived::class,
+        ]);
+
+        $response = (new WebhookControllerTestStub)->handleWebhook($request);
+
+        Event::assertDispatched(WebhookReceived::class);
+        Event::assertDispatched(WebhookHandled::class);
+
+        $this->assertEquals('Subscription Schedule Webhook Handled', $response->getContent());
+    }
+
+    public function test_subscription_schedule_canceled_webhook_is_handled()
+    {
+        $request = $this->request('subscription_schedule.canceled');
+
+        Event::fake([
+            WebhookHandled::class,
+            WebhookReceived::class,
+        ]);
+
+        $response = (new WebhookControllerTestStub)->handleWebhook($request);
+
+        Event::assertDispatched(WebhookReceived::class);
+        Event::assertDispatched(WebhookHandled::class);
+
+        $this->assertEquals('Subscription Schedule Webhook Handled', $response->getContent());
+    }
+
+    public function test_subscription_schedule_completed_webhook_is_handled()
+    {
+        $request = $this->request('subscription_schedule.completed');
+
+        Event::fake([
+            WebhookHandled::class,
+            WebhookReceived::class,
+        ]);
+
+        $response = (new WebhookControllerTestStub)->handleWebhook($request);
+
+        Event::assertDispatched(WebhookReceived::class);
+        Event::assertDispatched(WebhookHandled::class);
+
+        $this->assertEquals('Subscription Schedule Webhook Handled', $response->getContent());
+    }
+
+    public function test_subscription_schedule_released_webhook_is_handled()
+    {
+        $request = $this->request('subscription_schedule.released');
+
+        Event::fake([
+            WebhookHandled::class,
+            WebhookReceived::class,
+        ]);
+
+        $response = (new WebhookControllerTestStub)->handleWebhook($request);
+
+        Event::assertDispatched(WebhookReceived::class);
+        Event::assertDispatched(WebhookHandled::class);
+
+        $this->assertEquals('Subscription Schedule Webhook Handled', $response->getContent());
+    }
+
     private function request($event)
     {
         return Request::create(
@@ -70,9 +206,49 @@ class WebhookControllerTestStub extends WebhookController
         // Don't call parent constructor to prevent setting middleware...
     }
 
-    public function handleChargeSucceeded()
+    public function handleChargeSucceeded(array $payload)
     {
         return new Response('Webhook Handled', 200);
+    }
+
+    public function handleQuoteFinalized(array $payload)
+    {
+        return new Response('Quote Webhook Handled', 200);
+    }
+
+    public function handleQuoteAccepted(array $payload)
+    {
+        return new Response('Quote Webhook Handled', 200);
+    }
+
+    public function handleQuoteCanceled(array $payload)
+    {
+        return new Response('Quote Webhook Handled', 200);
+    }
+
+    public function handleSubscriptionScheduleCreated(array $payload)
+    {
+        return new Response('Subscription Schedule Webhook Handled', 200);
+    }
+
+    public function handleSubscriptionScheduleUpdated(array $payload)
+    {
+        return new Response('Subscription Schedule Webhook Handled', 200);
+    }
+
+    public function handleSubscriptionScheduleCanceled(array $payload)
+    {
+        return new Response('Subscription Schedule Webhook Handled', 200);
+    }
+
+    public function handleSubscriptionScheduleCompleted(array $payload)
+    {
+        return new Response('Subscription Schedule Webhook Handled', 200);
+    }
+
+    public function handleSubscriptionScheduleReleased(array $payload)
+    {
+        return new Response('Subscription Schedule Webhook Handled', 200);
     }
 
     public function missingMethod($parameters = [])

@@ -13,6 +13,7 @@ class CustomerTest extends TestCase
     public function test_customer_can_be_put_on_a_generic_trial()
     {
         $user = new User;
+        $user->setDateFormat('Y-m-d H:i:s');
 
         $this->assertFalse($user->onGenericTrial());
 
@@ -29,6 +30,7 @@ class CustomerTest extends TestCase
     public function test_we_can_check_if_a_generic_trial_has_expired()
     {
         $user = new User;
+        $user->setDateFormat('Y-m-d H:i:s');
 
         $user->trial_ends_at = Carbon::yesterday();
 

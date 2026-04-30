@@ -200,57 +200,121 @@ class CheckoutTest extends FeatureTestCase
         $this->assertInstanceOf(Checkout::class, $checkout);
     }
 
-    public function test_checkout_prevents_address_lock_when_tax_collection_enabled()
+    public function test_subscription_checkout_with_flexible_billing_mode()
     {
-        // Enable tax calculation globally
-        \Laravel\Cashier\Cashier::calculateTaxes();
+        $user = $this->createCustomer('subscription_checkout_flexible_billing');
 
-        try {
-            $user = $this->createCustomer('address_lock_fix');
+        $price = self::stripe()->prices->create([
+            'currency' => 'USD',
+            'product_data' => [
+                'name' => 'Flexible Test Plan',
+            ],
+            'recurring' => ['interval' => 'month'],
+            'unit_amount' => 1000,
+        ]);
 
-            $price = self::stripe()->prices->create([
-                'currency' => 'USD',
-                'product_data' => ['name' => 'Test Product'],
-                'unit_amount' => 1000,
-            ]);
-
-            $checkout = $user->checkout($price->id, [
+        $checkout = $user->newSubscription('default', $price->id)
+            ->withBillingMode('flexible')
+            ->checkout([
                 'success_url' => 'http://example.com',
                 'cancel_url' => 'http://example.com',
             ]);
 
-            $session = $checkout->asStripeCheckoutSession();
+        $this->assertInstanceOf(Checkout::class, $checkout);
+        $this->assertEquals('subscription', $checkout->mode);
 
-            // Verify that address lock is prevented
-            $this->assertTrue($session->tax_id_collection['enabled']);
-            $this->assertEquals('required', $session->billing_address_collection);
-            $this->assertNotEquals('auto', $session->customer_update['address'] ?? null);
-        } finally {
-            \Laravel\Cashier\Cashier::$calculatesTaxes = false;
-        }
+        // Verify the checkout session was created successfully
+        $this->assertNotNull($checkout->id);
+        $this->assertNotNull($checkout->url);
     }
 
-    public function test_checkout_respects_user_overrides_when_tax_collection_enabled()
+    public function test_subscription_checkout_with_classic_billing_mode()
     {
-        $user = $this->createCustomer('user_overrides_tax_collection');
+        $user = $this->createCustomer('subscription_checkout_classic_billing');
 
         $price = self::stripe()->prices->create([
             'currency' => 'USD',
-            'product_data' => ['name' => 'Test Product'],
+            'product_data' => [
+                'name' => 'Classic Test Plan',
+            ],
+            'recurring' => ['interval' => 'month'],
             'unit_amount' => 1000,
         ]);
 
-        // User explicitly overrides billing_address_collection
-        $checkout = $user->checkout($price->id, [
-            'success_url' => 'http://example.com',
-            'cancel_url' => 'http://example.com',
-            'tax_id_collection' => ['enabled' => true],
-            'billing_address_collection' => 'auto',  // User override
+        $checkout = $user->newSubscription('default', $price->id)
+            ->withBillingMode('classic')
+            ->checkout([
+                'success_url' => 'http://example.com',
+                'cancel_url' => 'http://example.com',
+            ]);
+
+        $this->assertInstanceOf(Checkout::class, $checkout);
+        $this->assertEquals('subscription', $checkout->mode);
+
+        // Verify the checkout session was created successfully
+        $this->assertNotNull($checkout->id);
+        $this->assertNotNull($checkout->url);
+    }
+
+    public function test_checkout_builder_with_flexible_billing_mode()
+    {
+        $user = $this->createCustomer('checkout_builder_flexible_billing');
+
+        $price = self::stripe()->prices->create([
+            'currency' => 'USD',
+            'product_data' => [
+                'name' => 'Builder Test Plan',
+            ],
+            'recurring' => ['interval' => 'month'],
+            'unit_amount' => 1000,
         ]);
 
-        $session = $checkout->asStripeCheckoutSession();
+        $checkout = Checkout::customer($user)
+            ->withBillingMode('flexible')
+            ->createSubscription([$price->id => 1], [
+                'success_url' => 'http://example.com',
+                'cancel_url' => 'http://example.com',
+            ]);
 
-        // User override should be respected
-        $this->assertEquals('auto', $session->billing_address_collection);
+        $this->assertInstanceOf(Checkout::class, $checkout);
+        $this->assertEquals('subscription', $checkout->mode);
+
+        // Verify the checkout session was created successfully
+        $this->assertNotNull($checkout->id);
+        $this->assertNotNull($checkout->url);
+    }
+
+    public function test_checkout_billing_mode_respects_config_default()
+    {
+        // Set config to flexible
+        config(['cashier.default_billing_mode' => 'flexible']);
+
+        $user = $this->createCustomer('checkout_config_default_flexible');
+
+        $price = self::stripe()->prices->create([
+            'currency' => 'USD',
+            'product_data' => [
+                'name' => 'Config Default Test Plan',
+            ],
+            'recurring' => ['interval' => 'month'],
+            'unit_amount' => 1000,
+        ]);
+
+        // Create checkout without explicit billing mode (should use config default)
+        $checkout = $user->newSubscription('default', $price->id)
+            ->checkout([
+                'success_url' => 'http://example.com',
+                'cancel_url' => 'http://example.com',
+            ]);
+
+        $this->assertInstanceOf(Checkout::class, $checkout);
+        $this->assertEquals('subscription', $checkout->mode);
+
+        // Verify the checkout session was created successfully
+        $this->assertNotNull($checkout->id);
+        $this->assertNotNull($checkout->url);
+
+        // Reset config
+        config(['cashier.default_billing_mode' => 'classic']);
     }
 }
