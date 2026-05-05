@@ -1,6 +1,14 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v15.7.1...15.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v15.8.0...15.x)
+
+## [v15.8.0](https://github.com/laravel/cashier/compare/v15.7.1...v15.8.0) - 2026-03-30
+
+* Prevent address lock in Checkout (#1764) by [@captainscorch](https://github.com/captainscorch) in https://github.com/laravel/cashier-stripe/pull/1766
+* Fix handling of `customer.subscription.updated` webhook to prevent 500 error and correctly set ends_at by [@imerfanahmed](https://github.com/imerfanahmed) in https://github.com/laravel/cashier-stripe/pull/1774
+* Improve type hints for collection return types by [@nguyentranchung](https://github.com/nguyentranchung) in https://github.com/laravel/cashier-stripe/pull/1796
+* Update parameter withCoupon and withPromotionCode methods to allow null values by [@nguyentranchung](https://github.com/nguyentranchung) in https://github.com/laravel/cashier-stripe/pull/1809
+* Supports Laravel 13 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/cashier-stripe/pull/1838
 
 ## [v15.7.1](https://github.com/laravel/cashier/compare/v15.7.0...v15.7.1) - 2025-07-22
 
