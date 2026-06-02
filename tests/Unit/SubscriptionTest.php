@@ -2,9 +2,12 @@
 
 namespace Laravel\Cashier\Tests\Unit;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use Laravel\Cashier\Subscription;
+use Laravel\Cashier\SubscriptionItem;
 use PHPUnit\Framework\TestCase;
 use Stripe\Subscription as StripeSubscription;
 
@@ -170,5 +173,50 @@ class SubscriptionTest extends TestCase
 
         $this->assertTrue($subscription->hasMultiplePrices());
         $this->assertFalse($subscription->hasSinglePrice());
+    }
+
+    public function test_current_period_dates_do_not_lazy_load_subscription_item_relations()
+    {
+        Model::preventLazyLoading();
+
+        try {
+            $subscription = new Subscription;
+            $subscription->exists = true;
+            $subscription->setRelation('owner', new class
+            {
+                public function stripe()
+                {
+                    return new class
+                    {
+                        public $subscriptionItems;
+
+                        public function __construct()
+                        {
+                            $this->subscriptionItems = new class
+                            {
+                                public function retrieve($id, array $params = [])
+                                {
+                                    return (object) [
+                                        'current_period_start' => 1700000000,
+                                        'current_period_end' => 1700086400,
+                                    ];
+                                }
+                            };
+                        }
+                    };
+                }
+            });
+
+            $item = new SubscriptionItem(['stripe_id' => 'si_test']);
+            $item->exists = true;
+            $item->preventsLazyLoading = true;
+
+            $subscription->setRelation('items', new Collection([$item]));
+
+            $this->assertSame(1700000000, $subscription->currentPeriodStart()->getTimestamp());
+            $this->assertSame(1700086400, $subscription->currentPeriodEnd()->getTimestamp());
+        } finally {
+            Model::preventLazyLoading(false);
+        }
     }
 }

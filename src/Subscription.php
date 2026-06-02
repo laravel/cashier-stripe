@@ -1194,7 +1194,7 @@ class Subscription extends Model
      */
     public function currentPeriodStart(DateTimeZone|string|int|null $timezone = null): ?CarbonInterface
     {
-        $items = $this->items;
+        $items = $this->itemsForCurrentPeriodLookup();
 
         if ($items->isEmpty()) {
             return null;
@@ -1223,7 +1223,7 @@ class Subscription extends Model
      */
     public function currentPeriodEnd(DateTimeZone|string|int|null $timezone = null): ?CarbonInterface
     {
-        $items = $this->items;
+        $items = $this->itemsForCurrentPeriodLookup();
 
         if ($items->isEmpty()) {
             return null;
@@ -1240,6 +1240,28 @@ class Subscription extends Model
         }
 
         return $latestEnd ? ($timezone ? $latestEnd->setTimezone($timezone) : $latestEnd) : null;
+    }
+
+    /**
+     * Get the subscription items prepared for Stripe current period lookups.
+     *
+     * @return \Illuminate\Support\Collection<int, \Laravel\Cashier\SubscriptionItem>
+     */
+    protected function itemsForCurrentPeriodLookup(): Collection
+    {
+        $items = $this->items;
+
+        if ($items->isEmpty()) {
+            return $items;
+        }
+
+        if (! $this->relationLoaded('owner')) {
+            $this->load('owner');
+        }
+
+        return $items->each(function (SubscriptionItem $item) {
+            $item->setRelation('subscription', $this);
+        });
     }
 
     /**
