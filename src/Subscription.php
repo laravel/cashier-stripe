@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Cashier\Concerns\AllowsCoupons;
@@ -93,7 +94,11 @@ class Subscription extends Model
     {
         $model = Cashier::$customerModel;
 
-        return $this->belongsTo($model, (new $model)->getForeignKey());
+        $relation = $this->belongsTo($model, (new $model)->getForeignKey());
+
+        return in_array(SoftDeletes::class, class_uses_recursive($model))
+            ? $relation->withTrashed()
+            : $relation;
     }
 
     /**
