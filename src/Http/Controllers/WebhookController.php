@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Http\Controllers;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Routing\Controller;
@@ -80,7 +81,7 @@ class WebhookController extends Controller
                 $firstItem = $data['items']['data'][0];
                 $isSinglePrice = count($data['items']['data']) === 1;
 
-                $subscription = $user->subscriptions()->updateOrCreate([
+                $subscription = $this->updateOrCreateSubscription($user, [
                     'stripe_id' => $data['id'],
                 ], [
                     'type' => $data['metadata']['type'] ?? $data['metadata']['name'] ?? $this->newSubscriptionType($payload),
@@ -92,7 +93,7 @@ class WebhookController extends Controller
                 ]);
 
                 foreach ($data['items']['data'] as $item) {
-                    $subscription->items()->updateOrCreate([
+                    $this->updateOrCreateSubscriptionItem($subscription, [
                         'stripe_id' => $item['id'],
                     ], [
                         'stripe_product' => $item['price']['product'],
@@ -121,6 +122,90 @@ class WebhookController extends Controller
     protected function newSubscriptionType(array $payload)
     {
         return 'default';
+    }
+
+    /**
+     * Update or create a subscription while tolerating a concurrent insert.
+     *
+     * @param  \Laravel\Cashier\Billable  $user
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Laravel\Cashier\Subscription
+     */
+    protected function updateOrCreateSubscription($user, array $attributes, array $values)
+    {
+        if ($subscription = $user->subscriptions()->where($attributes)->first()) {
+            $subscription->fill($values)->save();
+
+            return $subscription;
+        }
+
+        try {
+            return $user->subscriptions()->create(array_merge($attributes, $values));
+        } catch (QueryException $e) {
+            if (! $this->causedByUniqueConstraintViolation($e)) {
+                throw $e;
+            }
+
+            $subscription = $user->subscriptions()->where($attributes)->first();
+
+            if (! $subscription) {
+                throw $e;
+            }
+
+            $subscription->fill($values)->save();
+
+            return $subscription;
+        }
+    }
+
+    /**
+     * Update or create a subscription item while tolerating a concurrent insert.
+     *
+     * @param  \Laravel\Cashier\Subscription  $subscription
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Laravel\Cashier\SubscriptionItem
+     */
+    protected function updateOrCreateSubscriptionItem(Subscription $subscription, array $attributes, array $values)
+    {
+        if ($item = $subscription->items()->where($attributes)->first()) {
+            $item->fill($values)->save();
+
+            return $item;
+        }
+
+        try {
+            return $subscription->items()->create(array_merge($attributes, $values));
+        } catch (QueryException $e) {
+            if (! $this->causedByUniqueConstraintViolation($e)) {
+                throw $e;
+            }
+
+            $item = $subscription->items()->where($attributes)->first();
+
+            if (! $item) {
+                throw $e;
+            }
+
+            $item->fill($values)->save();
+
+            return $item;
+        }
+    }
+
+    /**
+     * Determine if the query exception was caused by a unique constraint violation.
+     *
+     * @param  \Illuminate\Database\QueryException  $exception
+     * @return bool
+     */
+    protected function causedByUniqueConstraintViolation(QueryException $exception)
+    {
+        return is_a($exception, 'Illuminate\Database\UniqueConstraintViolationException')
+            || ($exception->errorInfo[0] ?? null) === '23505'
+            || ($exception->errorInfo[1] ?? null) === 1062
+            || preg_match('#(UNIQUE constraint failed|Integrity constraint violation: 1062|duplicate key value violates unique constraint)#i', $exception->getMessage()) === 1;
     }
 
     /**
