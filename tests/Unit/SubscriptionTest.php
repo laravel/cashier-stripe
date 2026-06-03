@@ -70,6 +70,16 @@ class SubscriptionTest extends TestCase
         $this->assertTrue($subscription->valid());
     }
 
+    public function test_a_canceled_subscription_is_not_active_or_valid()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_CANCELED,
+        ]);
+
+        $this->assertFalse($subscription->active());
+        $this->assertFalse($subscription->valid());
+    }
+
     public function test_payment_is_incomplete_when_status_is_incomplete()
     {
         $subscription = new Subscription([

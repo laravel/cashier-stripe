@@ -230,6 +230,7 @@ class Subscription extends Model
     {
         return ! $this->ended() &&
             (! Cashier::$deactivateIncomplete || $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE) &&
+            $this->stripe_status !== StripeSubscription::STATUS_CANCELED &&
             $this->stripe_status !== StripeSubscription::STATUS_INCOMPLETE_EXPIRED &&
             (! Cashier::$deactivatePastDue || $this->stripe_status !== StripeSubscription::STATUS_PAST_DUE) &&
             $this->stripe_status !== StripeSubscription::STATUS_UNPAID;
@@ -248,7 +249,8 @@ class Subscription extends Model
                 ->orWhere(function ($query) {
                     $query->onGracePeriod();
                 });
-        })->where('stripe_status', '!=', StripeSubscription::STATUS_INCOMPLETE_EXPIRED)
+        })->where('stripe_status', '!=', StripeSubscription::STATUS_CANCELED)
+            ->where('stripe_status', '!=', StripeSubscription::STATUS_INCOMPLETE_EXPIRED)
             ->where('stripe_status', '!=', StripeSubscription::STATUS_UNPAID);
 
         if (Cashier::$deactivatePastDue) {
