@@ -293,11 +293,7 @@ class WebhookController extends Controller
             return $this->successMethod();
         }
 
-        if ($payload['data']['object']['metadata']['is_on_session_checkout'] ?? false) {
-            return $this->successMethod();
-        }
-
-        if ($payload['data']['object']['subscription_details']['metadata']['is_on_session_checkout'] ?? false) {
+        if ($this->invoiceIsOnSessionCheckout($payload)) {
             return $this->successMethod();
         }
 
@@ -319,6 +315,31 @@ class WebhookController extends Controller
     }
 
     /**
+     * Handle invoice payment succeeded.
+     *
+     * @param  array  $payload
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleInvoicePaymentSucceeded(array $payload)
+    {
+        if (! $this->invoiceIsOnSessionCheckout($payload)) {
+            return $this->successMethod();
+        }
+
+        if (is_null($subscriptionId = $payload['data']['object']['parent']['subscription_details']['subscription'] ?? null)) {
+            return $this->successMethod();
+        }
+
+        if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
+            $user->stripe()->subscriptions->update($subscriptionId, [
+                'metadata' => ['is_on_session_checkout' => ''],
+            ]);
+        }
+
+        return $this->successMethod();
+    }
+
+    /**
      * Get the customer instance by Stripe ID.
      *
      * @param  string|null  $stripeId
@@ -327,6 +348,18 @@ class WebhookController extends Controller
     protected function getUserByStripeId($stripeId)
     {
         return Cashier::findBillable($stripeId);
+    }
+
+    /**
+     * Determine whether the invoice belongs to an on-session checkout.
+     *
+     * @param  array  $payload
+     * @return bool
+     */
+    protected function invoiceIsOnSessionCheckout(array $payload)
+    {
+        return ($payload['data']['object']['metadata']['is_on_session_checkout'] ?? false) || // One-time payment invoice
+               ($payload['data']['object']['parent']['subscription_details']['metadata']['is_on_session_checkout'] ?? false); // Subscription
     }
 
     /**
