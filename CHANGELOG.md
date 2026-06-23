@@ -1,6 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v16.5.3...16.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v16.6.0...16.x)
 
 ## [v15.7.1](https://github.com/laravel/cashier/compare/v15.7.0...v15.7.1) - 2025-07-22
 
@@ -9,6 +9,18 @@
 ## [v15.7.0](https://github.com/laravel/cashier/compare/v15.6.4...v15.7.0) - 2025-06-10
 
 * [15.x] feat: allowing dompdf 3.0 by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/cashier-stripe/pull/1763
+
+## [v16.6.0](https://github.com/laravel/cashier/compare/v16.5.3...v16.6.0) - 2026-06-23
+
+* GitHub Actions hardening by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/cashier-stripe/pull/1848
+* Bump actions/checkout from 4.3.1 to 6.0.3 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/cashier-stripe/pull/1849
+* Pin pull requests and issues workflows to least-privilege reusable workflows by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/cashier-stripe/pull/1851
+* Pin pull requests and issues workflows to latest laravel/.github by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/cashier-stripe/pull/1852
+* Add Dependabot cooldown of 5 days by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/cashier-stripe/pull/1853
+* Enable Dependabot auto-merge by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/cashier-stripe/pull/1854
+* Bump shivammathur/setup-php from 2.37.1 to 2.37.2 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/cashier-stripe/pull/1856
+* Fix trial_ends_at not being cleared when trial_end is null in webhook payload by [@lazerg](https://github.com/lazerg) in https://github.com/laravel/cashier-stripe/pull/1858
+* Clear on-session checkout flag after the initial payment by [@clarkewing](https://github.com/clarkewing) in https://github.com/laravel/cashier-stripe/pull/1857
 
 ## [v16.5.3](https://github.com/laravel/cashier/compare/v16.5.1...v16.5.3) - 2026-05-05
 
