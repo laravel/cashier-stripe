@@ -382,8 +382,82 @@ class WebhooksTest extends FeatureTestCase
 
             Notification::assertSentTo($user, ConfirmPayment::class, function (ConfirmPayment $notification) use ($exception) {
                 return $notification->paymentId === $exception->payment->id &&
-                    $notification->amount === $exception->payment->amount();
+                       $notification->amount === $exception->payment->amount();
             });
         }
+    }
+
+    public function test_payment_action_required_email_is_not_sent_during_on_session_checkout()
+    {
+        $user = $this->createCustomer('payment_action_required_email_is_not_sent_during_on_session_checkout', [
+            'stripe_id' => 'cus_foo',
+        ]);
+
+        Notification::fake();
+
+        $this->postJson('stripe/webhook', [
+            'id' => 'foo',
+            'type' => 'invoice.payment_action_required',
+            'data' => [
+                'object' => [
+                    'id' => 'in_foo',
+                    'customer' => 'cus_foo',
+                    'payment_intent' => 'pi_foo',
+                    'parent' => [
+                        'type' => 'subscription_details',
+                        'subscription_details' => [
+                            'subscription' => 'sub_foo',
+                            'metadata' => ['is_on_session_checkout' => 'true'],
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertOk();
+
+        Notification::assertNothingSent();
+    }
+
+    public function test_on_session_checkout_metadata_is_cleared_when_invoice_payment_succeeds()
+    {
+        $user = $this->createCustomer('on_session_checkout_metadata_is_cleared_when_invoice_payment_succeeds');
+
+        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+
+        // Mimic the metadata Cashier stores on subscriptions created during an on-session checkout...
+        $user->stripe()->subscriptions->update($subscription->stripe_id, ['metadata' => [
+            'name' => 'main',
+            'type' => 'main',
+            'is_on_session_checkout' => 'true',
+        ]]);
+
+        $this->assertSame('true', $subscription->asStripeSubscription()->metadata->is_on_session_checkout);
+
+        $this->postJson('stripe/webhook', [
+            'id' => 'foo',
+            'type' => 'invoice.payment_succeeded',
+            'data' => [
+                'object' => [
+                    'id' => 'in_'.Str::random(10),
+                    'customer' => $user->stripe_id,
+                    'parent' => [
+                        'type' => 'subscription_details',
+                        'subscription_details' => [
+                            'subscription' => $subscription->stripe_id,
+                            'metadata' => [
+                                'name' => 'main',
+                                'type' => 'main',
+                                'is_on_session_checkout' => 'true',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertOk();
+
+        $metadata = $subscription->asStripeSubscription()->metadata->toArray();
+
+        $this->assertSame('main', $metadata['name'] ?? null);
+        $this->assertSame('main', $metadata['type'] ?? null);
+        $this->assertArrayNotHasKey('is_on_session_checkout', $metadata);
     }
 }
