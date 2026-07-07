@@ -190,11 +190,14 @@ class DiscountTest extends FeatureTestCase
         $this->assertEquals(static::$promotionCodeCode, $promotionCode->code);
 
         // Inactive promotion codes aren't retrieved with the "active only" method...
-        $inactivePromotionCode = $user->stripe()->promotionCodes->create([
+        $inactivePromotionCode = $user->stripe()->promotionCodes->create(array_merge([
             'active' => false,
             'coupon' => static::$couponId,
             'code' => 'NEWYEAR',
-        ]);
+        ], match (StripeApiVersion::CURRENT_MAJOR) {
+            'basil' => ['coupon' => static::$couponId],
+            default => ['promotion' => ['type' => 'coupon', 'coupon' => static::$couponId]],
+        });
 
         $promotionCode = $user->findActivePromotionCode($inactivePromotionCode->id);
 
