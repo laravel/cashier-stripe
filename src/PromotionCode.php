@@ -5,12 +5,15 @@ namespace Laravel\Cashier;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
+use Laravel\Cashier\Concerns\InteractsWithStripe;
 use Stripe\Coupon as StripeCoupon;
 use Stripe\PromotionCode as StripePromotionCode;
 use Stripe\Util\ApiVersion as StripeApiVersion;
 
 class PromotionCode implements Arrayable, Jsonable, JsonSerializable
 {
+    use InteractsWithStripe;
+
     /**
      * Create a new PromotionCode instance.
      *
@@ -35,7 +38,7 @@ class PromotionCode implements Arrayable, Jsonable, JsonSerializable
         };
 
         if (! $coupon instanceof StripeCoupon) {
-            $coupon = StripeCoupon::retrieve($coupon);
+            $coupon = static::stripe()->coupons->retrieve($coupon);
         }
 
         return new Coupon($this->promotionCode->coupon);

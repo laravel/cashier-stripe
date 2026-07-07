@@ -7,6 +7,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
+use Laravel\Cashier\Concerns\InteractsWithStripe;
 use Stripe\Coupon as StripeCoupon;
 use Stripe\Discount as StripeDiscount;
 use Stripe\PromotionCode as StripePromotionCode;
@@ -14,6 +15,8 @@ use Stripe\Util\ApiVersion as StripeApiVersion;
 
 class Discount implements Arrayable, Jsonable, JsonSerializable
 {
+    use InteractsWithStripe;
+
     /**
      * Create a new Discount instance.
      *
@@ -38,7 +41,7 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
         };
 
         if (! $coupon instanceof StripeCoupon) {
-            $coupon = StripeCoupon::retrieve($coupon);
+            $coupon = static::stripe()->coupons->retrieve($coupon);
         }
 
         return new Coupon($coupon);
