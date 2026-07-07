@@ -99,7 +99,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
             $data['cancel_url'] = $sessionOptions['cancel_url'] ?? route('home').'?checkout=cancelled';
         }
 
-        if (isset($data['ui_mode']) && StripeApiVersion::CURRENT_MAJOR === 'dahlia') {
+        if (isset($data['ui_mode']) && in_array(StripeApiVersion::CURRENT_MAJOR, ['dahlia', 'clover'])) {
             $data['ui_mode'] = match ($data['ui_mode']) {
                 'embedded' => 'embedded_page',
                 'custom' => 'elements',
