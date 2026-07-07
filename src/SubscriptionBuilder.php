@@ -17,8 +17,8 @@ use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\InteractsWithStripe;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Exceptions\InvalidCoupon;
-use Stripe\Stripe;
 use Stripe\Subscription as StripeSubscription;
+use Stripe\Util\ApiVersion as StripeApiVersion;
 
 class SubscriptionBuilder
 {
@@ -529,8 +529,8 @@ class SubscriptionBuilder
      */
     protected function getBillingModeForPayload(): ?array
     {
-        return match (true) {
-            str_ends_with(Stripe::$apiVersion, '.basil') => null,
+        return match (StripeApiVersion::CURRENT_MAJOR) {
+            'basil' => null,
             default => ['classic'],
         };
     }
