@@ -531,7 +531,7 @@ class SubscriptionBuilder
     {
         return match (StripeApiVersion::CURRENT_MAJOR) {
             'basil' => null,
-            default => ['classic'],
+            default => ['type' => 'classic'],
         };
     }
 
