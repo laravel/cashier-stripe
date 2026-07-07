@@ -74,7 +74,7 @@ class DiscountTest extends FeatureTestCase
             'currency' => 'USD',
         ])->id;
 
-        $payload = match(StripeApiVersion::CURRENT_MAJOR) {
+        $payload = match (StripeApiVersion::CURRENT_MAJOR) {
             'basil' => [
                 'coupon' => static::$secondCouponId,
                 'code' => static::$promotionCodeCode = Str::random(16),
