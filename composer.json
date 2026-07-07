@@ -20,33 +20,34 @@
     "require": {
         "php": "^8.1",
         "ext-json": "*",
-        "illuminate/console": "^10.0|^11.0|^12.0",
-        "illuminate/contracts": "^10.0|^11.0|^12.0",
-        "illuminate/database": "^10.0|^11.0|^12.0",
-        "illuminate/http": "^10.0|^11.0|^12.0",
-        "illuminate/log": "^10.0|^11.0|^12.0",
-        "illuminate/notifications": "^10.0|^11.0|^12.0",
-        "illuminate/pagination": "^10.0|^11.0|^12.0",
-        "illuminate/routing": "^10.0|^11.0|^12.0",
-        "illuminate/support": "^10.0|^11.0|^12.0",
-        "illuminate/view": "^10.0|^11.0|^12.0",
+        "illuminate/console": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/contracts": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/database": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/http": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/log": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/notifications": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/pagination": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/routing": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/view": "^10.0|^11.0|^12.0|^13.0",
         "moneyphp/money": "^4.0",
         "nesbot/carbon": "^2.0|^3.0",
         "stripe/stripe-php": "^17.4|^18.0|^19.0|^20.0",
-        "symfony/console": "^6.0|^7.0",
-        "symfony/http-kernel": "^6.0|^7.0",
+        "symfony/console": "^6.0|^7.0|^8.0",
+        "symfony/http-kernel": "^6.0|^7.0|^8.0",
         "symfony/polyfill-intl-icu": "^1.22.1",
         "symfony/polyfill-php84": "^1.32"
     },
     "require-dev": {
         "dompdf/dompdf": "^2.0|^3.0",
-        "orchestra/testbench": "^8.36|^9.15|^10.8",
+        "orchestra/testbench": "^8.36|^9.15|^10.8|^11.0",
         "phpstan/phpstan": "^1.10",
         "spatie/laravel-ray": "^1.40"
     },
     "suggest": {
         "ext-intl": "Allows for more locales besides the default \"en\" when formatting money values.",
-        "dompdf/dompdf": "Required when generating and downloading invoice PDF's using Dompdf (^2.0|^3.0)."
+        "dompdf/dompdf": "Required when generating and downloading invoice PDF's using Dompdf (^2.0|^3.0).",
+        "spatie/laravel-pdf": "Required when generating and downloading invoice PDF's using Cashier's LaravelPdfInvoiceRenderer."
     },
     "autoload": {
         "psr-4": {

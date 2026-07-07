@@ -1,6 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v16.1.0...16.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v16.6.0...16.x)
 
 ## [v15.7.1](https://github.com/laravel/cashier/compare/v15.7.0...v15.7.1) - 2025-07-22
 
@@ -9,6 +9,45 @@
 ## [v15.7.0](https://github.com/laravel/cashier/compare/v15.6.4...v15.7.0) - 2025-06-10
 
 * [15.x] feat: allowing dompdf 3.0 by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/cashier-stripe/pull/1763
+
+## [v16.6.0](https://github.com/laravel/cashier/compare/v16.5.3...v16.6.0) - 2026-06-23
+
+* GitHub Actions hardening by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/cashier-stripe/pull/1848
+* Bump actions/checkout from 4.3.1 to 6.0.3 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/cashier-stripe/pull/1849
+* Pin pull requests and issues workflows to least-privilege reusable workflows by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/cashier-stripe/pull/1851
+* Pin pull requests and issues workflows to latest laravel/.github by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/cashier-stripe/pull/1852
+* Add Dependabot cooldown of 5 days by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/cashier-stripe/pull/1853
+* Enable Dependabot auto-merge by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/cashier-stripe/pull/1854
+* Bump shivammathur/setup-php from 2.37.1 to 2.37.2 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/cashier-stripe/pull/1856
+* Fix trial_ends_at not being cleared when trial_end is null in webhook payload by [@lazerg](https://github.com/lazerg) in https://github.com/laravel/cashier-stripe/pull/1858
+* Clear on-session checkout flag after the initial payment by [@clarkewing](https://github.com/clarkewing) in https://github.com/laravel/cashier-stripe/pull/1857
+
+## [v16.5.3](https://github.com/laravel/cashier/compare/v16.5.1...v16.5.3) - 2026-05-05
+
+* fix: correctly calculate unit amount excluding tax based on tax behavior by [@briankiewel](https://github.com/briankiewel) in https://github.com/laravel/cashier-stripe/pull/1840
+
+## [v16.5.1](https://github.com/laravel/cashier/compare/v16.5.0...v16.5.1) - 2026-04-01
+
+* Remove redundant "When to Apply" section from skill body by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/cashier-stripe/pull/1829
+* Update Symfony deps versions to support v8 by [@HichemTab-tech](https://github.com/HichemTab-tech) in https://github.com/laravel/cashier-stripe/pull/1833
+
+## [v16.5.0](https://github.com/laravel/cashier/compare/v16.4.0...v16.5.0) - 2026-03-17
+
+* Fix: Add support for Stripe Source in fillSourceDetails by [@colinmac17](https://github.com/colinmac17) in https://github.com/laravel/cashier-stripe/pull/1827
+* Laravel 13.x Compatibility by [@laravel-shift](https://github.com/laravel-shift) in https://github.com/laravel/cashier-stripe/pull/1828
+
+## [v16.4.0](https://github.com/laravel/cashier/compare/v16.3.0...v16.4.0) - 2026-03-10
+
+* Only use clear_usage when billing mode is not flexible by [@vrymel](https://github.com/vrymel) in https://github.com/laravel/cashier-stripe/pull/1823
+* Add cashier-stripe-development Boost skill by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/cashier-stripe/pull/1825
+
+## [v16.3.0](https://github.com/laravel/cashier/compare/v16.2.0...v16.3.0) - 2026-02-21
+
+* Avoids Stripe error removing metered price from flex sub by [@Arkitecht](https://github.com/Arkitecht) in https://github.com/laravel/cashier-stripe/pull/1820
+
+## [v16.2.0](https://github.com/laravel/cashier/compare/v16.1.0...v16.2.0) - 2026-01-06
+
+* Add support for `ui_mode: custom` in Stripe Checkout Sessions by [@emaadali](https://github.com/emaadali) in https://github.com/laravel/cashier-stripe/pull/1815
 
 ## [v16.1.0](https://github.com/laravel/cashier/compare/v16.0.6...v16.1.0) - 2025-12-03
 

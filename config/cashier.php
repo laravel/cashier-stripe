@@ -3,6 +3,8 @@
 use Laravel\Cashier\Console\WebhookCommand;
 use Laravel\Cashier\Invoices\DompdfInvoiceRenderer;
 
+// use Laravel\Cashier\Invoices\LaravelPdfInvoiceRenderer;
+
 return [
 
     /*
@@ -101,6 +103,7 @@ return [
     */
 
     'invoices' => [
+        // Supported: DompdfInvoiceRenderer::class, LaravelPdfInvoiceRenderer::class
         'renderer' => env('CASHIER_INVOICE_RENDERER', DompdfInvoiceRenderer::class),
 
         'options' => [
