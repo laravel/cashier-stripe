@@ -86,7 +86,7 @@ class DiscountTest extends FeatureTestCase
                 ],
                 'code' => static::$promotionCodeCode = Str::random(16),
             ],
-        }
+        };
 
         static::$promotionCodeId = self::stripe()->promotionCodes->create($payload)->id;
     }
