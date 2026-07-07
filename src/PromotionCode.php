@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 use Stripe\PromotionCode as StripePromotionCode;
+use Stripe\Util\ApiVersion as StripeApiVersion;
 
 class PromotionCode implements Arrayable, Jsonable, JsonSerializable
 {
@@ -27,6 +28,15 @@ class PromotionCode implements Arrayable, Jsonable, JsonSerializable
      */
     public function coupon(): Coupon
     {
+        $coupon = match (StripeApiVersion::CURRENT_MAJOR) {
+            'basil' => $this->promotionCode->coupon,
+            default => $this->promotionCode->promotion->coupon,
+        };
+
+        if (! $coupon instanceof StripeCoupon) {
+            $coupon = Cashier::stripe()->coupons->retrieve($coupon);
+        }
+
         return new Coupon($this->promotionCode->coupon);
     }
 
