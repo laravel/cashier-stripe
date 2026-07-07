@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 use Stripe\Discount as StripeDiscount;
 use Stripe\PromotionCode as StripePromotionCode;
+use Stripe\Util\ApiVersion as StripeApiVersion;
 
 class Discount implements Arrayable, Jsonable, JsonSerializable
 {
@@ -30,7 +31,12 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
      */
     public function coupon(): Coupon
     {
-        return new Coupon($this->discount->coupon);
+        $coupon = match (StripeApiVersion::CURRENT_MAJOR) {
+            'basil' => $this->discount->coupon,
+            default => $this->discount->source->coupon,
+        }
+
+        return new Coupon($coupon);
     }
 
     /**
