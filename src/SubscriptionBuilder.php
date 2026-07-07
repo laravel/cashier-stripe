@@ -526,14 +526,12 @@ class SubscriptionBuilder
 
     /**
      * Get the billing mode for the Stripe payload.
-     *
-     * @return array|null
      */
-    protected function getBillingModeForPayload()
+    protected function getBillingModeForPayload(): ?array
     {
         return match (true) {
             str_ends_with(Stripe::$apiVersion, '.basil') => null,
-            default => 'classic',
+            default => ['classic'],
         };
     }
 
