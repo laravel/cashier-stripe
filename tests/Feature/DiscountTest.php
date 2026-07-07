@@ -197,7 +197,7 @@ class DiscountTest extends FeatureTestCase
         ], match (StripeApiVersion::CURRENT_MAJOR) {
             'basil' => ['coupon' => static::$couponId],
             default => ['promotion' => ['type' => 'coupon', 'coupon' => static::$couponId]],
-        });
+        }));
 
         $promotionCode = $user->findActivePromotionCode($inactivePromotionCode->id);
 
