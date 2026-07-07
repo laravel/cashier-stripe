@@ -34,7 +34,7 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
         $coupon = match (StripeApiVersion::CURRENT_MAJOR) {
             'basil' => $this->discount->coupon,
             default => $this->discount->source->coupon,
-        }
+        };
 
         return new Coupon($coupon);
     }
