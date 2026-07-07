@@ -8,6 +8,7 @@ use Laravel\Cashier\PaymentMethod;
 use Stripe\BankAccount as StripeBankAccount;
 use Stripe\Card as StripeCard;
 use Stripe\PaymentMethod as StripePaymentMethod;
+use Stripe\Source as StripeSource;
 
 trait ManagesPaymentMethods
 {
@@ -247,13 +248,13 @@ trait ManagesPaymentMethods
     /**
      * Fills the model's properties with the source from Stripe.
      *
-     * @param  \Stripe\Card|\Stripe\BankAccount|null  $source
+     * @param  \Stripe\Card|\Stripe\BankAccount|\Stripe\Source|null  $source
      * @return $this
      *
      * @deprecated Will be removed in a future Cashier update. You should use the new payment methods API instead.
      */
     #[\Deprecated('Will be removed in a future Cashier update. You should use the new payment methods API instead')]
-    protected function fillSourceDetails(StripeCard|StripeBankAccount|null $source)
+    protected function fillSourceDetails(StripeCard|StripeBankAccount|StripeSource|null $source)
     {
         if ($source instanceof StripeCard) {
             $this->pm_type = $source->brand;
@@ -261,6 +262,9 @@ trait ManagesPaymentMethods
         } elseif ($source instanceof StripeBankAccount) {
             $this->pm_type = 'Bank Account';
             $this->pm_last_four = $source->last4;
+        } elseif ($source instanceof StripeSource) {
+            $this->pm_type = $source->card->brand ?? $source->type ?? null;
+            $this->pm_last_four = $source->card->last4 ?? null;
         }
 
         return $this;

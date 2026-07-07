@@ -830,14 +830,16 @@ class Subscription extends Model
      */
     protected function mergeItemsThatShouldBeDeletedDuringSwap(Collection $items): Collection
     {
+        $stripeSubscription = $this->asStripeSubscription();
+
         /** @var \Stripe\SubscriptionItem $stripeSubscriptionItem */
-        foreach ($this->asStripeSubscription()->items->data as $stripeSubscriptionItem) {
+        foreach ($stripeSubscription->items->data as $stripeSubscriptionItem) {
             $price = $stripeSubscriptionItem->price;
 
             if (! $item = $items->get($price->id, [])) {
                 $item['deleted'] = true;
 
-                if ($price->recurring->usage_type == 'metered') {
+                if ($price->recurring->usage_type == 'metered' && ! $this->usesFlexibleBilling($stripeSubscription)) {
                     $item['clear_usage'] = true;
                 }
             }
@@ -1022,7 +1024,7 @@ class Subscription extends Model
         $stripeItem = $this->findItemOrFail($price)->asStripeSubscriptionItem();
 
         $stripeItem->delete(array_filter([
-            'clear_usage' => $stripeItem->price->recurring->usage_type === 'metered' ? true : null,
+            'clear_usage' => $stripeItem->price->recurring->usage_type === 'metered' && ! $this->usesFlexibleBilling() ? true : null,
             'proration_behavior' => $this->prorateBehavior(),
         ]));
 
@@ -1571,6 +1573,21 @@ class Subscription extends Model
         return $this->owner->stripe()->subscriptions->retrieve(
             $this->stripe_id, ['expand' => $expand]
         );
+    }
+
+    /**
+     * Ascertain if the subscription uses the new flexible billing mode.
+     *
+     * @param  StripeSubscription|null  $subscription
+     * @return bool
+     */
+    public function usesFlexibleBilling(?StripeSubscription $subscription = null): bool
+    {
+        if (! $subscription) {
+            $subscription = $this->asStripeSubscription();
+        }
+
+        return $subscription->billing_mode->type == 'flexible';
     }
 
     /**
