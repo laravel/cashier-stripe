@@ -7,6 +7,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
+use Stripe\Coupon as StripeCoupon;
 use Stripe\Discount as StripeDiscount;
 use Stripe\PromotionCode as StripePromotionCode;
 use Stripe\Util\ApiVersion as StripeApiVersion;
@@ -35,6 +36,10 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
             'basil' => $this->discount->coupon,
             default => $this->discount->source->coupon,
         };
+
+        if (! $coupon instanceof StripeCoupon) {
+            $coupon = Cashier::stripe()->coupons->retrieve($coupon);
+        }
 
         return new Coupon($coupon);
     }
