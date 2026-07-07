@@ -35,7 +35,7 @@ class PromotionCode implements Arrayable, Jsonable, JsonSerializable
         };
 
         if (! $coupon instanceof StripeCoupon) {
-            $coupon = Cashier::stripe()->coupons->retrieve($coupon);
+            $coupon = StripeCoupon::retrieve($coupon);
         }
 
         return new Coupon($this->promotionCode->coupon);
