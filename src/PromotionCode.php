@@ -5,6 +5,7 @@ namespace Laravel\Cashier;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
+use Stripe\Coupon as StripeCoupon;
 use Stripe\PromotionCode as StripePromotionCode;
 use Stripe\Util\ApiVersion as StripeApiVersion;
 
