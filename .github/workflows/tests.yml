@@ -105,7 +105,7 @@ jobs:
 
       - name: Install dependencies (Laravel )
         run: |
-          composer update --prefer-dist --no-interaction --no-progress --with="illuminate/contracts:^${{ matrix.laravel }}" --with="stripe/stripe-php:^${{ matrix.stripe }}"
+          composer update --prefer-dist --no-interaction --no-progress --with="stripe/stripe-php:^${{ matrix.stripe }}"
 
       - name: Execute tests
         run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
