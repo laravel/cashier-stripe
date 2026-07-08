@@ -41,7 +41,7 @@ class PromotionCode implements Arrayable, Jsonable, JsonSerializable
             $coupon = static::stripe()->coupons->retrieve($coupon);
         }
 
-        return new Coupon($this->promotionCode->coupon);
+        return new Coupon($coupon);
     }
 
     /**
