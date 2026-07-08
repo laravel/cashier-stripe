@@ -65,7 +65,7 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
 
         // If promotion_code is just an ID string, fetch it from Stripe...
         if (is_string($this->discount->promotion_code)) {
-            $promotionCode = StripePromotionCode::retrieve($this->discount->promotion_code);
+            $promotionCode = static::stripe()->promotionCodes->retrieve($this->discount->promotion_code);
 
             return new PromotionCode($promotionCode);
         }
