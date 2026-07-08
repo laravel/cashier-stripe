@@ -83,7 +83,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: 8.5
+        php: [8.5]
         stripe: [17, 18, 19, 20]
 
     name: PHP ${{ matrix.php }}
