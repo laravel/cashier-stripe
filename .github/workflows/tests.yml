@@ -103,7 +103,7 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Install dependencies (Laravel )
+      - name: Install dependencies
         run: |
           composer update --prefer-dist --no-interaction --no-progress --with="stripe/stripe-php:^${{ matrix.stripe }}"
 
