@@ -19,34 +19,72 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
+        php: [8.1, 8.2, 8.3, 8.4, 8.5]
+
+    name: PHP ${{ matrix.php }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, bcmath
+          ini-values: error_reporting=E_ALL
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies (Laravel 10)
+        run: |
+          composer update --prefer-dist --no-interaction --no-progress --with="illuminate/contracts:^10"
+        if: matrix.php >= 8.1 && matrix.php < 8.4
+
+      - name: Execute tests (Laravel 10)
+        run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
+        if: matrix.php >= 8.1 && matrix.php < 8.4
+        env:
+          STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
+          STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
+          CASHIER_TESTER_BUILD_ID: ${{ github.run_number }}
+
+      - name: Install dependencies (Laravel 11)
+        run: |
+          composer update --prefer-dist --no-interaction --no-progress --with="illuminate/contracts:^11"
+        if: matrix.php >= 8.2 && matrix.php <= 8.4
+
+      - name: Execute tests (Laravel 11)
+        run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
+        if: matrix.php >= 8.2 && matrix.php <= 8.4
+        env:
+          STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
+          STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
+          CASHIER_TESTER_BUILD_ID: ${{ github.run_number }}
+
+      - name: Install dependencies (Laravel 12)
+        run: |
+          composer update --prefer-dist --no-interaction --no-progress --with="illuminate/contracts:^12"
+        if: matrix.php >= 8.2 && matrix.php <= 8.5
+
+      - name: Execute tests (Laravel 12)
+        run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
+        if: matrix.php >= 8.2 && matrix.php <= 8.5
+        env:
+          STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
+          STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
+          CASHIER_TESTER_BUILD_ID: ${{ github.run_number }}
+
+  integration-tests:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: true
+      matrix:
         php: 8.5
-        laravel: 13
-        stripe: 20
-        include:
-          - php: 8.1
-            laravel: 10
-            stripe: 17
-          - php: 8.1
-            laravel: 10
-            stripe: 18
-          - php: 8.1
-            laravel: 10
-            stripe: 19
-          - php: 8.1
-            laravel: 10
-            stripe: 20
-          - php: 8.5
-            laravel: 13
-            stripe: 17
-          - php: 8.5
-            laravel: 13
-            stripe: 18
-          - php: 8.5
-            laravel: 13
-            stripe: 19
-          - php: 8.5
-            laravel: 13
-            stripe: 20
+        stripe: [17, 18, 19, 20]
 
     name: PHP ${{ matrix.php }}
 
