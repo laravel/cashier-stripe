@@ -192,7 +192,6 @@ class DiscountTest extends FeatureTestCase
         // Inactive promotion codes aren't retrieved with the "active only" method...
         $inactivePromotionCode = $user->stripe()->promotionCodes->create(array_merge([
             'active' => false,
-            'coupon' => static::$couponId,
             'code' => 'NEWYEAR',
         ], match (StripeApiVersion::CURRENT_MAJOR) {
             'basil' => ['coupon' => static::$couponId],
