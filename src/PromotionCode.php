@@ -4,6 +4,7 @@ namespace Laravel\Cashier;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use InvalidArgumentException;
 use JsonSerializable;
 use Laravel\Cashier\Concerns\InteractsWithStripe;
 use Laravel\Cashier\Enums\StripeApiVersions;
