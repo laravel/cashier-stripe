@@ -2,6 +2,8 @@
 
 namespace Laravel\Cashier\Enums;
 
+use Stripe\Coupon as StripeCoupon;
+use Stripe\Discount as StripeDiscount;
 use Stripe\Util\ApiVersion;
 
 enum StripeApiVersions: string
@@ -21,7 +23,20 @@ enum StripeApiVersions: string
     }
 
     /**
-     * Transform `ui_mode` based on current API.
+     * Get `Stripe\Coupon` from `Stripe\Discount` for the current API.
+     *
+     * @throws
+     */
+    public function couponFromDiscout(StripeDiscount $discount): StripeCoupon|string|null
+    {
+        return match (StripeApiVersion::CURRENT_MAJOR) {
+            StripeApiVersions::BASIL => $discount->coupon,
+            default => $discount->source->coupon,
+        };
+    }
+
+    /**
+     * Transform `ui_mode` for the current API.
      */
     public function transformUIMode(string $uiMode): string
     {

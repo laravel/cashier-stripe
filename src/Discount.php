@@ -6,11 +6,12 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use InvalidArgumentException;
 use JsonSerializable;
 use Laravel\Cashier\Concerns\InteractsWithStripe;
+use Laravel\Cashier\Enums\StripeApiVersions;
 use Stripe\Coupon as StripeCoupon;
 use Stripe\Discount as StripeDiscount;
-use Stripe\Util\ApiVersion as StripeApiVersion;
 
 class Discount implements Arrayable, Jsonable, JsonSerializable
 {
@@ -34,10 +35,11 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
      */
     public function coupon(): Coupon
     {
-        $coupon = match (StripeApiVersion::CURRENT_MAJOR) {
-            'basil' => $this->discount->coupon,
-            default => $this->discount->source->coupon,
-        };
+        $coupon = StripeApiVersions::current()->couponFromDiscout($this->discount);
+
+        if (is_null($coupon)) {
+            throw new InvalidArgumentException('Unable to retrieve coupon information for the discount.');
+        }
 
         if (! $coupon instanceof StripeCoupon) {
             $coupon = static::stripe()->coupons->retrieve($coupon);
