@@ -4,7 +4,8 @@ namespace Laravel\Cashier\Enums;
 
 use Stripe\Util\ApiVersion;
 
-enum StripeApiVersions: string {
+enum StripeApiVersions: string
+{
     case DAHLIA = 'dahlia';
     case CLOVER = 'clover';
     case BASIL = 'basil';
