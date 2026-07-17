@@ -8,8 +8,8 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use JsonSerializable;
+use Laravel\Cashier\Enums\StripeApiVersions;
 use Stripe\Checkout\Session;
-use Stripe\Util\ApiVersion as StripeApiVersion;
 
 class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
 {
@@ -99,12 +99,8 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
             $data['cancel_url'] = $sessionOptions['cancel_url'] ?? route('home').'?checkout=cancelled';
         }
 
-        if (isset($data['ui_mode']) && in_array(StripeApiVersion::CURRENT_MAJOR, ['dahlia'])) {
-            $data['ui_mode'] = match ($data['ui_mode']) {
-                'embedded' => 'embedded_page',
-                'custom' => 'elements',
-                default => $data['ui_mode'],
-            };
+        if (isset($data['ui_mode'])) {
+            $data['ui_mode'] = StripeApiVersions::current()->transformUIMode($data['ui_mode']);
         }
 
         $session = $stripe->checkout->sessions->create($data);
