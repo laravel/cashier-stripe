@@ -29,13 +29,16 @@ class PromotionCode implements Arrayable, Jsonable, JsonSerializable
      * Get the coupon that belongs to the promotion code.
      *
      * @return \Laravel\Cashier\Coupon
+     *
+     * @throws \InvalidArgumentException
      */
     public function coupon(): Coupon
     {
-        $coupon = match (StripeApiVersion::CURRENT_MAJOR) {
-            'basil' => $this->promotionCode->coupon,
-            default => $this->promotionCode->promotion->coupon,
-        };
+        $coupon = StripeApiVersions::current()->couponFromPromotionCode($this->promotionCode);
+
+        if (is_null($coupon)) {
+            throw new InvalidArgumentException('Unable to retrieve coupon information for the promotion code.');
+        }
 
         if (! $coupon instanceof StripeCoupon) {
             $coupon = static::stripe()->coupons->retrieve($coupon);

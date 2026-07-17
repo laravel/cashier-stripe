@@ -32,10 +32,12 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
      * Get the coupon applied to the discount.
      *
      * @return \Laravel\Cashier\Coupon
+     *
+     * @throws \InvalidArgumentException
      */
     public function coupon(): Coupon
     {
-        $coupon = StripeApiVersions::current()->couponFromDiscout($this->discount);
+        $coupon = StripeApiVersions::current()->couponFromDiscount($this->discount);
 
         if (is_null($coupon)) {
             throw new InvalidArgumentException('Unable to retrieve coupon information for the discount.');
