@@ -24,8 +24,6 @@ enum StripeApiVersions: string
 
     /**
      * Get `Stripe\Coupon` from `Stripe\Discount` for the current API.
-     *
-     * @throws
      */
     public function couponFromDiscout(StripeDiscount $discount): StripeCoupon|string|null
     {
