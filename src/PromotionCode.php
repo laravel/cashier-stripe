@@ -8,7 +8,6 @@ use JsonSerializable;
 use Laravel\Cashier\Concerns\InteractsWithStripe;
 use Stripe\Coupon as StripeCoupon;
 use Stripe\PromotionCode as StripePromotionCode;
-use Stripe\Util\ApiVersion as StripeApiVersion;
 
 class PromotionCode implements Arrayable, Jsonable, JsonSerializable
 {
