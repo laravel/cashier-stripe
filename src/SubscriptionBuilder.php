@@ -397,7 +397,9 @@ class SubscriptionBuilder
             'line_items' => Collection::make($this->items)->values()->all(),
             'mode' => 'subscription',
             'subscription_data' => array_filter([
-                'billing_mode' => $this->getBillingModeForPayload(),
+                'billing_mode' => ! Arr::has($sessionOptions, 'subscription_data.billing_mode')
+                    ? $this->getBillingModeForPayload()
+                    : null,
                 'default_tax_rates' => $this->getTaxRatesForPayload(),
                 'trial_end' => $trialEnd?->getTimestamp(),
                 'billing_cycle_anchor' => $billingCycleAnchor,
