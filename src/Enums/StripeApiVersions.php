@@ -30,7 +30,8 @@ enum StripeApiVersions: string
     {
         return match ($this) {
             StripeApiVersions::BASIL => $discount->coupon,
-            default => $discount->source->coupon,
+            StripeApiVersions::CLOVER => $discount->source->coupon,
+            StripeApiVersions::DAHLIA => $discount->source->coupon,
         };
     }
 
@@ -41,7 +42,8 @@ enum StripeApiVersions: string
     {
         return match ($this) {
             StripeApiVersions::BASIL => $promotionCode->coupon,
-            default => $promotionCode->promotion->coupon,
+            StripeApiVersions::CLOVER => $promotionCode->promotion->coupon,
+            StripeApiVersions::DAHLIA => $promotionCode->promotion->coupon,
         };
     }
 
@@ -51,11 +53,12 @@ enum StripeApiVersions: string
     public function transformUIMode(string $uiMode): string
     {
         return match ($this) {
+            StripeApiVersions::BASIL => $uiMode,
+            StripeApiVersions::CLOVER => $uiMode,
             StripeApiVersions::DAHLIA => match ($uiMode) {
                 'embedded' => 'embedded_page',
                 'custom' => 'elements',
             },
-            default => $uiMode,
         };
     }
 }
