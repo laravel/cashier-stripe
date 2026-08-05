@@ -50,7 +50,7 @@ enum StripeApiVersions: string
     /**
      * Transform `ui_mode` for the current API.
      */
-    public function transformUIMode(string $uiMode): string
+    public function transformUiMode(string $uiMode): string
     {
         return match ($this) {
             StripeApiVersions::BASIL => $uiMode,

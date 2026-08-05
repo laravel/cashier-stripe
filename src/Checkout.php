@@ -100,7 +100,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
         }
 
         if (isset($data['ui_mode'])) {
-            $data['ui_mode'] = StripeApiVersions::current()->transformUIMode($data['ui_mode']);
+            $data['ui_mode'] = StripeApiVersions::current()->transformUiMode($data['ui_mode']);
         }
 
         $session = $stripe->checkout->sessions->create($data);
