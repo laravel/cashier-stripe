@@ -527,17 +527,6 @@ class SubscriptionBuilder
     }
 
     /**
-     * Get the billing mode for the Stripe payload.
-     */
-    protected function getBillingModeForPayload(): ?array
-    {
-        return match (StripeApiVersion::CURRENT_MAJOR) {
-            'basil' => null,
-            default => ['type' => 'classic'],
-        };
-    }
-
-    /**
      * Validate that a coupon can be applied to a subscription.
      *
      * @param  string  $couponId
@@ -558,6 +547,17 @@ class SubscriptionBuilder
         if ($coupon->isForeverAmountOff()) {
             throw InvalidCoupon::cannotApplyForeverAmountOffToSubscription($couponId);
         }
+    }
+
+    /**
+     * Get the billing mode for the Stripe payload.
+     */
+    protected function getBillingModeForPayload(): ?array
+    {
+        return match (StripeApiVersion::CURRENT_MAJOR) {
+            'basil' => null,
+            default => ['type' => 'classic'],
+        };
     }
 
     /**
