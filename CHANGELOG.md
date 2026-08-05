@@ -1,6 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v16.6.0...16.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v16.7.0...16.x)
 
 ## [v15.7.1](https://github.com/laravel/cashier/compare/v15.7.0...v15.7.1) - 2025-07-22
 
@@ -9,6 +9,12 @@
 ## [v15.7.0](https://github.com/laravel/cashier/compare/v15.6.4...v15.7.0) - 2025-06-10
 
 * [15.x] feat: allowing dompdf 3.0 by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/cashier-stripe/pull/1763
+
+## [v16.7.0](https://github.com/laravel/cashier/compare/v16.6.0...v16.7.0) - 2026-08-05
+
+* Bump actions/checkout from 6.0.3 to 7.0.0 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/cashier-stripe/pull/1859
+* Bump actions/checkout from 7.0.0 to 7.0.1 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/cashier-stripe/pull/1861
+* Supports Stripe API codename `clover` and `dahlia`  by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/cashier-stripe/pull/1860
 
 ## [v16.6.0](https://github.com/laravel/cashier/compare/v16.5.3...v16.6.0) - 2026-06-23
 
