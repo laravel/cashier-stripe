@@ -76,3 +76,41 @@ jobs:
           STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
           STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
           CASHIER_TESTER_BUILD_ID: ${{ github.run_number }}
+
+  integration-tests:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [8.5]
+        stripe: [17, 18, 19, 20]
+
+    name: Stripe API ${{ matrix.stripe }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, bcmath
+          ini-values: error_reporting=E_ALL
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer update --prefer-dist --no-interaction --no-progress --with="stripe/stripe-php:^${{ matrix.stripe }}"
+
+      - name: Execute tests
+        run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
+        env:
+          STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
+          STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
+          CASHIER_TESTER_BUILD_ID: ${{ github.run_number }}
+

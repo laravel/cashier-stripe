@@ -18,6 +18,7 @@ use Laravel\Cashier\Concerns\InteractsWithStripe;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Exceptions\InvalidCoupon;
 use Stripe\Subscription as StripeSubscription;
+use Stripe\Util\ApiVersion as StripeApiVersion;
 
 class SubscriptionBuilder
 {
@@ -396,6 +397,9 @@ class SubscriptionBuilder
             'line_items' => Collection::make($this->items)->values()->all(),
             'mode' => 'subscription',
             'subscription_data' => array_filter([
+                'billing_mode' => ! Arr::has($sessionOptions, 'subscription_data.billing_mode')
+                    ? $this->getBillingModeForPayload()
+                    : null,
                 'default_tax_rates' => $this->getTaxRatesForPayload(),
                 'trial_end' => $trialEnd?->getTimestamp(),
                 'billing_cycle_anchor' => $billingCycleAnchor,
@@ -439,6 +443,7 @@ class SubscriptionBuilder
         $payload = array_filter([
             'automatic_tax' => $this->automaticTaxPayload(),
             'billing_cycle_anchor' => $this->billingCycleAnchor,
+            'billing_mode' => $this->getBillingModeForPayload(),
             'billing_thresholds' => $this->billingThresholds,
             'expand' => ['latest_invoice.confirmation_secret'],
             'metadata' => $this->metadata,
@@ -542,6 +547,17 @@ class SubscriptionBuilder
         if ($coupon->isForeverAmountOff()) {
             throw InvalidCoupon::cannotApplyForeverAmountOffToSubscription($couponId);
         }
+    }
+
+    /**
+     * Get the billing mode for the Stripe payload.
+     */
+    protected function getBillingModeForPayload(): ?array
+    {
+        return match (StripeApiVersion::CURRENT_MAJOR) {
+            'basil' => null,
+            default => ['type' => 'classic'],
+        };
     }
 
     /**

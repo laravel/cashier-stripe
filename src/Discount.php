@@ -6,12 +6,17 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use InvalidArgumentException;
 use JsonSerializable;
+use Laravel\Cashier\Concerns\InteractsWithStripe;
+use Laravel\Cashier\Enums\StripeApiVersions;
+use Stripe\Coupon as StripeCoupon;
 use Stripe\Discount as StripeDiscount;
-use Stripe\PromotionCode as StripePromotionCode;
 
 class Discount implements Arrayable, Jsonable, JsonSerializable
 {
+    use InteractsWithStripe;
+
     /**
      * Create a new Discount instance.
      *
@@ -27,10 +32,22 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
      * Get the coupon applied to the discount.
      *
      * @return \Laravel\Cashier\Coupon
+     *
+     * @throws \InvalidArgumentException
      */
     public function coupon(): Coupon
     {
-        return new Coupon($this->discount->coupon);
+        $coupon = StripeApiVersions::current()->couponFromDiscount($this->discount);
+
+        if (is_null($coupon)) {
+            throw new InvalidArgumentException('Unable to retrieve coupon information for the discount.');
+        }
+
+        if (! $coupon instanceof StripeCoupon) {
+            $coupon = static::stripe()->coupons->retrieve($coupon);
+        }
+
+        return new Coupon($coupon);
     }
 
     /**
@@ -51,7 +68,7 @@ class Discount implements Arrayable, Jsonable, JsonSerializable
 
         // If promotion_code is just an ID string, fetch it from Stripe...
         if (is_string($this->discount->promotion_code)) {
-            $promotionCode = StripePromotionCode::retrieve($this->discount->promotion_code);
+            $promotionCode = static::stripe()->promotionCodes->retrieve($this->discount->promotion_code);
 
             return new PromotionCode($promotionCode);
         }

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use JsonSerializable;
+use Laravel\Cashier\Enums\StripeApiVersions;
 use Stripe\Checkout\Session;
 
 class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
@@ -86,7 +87,7 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
         }
 
         // Remove success and cancel URLs if "ui_mode" is "embedded" or "custom"...
-        if (isset($data['ui_mode']) && in_array($data['ui_mode'], ['embedded', 'custom'])) {
+        if (isset($data['ui_mode']) && in_array($data['ui_mode'], ['embedded', 'embedded_page', 'custom', 'elements'])) {
             $data['return_url'] = $sessionOptions['return_url'] ?? route('home');
 
             // Remove return URL for embedded UI mode when no redirection is desired on completion...
@@ -96,6 +97,10 @@ class Checkout implements Arrayable, Jsonable, JsonSerializable, Responsable
         } else {
             $data['success_url'] = $sessionOptions['success_url'] ?? route('home').'?checkout=success';
             $data['cancel_url'] = $sessionOptions['cancel_url'] ?? route('home').'?checkout=cancelled';
+        }
+
+        if (isset($data['ui_mode'])) {
+            $data['ui_mode'] = StripeApiVersions::current()->transformUiMode($data['ui_mode']);
         }
 
         $session = $stripe->checkout->sessions->create($data);
