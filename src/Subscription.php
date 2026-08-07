@@ -264,7 +264,7 @@ class Subscription extends Model
      * Sync the Stripe status of the subscription.
      *
      * @return void
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function syncStripeStatus(): void
@@ -665,7 +665,7 @@ class Subscription extends Model
      * Force the subscription's trial to end immediately.
      *
      * @return $this
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function endTrial()
@@ -691,7 +691,7 @@ class Subscription extends Model
      *
      * @param  \Carbon\CarbonInterface  $date
      * @return $this
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function extendTrial(CarbonInterface $date)
@@ -839,7 +839,7 @@ class Subscription extends Model
      *
      * @param  \Illuminate\Support\Collection  $items
      * @return \Illuminate\Support\Collection
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     protected function mergeItemsThatShouldBeDeletedDuringSwap(Collection $items): Collection
@@ -1067,7 +1067,7 @@ class Subscription extends Model
      * Cancel the subscription at the end of the billing period.
      *
      * @return $this
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function cancel()
@@ -1097,7 +1097,7 @@ class Subscription extends Model
      *
      * @param  \DateTimeInterface|int  $endsAt
      * @return $this
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function cancelAt(DateTimeInterface|int $endsAt)
@@ -1124,7 +1124,7 @@ class Subscription extends Model
      * Cancel the subscription immediately without invoicing.
      *
      * @return $this
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function cancelNow()
@@ -1142,7 +1142,7 @@ class Subscription extends Model
      * Cancel the subscription immediately and invoice.
      *
      * @return $this
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function cancelNowAndInvoice()
@@ -1206,7 +1206,7 @@ class Subscription extends Model
      * Determine if the subscription has pending updates.
      *
      * @return bool
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function pending(): bool
@@ -1299,7 +1299,7 @@ class Subscription extends Model
      * Get the latest invoice for the subscription.
      *
      * @return \Laravel\Cashier\Invoice|null
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function latestInvoice(array $expand = []): ?Invoice
@@ -1336,7 +1336,7 @@ class Subscription extends Model
      * @param  string|array  $prices
      * @param  array  $options
      * @return \Laravel\Cashier\Invoice|null
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function previewInvoice(string|array $prices, array $options = []): ?Invoice
@@ -1398,7 +1398,7 @@ class Subscription extends Model
      * Sync the tax rates of the user to the subscription.
      *
      * @return void
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function syncTaxRates(): void
@@ -1445,7 +1445,7 @@ class Subscription extends Model
      * Get the latest payment for a Subscription.
      *
      * @return \Laravel\Cashier\Payment|null
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function latestPayment(): ?Payment
@@ -1471,7 +1471,7 @@ class Subscription extends Model
      * The discount that applies to the subscription, if applicable.
      *
      * @return \Laravel\Cashier\Discount|null
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function discount(): ?Discount
@@ -1489,7 +1489,7 @@ class Subscription extends Model
      * Get all discounts that apply to the subscription.
      *
      * @return \Illuminate\Support\Collection<int, \Laravel\Cashier\Discount>
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function discounts(): Collection
@@ -1552,7 +1552,7 @@ class Subscription extends Model
      *
      * @param  string  $promotionCodeId
      * @return void
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function applyPromotionCode(string $promotionCodeId): void
@@ -1600,7 +1600,7 @@ class Subscription extends Model
      *
      * @param  array  $options
      * @return \Stripe\Subscription
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function updateStripeSubscription(array $options = [])
@@ -1615,7 +1615,7 @@ class Subscription extends Model
      *
      * @param  array  $expand
      * @return \Stripe\Subscription
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function asStripeSubscription(array $expand = [])
@@ -1630,7 +1630,7 @@ class Subscription extends Model
      *
      * @param  StripeSubscription|null  $subscription
      * @return bool
-     * 
+     *
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function usesFlexibleBilling(?StripeSubscription $subscription = null): bool
