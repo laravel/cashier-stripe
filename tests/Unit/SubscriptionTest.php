@@ -171,4 +171,44 @@ class SubscriptionTest extends TestCase
         $this->assertTrue($subscription->hasMultiplePrices());
         $this->assertFalse($subscription->hasSinglePrice());
     }
+
+    public function test_upcoming_invoice_is_still_fetched_during_the_grace_period()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->ends_at = now()->addDays(5);
+
+        $this->assertTrue($subscription->canceled());
+        $this->assertFalse($subscription->ended());
+
+        $owner = new class
+        {
+            public bool $wasCalled = false;
+
+            public function upcomingInvoice(array $options = [])
+            {
+                $this->wasCalled = true;
+
+                return null;
+            }
+        };
+
+        $subscription->setRelation('owner', $owner);
+
+        $subscription->upcomingInvoice();
+
+        $this->assertTrue($owner->wasCalled);
+    }
+
+    public function test_upcoming_invoice_returns_null_once_the_grace_period_has_ended()
+    {
+        $subscription = new Subscription();
+        $subscription->setDateFormat('Y-m-d H:i:s');
+        $subscription->ends_at = now()->subDays(5);
+
+        $this->assertTrue($subscription->canceled());
+        $this->assertTrue($subscription->ended());
+
+        $this->assertNull($subscription->upcomingInvoice());
+    }
 }
