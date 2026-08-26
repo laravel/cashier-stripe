@@ -25,6 +25,11 @@ class DiscountTest extends FeatureTestCase
     /**
      * @var string
      */
+    protected static $foreverAmountOffCouponId;
+
+    /**
+     * @var string
+     */
     protected static $secondCouponId;
 
     /**
@@ -65,6 +70,12 @@ class DiscountTest extends FeatureTestCase
             'duration' => 'repeating',
             'amount_off' => 500,
             'duration_in_months' => 3,
+            'currency' => 'USD',
+        ])->id;
+
+        static::$foreverAmountOffCouponId = self::stripe()->coupons->create([
+            'duration' => 'forever',
+            'amount_off' => 500,
             'currency' => 'USD',
         ])->id;
 
@@ -110,6 +121,16 @@ class DiscountTest extends FeatureTestCase
         $this->assertEquals(static::$promotionCodeId, $user->discount()->promotionCode()->id);
         $this->assertEquals(static::$secondCouponId, $user->discount()->promotionCode()->coupon()->id);
         $this->assertEquals(static::$promotionCodeCode, $user->discount()->promotionCode()->code);
+    }
+
+    public function test_applying_a_forever_amount_off_coupon_to_an_existing_customer()
+    {
+        $user = $this->createCustomer('applying_forever_amount_off_coupon_to_existing_customer');
+        $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+
+        $user->applyCoupon(static::$foreverAmountOffCouponId);
+
+        $this->assertEquals(static::$foreverAmountOffCouponId, $user->discount()->coupon()->id);
     }
 
     public function test_applying_discounts_to_specific_subscription_types()
@@ -179,6 +200,16 @@ class DiscountTest extends FeatureTestCase
         $this->assertEquals(static::$promotionCodeId, $subscription->discount()->promotionCode()->id);
         $this->assertEquals(static::$secondCouponId, $subscription->discount()->promotionCode()->coupon()->id);
         $this->assertEquals(static::$promotionCodeCode, $subscription->discount()->promotionCode()->code);
+    }
+
+    public function test_applying_a_forever_amount_off_coupon_directly_to_a_subscription()
+    {
+        $user = $this->createCustomer('applying_forever_amount_off_coupon_directly_to_subscription');
+        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+
+        $subscription->applyCoupon(static::$foreverAmountOffCouponId);
+
+        $this->assertEquals(static::$foreverAmountOffCouponId, $subscription->discount()->coupon()->id);
     }
 
     public function test_customers_can_retrieve_a_promotion_code()

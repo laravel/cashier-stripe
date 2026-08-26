@@ -66,9 +66,9 @@ The new `taxBehavior` method supports Basil's enhanced tax modeling (e.g., inclu
 
 ### Coupon Ending Dates
 
-Stripe's Basil API no longer supports setting discount coupons without an end date, and any application using a coupon without an end date will trigger `Laravel\Cashier\Exceptions\InvalidCoupon` exception after updating to Cashier 16.
+Stripe's Basil API originally restricted `amount_off` coupons with a `forever` duration. Stripe later reversed this restriction, and Cashier no longer rejects these coupons client-side.
 
-For existing infinite coupons, recreate them in Stripe with a finite duration before upgrading, or handle the exception by falling back to time-bound alternatives in code.
+Coupon validity is now determined by Stripe when the coupon is applied.
 
 ### Apply a Coupon by Subscription Type
 
@@ -100,7 +100,7 @@ $billable->applyPromotionCode('promotion_code_id', 'default');
 
 ### Coupon Validation in Checkouts
 
-New traits like `AllowsCoupons` introduce stricter validation for coupons in checkout sessions (e.g., ensuring compatibility with Basil). If you customize checkouts, test for rejection of invalid promotions.
+Coupon compatibility is validated by Stripe when creating Checkout sessions.
 
 ### Payment Failure Handling
 

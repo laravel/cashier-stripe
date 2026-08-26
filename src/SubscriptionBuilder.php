@@ -16,7 +16,6 @@ use Laravel\Cashier\Concerns\HandlesTaxes;
 use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\InteractsWithStripe;
 use Laravel\Cashier\Concerns\Prorates;
-use Laravel\Cashier\Exceptions\InvalidCoupon;
 use Stripe\Subscription as StripeSubscription;
 use Stripe\Util\ApiVersion as StripeApiVersion;
 
@@ -459,9 +458,6 @@ class SubscriptionBuilder
             $discounts = [];
 
             if ($this->couponId) {
-                // Validate the coupon before applying...
-                $this->validateCouponForSubscriptionApplication($this->couponId);
-
                 $discounts[] = ['coupon' => $this->couponId];
             }
 
@@ -524,29 +520,6 @@ class SubscriptionBuilder
         }
 
         return null;
-    }
-
-    /**
-     * Validate that a coupon can be applied to a subscription.
-     *
-     * @param  string  $couponId
-     * @return void
-     *
-     * @throws \Laravel\Cashier\Exceptions\InvalidCoupon
-     * @throws \Stripe\Exception\ApiErrorException
-     */
-    protected function validateCouponForSubscriptionApplication(string $couponId): void
-    {
-        /** @var \Stripe\Service\CouponService $couponsService */
-        $couponsService = $this->owner::stripe()->coupons;
-
-        $stripeCoupon = $couponsService->retrieve($couponId);
-
-        $coupon = new Coupon($stripeCoupon);
-
-        if ($coupon->isForeverAmountOff()) {
-            throw InvalidCoupon::cannotApplyForeverAmountOffToSubscription($couponId);
-        }
     }
 
     /**

@@ -43,6 +43,11 @@ class SubscriptionsTest extends FeatureTestCase
     /**
      * @var string
      */
+    protected static $foreverAmountOffCouponId;
+
+    /**
+     * @var string
+     */
     protected static $taxRateId;
 
     public static function setUpBeforeClass(): void
@@ -95,6 +100,12 @@ class SubscriptionsTest extends FeatureTestCase
             'duration' => 'repeating',
             'amount_off' => 500,
             'duration_in_months' => 3,
+            'currency' => 'USD',
+        ])->id;
+
+        static::$foreverAmountOffCouponId = self::stripe()->coupons->create([
+            'duration' => 'forever',
+            'amount_off' => 500,
             'currency' => 'USD',
         ])->id;
 
@@ -186,6 +197,17 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertFalse($invoice->hasStartingBalance());
         $this->assertEmpty($invoice->discounts());
         $this->assertInstanceOf(Carbon::class, $invoice->date());
+    }
+
+    public function test_subscriptions_can_be_created_with_a_forever_amount_off_coupon()
+    {
+        $user = $this->createCustomer('creating_subscription_with_forever_amount_off_coupon');
+
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->withCoupon(static::$foreverAmountOffCouponId)
+            ->create('pm_card_visa');
+
+        $this->assertEquals(static::$foreverAmountOffCouponId, $subscription->discount()->coupon()->id);
     }
 
     public function test_swapping_subscription_with_coupon()

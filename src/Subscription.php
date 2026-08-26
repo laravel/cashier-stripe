@@ -19,7 +19,6 @@ use Laravel\Cashier\Concerns\InteractsWithPaymentBehavior;
 use Laravel\Cashier\Concerns\Prorates;
 use Laravel\Cashier\Database\Factories\SubscriptionFactory;
 use Laravel\Cashier\Exceptions\IncompletePayment;
-use Laravel\Cashier\Exceptions\InvalidCoupon;
 use Laravel\Cashier\Exceptions\SubscriptionUpdateFailure;
 use LogicException;
 use Stripe\Subscription as StripeSubscription;
@@ -1511,40 +1510,17 @@ class Subscription extends Model
      * @param  string  $couponId
      * @return void
      *
-     * @throws \Laravel\Cashier\Exceptions\InvalidCoupon
      * @throws \Stripe\Exception\InvalidRequestException
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function applyCoupon(string $couponId): void
     {
-        // Validate the coupon to ensure it's not a forever amount_off coupon...
-        $this->validateCouponForSubscriptionApplication($couponId);
-
         $this->updateStripeSubscription([
             'discounts' => [['coupon' => $couponId]],
         ]);
 
         // Clear any cached discount data to ensure fresh data is retrieved...
         unset($this->discount, $this->discounts);
-    }
-
-    /**
-     * Validate that a coupon can be applied to a subscription.
-     *
-     * @param  string  $couponId
-     * @return void
-     *
-     * @throws \Laravel\Cashier\Exceptions\InvalidCoupon
-     * @throws \Stripe\Exception\ApiErrorException
-     */
-    protected function validateCouponForSubscriptionApplication(string $couponId): void
-    {
-        $stripeCoupon = $this->owner::stripe()->coupons->retrieve($couponId);
-        $coupon = new Coupon($stripeCoupon);
-
-        if ($coupon->isForeverAmountOff()) {
-            throw InvalidCoupon::cannotApplyForeverAmountOffToSubscription($couponId);
-        }
     }
 
     /**
