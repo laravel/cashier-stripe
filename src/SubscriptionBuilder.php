@@ -324,6 +324,10 @@ class SubscriptionBuilder
     protected function createSubscription(StripeSubscription $stripeSubscription)
     {
         if ($subscription = $this->owner->subscriptions()->where('stripe_id', $stripeSubscription->id)->first()) {
+            if ($subscription->type !== $this->type) {
+                $subscription->update(['type' => $this->type]);
+            }
+
             return $subscription;
         }
 
