@@ -1224,7 +1224,7 @@ class Subscription extends Model
      */
     public function currentPeriodStart(DateTimeZone|string|int|null $timezone = null): ?CarbonInterface
     {
-        $items = $this->items;
+        $items = $this->items->loadMissing(['subscription', 'subscription.owner']);
 
         if ($items->isEmpty()) {
             return null;
@@ -1253,7 +1253,7 @@ class Subscription extends Model
      */
     public function currentPeriodEnd(DateTimeZone|string|int|null $timezone = null): ?CarbonInterface
     {
-        $items = $this->items;
+        $items = $this->items->loadMissing(['subscription', 'subscription.owner']);
 
         if ($items->isEmpty()) {
             return null;

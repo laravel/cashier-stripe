@@ -5,6 +5,7 @@ namespace Laravel\Cashier\Tests\Feature;
 use App\Models\User;
 use Carbon\Carbon;
 use DateTime;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Exceptions\IncompletePayment;
@@ -974,6 +975,23 @@ class SubscriptionsTest extends FeatureTestCase
 
         $this->assertSame('paid', $invoice->status);
         $this->assertSame(2000, $invoice->total);
+    }
+
+    public function test_current_period_start_does_not_cause_lazy_load_violation()
+    {
+        Model::preventLazyLoading();
+
+        $user = $this->createCustomer('current_period_lazy_load');
+
+        $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+        $user->newSubscription('other', static::$otherPriceId)->create('pm_card_visa');
+
+        $results = Subscription::latest()->take(2)->get()->map->currentPeriodStart();
+
+        Model::preventLazyLoading(false);
+
+        $this->assertCount(2, $results);
+        $this->assertTrue($results->every(fn ($date) => $date !== null));
     }
 
     public function test_updating_single_price_subscription_quantity_updates_the_quantity_of_the_subscription_item()
