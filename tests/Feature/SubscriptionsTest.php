@@ -976,6 +976,18 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertSame(2000, $invoice->total);
     }
 
+    public function test_upcoming_invoice_is_not_null_during_grace_period()
+    {
+        $user = $this->createCustomer('upcoming_invoice_grace_period');
+
+        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+
+        $subscription->ends_at = now()->addMonths(3);
+        $subscription->save();
+
+        $this->assertNotNull($subscription->upcomingInvoice());
+    }
+
     public function test_updating_single_price_subscription_quantity_updates_the_quantity_of_the_subscription_item()
     {
         $user = $this->createCustomer('invoice_subscription_directly');
