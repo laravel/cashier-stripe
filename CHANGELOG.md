@@ -1,6 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v16.7.0...16.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v16.8.0...16.x)
 
 ## [v15.7.1](https://github.com/laravel/cashier/compare/v15.7.0...v15.7.1) - 2025-07-22
 
@@ -9,6 +9,12 @@
 ## [v15.7.0](https://github.com/laravel/cashier/compare/v15.6.4...v15.7.0) - 2025-06-10
 
 * [15.x] feat: allowing dompdf 3.0 by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/cashier-stripe/pull/1763
+
+## [v16.8.0](https://github.com/laravel/cashier/compare/v16.7.0...v16.8.0) - 2026-09-01
+
+* [16.x] Add missing [@throws](https://github.com/throws) docblocks for Stripe exceptions in Subscription by [@Solaire](https://github.com/Solaire) in https://github.com/laravel/cashier-stripe/pull/1864
+* Bump actions/checkout from 7.0.0 to 7.0.1 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/cashier-stripe/pull/1865
+* Supports `stripe/stripe-php` version 21 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/cashier-stripe/pull/1869
 
 ## [v16.7.0](https://github.com/laravel/cashier/compare/v16.6.0...v16.7.0) - 2026-08-05
 
