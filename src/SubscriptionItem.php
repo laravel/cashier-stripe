@@ -42,6 +42,17 @@ class SubscriptionItem extends Model
     ];
 
     /**
+     * The relationships that should be hidden from serialization.
+     *
+     * The parent subscription hands each of its items a reference back to
+     * itself, so hiding it here keeps that reference out of the array and
+     * JSON representations, which would otherwise nest circularly.
+     *
+     * @var array
+     */
+    protected $hidden = ['subscription'];
+
+    /**
      * Get the subscription that the item belongs to.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

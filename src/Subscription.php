@@ -107,6 +107,26 @@ class Subscription extends Model
     }
 
     /**
+     * Set the given relationship on the model.
+     *
+     * @param  string  $relation
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setRelation($relation, $value)
+    {
+        // Subscription items are always eager loaded, and every item belongs to
+        // the subscription that just loaded them. Handing each item the parent
+        // it already has keeps calls such as "asStripeSubscriptionItem" from
+        // lazy loading a subscription that is sitting right there in memory.
+        if ($relation === 'items' && $value instanceof Collection) {
+            $value->each(fn ($item) => $item->setRelation('subscription', $this));
+        }
+
+        return parent::setRelation($relation, $value);
+    }
+
+    /**
      * Determine if the subscription has multiple prices.
      *
      * @return bool
