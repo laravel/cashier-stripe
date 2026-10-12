@@ -119,6 +119,17 @@ class SubscriptionTest extends TestCase
         $subscription->updateQuantity(5);
     }
 
+    public function test_incomplete_subscriptions_cannot_add_metered_prices_and_invoice()
+    {
+        $subscription = new Subscription([
+            'stripe_status' => StripeSubscription::STATUS_INCOMPLETE,
+        ]);
+
+        $this->expectException(SubscriptionUpdateFailure::class);
+
+        $subscription->addMeteredPriceAndInvoice('metered_price');
+    }
+
     public function test_extending_a_trial_requires_a_date_in_the_future()
     {
         $this->expectException(InvalidArgumentException::class);

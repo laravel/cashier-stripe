@@ -117,9 +117,9 @@ class CustomerBalanceTransaction
     /**
      * Return the related invoice for this transaction.
      *
-     * @return \Laravel\Cashier\Invoice
+     * @return \Laravel\Cashier\Invoice|null
      */
-    public function invoice(): Invoice
+    public function invoice(): ?Invoice
     {
         return $this->transaction->invoice
             ? $this->owner->findInvoice($this->transaction->invoice)
