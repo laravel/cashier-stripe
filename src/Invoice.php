@@ -378,7 +378,7 @@ class Invoice implements Arrayable, Jsonable, JsonSerializable
      */
     public function tax(): string
     {
-        return $this->formatAmount($this->invoice->tax ?? 0);
+        return $this->formatAmount(collect($this->invoice->total_taxes ?? [])->sum('amount'));
     }
 
     /**

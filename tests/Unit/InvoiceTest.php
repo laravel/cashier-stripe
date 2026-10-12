@@ -252,7 +252,7 @@ class InvoiceTest extends TestCase
     {
         $stripeInvoice = new StripeInvoice();
         $stripeInvoice->customer = 'foo';
-        $stripeInvoice->tax = 50;
+        $stripeInvoice->total_taxes = [['amount' => 30], ['amount' => 20]];
         $stripeInvoice->currency = 'USD';
 
         $user = new User();
@@ -267,7 +267,7 @@ class InvoiceTest extends TestCase
         // No tax...
         $stripeInvoice = new StripeInvoice();
         $stripeInvoice->customer = 'foo';
-        $stripeInvoice->tax = null;
+        $stripeInvoice->total_taxes = [];
         $stripeInvoice->currency = 'USD';
 
         $user = new User();
