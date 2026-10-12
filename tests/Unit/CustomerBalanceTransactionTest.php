@@ -33,4 +33,25 @@ class CustomerBalanceTransactionTest extends TestCase
         $this->assertTrue($transaction->isCheckoutSessionSubscriptionPayment());
         $this->assertFalse($transaction->isCheckoutSessionSubscriptionPaymentCanceled());
     }
+
+    public function test_invoice_is_null_when_the_transaction_has_no_invoice()
+    {
+        $stripeTransaction = StripeCustomerBalanceTransaction::constructFrom([
+            'id' => 'cbtxn_test_123',
+            'object' => 'customer_balance_transaction',
+            'amount' => -500,
+            'currency' => 'usd',
+            'customer' => 'cus_test_456',
+            'invoice' => null,
+        ], []);
+
+        $owner = new class
+        {
+            public $stripe_id = 'cus_test_456';
+        };
+
+        $transaction = new CustomerBalanceTransaction($owner, $stripeTransaction);
+
+        $this->assertNull($transaction->invoice());
+    }
 }

@@ -979,7 +979,7 @@ class Subscription extends Model
      * Add a new Stripe price to the subscription, and invoice immediately.
      *
      * @param  string  $price
-     * @param  int  $quantity
+     * @param  int|null  $quantity
      * @param  array  $options
      * @return $this
      *
@@ -987,7 +987,7 @@ class Subscription extends Model
      * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
      * @throws \Stripe\Exception\ApiErrorException
      */
-    public function addPriceAndInvoice(string $price, int $quantity = 1, array $options = [])
+    public function addPriceAndInvoice(string $price, ?int $quantity = 1, array $options = [])
     {
         $this->alwaysInvoice();
 
