@@ -1,6 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v16.8.0...16.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v16.9.0...16.x)
 
 ## [v15.7.1](https://github.com/laravel/cashier/compare/v15.7.0...v15.7.1) - 2025-07-22
 
@@ -9,6 +9,13 @@
 ## [v15.7.0](https://github.com/laravel/cashier/compare/v15.6.4...v15.7.0) - 2025-06-10
 
 * [15.x] feat: allowing dompdf 3.0 by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/cashier-stripe/pull/1763
+
+## [v16.9.0](https://github.com/laravel/cashier/compare/v16.8.0...v16.9.0) - 2026-10-13
+
+* [16.x] Fix `Invoice::tax()` always returning zero by [@svidskiy](https://github.com/svidskiy) in https://github.com/laravel/cashier-stripe/pull/1876
+* [16.x] Fix `TypeError`s in `invoice()` and `addMeteredPriceAndInvoice()` by [@svidskiy](https://github.com/svidskiy) in https://github.com/laravel/cashier-stripe/pull/1875
+* [16.x] Fix price tax rates with array prices in the subscription builder by [@svidskiy](https://github.com/svidskiy) in https://github.com/laravel/cashier-stripe/pull/1878
+* [16.x] Fix `UnhandledMatchError` for `ui_mode` on Dahlia by [@svidskiy](https://github.com/svidskiy) in https://github.com/laravel/cashier-stripe/pull/1877
 
 ## [v16.8.0](https://github.com/laravel/cashier/compare/v16.7.0...v16.8.0) - 2026-09-01
 
