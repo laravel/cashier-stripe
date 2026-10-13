@@ -56,8 +56,10 @@ enum StripeApiVersions: string
             StripeApiVersions::BASIL => $uiMode,
             StripeApiVersions::CLOVER => $uiMode,
             StripeApiVersions::DAHLIA => match ($uiMode) {
+                'hosted' => 'hosted_page',
                 'embedded' => 'embedded_page',
                 'custom' => 'elements',
+                default => $uiMode,
             },
         };
     }
