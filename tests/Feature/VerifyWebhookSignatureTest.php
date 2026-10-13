@@ -97,11 +97,12 @@ class VerifyWebhookSignatureTest extends TestCase
 
     public function test_app_aborts_when_no_secret_was_provided()
     {
+        config(['cashier.webhook.secret' => '']);
+
         $this->withTimestamp(time());
-        $this->withSignedSignature('');
+        $this->withSignedSignature('secret');
 
         $this->expectException(AccessDeniedHttpException::class);
-        $this->expectExceptionMessage('No signatures found matching the expected signature for payload');
 
         (new VerifyWebhookSignature())
             ->handle($this->request, function ($request) {

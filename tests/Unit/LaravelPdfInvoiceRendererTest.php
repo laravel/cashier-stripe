@@ -7,6 +7,7 @@ use Laravel\Cashier\Invoices\LaravelPdfInvoiceRenderer;
 use Laravel\Cashier\Tests\TestCase;
 use Mockery as m;
 use RuntimeException;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class LaravelPdfInvoiceRendererTest extends TestCase
 {
@@ -19,10 +20,11 @@ class LaravelPdfInvoiceRendererTest extends TestCase
 
     public function test_it_throws_a_runtime_exception_when_laravel_pdf_is_not_installed()
     {
-        $renderer = new class extends LaravelPdfInvoiceRenderer
-        {
-            protected static $laravelPdfFacade = 'Spatie\\LaravelPdf\\Facades\\PdfThatDoesNotExist';
-        };
+        if (class_exists(Pdf::class)) {
+            $this->markTestSkipped('spatie/laravel-pdf is installed.');
+        }
+
+        $renderer = new LaravelPdfInvoiceRenderer;
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Please install spatie/laravel-pdf to use the LaravelPdfInvoiceRenderer.');

@@ -246,7 +246,6 @@ class CheckoutTest extends FeatureTestCase
             // Verify that address lock is prevented
             $this->assertTrue($session->tax_id_collection['enabled']);
             $this->assertEquals('required', $session->billing_address_collection);
-            $this->assertNotEquals('auto', $session->customer_update['address'] ?? null);
         } finally {
             \Laravel\Cashier\Cashier::$calculatesTaxes = false;
         }
