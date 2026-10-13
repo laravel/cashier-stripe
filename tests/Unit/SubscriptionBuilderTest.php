@@ -25,6 +25,22 @@ class SubscriptionBuilderTest extends TestCase
         ], $builder->getItems());
     }
 
+    public function test_price_tax_rates_are_applied_to_array_prices()
+    {
+        $user = new User;
+        $user->priceTaxRates = ['price_bar' => ['txr_123']];
+
+        $builder = new SubscriptionBuilder($user, 'default', [
+            'price_foo',
+            ['price' => 'price_bar', 'quantity' => 2],
+        ]);
+
+        $this->assertSame([
+            'price_foo' => ['price' => 'price_foo', 'quantity' => 1],
+            'price_bar' => ['price' => 'price_bar', 'quantity' => 2, 'tax_rates' => ['txr_123']],
+        ], $builder->getItems());
+    }
+
     public function test_quantity_without_price_and_no_items_throws_exception()
     {
         $this->expectException(\InvalidArgumentException::class);
