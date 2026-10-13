@@ -64,7 +64,7 @@ class VerifyWebhookSignatureTest extends TestCase
         $this->expectException(AccessDeniedHttpException::class);
         $this->expectExceptionMessage('Timestamp outside the tolerance zone');
 
-        $response = (new VerifyWebhookSignature())
+        (new VerifyWebhookSignature())
             ->handle($this->request, function ($request) {
             });
     }
@@ -77,7 +77,7 @@ class VerifyWebhookSignatureTest extends TestCase
         $this->expectException(AccessDeniedHttpException::class);
         $this->expectExceptionMessage('Unable to extract timestamp and signatures from header');
 
-        $response = (new VerifyWebhookSignature())
+        (new VerifyWebhookSignature())
             ->handle($this->request, function ($request) {
             });
     }

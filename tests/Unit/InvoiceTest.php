@@ -8,7 +8,6 @@ use Carbon\CarbonTimeZone;
 use Laravel\Cashier\Discount;
 use Laravel\Cashier\Invoice;
 use Laravel\Cashier\Tests\TestCase;
-use Mockery as m;
 use stdClass;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Discount as StripeDiscount;
@@ -16,13 +15,6 @@ use Stripe\Invoice as StripeInvoice;
 
 class InvoiceTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     public function test_it_can_return_the_invoice_date()
     {
         $stripeInvoice = new StripeInvoice();
@@ -57,7 +49,7 @@ class InvoiceTest extends TestCase
         $this->assertEquals('CET', $timezone->getName());
     }
 
-    public function test_it_can_return_its_total()
+    public function test_it_can_return_its_real_total()
     {
         $stripeInvoice = new StripeInvoice();
         $stripeInvoice->customer = 'foo';
@@ -74,7 +66,7 @@ class InvoiceTest extends TestCase
         $this->assertEquals('$10.00', $total);
     }
 
-    public function test_it_can_return_its_raw_total()
+    public function test_it_can_return_its_raw_real_total()
     {
         $stripeInvoice = new StripeInvoice();
         $stripeInvoice->customer = 'foo';

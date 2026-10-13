@@ -206,7 +206,7 @@ class CustomerTest extends FeatureTestCase
 
     public function test_expired_generic_trial_scopes()
     {
-        $user = $this->createCustomer('on_generic_trial', ['trial_ends_at' => Carbon::yesterday()]);
+        $user = $this->createCustomer('expired_generic_trial', ['trial_ends_at' => Carbon::yesterday()]);
 
         $this->assertFalse($user->query()->onGenericTrial()->exists());
         $this->assertTrue($user->query()->hasExpiredGenericTrial()->exists());

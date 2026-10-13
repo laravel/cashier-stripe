@@ -19,7 +19,7 @@ class PaymentMethodsTest extends FeatureTestCase
 
     public function test_we_can_retrieve_an_existing_setup_intent()
     {
-        $user = $this->createCustomer('we_can_retrieve_a_setup_intent');
+        $user = $this->createCustomer('we_can_retrieve_an_existing_setup_intent');
 
         $originalSetupIntent = $user->createSetupIntent();
 
@@ -191,9 +191,9 @@ class PaymentMethodsTest extends FeatureTestCase
         $this->assertEquals('4242', $user->pm_last_four);
     }
 
-    public function test_we_delete_all_payment_methods()
+    public function test_we_can_delete_all_payment_methods()
     {
-        $user = $this->createCustomer('we_delete_all_payment_methods');
+        $user = $this->createCustomer('we_can_delete_all_payment_methods');
         $customer = $user->createAsStripeCustomer();
 
         $paymentMethod = self::stripe()->paymentMethods->retrieve('pm_card_visa');

@@ -185,7 +185,7 @@ class MeteredBillingTest extends FeatureTestCase
             ->meteredPrice(static::$otherMeteredPrice)
             ->create('pm_card_visa');
 
-        $this->assertSame($subscription->items->count(), 3);
+        $this->assertCount(3, $subscription->items);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('This method requires a price argument since the subscription has multiple prices.');

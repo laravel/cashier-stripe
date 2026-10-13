@@ -58,7 +58,6 @@ class WebhooksTest extends FeatureTestCase
                     'id' => 'sub_foo',
                     'customer' => 'cus_foo',
                     'cancel_at_period_end' => false,
-                    'quantity' => 10,
                     'items' => [
                         'data' => [[
                             'id' => 'bar',
@@ -317,7 +316,6 @@ class WebhooksTest extends FeatureTestCase
                 'object' => [
                     'id' => $subscription->stripe_id,
                     'customer' => $user->stripe_id,
-                    'quantity' => 1,
                 ],
             ],
         ])->assertOk();
@@ -340,7 +338,6 @@ class WebhooksTest extends FeatureTestCase
                     'id' => $subscription->stripe_id,
                     'customer' => $user->stripe_id,
                     'status' => StripeSubscription::STATUS_INCOMPLETE_EXPIRED,
-                    'quantity' => 1,
                 ],
             ],
         ])->assertOk();
@@ -353,7 +350,7 @@ class WebhooksTest extends FeatureTestCase
         $user = $this->createCustomer('payment_action_required_email_is_sent');
 
         try {
-            $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_threeDSecure2Required');
+            $user->newSubscription('main', static::$priceId)->create('pm_card_threeDSecure2Required');
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $exception) {
@@ -383,7 +380,7 @@ class WebhooksTest extends FeatureTestCase
 
     public function test_payment_action_required_email_is_not_sent_during_on_session_checkout()
     {
-        $user = $this->createCustomer('payment_action_required_email_is_not_sent_during_on_session_checkout', [
+        $this->createCustomer('payment_action_required_email_is_not_sent_during_on_session_checkout', [
             'stripe_id' => 'cus_foo',
         ]);
 

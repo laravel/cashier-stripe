@@ -293,7 +293,7 @@ class SubscriptionsWithMultiplePricesTest extends FeatureTestCase
 
         $subscription->addPriceAndInvoice(self::$priceId);
 
-        // Assert that a new invoice was created because of no prorating.
+        // Assert that a new invoice was created because of immediate invoicing.
         $this->assertEquals(1000, ($invoice = $user->invoices()->first())->rawTotal());
         $this->assertEquals(4000, $user->upcomingInvoice()->rawTotal());
 
@@ -304,15 +304,15 @@ class SubscriptionsWithMultiplePricesTest extends FeatureTestCase
         $this->assertEquals(2000, $user->upcomingInvoice()->rawTotal());
     }
 
-    public function test_subscription_item_quantity_changes_can_be_prorated()
+    public function test_subscription_item_quantity_changes_can_skip_proration()
     {
-        $user = $this->createCustomer('subscription_item_quantity_changes_can_be_prorated');
+        $user = $this->createCustomer('subscription_item_quantity_changes_can_skip_proration');
 
         $subscription = $user->newSubscription('main', [self::$priceId, self::$otherPriceId])
             ->quantity(3, self::$otherPriceId)
             ->create('pm_card_visa');
 
-        $this->assertEquals(4000, ($invoice = $user->invoices()->first())->rawTotal());
+        $this->assertEquals(4000, $user->invoices()->first()->rawTotal());
 
         $subscription->noProrate()->updateQuantity(1, self::$otherPriceId);
 
@@ -327,7 +327,7 @@ class SubscriptionsWithMultiplePricesTest extends FeatureTestCase
             ->quantity(1, self::$otherPriceId)
             ->create('pm_card_visa');
 
-        $this->assertEquals(2000, ($invoice1 = $user->invoices()->first())->rawTotal());
+        $this->assertEquals(2000, $user->invoices()->first()->rawTotal());
 
         $user->updateDefaultPaymentMethod('pm_card_chargeCustomerFail');
 
@@ -339,7 +339,7 @@ class SubscriptionsWithMultiplePricesTest extends FeatureTestCase
     /**
      * Create a subscription with a single price.
      *
-     * @param  \Laravel\Cashier\Tests\Fixtures\User  $user
+     * @param  \App\Models\User  $user
      * @return \Laravel\Cashier\Subscription
      */
     protected function createSubscriptionWithSinglePrice(User $user)
@@ -366,7 +366,7 @@ class SubscriptionsWithMultiplePricesTest extends FeatureTestCase
     /**
      * Create a subscription with multiple prices.
      *
-     * @param  \Laravel\Cashier\Tests\Fixtures\User  $user
+     * @param  \App\Models\User  $user
      * @return \Laravel\Cashier\Subscription
      */
     protected function createSubscriptionWithMultiplePrices(User $user)

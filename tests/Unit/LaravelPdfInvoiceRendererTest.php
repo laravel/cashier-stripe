@@ -11,13 +11,6 @@ use Spatie\LaravelPdf\Facades\Pdf;
 
 class LaravelPdfInvoiceRendererTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     public function test_it_throws_a_runtime_exception_when_laravel_pdf_is_not_installed()
     {
         if (class_exists(Pdf::class)) {
@@ -50,7 +43,6 @@ class LaravelPdfInvoiceRendererTest extends TestCase
         $renderer = new LaravelPdfInvoiceRenderer;
 
         $method = new \ReflectionMethod(LaravelPdfInvoiceRenderer::class, 'renderInvoice');
-        $method->setAccessible(true);
 
         $this->assertSame('<p>invoice</p>', $method->invoke($renderer, $invoice, ['key' => 'value']));
     }
