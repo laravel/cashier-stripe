@@ -13,7 +13,7 @@ class CustomerBalanceTransactionTest extends TestCase
         $stripeTransaction = StripeCustomerBalanceTransaction::constructFrom([
             'id' => 'cbtxn_test_123',
             'object' => 'customer_balance_transaction',
-            'balance_type' => 'checkout_session_subscription_payment',
+            'type' => 'checkout_session_subscription_payment',
             'checkout_session' => 'cs_test_123',
             'amount' => 1000,
             'currency' => 'usd',
@@ -32,6 +32,30 @@ class CustomerBalanceTransactionTest extends TestCase
         $this->assertSame('cs_test_123', $transaction->checkoutSession());
         $this->assertTrue($transaction->isCheckoutSessionSubscriptionPayment());
         $this->assertFalse($transaction->isCheckoutSessionSubscriptionPaymentCanceled());
+    }
+
+    public function test_canceled_checkout_session_subscription_payments_are_detected()
+    {
+        $stripeTransaction = StripeCustomerBalanceTransaction::constructFrom([
+            'id' => 'cbtxn_test_123',
+            'object' => 'customer_balance_transaction',
+            'type' => 'checkout_session_subscription_payment_canceled',
+            'checkout_session' => 'cs_test_123',
+            'amount' => -1000,
+            'currency' => 'usd',
+            'customer' => 'cus_test_456',
+            'ending_balance' => 0,
+        ], []);
+
+        $owner = new class
+        {
+            public $stripe_id = 'cus_test_456';
+        };
+
+        $transaction = new CustomerBalanceTransaction($owner, $stripeTransaction);
+
+        $this->assertFalse($transaction->isCheckoutSessionSubscriptionPayment());
+        $this->assertTrue($transaction->isCheckoutSessionSubscriptionPaymentCanceled());
     }
 
     public function test_invoice_is_null_when_the_transaction_has_no_invoice()

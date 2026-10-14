@@ -70,7 +70,7 @@ class CustomerBalanceTransaction
      */
     public function balanceType(): ?string
     {
-        return $this->transaction->balance_type;
+        return $this->transaction->type;
     }
 
     /**
@@ -90,7 +90,7 @@ class CustomerBalanceTransaction
      */
     public function isCheckoutSessionSubscriptionPayment(): bool
     {
-        return $this->transaction->balance_type === 'checkout_session_subscription_payment';
+        return $this->transaction->type === 'checkout_session_subscription_payment';
     }
 
     /**
@@ -100,7 +100,7 @@ class CustomerBalanceTransaction
      */
     public function isCheckoutSessionSubscriptionPaymentCanceled(): bool
     {
-        return $this->transaction->balance_type === 'checkout_session_subscription_payment_canceled';
+        return $this->transaction->type === 'checkout_session_subscription_payment_canceled';
     }
 
     /**
