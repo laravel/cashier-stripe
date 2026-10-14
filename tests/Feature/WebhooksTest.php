@@ -375,7 +375,6 @@ class WebhooksTest extends FeatureTestCase
                     'object' => [
                         'id' => $latestInvoice->id,
                         'customer' => $user->stripe_id,
-                        'payment_intent' => $exception->payment->id,
                     ],
                 ],
             ])->assertOk();
@@ -402,7 +401,6 @@ class WebhooksTest extends FeatureTestCase
                 'object' => [
                     'id' => 'in_foo',
                     'customer' => 'cus_foo',
-                    'payment_intent' => 'pi_foo',
                     'parent' => [
                         'type' => 'subscription_details',
                         'subscription_details' => [
