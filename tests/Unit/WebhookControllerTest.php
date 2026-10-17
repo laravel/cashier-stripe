@@ -52,7 +52,7 @@ class WebhookControllerTest extends TestCase
         Event::assertNotDispatched(WebhookHandled::class);
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertSame('Missing event type: foo.bar', $response->getContent());
+        $this->assertSame('', $response->getContent());
     }
 
     private function request($event)
@@ -73,10 +73,5 @@ class WebhookControllerTestStub extends WebhookController
     public function handleChargeSucceeded()
     {
         return new Response('Webhook Handled', 200);
-    }
-
-    public function missingMethod($parameters = [])
-    {
-        return new Response('Missing event type: '.$parameters['type']);
     }
 }

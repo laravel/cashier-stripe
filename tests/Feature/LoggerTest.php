@@ -17,7 +17,7 @@ class LoggerTest extends TestCase
 
     public function tearDown(): void
     {
-        config(['cashier.logger' => null]);
+        Stripe::setLogger(null);
 
         parent::tearDown();
     }
@@ -68,7 +68,7 @@ class LoggerTest extends TestCase
 
     public function test_it_uses_a_configured_logger()
     {
-        $this->channel = 'default';
+        $this->channel = 'null';
 
         $this->refreshApplication();
 

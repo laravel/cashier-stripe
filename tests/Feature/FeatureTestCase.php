@@ -4,6 +4,8 @@ namespace Laravel\Cashier\Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Tests\TestCase;
 use Orchestra\Testbench\Attributes\RequiresEnv;
@@ -18,6 +20,15 @@ abstract class FeatureTestCase extends TestCase
 {
     use RefreshDatabase;
     use WithLaravelMigrations;
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        if (($apiKey = getenv('STRIPE_SECRET')) && ! Str::startsWith($apiKey, 'sk_test_')) {
+            throw new InvalidArgumentException('Tests may not be run with a production Stripe key.');
+        }
+    }
 
     protected function setUp(): void
     {

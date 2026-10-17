@@ -290,7 +290,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         try {
             // Attempt to increment quantity and pay with a faulty card.
-            $subscription = $subscription->incrementAndInvoice(3);
+            $subscription = $subscription->incrementAndInvoice(3, static::$priceId);
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
         } catch (IncompletePayment $e) {
@@ -485,7 +485,7 @@ class SubscriptionsTest extends FeatureTestCase
         $subscription = $user->subscription('main');
 
         $this->assertTrue($user->subscribed('main'));
-        $this->assertNotNull($user->subscribed('main', static::$otherPriceId));
+        $this->assertFalse($user->subscribed('main', static::$otherPriceId));
         $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->canceled());
         $this->assertFalse($subscription->onGracePeriod());
@@ -851,13 +851,15 @@ class SubscriptionsTest extends FeatureTestCase
 
         Cashier::keepPastDueSubscriptionsActive();
 
-        $subscription->update(['ends_at' => null, 'stripe_status' => StripeSubscription::STATUS_PAST_DUE]);
+        try {
+            $subscription->update(['ends_at' => null, 'stripe_status' => StripeSubscription::STATUS_PAST_DUE]);
 
-        $this->assertTrue($subscription->active());
-        $this->assertTrue($user->subscriptions()->active()->exists());
-
-        // Reset deactivate past due state to default to not conflict with other tests.
-        Cashier::$deactivatePastDue = true;
+            $this->assertTrue($subscription->active());
+            $this->assertTrue($user->subscriptions()->active()->exists());
+        } finally {
+            // Reset deactivate past due state to default to not conflict with other tests.
+            Cashier::$deactivatePastDue = true;
+        }
     }
 
     public function test_retrieve_the_latest_payment_for_a_subscription()

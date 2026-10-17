@@ -198,7 +198,9 @@ class DiscountTest extends FeatureTestCase
             default => ['promotion' => ['type' => 'coupon', 'coupon' => static::$couponId]],
         }));
 
-        $promotionCode = $user->findActivePromotionCode($inactivePromotionCode->id);
+        $this->assertNotNull($user->findActivePromotionCode(static::$promotionCodeCode));
+
+        $promotionCode = $user->findActivePromotionCode($inactivePromotionCode->code);
 
         $this->assertNull($promotionCode);
     }
