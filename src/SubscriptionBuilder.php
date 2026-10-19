@@ -323,24 +323,25 @@ class SubscriptionBuilder
      */
     protected function createSubscription(StripeSubscription $stripeSubscription)
     {
-        if ($subscription = $this->owner->subscriptions()->where('stripe_id', $stripeSubscription->id)->first()) {
-            return $subscription;
-        }
-
         /** @var \Stripe\SubscriptionItem $firstItem */
         $firstItem = $stripeSubscription->items->first();
         $isSinglePrice = $stripeSubscription->items->count() === 1;
 
         /** @var \Laravel\Cashier\Subscription $subscription */
-        $subscription = $this->owner->subscriptions()->create([
-            'type' => $this->type,
+        $subscription = $this->owner->subscriptions()->firstOrCreate([
             'stripe_id' => $stripeSubscription->id,
+        ], [
+            'type' => $this->type,
             'stripe_status' => $stripeSubscription->status,
             'stripe_price' => $isSinglePrice ? $firstItem->price->id : null,
             'quantity' => $isSinglePrice ? ($firstItem->quantity ?? null) : null,
             'trial_ends_at' => ! $this->skipTrial ? $this->trialExpires : null,
             'ends_at' => null,
         ]);
+
+        if (! $subscription->wasRecentlyCreated) {
+            return $subscription;
+        }
 
         /** @var \Stripe\SubscriptionItem $item */
         foreach ($stripeSubscription->items as $item) {
