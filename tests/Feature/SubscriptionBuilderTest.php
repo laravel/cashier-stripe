@@ -3,6 +3,7 @@
 namespace Laravel\Cashier\Tests\Feature;
 
 use Illuminate\Support\Facades\DB;
+use Laravel\Cashier\SubscriptionBuilder;
 use Stripe\Subscription as StripeSubscription;
 
 class SubscriptionBuilderTest extends FeatureTestCase
@@ -19,14 +20,18 @@ class SubscriptionBuilderTest extends FeatureTestCase
             ]],
         ]);
 
-        // The "customer.subscription.created" webhook stores the subscription right after Cashier looked for it...
-        $stored = false;
+        // Simulate the "customer.subscription.created" webhook concurrently inserting the
+        // subscription right after Cashier has looked it up and before Cashier inserts it...
+        $webhookSubscriptionId = null;
 
-        DB::listen(function ($query) use ($user, &$stored) {
-            if (! $stored && str_starts_with($query->sql, 'select * from "subscriptions"')) {
-                $stored = true;
+        DB::listen(function ($query) use ($user, &$webhookSubscriptionId) {
+            $sql = strtolower(str_replace(['"', '`', '[', ']'], '', $query->sql));
 
-                DB::table('subscriptions')->insert([
+            if (is_null($webhookSubscriptionId) &&
+                str_starts_with($sql, 'select') &&
+                str_contains($sql, 'from subscriptions') &&
+                str_contains($sql, 'stripe_id')) {
+                $webhookSubscriptionId = DB::table('subscriptions')->insertGetId([
                     'user_id' => $user->id,
                     'type' => 'main',
                     'stripe_id' => 'sub_123',
@@ -35,11 +40,20 @@ class SubscriptionBuilderTest extends FeatureTestCase
             }
         });
 
-        $builder = $user->newSubscription('main', 'price_123');
+        $builder = new class($user, 'main', 'price_123') extends SubscriptionBuilder
+        {
+            public function createSubscription(StripeSubscription $stripeSubscription)
+            {
+                return parent::createSubscription($stripeSubscription);
+            }
+        };
 
-        $subscription = (fn () => $this->createSubscription($stripeSubscription))->call($builder);
+        $subscription = $builder->createSubscription($stripeSubscription);
 
+        $this->assertNotNull($webhookSubscriptionId);
+        $this->assertSame($webhookSubscriptionId, $subscription->id);
         $this->assertSame('sub_123', $subscription->stripe_id);
         $this->assertDatabaseCount('subscriptions', 1);
+        $this->assertDatabaseCount('subscription_items', 0);
     }
 }
