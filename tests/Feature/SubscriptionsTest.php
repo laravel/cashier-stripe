@@ -381,7 +381,7 @@ class SubscriptionsTest extends FeatureTestCase
         $user->updateDefaultPaymentMethod('pm_card_threeDSecure2Required');
 
         try {
-            // Attempt to swap and pay with a faulty card.
+            // Attempt to swap and pay with a card that requires a next action.
             $subscription = $subscription->swapAndInvoice(static::$premiumPriceId);
 
             $this->fail('Expected exception '.IncompletePayment::class.' was not thrown.');
@@ -403,7 +403,7 @@ class SubscriptionsTest extends FeatureTestCase
 
         $subscription = $user->newSubscription('main', static::$premiumPriceId)->create('pm_card_visa');
 
-        // Set a card that requires a next action as the customer's default payment method.
+        // Set a faulty card as the customer's default payment method.
         $user->updateDefaultPaymentMethod('pm_card_chargeCustomerFail');
 
         // Attempt to swap and pay with a faulty card.
@@ -425,7 +425,7 @@ class SubscriptionsTest extends FeatureTestCase
         // Set a card that requires a next action as the customer's default payment method.
         $user->updateDefaultPaymentMethod('pm_card_threeDSecure2Required');
 
-        // Attempt to swap and pay with a faulty card.
+        // Attempt to swap and pay with a card that requires a next action.
         $subscription = $subscription->swap(static::$priceId);
 
         // Assert that the price was swapped anyway.
@@ -746,7 +746,7 @@ class SubscriptionsTest extends FeatureTestCase
         $subscription->extendTrial($trialEndsAt = now()->addDays()->floor());
 
         $this->assertTrue($trialEndsAt->equalTo($subscription->trial_ends_at));
-        $this->assertEquals($subscription->asStripeSubscription()->trial_end, $trialEndsAt->getTimestamp());
+        $this->assertEquals($trialEndsAt->getTimestamp(), $subscription->asStripeSubscription()->trial_end);
     }
 
     public function test_trials_can_be_ended()
@@ -905,7 +905,7 @@ class SubscriptionsTest extends FeatureTestCase
     /** @link https://github.com/laravel/cashier-stripe/issues/1041 */
     public function test_new_subscription_after_previous_cancellation_means_customer_is_subscribed()
     {
-        $user = $this->createCustomer('subscriptions_with_options_can_be_created');
+        $user = $this->createCustomer('new_subscription_after_previous_cancellation_means_customer_is_subscribed');
 
         $subscription = $user->subscriptions()->create([
             'type' => 'default',
@@ -922,8 +922,6 @@ class SubscriptionsTest extends FeatureTestCase
         $subscription->markAsCanceled();
 
         $this->assertFalse($user->refresh()->subscribed());
-
-        $subscription->markAsCanceled();
 
         $user->subscriptions()->create([
             'type' => 'default',
@@ -951,9 +949,9 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertSame($endsAt->timestamp, $subscription->asStripeSubscription()->cancel_at);
     }
 
-    public function test_upcoming_invoice()
+    public function test_preview_invoice()
     {
-        $user = $this->createCustomer('subscription_upcoming_invoice');
+        $user = $this->createCustomer('subscription_preview_invoice');
         $subscription = $user->newSubscription('main', static::$priceId)
             ->create('pm_card_visa');
 
@@ -980,7 +978,7 @@ class SubscriptionsTest extends FeatureTestCase
 
     public function test_updating_single_price_subscription_quantity_updates_the_quantity_of_the_subscription_item()
     {
-        $user = $this->createCustomer('invoice_subscription_directly');
+        $user = $this->createCustomer('updating_single_price_subscription_quantity');
 
         $subscription = $user->newSubscription('main', static::$priceId)
             ->create('pm_card_visa');

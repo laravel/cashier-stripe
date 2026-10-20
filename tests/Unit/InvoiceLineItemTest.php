@@ -259,7 +259,7 @@ class InvoiceLineItemTest extends TestCase
     }
 
     /**
-     * Get a test exclusive Tax Rate.
+     * Get a test Tax Rate.
      *
      * @param  float  $percentage
      * @param  bool  $inclusive

@@ -15,7 +15,6 @@ use Stripe\HttpClient\CurlClient as StripeCurlClient;
 use Stripe\StripeClient;
 
 #[RequiresEnv('STRIPE_SECRET')]
-#[WithMigration]
 abstract class FeatureTestCase extends TestCase
 {
     use RefreshDatabase;

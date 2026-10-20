@@ -42,6 +42,7 @@ class CheckoutTest extends FeatureTestCase
         ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
+        $this->assertNotNull($checkout->url);
     }
 
     public function test_customers_can_start_a_product_checkout_session_with_a_coupon_applied()
@@ -70,6 +71,7 @@ class CheckoutTest extends FeatureTestCase
             ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
+        $this->assertNotNull($checkout->url);
     }
 
     public function test_customers_can_start_a_one_off_charge_checkout_session()
@@ -82,6 +84,7 @@ class CheckoutTest extends FeatureTestCase
         ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
+        $this->assertNotNull($checkout->url);
     }
 
     public function test_customers_can_start_a_subscription_checkout_session()
@@ -154,6 +157,7 @@ class CheckoutTest extends FeatureTestCase
         ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
+        $this->assertNotNull($checkout->url);
     }
 
     public function test_customers_can_start_an_embedded_product_checkout_session()
@@ -176,11 +180,12 @@ class CheckoutTest extends FeatureTestCase
         ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
+        $this->assertNotNull($checkout->client_secret);
     }
 
     public function test_customers_can_start_an_embedded_product_checkout_session_without_a_redirect()
     {
-        $user = $this->createCustomer('customers_can_start_an_embedded_product_checkout_session');
+        $user = $this->createCustomer('customers_can_start_an_embedded_product_checkout_session_without_a_redirect');
 
         $shirtPrice = self::stripe()->prices->create([
             'currency' => 'USD',
@@ -198,6 +203,7 @@ class CheckoutTest extends FeatureTestCase
         ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
+        $this->assertSame('never', $checkout->redirect_on_completion);
     }
 
     public function test_customers_can_start_a_custom_product_checkout_session()
@@ -220,6 +226,7 @@ class CheckoutTest extends FeatureTestCase
         ]);
 
         $this->assertInstanceOf(Checkout::class, $checkout);
+        $this->assertNotNull($checkout->client_secret);
     }
 
     public function test_checkout_prevents_address_lock_when_tax_collection_enabled()

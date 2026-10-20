@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class SubscriptionBuilderTest extends TestCase
 {
-    public function test_it_can_be_instantiated()
+    public function test_it_normalizes_the_given_prices()
     {
         $builder = new SubscriptionBuilder(new User, 'default', [
             'price_foo',
