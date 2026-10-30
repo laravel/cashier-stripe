@@ -5,11 +5,9 @@ namespace Laravel\Cashier\Concerns;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Laravel\Cashier\Cashier;
-use Laravel\Cashier\Coupon;
 use Laravel\Cashier\CustomerBalanceTransaction;
 use Laravel\Cashier\Discount;
 use Laravel\Cashier\Exceptions\CustomerAlreadyCreated;
-use Laravel\Cashier\Exceptions\InvalidCoupon;
 use Laravel\Cashier\Exceptions\InvalidCustomer;
 use Laravel\Cashier\PromotionCode;
 use Laravel\Cashier\Subscription;
@@ -321,15 +319,10 @@ trait ManagesCustomer
      * @param  string  $couponId
      * @param  string|array<int, string>|null  $subscriptionTypes
      * @return void
-     *
-     * @throws \Laravel\Cashier\Exceptions\InvalidCoupon
      */
     public function applyCoupon(string $couponId, string|array|null $subscriptionTypes = null): void
     {
         $this->assertCustomerExists();
-
-        // Validate the coupon to ensure it's not a forever amount_off coupon...
-        $this->validateCouponForCustomerApplication($couponId);
 
         $subscriptions = $this->getTargetSubscriptions($subscriptionTypes);
 
@@ -367,8 +360,6 @@ trait ManagesCustomer
      *
      * @param  string  $couponId
      * @return void
-     *
-     * @throws \Laravel\Cashier\Exceptions\InvalidCoupon
      */
     public function applyCouponToAllSubscriptions(string $couponId): void
     {
@@ -411,29 +402,6 @@ trait ManagesCustomer
         $types = is_array($subscriptionTypes) ? $subscriptionTypes : [$subscriptionTypes];
 
         return $this->subscriptions->whereIn('type', $types)->where('stripe_status', 'active');
-    }
-
-    /**
-     * Validate that a coupon can be applied to a customer.
-     *
-     * @param  string  $couponId
-     * @return void
-     *
-     * @throws \Laravel\Cashier\Exceptions\InvalidCoupon
-     * @throws \Stripe\Exception\ApiErrorException
-     */
-    protected function validateCouponForCustomerApplication(string $couponId): void
-    {
-        /** @var \Stripe\Service\CouponService $couponsService */
-        $couponsService = static::stripe()->coupons;
-
-        $stripeCoupon = $couponsService->retrieve($couponId);
-
-        $coupon = new Coupon($stripeCoupon);
-
-        if ($coupon->isForeverAmountOff()) {
-            throw InvalidCoupon::foreverAmountOffCouponNotAllowed($couponId);
-        }
     }
 
     /**
