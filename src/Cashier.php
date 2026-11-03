@@ -96,7 +96,7 @@ class Cashier
      * Get the customer instance by its Stripe ID.
      *
      * @param  \Stripe\Customer|string|null  $stripeId
-     * @return \Laravel\Cashier\Billable|null
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
     public static function findBillable(StripeCustomer|string|null $stripeId)
     {

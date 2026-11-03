@@ -16,7 +16,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     /**
      * The related customer instance.
      *
-     * @var \Laravel\Cashier\Billable
+     * @var \Illuminate\Database\Eloquent\Model|null
      */
     protected $customer;
 
@@ -174,7 +174,7 @@ class Payment implements Arrayable, Jsonable, JsonSerializable
     /**
      * Retrieve the related customer for the payment intent if one exists.
      *
-     * @return \Laravel\Cashier\Billable|null
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function customer()
     {

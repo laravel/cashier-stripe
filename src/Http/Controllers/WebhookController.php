@@ -353,7 +353,7 @@ class WebhookController extends Controller
      * Get the customer instance by Stripe ID.
      *
      * @param  string|null  $stripeId
-     * @return \Laravel\Cashier\Billable|null
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
     protected function getUserByStripeId($stripeId)
     {
