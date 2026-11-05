@@ -181,6 +181,33 @@ class DiscountTest extends FeatureTestCase
         $this->assertEquals(static::$promotionCodeCode, $subscription->discount()->promotionCode()->code);
     }
 
+    public function test_forever_amount_off_coupons_can_be_applied()
+    {
+        $foreverCouponId = self::stripe()->coupons->create([
+            'duration' => 'forever',
+            'amount_off' => 500,
+            'currency' => 'USD',
+        ])->id;
+
+        $user = $this->createCustomer('forever_amount_off_coupons_can_be_applied');
+
+        $subscription = $user->newSubscription('main', static::$priceId)
+            ->withCoupon($foreverCouponId)
+            ->create('pm_card_visa');
+
+        $this->assertEquals($foreverCouponId, $subscription->discount()->coupon()->id);
+
+        $subscription->applyCoupon(static::$couponId);
+        $subscription->applyCoupon($foreverCouponId);
+
+        $this->assertEquals($foreverCouponId, $subscription->discount()->coupon()->id);
+
+        $user->applyCoupon(static::$couponId);
+        $user->applyCoupon($foreverCouponId);
+
+        $this->assertEquals($foreverCouponId, $user->discount()->coupon()->id);
+    }
+
     public function test_customers_can_retrieve_a_promotion_code()
     {
         $user = $this->createCustomer('customers_can_retrieve_a_promotion_code');
