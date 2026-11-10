@@ -1,6 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v16.9.0...16.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v16.10.0...16.x)
 
 ## [v15.7.1](https://github.com/laravel/cashier/compare/v15.7.0...v15.7.1) - 2025-07-22
 
@@ -9,6 +9,18 @@
 ## [v15.7.0](https://github.com/laravel/cashier/compare/v15.6.4...v15.7.0) - 2025-06-10
 
 * [15.x] feat: allowing dompdf 3.0 by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/cashier-stripe/pull/1763
+
+## [v16.10.0](https://github.com/laravel/cashier/compare/v16.9.0...v16.10.0) - 2026-11-10
+
+* Remove security policy in favor of the org-wide default by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/cashier-stripe/pull/1881
+* [16.x] Fix `balanceType()` always returning null by [@imsvidskiy](https://github.com/imsvidskiy) in https://github.com/laravel/cashier-stripe/pull/1880
+* [16.x] Fix payment confirmation email not being sent since API basil by [@imsvidskiy](https://github.com/imsvidskiy) in https://github.com/laravel/cashier-stripe/pull/1879
+* Bump shivammathur/setup-php from 2.37.2 to 2.40.0 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/cashier-stripe/pull/1882
+* [16.x] Fix tests that can't fail by [@imsvidskiy](https://github.com/imsvidskiy) in https://github.com/laravel/cashier-stripe/pull/1883
+* [16.x] Clean up test names, labels and dead code by [@imsvidskiy](https://github.com/imsvidskiy) in https://github.com/laravel/cashier-stripe/pull/1885
+* Type findBillable() results as models instead of the Billable trait by [@odolbeau](https://github.com/odolbeau) in https://github.com/laravel/cashier-stripe/pull/1888
+* Dependency floor bump by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/cashier-stripe/pull/1889
+* [16.x] Allow amount_off coupons with forever duration again by [@ChrisAbner](https://github.com/ChrisAbner) in https://github.com/laravel/cashier-stripe/pull/1886
 
 ## [v16.9.0](https://github.com/laravel/cashier/compare/v16.8.0...v16.9.0) - 2026-10-13
 
