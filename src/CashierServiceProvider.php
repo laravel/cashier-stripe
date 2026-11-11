@@ -134,11 +134,7 @@ class CashierServiceProvider extends ServiceProvider
                 __DIR__.'/../config/cashier.php' => $this->app->configPath('cashier.php'),
             ], 'cashier-config');
 
-            $publishesMigrationsMethod = method_exists($this, 'publishesMigrations')
-                ? 'publishesMigrations'
-                : 'publishes';
-
-            $this->{$publishesMigrationsMethod}([
+            $this->publishesMigrations([
                 __DIR__.'/../database/migrations' => $this->app->databasePath('migrations'),
             ], 'cashier-migrations');
 
