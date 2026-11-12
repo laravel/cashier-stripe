@@ -33,6 +33,18 @@ class VerifyRedirectUrlTest extends TestCase
         });
     }
 
+    public function test_it_fails_on_non_http_scheme()
+    {
+        $request = Request::create('http://foo.com/stripe/payment', 'GET', ['redirect' => 'ftp://foo.com/bar']);
+        $middleware = new VerifyRedirectUrl;
+
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $middleware->handle($request, function () {
+            //
+        });
+    }
+
     public function test_it_passes_for_relative_urls()
     {
         $request = Request::create('http://baz.com/stripe/payment', 'GET', ['redirect' => '/foo/bar']);
