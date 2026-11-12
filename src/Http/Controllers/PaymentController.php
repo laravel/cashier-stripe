@@ -43,12 +43,14 @@ class PaymentController extends Controller
 
         $paymentIntent['payment_method'] = Arr::only($paymentIntent['payment_method'] ?? [], 'id');
 
+        $paymentMethod = request('source_type', optional($payment->payment_method)->type);
+
         return view('cashier::payment', [
             'stripeKey' => config('cashier.key'),
             'amount' => $payment->amount(),
             'payment' => $payment,
             'paymentIntent' => array_filter($paymentIntent),
-            'paymentMethod' => (string) request('source_type', optional($payment->payment_method)->type),
+            'paymentMethod' => in_array($paymentMethod, $paymentIntent['payment_method_types'] ?? [], true) ? $paymentMethod : null,
             'errorMessage' => request('redirect_status') === 'failed'
                 ? 'Something went wrong when trying to confirm the payment. Please try again.'
                 : '',

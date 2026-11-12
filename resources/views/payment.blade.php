@@ -183,7 +183,7 @@
     </div>
 
     <script>
-        window.stripe = Stripe('{{ $stripeKey }}');
+        window.stripe = Stripe(@js($stripeKey));
 
         new Vue({
             el: '#app',
@@ -192,12 +192,12 @@
                 return {
                     paymentIntent: @json($paymentIntent),
                     paymentMethod: null,
-                    name: '{{ optional($customer)->stripeName() }}',
-                    email: '{{ optional($customer)->stripeEmail() }}',
+                    name: @js((string) optional($customer)->stripeName()),
+                    email: @js((string) optional($customer)->stripeEmail()),
                     paymentElement: null,
                     remember: false,
                     isPaymentProcessing: false,
-                    errorMessage: '{{ $errorMessage }}'
+                    errorMessage: @js($errorMessage)
                 }
             },
 
@@ -241,7 +241,7 @@
                     // update it to either the current one or the first available one...
                     if (this.paymentMethod === null || ! paymentMethodTypes.includes(this.paymentMethod.type)) {
                         const type = this.paymentMethod === null
-                            ? ('{{ $paymentMethod }}' ? '{{ $paymentMethod }}' : paymentMethodTypes[0])
+                            ? (@js($paymentMethod) || paymentMethodTypes[0])
                             : (((this.paymentIntent || {}).payment_method || {}).type ?? paymentMethodTypes[0]);
 
                         this.paymentMethod = this.paymentMethods.filter(
@@ -295,7 +295,7 @@
                     // Set a return url to redirect the user back to the payment
                     // page after handling the off session payment confirmation.
                     if (this.paymentMethod.redirects) {
-                        data.return_url = '{{ route('cashier.payment', $paymentIntent['id']).'?redirect='.$redirect }}';
+                        data.return_url = @js(route('cashier.payment', ['id' => $paymentIntent['id'], 'redirect' => $redirect]));
                     }
 
                     if (this.paymentMethod.type === 'card') {

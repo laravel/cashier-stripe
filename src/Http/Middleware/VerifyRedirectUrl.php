@@ -24,6 +24,10 @@ class VerifyRedirectUrl
 
         $url = parse_url($redirect);
 
+        if (isset($url['scheme']) && ! in_array(strtolower($url['scheme']), ['http', 'https'], true)) {
+            throw new AccessDeniedHttpException('Redirect scheme not allowed.');
+        }
+
         if (isset($url['host']) && $url['host'] !== $request->getHost()) {
             throw new AccessDeniedHttpException('Redirect host mismatch.');
         }
