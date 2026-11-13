@@ -1065,15 +1065,16 @@ class Subscription extends Model
     /**
      * Cancel the subscription at the end of the billing period.
      *
+     * @param  array  $options
      * @return $this
      *
      * @throws \Stripe\Exception\ApiErrorException
      */
-    public function cancel()
+    public function cancel(array $options = [])
     {
-        $stripeSubscription = $this->updateStripeSubscription([
+        $stripeSubscription = $this->updateStripeSubscription(array_merge($options, [
             'cancel_at_period_end' => true,
-        ]);
+        ]));
 
         $this->stripe_status = $stripeSubscription->status;
 
@@ -1095,20 +1096,21 @@ class Subscription extends Model
      * Cancel the subscription at a specific moment in time.
      *
      * @param  \DateTimeInterface|int  $endsAt
+     * @param  array  $options
      * @return $this
      *
      * @throws \Stripe\Exception\ApiErrorException
      */
-    public function cancelAt(DateTimeInterface|int $endsAt)
+    public function cancelAt(DateTimeInterface|int $endsAt, array $options = [])
     {
         if ($endsAt instanceof DateTimeInterface) {
             $endsAt = $endsAt->getTimestamp();
         }
 
-        $stripeSubscription = $this->updateStripeSubscription([
+        $stripeSubscription = $this->updateStripeSubscription(array_merge($options, [
             'cancel_at' => $endsAt,
             'proration_behavior' => $this->prorateBehavior(),
-        ]);
+        ]));
 
         $this->stripe_status = $stripeSubscription->status;
 
@@ -1122,15 +1124,16 @@ class Subscription extends Model
     /**
      * Cancel the subscription immediately without invoicing.
      *
+     * @param  array  $options
      * @return $this
      *
      * @throws \Stripe\Exception\ApiErrorException
      */
-    public function cancelNow()
+    public function cancelNow(array $options = [])
     {
-        $this->owner->stripe()->subscriptions->cancel($this->stripe_id, [
+        $this->owner->stripe()->subscriptions->cancel($this->stripe_id, array_merge($options, [
             'prorate' => $this->prorateBehavior() === 'create_prorations',
-        ]);
+        ]));
 
         $this->markAsCanceled();
 
@@ -1140,16 +1143,17 @@ class Subscription extends Model
     /**
      * Cancel the subscription immediately and invoice.
      *
+     * @param  array  $options
      * @return $this
      *
      * @throws \Stripe\Exception\ApiErrorException
      */
-    public function cancelNowAndInvoice()
+    public function cancelNowAndInvoice(array $options = [])
     {
-        $this->owner->stripe()->subscriptions->cancel($this->stripe_id, [
+        $this->owner->stripe()->subscriptions->cancel($this->stripe_id, array_merge($options, [
             'invoice_now' => true,
             'prorate' => $this->prorateBehavior() === 'create_prorations',
-        ]);
+        ]));
 
         $this->markAsCanceled();
 

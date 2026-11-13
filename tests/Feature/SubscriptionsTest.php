@@ -949,6 +949,66 @@ class SubscriptionsTest extends FeatureTestCase
         $this->assertSame($endsAt->timestamp, $subscription->asStripeSubscription()->cancel_at);
     }
 
+    public function test_subscriptions_can_be_canceled_with_cancellation_details()
+    {
+        $user = $this->createCustomer('subscriptions_can_be_canceled_with_cancellation_details');
+
+        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+
+        $subscription = $subscription->cancel([
+            'cancellation_details' => [
+                'comment' => 'Switching to an annual plan.',
+                'feedback' => 'too_expensive',
+            ],
+        ]);
+
+        $this->assertTrue($subscription->onGracePeriod());
+
+        $stripeSubscription = $subscription->asStripeSubscription();
+
+        $this->assertTrue($stripeSubscription->cancel_at_period_end);
+        $this->assertSame('Switching to an annual plan.', $stripeSubscription->cancellation_details->comment);
+        $this->assertSame('too_expensive', $stripeSubscription->cancellation_details->feedback);
+    }
+
+    public function test_subscriptions_can_be_canceled_at_a_specific_time_with_cancellation_details()
+    {
+        $user = $this->createCustomer('subscriptions_can_be_canceled_at_a_specific_time_with_cancellation_details');
+
+        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+
+        $subscription = $subscription->cancelAt($endsAt = now()->addMonths(3), [
+            'cancellation_details' => ['feedback' => 'switched_service'],
+        ]);
+
+        $stripeSubscription = $subscription->asStripeSubscription();
+
+        $this->assertSame($endsAt->timestamp, $stripeSubscription->cancel_at);
+        $this->assertSame('switched_service', $stripeSubscription->cancellation_details->feedback);
+    }
+
+    public function test_subscriptions_can_be_canceled_immediately_with_cancellation_details()
+    {
+        $user = $this->createCustomer('subscriptions_can_be_canceled_immediately_with_cancellation_details');
+
+        $subscription = $user->newSubscription('main', static::$priceId)->create('pm_card_visa');
+
+        $subscription = $subscription->cancelNow([
+            'cancellation_details' => [
+                'comment' => 'No longer needed.',
+                'feedback' => 'unused',
+            ],
+        ]);
+
+        $this->assertTrue($subscription->ended());
+
+        $stripeSubscription = $subscription->asStripeSubscription();
+
+        $this->assertSame(StripeSubscription::STATUS_CANCELED, $stripeSubscription->status);
+        $this->assertSame('No longer needed.', $stripeSubscription->cancellation_details->comment);
+        $this->assertSame('unused', $stripeSubscription->cancellation_details->feedback);
+    }
+
     public function test_preview_invoice()
     {
         $user = $this->createCustomer('subscription_preview_invoice');
