@@ -1,6 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v16.10.0...16.x)
+## [Unreleased](https://github.com/laravel/cashier/compare/v16.11.0...16.x)
 
 ## [v15.7.1](https://github.com/laravel/cashier/compare/v15.7.0...v15.7.1) - 2025-07-22
 
@@ -9,6 +9,20 @@
 ## [v15.7.0](https://github.com/laravel/cashier/compare/v15.6.4...v15.7.0) - 2025-06-10
 
 * [15.x] feat: allowing dompdf 3.0 by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/cashier-stripe/pull/1763
+
+## [v16.11.0](https://github.com/laravel/cashier/compare/v16.10.0...v16.11.0) - 2026-11-17
+
+### What's Changed
+
+* Dependency floor bump by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/cashier-stripe/pull/1890
+* Tighten payment page input handling by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/cashier-stripe/pull/1891
+* [16.x] Allow passing options when canceling subscriptions by [@officialasishkumar](https://github.com/officialasishkumar) in https://github.com/laravel/cashier-stripe/pull/1892
+
+### New Contributors
+
+* [@officialasishkumar](https://github.com/officialasishkumar) made their first contribution in https://github.com/laravel/cashier-stripe/pull/1892
+
+**Full Changelog**: https://github.com/laravel/cashier-stripe/compare/v16.10.0...v16.11.0
 
 ## [v16.10.0](https://github.com/laravel/cashier/compare/v16.9.0...v16.10.0) - 2026-11-10
 
