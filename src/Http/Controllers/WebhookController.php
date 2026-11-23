@@ -2,6 +2,7 @@
 
 namespace Laravel\Cashier\Http\Controllers;
 
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Routing\Controller;
@@ -70,36 +71,34 @@ class WebhookController extends Controller
         if ($user) {
             $data = $payload['data']['object'];
 
-            if (! $user->subscriptions->contains('stripe_id', $data['id'])) {
-                if (isset($data['trial_end'])) {
-                    $trialEndsAt = Carbon::createFromTimestamp($data['trial_end']);
-                } else {
-                    $trialEndsAt = null;
-                }
+            if (isset($data['trial_end'])) {
+                $trialEndsAt = Carbon::createFromTimestamp($data['trial_end']);
+            } else {
+                $trialEndsAt = null;
+            }
 
-                $firstItem = $data['items']['data'][0];
-                $isSinglePrice = count($data['items']['data']) === 1;
+            $firstItem = $data['items']['data'][0];
+            $isSinglePrice = count($data['items']['data']) === 1;
 
-                $subscription = $user->subscriptions()->updateOrCreate([
-                    'stripe_id' => $data['id'],
-                ], [
-                    'type' => $data['metadata']['type'] ?? $data['metadata']['name'] ?? $this->newSubscriptionType($payload),
-                    'stripe_status' => $data['status'],
-                    'stripe_price' => $isSinglePrice ? $firstItem['price']['id'] : null,
-                    'quantity' => $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null,
-                    'trial_ends_at' => $trialEndsAt,
-                    'ends_at' => null,
+            // Prefer a DB lookup over the in-memory collection — concurrent webhooks
+            // may have inserted the row after the relation was loaded.
+            $existing = $user->subscriptions()->where('stripe_id', $data['id'])->first();
+
+            $subscription = $this->updateOrCreateSubscription($user, $data['id'], [
+                'type' => $existing?->type ?? $data['metadata']['type'] ?? $data['metadata']['name'] ?? $this->newSubscriptionType($payload),
+                'stripe_status' => $data['status'],
+                'stripe_price' => $isSinglePrice ? $firstItem['price']['id'] : null,
+                'quantity' => $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null,
+                'trial_ends_at' => $trialEndsAt,
+                'ends_at' => null,
+            ]);
+
+            foreach ($data['items']['data'] as $item) {
+                $this->updateOrCreateSubscriptionItem($subscription, $item['id'], [
+                    'stripe_product' => $item['price']['product'],
+                    'stripe_price' => $item['price']['id'],
+                    'quantity' => $item['quantity'] ?? null,
                 ]);
-
-                foreach ($data['items']['data'] as $item) {
-                    $subscription->items()->updateOrCreate([
-                        'stripe_id' => $item['id'],
-                    ], [
-                        'stripe_product' => $item['price']['product'],
-                        'stripe_price' => $item['price']['id'],
-                        'quantity' => $item['quantity'] ?? null,
-                    ]);
-                }
             }
 
             // Terminate the billable's generic trial if it exists...
@@ -146,47 +145,58 @@ class WebhookController extends Controller
                 return null;
             }
 
-            $subscription->type = $subscription->type ?? $data['metadata']['type'] ?? $data['metadata']['name'] ?? $this->newSubscriptionType($payload);
+            $applyStripePayload = function (Subscription $subscription) use ($data, $payload): void {
+                $subscription->type = $subscription->type ?? $data['metadata']['type'] ?? $data['metadata']['name'] ?? $this->newSubscriptionType($payload);
 
-            $firstItem = $data['items']['data'][0];
-            $isSinglePrice = count($data['items']['data']) === 1;
+                $firstItem = $data['items']['data'][0];
+                $isSinglePrice = count($data['items']['data']) === 1;
 
-            // Price...
-            $subscription->stripe_price = $isSinglePrice ? $firstItem['price']['id'] : null;
+                // Price...
+                $subscription->stripe_price = $isSinglePrice ? $firstItem['price']['id'] : null;
 
-            // Quantity...
-            $subscription->quantity = $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null;
+                // Quantity...
+                $subscription->quantity = $isSinglePrice && isset($firstItem['quantity']) ? $firstItem['quantity'] : null;
 
-            // Trial ending date...
-            if (array_key_exists('trial_end', $data)) {
-                if ($data['trial_end']) {
-                    $trialEnd = Carbon::createFromTimestamp($data['trial_end']);
+                // Trial ending date...
+                if (array_key_exists('trial_end', $data)) {
+                    if ($data['trial_end']) {
+                        $trialEnd = Carbon::createFromTimestamp($data['trial_end']);
 
-                    if (! $subscription->trial_ends_at || $subscription->trial_ends_at->ne($trialEnd)) {
-                        $subscription->trial_ends_at = $trialEnd;
+                        if (! $subscription->trial_ends_at || $subscription->trial_ends_at->ne($trialEnd)) {
+                            $subscription->trial_ends_at = $trialEnd;
+                        }
+                    } else {
+                        $subscription->trial_ends_at = null;
                     }
-                } else {
-                    $subscription->trial_ends_at = null;
                 }
-            }
 
-            // Cancellation date...
-            if ($data['cancel_at_period_end'] ?? false) {
-                $subscription->ends_at = $subscription->onTrial()
-                    ? $subscription->trial_ends_at
-                    : $subscription->currentPeriodEnd();
-            } elseif (isset($data['cancel_at']) || isset($data['canceled_at'])) {
-                $subscription->ends_at = Carbon::createFromTimestamp($data['cancel_at'] ?? $data['canceled_at']);
-            } else {
-                $subscription->ends_at = null;
-            }
+                // Cancellation date...
+                if ($data['cancel_at_period_end'] ?? false) {
+                    $subscription->ends_at = $subscription->onTrial()
+                        ? $subscription->trial_ends_at
+                        : $subscription->currentPeriodEnd();
+                } elseif (isset($data['cancel_at']) || isset($data['canceled_at'])) {
+                    $subscription->ends_at = Carbon::createFromTimestamp($data['cancel_at'] ?? $data['canceled_at']);
+                } else {
+                    $subscription->ends_at = null;
+                }
 
-            // Status...
-            if (isset($data['status'])) {
-                $subscription->stripe_status = $data['status'];
-            }
+                // Status...
+                if (isset($data['status'])) {
+                    $subscription->stripe_status = $data['status'];
+                }
+            };
 
-            $subscription->save();
+            $applyStripePayload($subscription);
+
+            try {
+                $subscription->save();
+            } catch (UniqueConstraintViolationException) {
+                // Concurrent customer.subscription.created inserted the same stripe_id.
+                $subscription = $user->subscriptions()->where('stripe_id', $data['id'])->firstOrFail();
+                $applyStripePayload($subscription);
+                $subscription->save();
+            }
 
             // Update subscription items...
             if (isset($data['items'])) {
@@ -195,9 +205,7 @@ class WebhookController extends Controller
                 foreach ($data['items']['data'] as $item) {
                     $subscriptionItemIds[] = $item['id'];
 
-                    $subscription->items()->updateOrCreate([
-                        'stripe_id' => $item['id'],
-                    ], [
+                    $this->updateOrCreateSubscriptionItem($subscription, $item['id'], [
                         'stripe_product' => $item['price']['product'],
                         'stripe_price' => $item['price']['id'],
                         'quantity' => $item['quantity'] ?? null,
@@ -210,6 +218,52 @@ class WebhookController extends Controller
         }
 
         return $this->successMethod();
+    }
+
+    /**
+     * Update or create a subscription, tolerating concurrent webhook inserts.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $user
+     * @param  string  $stripeId
+     * @param  array  $attributes
+     * @return \Laravel\Cashier\Subscription
+     */
+    protected function updateOrCreateSubscription($user, string $stripeId, array $attributes): Subscription
+    {
+        try {
+            return $user->subscriptions()->updateOrCreate([
+                'stripe_id' => $stripeId,
+            ], $attributes);
+        } catch (UniqueConstraintViolationException) {
+            $subscription = $user->subscriptions()->where('stripe_id', $stripeId)->firstOrFail();
+
+            $subscription->fill($attributes)->save();
+
+            return $subscription;
+        }
+    }
+
+    /**
+     * Update or create a subscription item, tolerating concurrent webhook inserts.
+     *
+     * @param  \Laravel\Cashier\Subscription  $subscription
+     * @param  string  $stripeId
+     * @param  array  $attributes
+     * @return \Laravel\Cashier\SubscriptionItem
+     */
+    protected function updateOrCreateSubscriptionItem(Subscription $subscription, string $stripeId, array $attributes)
+    {
+        try {
+            return $subscription->items()->updateOrCreate([
+                'stripe_id' => $stripeId,
+            ], $attributes);
+        } catch (UniqueConstraintViolationException) {
+            $item = $subscription->items()->where('stripe_id', $stripeId)->firstOrFail();
+
+            $item->fill($attributes)->save();
+
+            return $item;
+        }
     }
 
     /**
