@@ -1324,7 +1324,7 @@ class Subscription extends Model
      */
     public function upcomingInvoice(array $options = []): ?Invoice
     {
-        if ($this->canceled()) {
+        if ($this->ended()) {
             return null;
         }
 
