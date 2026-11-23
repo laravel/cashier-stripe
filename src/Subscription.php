@@ -102,7 +102,7 @@ class Subscription extends Model
      */
     public function items(): HasMany
     {
-        return $this->hasMany(Cashier::$subscriptionItemModel);
+        return $this->hasMany(Cashier::$subscriptionItemModel)->chaperone();
     }
 
     /**
@@ -1227,7 +1227,7 @@ class Subscription extends Model
      */
     public function currentPeriodStart(DateTimeZone|string|int|null $timezone = null): ?CarbonInterface
     {
-        $items = $this->items;
+        $items = $this->itemsForStripePeriodLookup();
 
         if ($items->isEmpty()) {
             return null;
@@ -1256,7 +1256,7 @@ class Subscription extends Model
      */
     public function currentPeriodEnd(DateTimeZone|string|int|null $timezone = null): ?CarbonInterface
     {
-        $items = $this->items;
+        $items = $this->itemsForStripePeriodLookup();
 
         if ($items->isEmpty()) {
             return null;
@@ -1273,6 +1273,30 @@ class Subscription extends Model
         }
 
         return $latestEnd ? ($timezone ? $latestEnd->setTimezone($timezone) : $latestEnd) : null;
+    }
+
+    /**
+     * Get subscription items prepared for Stripe period lookups.
+     *
+     * Ensures the inverse subscription relation and owner are available so
+     * SubscriptionItem::asStripeSubscriptionItem() does not lazy-load when
+     * Model::preventLazyLoading() is enabled.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<\Laravel\Cashier\SubscriptionItem>
+     */
+    protected function itemsForStripePeriodLookup()
+    {
+        $this->loadMissing('owner');
+
+        $items = $this->items;
+
+        foreach ($items as $item) {
+            if (! $item->relationLoaded('subscription')) {
+                $item->setRelation('subscription', $this);
+            }
+        }
+
+        return $items;
     }
 
     /**
